@@ -2,7 +2,7 @@ package io.synlabs.atcc.service;
 
 import io.synlabs.atcc.entity.AtccUser;
 import io.synlabs.atcc.entity.CurrentUser;
-import io.synlabs.atcc.view.SortRequest;
+import io.synlabs.atcc.views.SortRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.CollectionUtils;

@@ -1,4 +1,4 @@
-package io.synlabs.atcc.view;
+package io.synlabs.atcc.views;
 
 import lombok.Getter;
 import lombok.Setter;

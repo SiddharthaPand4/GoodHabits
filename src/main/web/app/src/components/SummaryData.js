@@ -17,13 +17,10 @@ export default class SummaryDataList extends Component {
             pages: 0
         };
 
-        this.makeChartData = this.makeChartData.bind(this)
-        this.getSummaryData = this.getSummaryData.bind(this)
+        this.makeChartData = this.makeChartData.bind(this);
+        this.getSummaryData = this.getSummaryData.bind(this);
     }
 
-    componentDidMount() {
-
-    }
 
     getSummaryData(page, pageSize, sorted, filtered, handleRetrievedData) {
 
@@ -128,7 +125,7 @@ export default class SummaryDataList extends Component {
                         onFetchData={(state, instance) => {
                             this.setState({loading: true});
                             this.getSummaryData(state.page, state.pageSize, state.sorted, state.filtered, (res) => {
-                                console.log(res);
+
                                 this.setState({
                                     data: res.data,
                                     pages: Math.ceil(res.totalElements / parseFloat(state.pageSize)),

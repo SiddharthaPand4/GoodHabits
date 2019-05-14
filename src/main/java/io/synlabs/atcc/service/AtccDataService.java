@@ -17,11 +17,10 @@ import org.simpleflatmapper.map.property.ConverterProperty;
 import org.simpleflatmapper.map.property.DateFormatProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.synlabs.atcc.view.AtccRawDataResponse;
-import io.synlabs.atcc.view.AtccSummaryDataResponse;
-import io.synlabs.atcc.view.ResponseWrapper;
-import io.synlabs.atcc.view.SearchRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.synlabs.atcc.views.AtccRawDataResponse;
+import io.synlabs.atcc.views.AtccSummaryDataResponse;
+import io.synlabs.atcc.views.ResponseWrapper;
+import io.synlabs.atcc.views.SearchRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -72,18 +71,23 @@ public class AtccDataService extends BaseService {
         this.statusRepository = statusRepository;
     }
 
-    public List<AtccRawDataResponse> listRawData() {
-        List<AtccRawData> atccRawData = rawDataRepository.findAll();
-        return atccRawData.stream().map(AtccRawDataResponse::new).collect(Collectors.toList());
+    public ResponseWrapper<AtccRawDataResponse> listRawData(SearchRequest searchRequest) {
+        Page<AtccRawData> page = rawDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? Sort.Direction.DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(), "id"))));
+        List<AtccRawDataResponse> collect = page.get().map(AtccRawDataResponse::new).collect(Collectors.toList());
+        ResponseWrapper<AtccRawDataResponse> wrapper = new ResponseWrapper<>();
+        wrapper.setData(collect);
+        wrapper.setCurrPage(searchRequest.getPage());
+        wrapper.setTotalElements(page.getTotalElements());
+        return wrapper;
     }
 
     public ResponseWrapper<AtccSummaryDataResponse> listSummaryData(SearchRequest searchRequest) {
-        Page<AtccSummaryData> atccSummaryData = summaryDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? Sort.Direction.DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(),"id"))));
-        List<AtccSummaryDataResponse> collect = atccSummaryData.get().map(AtccSummaryDataResponse::new).collect(Collectors.toList());
+        Page<AtccSummaryData> page = summaryDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? Sort.Direction.DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(), "id"))));
+        List<AtccSummaryDataResponse> collect = page.get().map(AtccSummaryDataResponse::new).collect(Collectors.toList());
         ResponseWrapper<AtccSummaryDataResponse> wrapper = new ResponseWrapper<>();
         wrapper.setData(collect);
         wrapper.setCurrPage(searchRequest.getPage());
-        wrapper.setTotalElements(atccSummaryData.getTotalElements());
+        wrapper.setTotalElements(page.getTotalElements());
         return wrapper;
     }
 
