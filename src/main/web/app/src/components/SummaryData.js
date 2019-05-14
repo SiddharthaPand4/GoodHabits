@@ -1,45 +1,83 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import 'react-table/react-table.css'
 
 import ReactTable from 'react-table'
 import {Row, Col} from "reactstrap";
 import {Bar} from "react-chartjs-2";
+
 export default class SummaryDataList extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            data: null,
+            data: [],
+            chartdata: null,
+            loading: true,
+            pages:0
         };
 
         this.makeChartData = this.makeChartData.bind(this)
+        this.getSummaryData = this.getSummaryData.bind(this)
     }
 
     componentDidMount() {
-        fetch("/api/data/summary")
+
+    }
+
+    getSummaryData(page, pageSize, sorted, filtered, handleRetrievedData) {
+        if(!page) page = 0;
+
+        let url = "/api/data/summary";
+        let postObject = {
+            page: page,
+            pageSize: pageSize,
+            sorted: sorted,
+            filtered: filtered,
+        };
+        this.setState({
+            loading: true
+        });
+        fetch(url,{
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: "PUT",
+            body: JSON.stringify(postObject)
+        })
             .then(response => response.json())
-            .then(data =>
-                this.makeChartData(data)
+            .then(response => {
+                    // this.makeChartData(data);
+                    // this.setState({data: response.data,loading: false});
+                    return handleRetrievedData(response);
+                }
             );
+
     }
 
     makeChartData(data) {
 
-        var chartdata = { datasets:[], labels:[] };
+        let chartdata = {
+            labels: [],
+            datasets: [{
+                label: "Data",
+                data: []
+            }]
+        };
 
-        for (var i=0;i<data.length;i++) {
-            chartdata.datasets.push(data[i].count);
-            chartdata.labels.push(i);
+        for (let i = 0; i < data.length; i++) {
+            chartdata.datasets[0].data.push(data[i].count);
+            chartdata.labels.push(data[i].type);
         }
 
-        this.setState({ data : data, chartdata: chartdata})
+        this.setState({chartdata: chartdata})
     }
 
     render() {
-        const data = this.state.data;
+
         const chartdata = this.state.chartdata;
-        if (!data) return (<div>Loading...</div>);
+        // if (!this.state.data) return (<div>Loading...</div>);
 
         const columns = [{
             Header: 'Span',
@@ -57,23 +95,41 @@ export default class SummaryDataList extends Component {
         return (
 
 
-        <Row>
-            <Col>
-                <ReactTable
-                    defaultPageSize={10}
-                    data={data}
-                    columns={columns}
-                />
-
-            </Col>
-            <Col>
-                <Bar
-                    data={chartdata}
-                    width={100}
-                    height={50}
-                    options={{ maintainAspectRatio: false }}
-                />
-            </Col>
-        </Row>)
+            <Row>
+                <Col>
+                    <ReactTable
+                        defaultPageSize={10}
+                        data={this.state.data}
+                        columns={columns}
+                        pages={this.state.pages}
+                        className="-striped -highlight"
+                        loading={this.state.loading}
+                        showPagination={true}
+                        showPaginationTop={false}
+                        showPaginationBottom={true}
+                        pageSizeOptions={[5, 10, 20, 25, 50, 100]}
+                        manual // this would indicate that server side pagination has been enabled
+                        onFetchData={(state, instance) => {
+                            this.setState({loading: true});
+                            this.getSummaryData(state.page, state.pageSize, state.sorted, state.filtered, (res) => {
+                                console.log(res);
+                                this.setState({
+                                    data: res.data,
+                                    pages: Math.ceil(res.totalElements / parseFloat(state.pageSize)),
+                                    loading: false
+                                })
+                            });
+                        }}
+                    />
+                </Col>
+                <Col>
+                    <br/>
+                    <br/>
+                    <br/>
+                    {/*<Bar*/}
+                        {/*data={chartdata}*/}
+                    {/*/>*/}
+                </Col>
+            </Row>)
     }
 }

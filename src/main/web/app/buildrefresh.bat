@@ -1,3 +1,3 @@
-yarn build
-copy /y build\index.html ..\..\resources\templates\index.ftl
-xcopy /E /Y  build ..\..\resources\public\
+CALL yarn build
+CALL copy /y build\index.html ..\..\resources\templates\index.ftl
+CALL xcopy /E /Y  build ..\..\resources\public\

@@ -3,13 +3,16 @@ package io.synlabs.atcc.controller;
 import io.synlabs.atcc.entity.AtccRawData;
 import io.synlabs.atcc.entity.AtccSummaryData;
 import io.synlabs.atcc.service.AtccDataService;
+import io.synlabs.atcc.view.AtccRawDataResponse;
+import io.synlabs.atcc.view.AtccSummaryDataResponse;
+import io.synlabs.atcc.view.ResponseWrapper;
+import io.synlabs.atcc.view.SearchRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/data")
 public class AtccDataController {
@@ -18,12 +21,13 @@ public class AtccDataController {
     private AtccDataService dataService;
 
     @GetMapping("raw")
-    public List<AtccRawData> findRawData() {
+    public List<AtccRawDataResponse> findRawData() {
         return dataService.listRawData();
     }
 
-    @GetMapping("summary")
-    public List<AtccSummaryData> findSummaryData() {
-        return dataService.listSummaryData();
+    @PutMapping("summary")
+    public ResponseWrapper<AtccSummaryDataResponse> findSummaryData(@RequestBody SearchRequest searchRequest) {
+        System.out.println(searchRequest);
+        return dataService.listSummaryData(searchRequest);
     }
 }
