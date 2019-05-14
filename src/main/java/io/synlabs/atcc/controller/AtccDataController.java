@@ -1,18 +1,19 @@
 package io.synlabs.atcc.controller;
 
-import io.synlabs.atcc.entity.AtccRawData;
-import io.synlabs.atcc.entity.AtccSummaryData;
 import io.synlabs.atcc.service.AtccDataService;
 import io.synlabs.atcc.views.UploadFileResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.synlabs.atcc.views.AtccRawDataResponse;
+import io.synlabs.atcc.views.AtccSummaryDataResponse;
+import io.synlabs.atcc.views.ResponseWrapper;
+import io.synlabs.atcc.views.SearchRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.List;
-
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/data")
 public class AtccDataController {
@@ -22,14 +23,15 @@ public class AtccDataController {
     @Autowired
     private AtccDataService dataService;
 
-    @GetMapping("raw")
-    public List<AtccRawData> findRawData() {
-        return dataService.listRawData();
+    @PutMapping("raw")
+    public ResponseWrapper<AtccRawDataResponse> findRawData(@RequestBody SearchRequest searchRequest) {
+        return dataService.listRawData(searchRequest);
     }
 
-    @GetMapping("summary")
-    public List<AtccSummaryData> findSummaryData() {
-        return dataService.listSummaryData();
+    @PutMapping("summary")
+    public ResponseWrapper<AtccSummaryDataResponse> findSummaryData(@RequestBody SearchRequest searchRequest) {
+
+        return dataService.listSummaryData(searchRequest);
     }
 
     @PostMapping("/import")

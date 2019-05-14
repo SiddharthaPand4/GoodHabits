@@ -1,79 +1,146 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import 'react-table/react-table.css'
 
 import ReactTable from 'react-table'
 import {Row, Col} from "reactstrap";
 import {Bar} from "react-chartjs-2";
+
 export default class SummaryDataList extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            data: null,
+            data: [],
+            chartdata: null,
+            loading: true,
+            pages: 0
         };
 
-        this.makeChartData = this.makeChartData.bind(this)
+        this.makeChartData = this.makeChartData.bind(this);
+        this.getSummaryData = this.getSummaryData.bind(this);
     }
 
-    componentDidMount() {
-        fetch("/api/data/summary")
-            .then(response => response.json())
-            .then(data =>
-                this.makeChartData(data)
+
+    getSummaryData(page, pageSize, sorted, filtered, handleRetrievedData) {
+
+        this.setState({
+            loading: true
+        });
+
+        let requestBody = {
+            page: page,
+            pageSize: pageSize,
+            sorted: sorted,
+            filtered: filtered,
+        };
+
+        fetch("/api/data/summary", {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: "PUT",
+            body: JSON.stringify(requestBody)
+        }).then(response => response.json())
+            .then(response => {
+                    this.makeChartData(response.data);
+                    return handleRetrievedData(response);
+                }
             );
+
     }
 
     makeChartData(data) {
+        let chartdata = {
+            labels: [],
+            datasets: [{
+                label: "Data",
+                data: []
+            }]
+        };
 
-        var chartdata = { datasets:[], labels:[] };
-
-        for (var i=0;i<data.length;i++) {
-            chartdata.datasets.push(data[i].count);
-            chartdata.labels.push(i);
+        for (let i = 0; i < data.length; i++) {
+            chartdata.datasets[0].data.push(data[i].count);
+            chartdata.labels.push(data[i].type);
         }
-
-        this.setState({ data : data, chartdata: chartdata})
+        this.setState({chartdata: chartdata})
     }
 
     render() {
-        const data = this.state.data;
-        const chartdata = this.state.chartdata;
-        if (!data) return (<div>Loading...</div>);
 
+
+
+        const chartdata = this.state.chartdata;
+        const data = this.state.data;
+        const pages = this.state.pages;
+        const loading = this.state.loading;
+        const chartComponent = this.state.loading ? (<div>Loading...</div>) : ( <Bar data={chartdata}/>);
         const columns = [{
+            Header: 'Date',
+            accessor: 'date',
+            id: 'date'
+        }, {
+            Header: 'From',
+            accessor: 'from',
+            id: 'from'
+        }, {
+            Header: 'To',
+            accessor: 'to',
+            id: 'to'
+        }, {
             Header: 'Span',
-            accessor: 'ts'
+            accessor: 'span',
+            id: 'span'
         }, {
             Header: 'Type',
             accessor: 'type',
+            id: 'type',
             Cell: props => <span className='number'>{props.value}</span> // Custom cell components!
         }, {
-            id: 'Count', // Required because our accessor is not a string
             Header: 'Count',
-            accessor: 'count' // Custom value accessors!
-        }];
+            accessor: 'count', // Custom value accessors!
+            id: 'count', // Required because our accessor is not a string
+        }
+        ];
+
+
 
         return (
 
+            <Row>
+                <Col>
+                    <ReactTable
+                        defaultPageSize={10}
+                        data={data}
+                        columns={columns}
+                        pages={pages}
+                        className="-striped -highlight"
+                        loading={loading}
+                        showPagination={true}
+                        showPaginationTop={false}
+                        showPaginationBottom={true}
+                        pageSizeOptions={[5, 10, 20, 25, 50, 100]}
+                        manual // this would indicate that server side pagination has been enabled
+                        onFetchData={(state, instance) => {
+                            this.setState({loading: true});
+                            this.getSummaryData(state.page, state.pageSize, state.sorted, state.filtered, (res) => {
 
-        <Row>
-            <Col>
-                <ReactTable
-                    defaultPageSize={10}
-                    data={data}
-                    columns={columns}
-                />
-
-            </Col>
-            <Col>
-                <Bar
-                    data={chartdata}
-                    width={100}
-                    height={50}
-                    options={{ maintainAspectRatio: false }}
-                />
-            </Col>
-        </Row>)
+                                this.setState({
+                                    data: res.data,
+                                    pages: Math.ceil(res.totalElements / parseFloat(state.pageSize)),
+                                    loading: false
+                                })
+                            });
+                        }}
+                    />
+                </Col>
+                <Col>
+                    <br/>
+                    <br/>
+                    <br/>
+                    {chartComponent}
+                </Col>
+            </Row>)
     }
 }

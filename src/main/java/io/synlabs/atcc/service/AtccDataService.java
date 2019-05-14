@@ -17,6 +17,13 @@ import org.simpleflatmapper.map.property.ConverterProperty;
 import org.simpleflatmapper.map.property.DateFormatProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.synlabs.atcc.views.AtccRawDataResponse;
+import io.synlabs.atcc.views.AtccSummaryDataResponse;
+import io.synlabs.atcc.views.ResponseWrapper;
+import io.synlabs.atcc.views.SearchRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,9 +37,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-public class AtccDataService {
+public class AtccDataService extends BaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(AtccDataService.class);
 
@@ -63,12 +71,24 @@ public class AtccDataService {
         this.statusRepository = statusRepository;
     }
 
-    public List<AtccRawData> listRawData() {
-        return rawDataRepository.findAll();
+    public ResponseWrapper<AtccRawDataResponse> listRawData(SearchRequest searchRequest) {
+        Page<AtccRawData> page = rawDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? Sort.Direction.DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(), "id"))));
+        List<AtccRawDataResponse> collect = page.get().map(AtccRawDataResponse::new).collect(Collectors.toList());
+        ResponseWrapper<AtccRawDataResponse> wrapper = new ResponseWrapper<>();
+        wrapper.setData(collect);
+        wrapper.setCurrPage(searchRequest.getPage());
+        wrapper.setTotalElements(page.getTotalElements());
+        return wrapper;
     }
 
-    public List<AtccSummaryData> listSummaryData() {
-        return summaryDataRepository.findAll();
+    public ResponseWrapper<AtccSummaryDataResponse> listSummaryData(SearchRequest searchRequest) {
+        Page<AtccSummaryData> page = summaryDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? Sort.Direction.DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(), "id"))));
+        List<AtccSummaryDataResponse> collect = page.get().map(AtccSummaryDataResponse::new).collect(Collectors.toList());
+        ResponseWrapper<AtccSummaryDataResponse> wrapper = new ResponseWrapper<>();
+        wrapper.setData(collect);
+        wrapper.setCurrPage(searchRequest.getPage());
+        wrapper.setTotalElements(page.getTotalElements());
+        return wrapper;
     }
 
     public String importFile(MultipartFile file) {
@@ -108,7 +128,7 @@ public class AtccDataService {
     private void addStatusSpan(List<AtccRawData> datalist, ImportStatus status) {
         if (datalist == null || datalist.isEmpty()) return;
         AtccRawData first = datalist.get(0);
-        AtccRawData last = datalist.get(datalist.size()-1);
+        AtccRawData last = datalist.get(datalist.size() - 1);
         status.setFrom(first.getTime());
         status.setTo(last.getTime());
         status.setDataDate(first.getDate());
