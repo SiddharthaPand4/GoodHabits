@@ -20,6 +20,9 @@ public class ImportStatus extends AbstractPersistable<Long> {
     @Temporal(TemporalType.TIMESTAMP)
     private Date importDate;
 
+    @Temporal(TemporalType.DATE)
+    private Date dataDate;
+
     @Temporal(TemporalType.TIME)
     @Column(name = "data_from")
     private Date from;
@@ -27,4 +30,8 @@ public class ImportStatus extends AbstractPersistable<Long> {
     @Temporal(TemporalType.TIME)
     @Column(name = "data_to")
     private Date to;
+
+    private String status;
+
+    private String error;
 }
