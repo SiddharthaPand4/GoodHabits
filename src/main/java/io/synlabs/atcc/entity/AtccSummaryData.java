@@ -1,12 +1,11 @@
 package io.synlabs.atcc.entity;
 
+import io.synlabs.atcc.enums.TimeSpan;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
-import javax.persistence.Entity;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import java.util.Date;
 
 @Getter
@@ -16,8 +15,19 @@ public class AtccSummaryData extends AbstractPersistable<Long> {
 
     private String type;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date ts;
+    @Temporal(TemporalType.DATE)
+    private Date date;
+
+    @Temporal(TemporalType.TIME)
+    @Column(name = "data_from")
+    private Date from;
+
+    @Temporal(TemporalType.TIME)
+    @Column(name = "data_to")
+    private Date to;
+
+    @Enumerated
+    private TimeSpan span;
 
     private int count;
     

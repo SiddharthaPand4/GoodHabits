@@ -27,18 +27,23 @@ export default class RawDataList extends Component {
 
         const columns = [{
             Header: 'Id',
-            accessor: 'id' // String-based value accessors!
+            accessor: 'id'
         }, {
             Header: 'Type',
             accessor: 'type',
             Cell: props => <span className='number'>{props.value}</span> // Custom cell components!
         }, {
-            id: 'Timestamp', // Required because our accessor is not a string
-            Header: 'Timestamp',
-            accessor: 'ts' // Custom value accessors!
+            Header: 'Date',
+            accessor: 'date'
+        }, {
+            Header: 'Time',
+            accessor: 'time'
         }, {
             Header: 'Lane',
             accessor: 'lane',
+        }, {
+            Header: 'Speed',
+            accessor: 'speed'
         }];
 
 

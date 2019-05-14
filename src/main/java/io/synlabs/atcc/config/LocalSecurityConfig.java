@@ -24,6 +24,7 @@ public class LocalSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                     .antMatchers( "/login_check","/favicon.ico", "/webjars/**" , "/static/**", "/error**", "/manifest.json").permitAll()
                     .antMatchers("/api/public/**").permitAll()
+                    .antMatchers("/api/data/import").permitAll()
                     .anyRequest().authenticated()
                 .and()
                 .formLogin()
