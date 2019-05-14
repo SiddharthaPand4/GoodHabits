@@ -1,23 +1,54 @@
 package io.synlabs.atcc.service;
 
+import io.synlabs.atcc.config.FileStorageProperties;
 import io.synlabs.atcc.entity.AtccRawData;
 import io.synlabs.atcc.entity.AtccSummaryData;
+import io.synlabs.atcc.ex.FileStorageException;
 import io.synlabs.atcc.jpa.AtccRawDataRepository;
 import io.synlabs.atcc.jpa.AtccSummaryDataRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.simpleflatmapper.csv.CsvMapper;
+import org.simpleflatmapper.csv.CsvMapperFactory;
+import org.simpleflatmapper.csv.CsvParser;
+import org.simpleflatmapper.map.property.DateFormatProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
 public class AtccDataService {
 
-    @Autowired
-    private AtccRawDataRepository rawDataRepository;
+    private static final Logger logger = LoggerFactory.getLogger(AtccDataService.class);
 
-    @Autowired
-    private AtccSummaryDataRepository summaryDataRepository;
+    private final AtccRawDataRepository rawDataRepository;
 
+    private final AtccSummaryDataRepository summaryDataRepository;
+
+    private final Path fileStorageLocation;
+
+    public AtccDataService(AtccRawDataRepository rawDataRepository, AtccSummaryDataRepository summaryDataRepository, FileStorageProperties fileStorageProperties) {
+        this.rawDataRepository = rawDataRepository;
+        this.summaryDataRepository = summaryDataRepository;
+
+        this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
+                .toAbsolutePath().normalize();
+
+        try {
+            Files.createDirectories(this.fileStorageLocation);
+        } catch (Exception ex) {
+            throw new FileStorageException("Could not create the directory where the uploaded files will be stored.", ex);
+        }
+    }
 
     public List<AtccRawData> listRawData() {
         return rawDataRepository.findAll();
@@ -25,5 +56,55 @@ public class AtccDataService {
 
     public List<AtccSummaryData> listSummaryData() {
         return summaryDataRepository.findAll();
+    }
+
+    public String importFile(MultipartFile file) {
+        // Normalize file name
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+
+        try {
+            // Check if the file's name contains invalid characters
+            if(fileName.contains("..")) {
+                throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
+            }
+
+            // Copy file to the target location (Replacing existing file with the same name)
+            Path targetLocation = this.fileStorageLocation.resolve(fileName);
+            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+
+            List<AtccRawData> datalist = importData(targetLocation);
+
+            rawDataRepository.saveAll(datalist);
+
+            return fileName;
+        } catch (IOException ex) {
+            throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
+        }
+    }
+
+    private List<AtccRawData> importData(Path fileName) {
+        try {
+
+            List<AtccRawData> raws = new LinkedList<>();
+
+            CsvParser
+                    .mapWith(getCsvFactory())
+                    .forEach(fileName.toFile(), raws::add);
+
+            return raws;
+        } catch (Exception e) {
+            logger.error("Error occurred while loading object list from file " + fileName, e);
+            return Collections.emptyList();
+        }
+
+    }
+
+    private CsvMapper<AtccRawData> getCsvFactory() {
+        return CsvMapperFactory
+                .newInstance()
+                .addColumnProperty("Time", new DateFormatProperty("HH:mm:ss"))
+                .addColumnProperty("Date", new DateFormatProperty("dd/MM/yyyy"))
+                .addAlias("Class", "type")
+                .newMapper(AtccRawData.class);
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 import javax.persistence.Entity;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Getter
@@ -14,11 +15,20 @@ import java.util.Date;
 @Entity
 public class AtccRawData extends AbstractPersistable<Long> {
 
-    private String type;
+    @Temporal(TemporalType.TIME)
+    private Date time;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date ts;
+    @Temporal(TemporalType.DATE)
+    private Date date;
+
+    private long timeStamp;
 
     private int lane;
+
+    private BigDecimal speed;
+
+    private int direction;
+
+    private String type;
 
 }
