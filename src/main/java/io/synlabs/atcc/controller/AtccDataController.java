@@ -35,7 +35,7 @@ public class AtccDataController {
 
     @PutMapping("summary")
     public ResponseWrapper<AtccSummaryDataResponse> findSummaryData(@RequestBody SearchRequest searchRequest) {
-        System.out.println(searchRequest);
+
         return dataService.listSummaryData(searchRequest);
     }
 

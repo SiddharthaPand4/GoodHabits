@@ -11,7 +11,7 @@ import java.util.List;
 public class SearchRequest {
     private Integer page;
     private Integer pageSize;
-    private List<String> sorted = new ArrayList<>();
+    private List<SortRequest> sorted = new ArrayList<>();
     private List<String> filtered = new ArrayList<>();
 
     @Override

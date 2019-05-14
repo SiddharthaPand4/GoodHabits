@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class AtccDataService {
+public class AtccDataService extends BaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(AtccDataService.class);
 
@@ -78,7 +78,7 @@ public class AtccDataService {
     }
 
     public ResponseWrapper<AtccSummaryDataResponse> listSummaryData(SearchRequest searchRequest) {
-        Page<AtccSummaryData> atccSummaryData = summaryDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(Sort.Direction.ASC, "type")));
+        Page<AtccSummaryData> atccSummaryData = summaryDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? Sort.Direction.DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(),"id"))));
         List<AtccSummaryDataResponse> collect = atccSummaryData.get().map(AtccSummaryDataResponse::new).collect(Collectors.toList());
         ResponseWrapper<AtccSummaryDataResponse> wrapper = new ResponseWrapper<>();
         wrapper.setData(collect);
@@ -124,7 +124,7 @@ public class AtccDataService {
     private void addStatusSpan(List<AtccRawData> datalist, ImportStatus status) {
         if (datalist == null || datalist.isEmpty()) return;
         AtccRawData first = datalist.get(0);
-        AtccRawData last = datalist.get(datalist.size()-1);
+        AtccRawData last = datalist.get(datalist.size() - 1);
         status.setFrom(first.getTime());
         status.setTo(last.getTime());
         status.setDataDate(first.getDate());

@@ -1,6 +1,7 @@
 package io.synlabs.atcc.view;
 
 import io.synlabs.atcc.entity.AtccSummaryData;
+import io.synlabs.atcc.enums.TimeSpan;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,12 +11,23 @@ import java.text.SimpleDateFormat;
 @Setter
 public class AtccSummaryDataResponse {
     private String type;
-    private String ts;
+
+    private String date;
+
+    private String from;
+
+    private String to;
+
+    private TimeSpan span;
+
     private int count;
 
     public AtccSummaryDataResponse(AtccSummaryData atccSummaryData) {
         this.type = atccSummaryData.getType();
-        this.ts = new SimpleDateFormat("dd/MM/YYYY hh:mm:ss").format(atccSummaryData.getTs());
+        this.date = new SimpleDateFormat("dd/MM/YYYY").format(atccSummaryData.getDate());
+        this.from = new SimpleDateFormat("hh:mm:ss").format(atccSummaryData.getFrom());
+        this.to = new SimpleDateFormat("hh:mm:ss").format(atccSummaryData.getTo());
+        this.span = atccSummaryData.getSpan();
         this.count = atccSummaryData.getCount();
     }
 }

@@ -14,7 +14,7 @@ export default class SummaryDataList extends Component {
             data: [],
             chartdata: null,
             loading: true,
-            pages:0
+            pages: 0
         };
 
         this.makeChartData = this.makeChartData.bind(this)
@@ -26,30 +26,28 @@ export default class SummaryDataList extends Component {
     }
 
     getSummaryData(page, pageSize, sorted, filtered, handleRetrievedData) {
-        if(!page) page = 0;
 
-        let url = "/api/data/summary";
-        let postObject = {
+        this.setState({
+            loading: true
+        });
+
+        let requestBody = {
             page: page,
             pageSize: pageSize,
             sorted: sorted,
             filtered: filtered,
         };
-        this.setState({
-            loading: true
-        });
-        fetch(url,{
+
+        fetch("/api/data/summary", {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
             method: "PUT",
-            body: JSON.stringify(postObject)
-        })
-            .then(response => response.json())
+            body: JSON.stringify(requestBody)
+        }).then(response => response.json())
             .then(response => {
-                    // this.makeChartData(data);
-                    // this.setState({data: response.data,loading: false});
+                    this.makeChartData(response.data);
                     return handleRetrievedData(response);
                 }
             );
@@ -57,7 +55,6 @@ export default class SummaryDataList extends Component {
     }
 
     makeChartData(data) {
-
         let chartdata = {
             labels: [],
             datasets: [{
@@ -70,40 +67,59 @@ export default class SummaryDataList extends Component {
             chartdata.datasets[0].data.push(data[i].count);
             chartdata.labels.push(data[i].type);
         }
-
         this.setState({chartdata: chartdata})
     }
 
     render() {
 
-        const chartdata = this.state.chartdata;
-        // if (!this.state.data) return (<div>Loading...</div>);
 
+
+        const chartdata = this.state.chartdata;
+        const data = this.state.data;
+        const pages = this.state.pages;
+        const loading = this.state.loading;
+        const chartComponent = this.state.loading ? (<div>Loading...</div>) : ( <Bar data={chartdata}/>);
         const columns = [{
+            Header: 'Date',
+            accessor: 'date',
+            id: 'date'
+        }, {
+            Header: 'From',
+            accessor: 'from',
+            id: 'from'
+        }, {
+            Header: 'To',
+            accessor: 'to',
+            id: 'to'
+        }, {
             Header: 'Span',
-            accessor: 'ts'
+            accessor: 'span',
+            id: 'span'
         }, {
             Header: 'Type',
             accessor: 'type',
+            id: 'type',
             Cell: props => <span className='number'>{props.value}</span> // Custom cell components!
         }, {
-            id: 'Count', // Required because our accessor is not a string
             Header: 'Count',
-            accessor: 'count' // Custom value accessors!
-        }];
+            accessor: 'count', // Custom value accessors!
+            id: 'count', // Required because our accessor is not a string
+        }
+        ];
+
+
 
         return (
-
 
             <Row>
                 <Col>
                     <ReactTable
                         defaultPageSize={10}
-                        data={this.state.data}
+                        data={data}
                         columns={columns}
-                        pages={this.state.pages}
+                        pages={pages}
                         className="-striped -highlight"
-                        loading={this.state.loading}
+                        loading={loading}
                         showPagination={true}
                         showPaginationTop={false}
                         showPaginationBottom={true}
@@ -126,9 +142,7 @@ export default class SummaryDataList extends Component {
                     <br/>
                     <br/>
                     <br/>
-                    {/*<Bar*/}
-                        {/*data={chartdata}*/}
-                    {/*/>*/}
+                    {chartComponent}
                 </Col>
             </Row>)
     }
