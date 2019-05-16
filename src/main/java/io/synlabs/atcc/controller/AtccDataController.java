@@ -29,9 +29,9 @@ public class AtccDataController {
     }
 
     @PutMapping("summary")
-    public ResponseWrapper<AtccSummaryDataResponse> findSummaryData(@RequestBody SearchRequest searchRequest) {
+    public ResponseWrapper<AtccSummaryDataResponse> findSummaryData(@RequestBody SearchRequest searchRequest, @RequestParam String interval) {
 
-        return dataService.listSummaryData(searchRequest);
+        return dataService.listSummaryData(searchRequest,interval);
     }
 
     @PostMapping("/import")

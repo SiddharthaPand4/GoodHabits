@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import 'react-table/react-table.css'
 
 import ReactTable from 'react-table'
-import {Row, Col} from "reactstrap";
+import {Row, Col, Button,ButtonGroup} from "reactstrap";
 import {Bar} from "react-chartjs-2";
 
 export default class SummaryDataList extends Component {
@@ -14,11 +14,19 @@ export default class SummaryDataList extends Component {
             data: [],
             chartdata: null,
             loading: true,
-            pages: 0
+            pages: 0,
+            interval: "hour"
         };
 
         this.makeChartData = this.makeChartData.bind(this);
         this.getSummaryData = this.getSummaryData.bind(this);
+        this.changeInterval = this.changeInterval.bind(this);
+    }
+
+
+    async changeInterval(value) {
+        await this.setState({interval: value});
+        this.refReactTable.fireFetchData();
     }
 
 
@@ -35,7 +43,7 @@ export default class SummaryDataList extends Component {
             filtered: filtered,
         };
 
-        fetch("/api/data/summary", {
+        fetch("/api/data/summary?interval=" + this.state.interval, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -45,7 +53,16 @@ export default class SummaryDataList extends Component {
         }).then(response => response.json())
             .then(response => {
                     this.makeChartData(response.data);
-                    return handleRetrievedData(response);
+                    this.setState({
+                        loading: false
+                    });
+
+                    if (handleRetrievedData) {
+                        return handleRetrievedData(response);
+                    } else {
+                        return response;
+                    }
+
                 }
             );
 
@@ -70,12 +87,19 @@ export default class SummaryDataList extends Component {
     render() {
 
 
+        const options =  {scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }};
 
         const chartdata = this.state.chartdata;
         const data = this.state.data;
         const pages = this.state.pages;
         const loading = this.state.loading;
-        const chartComponent = this.state.loading ? (<div>Loading...</div>) : ( <Bar data={chartdata}/>);
+        const chartComponent = this.state.loading ? (<div>Loading...</div>) : ( <Bar data={chartdata} options={options}/>);
         const columns = [{
             Header: 'Date',
             accessor: 'date',
@@ -105,12 +129,18 @@ export default class SummaryDataList extends Component {
         ];
 
 
-
         return (
 
             <Row>
                 <Col>
+                    <ButtonGroup>
+                        <Button onClick={() => this.changeInterval('hour')}>Hour</Button>
+                        <Button onClick={() => this.changeInterval('day')}>Day</Button>
+                        <Button onClick={() => this.changeInterval('month')}>Month</Button>
+                    </ButtonGroup>
+
                     <ReactTable
+                        ref={(refReactTable) => {this.refReactTable = refReactTable;}}
                         defaultPageSize={10}
                         data={data}
                         columns={columns}
