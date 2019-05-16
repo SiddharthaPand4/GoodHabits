@@ -4,6 +4,7 @@ import io.synlabs.atcc.config.FileStorageProperties;
 import io.synlabs.atcc.entity.AtccRawData;
 import io.synlabs.atcc.entity.AtccSummaryData;
 import io.synlabs.atcc.entity.ImportStatus;
+import io.synlabs.atcc.enums.TimeSpan;
 import io.synlabs.atcc.ex.FileStorageException;
 import io.synlabs.atcc.jpa.AtccRawDataRepository;
 import io.synlabs.atcc.jpa.AtccSummaryDataRepository;
@@ -21,6 +22,8 @@ import io.synlabs.atcc.views.AtccRawDataResponse;
 import io.synlabs.atcc.views.AtccSummaryDataResponse;
 import io.synlabs.atcc.views.ResponseWrapper;
 import io.synlabs.atcc.views.SearchRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -28,16 +31,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.springframework.data.domain.Sort.Direction.ASC;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Service
 public class AtccDataService extends BaseService {
@@ -51,6 +59,10 @@ public class AtccDataService extends BaseService {
     private final Path fileStorageLocation;
 
     private final ImportStatusRepository statusRepository;
+
+    @Qualifier("dataSource")
+    @Autowired
+    private DataSource dataSource;
 
     public AtccDataService(AtccRawDataRepository rawDataRepository,
                            AtccSummaryDataRepository summaryDataRepository,
@@ -72,7 +84,7 @@ public class AtccDataService extends BaseService {
     }
 
     public ResponseWrapper<AtccRawDataResponse> listRawData(SearchRequest searchRequest) {
-        Page<AtccRawData> page = rawDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? Sort.Direction.DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(), "id"))));
+        Page<AtccRawData> page = rawDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(), "id"))));
         List<AtccRawDataResponse> collect = page.get().map(AtccRawDataResponse::new).collect(Collectors.toList());
         ResponseWrapper<AtccRawDataResponse> wrapper = new ResponseWrapper<>();
         wrapper.setData(collect);
@@ -81,13 +93,97 @@ public class AtccDataService extends BaseService {
         return wrapper;
     }
 
-    public ResponseWrapper<AtccSummaryDataResponse> listSummaryData(SearchRequest searchRequest) {
-        Page<AtccSummaryData> page = summaryDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? Sort.Direction.DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(), "id"))));
-        List<AtccSummaryDataResponse> collect = page.get().map(AtccSummaryDataResponse::new).collect(Collectors.toList());
+    public ResponseWrapper<AtccSummaryDataResponse> listSummaryData(SearchRequest searchRequest, String interval) {
+
         ResponseWrapper<AtccSummaryDataResponse> wrapper = new ResponseWrapper<>();
-        wrapper.setData(collect);
+
+        long totalRecords = 0;
+        AtccSummaryData atccSummaryData = null;
+        List<AtccSummaryData> data = new ArrayList<>();
+        List<AtccSummaryDataResponse> collect;
+        Connection connection = null;
+
+        switch (interval) {
+            case "hour":
+                Page<AtccSummaryData> page = summaryDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(), "id"))));
+                data = page.get().collect(Collectors.toList());
+                totalRecords = page.getTotalElements();
+                break;
+            case "day":
+
+                try {
+                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, MIN(`date`) AS `from`, MAX(`date`) AS `to` FROM atcc_raw_data GROUP BY type, date ORDER BY `"+getDefaultSortId(searchRequest.getSorted(), "id") + "` "+  (isDescending(searchRequest.getSorted()) ? "DESC" :  "ASC") + " LIMIT ?, ? ;";
+
+                    connection = dataSource.getConnection();
+                    PreparedStatement ps = connection.prepareStatement(query);
+                    ps.setInt(1, searchRequest.getPageSize() * searchRequest.getPage());
+                    ps.setInt(2, searchRequest.getPageSize());
+                    ResultSet rs = ps.executeQuery();
+                    while (rs.next()) {
+                        atccSummaryData = new AtccSummaryData();
+                        atccSummaryData.setCount(rs.getInt("count"));
+                        atccSummaryData.setType(rs.getString("type"));
+                        atccSummaryData.setDate(rs.getDate("date"));
+                        atccSummaryData.setFrom(rs.getDate("from"));
+                        atccSummaryData.setTo(rs.getDate("to"));
+                        atccSummaryData.setSpan(TimeSpan.Day);
+                        data.add(atccSummaryData);
+                    }
+
+                    query = "SELECT COUNT(*) AS count FROM (SELECT TYPE FROM atcc_raw_data GROUP BY TYPE, `date`) AS atcc_summary_data";
+                    ps = connection.prepareStatement(query);
+                    rs = ps.executeQuery();
+                    while (rs.next()) {
+                        totalRecords =  rs.getLong("count");
+                    }
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+
+                break;
+            case "month":
+
+                try {
+                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, MIN(`date`) AS `from`, MAX(`date`) AS `to` FROM atcc_raw_data GROUP BY type, MONTH(`date`) ORDER BY `"+getDefaultSortId(searchRequest.getSorted(), "id") + "` "+  (isDescending(searchRequest.getSorted()) ? "DESC" :  "ASC") + " LIMIT ?, ? ;";
+
+                    connection = dataSource.getConnection();
+                    PreparedStatement ps = connection.prepareStatement(query);
+                    ps.setInt(1, searchRequest.getPageSize() * searchRequest.getPage());
+                    ps.setInt(2, searchRequest.getPageSize());
+                    ResultSet rs = ps.executeQuery();
+
+                    while (rs.next()) {
+                        atccSummaryData = new AtccSummaryData();
+                        atccSummaryData.setCount(rs.getInt("count"));
+                        atccSummaryData.setType(rs.getString("type"));
+                        atccSummaryData.setDate(rs.getDate("date"));
+                        atccSummaryData.setFrom(rs.getDate("from"));
+                        atccSummaryData.setTo(rs.getDate("to"));
+                        atccSummaryData.setSpan(TimeSpan.Month);
+                        data.add(atccSummaryData);
+
+                    }
+
+                    query = "SELECT COUNT(*) AS count FROM (SELECT TYPE FROM atcc_raw_data GROUP BY TYPE, MONTH(`date`)) AS atcc_summary_data";
+                    ps = connection.prepareStatement(query);
+                    rs = ps.executeQuery();
+                    while (rs.next()) {
+                       totalRecords =  rs.getLong("count");
+                    }
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
+
+        wrapper.setTotalElements(totalRecords);
         wrapper.setCurrPage(searchRequest.getPage());
-        wrapper.setTotalElements(page.getTotalElements());
+        collect = data.stream().map(AtccSummaryDataResponse::new).collect(Collectors.toList());
+        wrapper.setData(collect);
+
         return wrapper;
     }
 
