@@ -100,19 +100,13 @@ public class AtccDataService extends BaseService {
         long totalRecords = 0;
         AtccSummaryData atccSummaryData = null;
         List<AtccSummaryData> data = new ArrayList<>();
-        List<AtccSummaryDataResponse> collect;
         Connection connection = null;
 
         switch (interval) {
-            case "hour":
-                Page<AtccSummaryData> page = summaryDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(), "id"))));
-                data = page.get().collect(Collectors.toList());
-                totalRecords = page.getTotalElements();
-                break;
             case "day":
 
                 try {
-                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, MIN(`date`) AS `from`, MAX(`date`) AS `to` FROM atcc_raw_data GROUP BY type, date ORDER BY `"+getDefaultSortId(searchRequest.getSorted(), "id") + "` "+  (isDescending(searchRequest.getSorted()) ? "DESC" :  "ASC") + " LIMIT ?, ? ;";
+                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, MIN(`date`) AS `from`, MAX(`date`) AS `to` FROM atcc_raw_data GROUP BY type, date ORDER BY `" + getDefaultSortId(searchRequest.getSorted(), "id") + "` " + (isDescending(searchRequest.getSorted()) ? "DESC" : "ASC") + " LIMIT ?, ? ;";
 
                     connection = dataSource.getConnection();
                     PreparedStatement ps = connection.prepareStatement(query);
@@ -134,7 +128,7 @@ public class AtccDataService extends BaseService {
                     ps = connection.prepareStatement(query);
                     rs = ps.executeQuery();
                     while (rs.next()) {
-                        totalRecords =  rs.getLong("count");
+                        totalRecords = rs.getLong("count");
                     }
                     connection.close();
                 } catch (SQLException e) {
@@ -146,7 +140,7 @@ public class AtccDataService extends BaseService {
             case "month":
 
                 try {
-                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, MIN(`date`) AS `from`, MAX(`date`) AS `to` FROM atcc_raw_data GROUP BY type, MONTH(`date`) ORDER BY `"+getDefaultSortId(searchRequest.getSorted(), "id") + "` "+  (isDescending(searchRequest.getSorted()) ? "DESC" :  "ASC") + " LIMIT ?, ? ;";
+                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, MIN(`date`) AS `from`, MAX(`date`) AS `to` FROM atcc_raw_data GROUP BY type, MONTH(`date`) ORDER BY `" + getDefaultSortId(searchRequest.getSorted(), "id") + "` " + (isDescending(searchRequest.getSorted()) ? "DESC" : "ASC") + " LIMIT ?, ? ;";
 
                     connection = dataSource.getConnection();
                     PreparedStatement ps = connection.prepareStatement(query);
@@ -163,25 +157,31 @@ public class AtccDataService extends BaseService {
                         atccSummaryData.setTo(rs.getDate("to"));
                         atccSummaryData.setSpan(TimeSpan.Month);
                         data.add(atccSummaryData);
-
                     }
 
                     query = "SELECT COUNT(*) AS count FROM (SELECT TYPE FROM atcc_raw_data GROUP BY TYPE, MONTH(`date`)) AS atcc_summary_data";
                     ps = connection.prepareStatement(query);
                     rs = ps.executeQuery();
                     while (rs.next()) {
-                       totalRecords =  rs.getLong("count");
+                        totalRecords = rs.getLong("count");
                     }
                     connection.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
                 break;
+
+            case "hour":
+            default:
+                Page<AtccSummaryData> page = summaryDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(), "id"))));
+                data = page.get().collect(Collectors.toList());
+                totalRecords = page.getTotalElements();
+                break;
         }
 
+        List<AtccSummaryDataResponse> collect = data.stream().map(AtccSummaryDataResponse::new).collect(Collectors.toList());
         wrapper.setTotalElements(totalRecords);
         wrapper.setCurrPage(searchRequest.getPage());
-        collect = data.stream().map(AtccSummaryDataResponse::new).collect(Collectors.toList());
         wrapper.setData(collect);
 
         return wrapper;
