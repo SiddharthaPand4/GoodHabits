@@ -1,5 +1,7 @@
 package io.synlabs.atcc.controller;
 
+import io.synlabs.atcc.config.FileStorageProperties;
+import io.synlabs.atcc.ex.AuthException;
 import io.synlabs.atcc.service.AtccDataService;
 import io.synlabs.atcc.views.UploadFileResponse;
 import org.slf4j.Logger;
@@ -20,8 +22,14 @@ public class AtccDataController {
 
     private static final Logger logger = LoggerFactory.getLogger(AtccDataController.class);
 
-    @Autowired
-    private AtccDataService dataService;
+    private final AtccDataService dataService;
+
+    private String uploadKey;
+
+    public AtccDataController(AtccDataService dataService, FileStorageProperties fileStorageProperties) {
+        this.dataService = dataService;
+        this.uploadKey = fileStorageProperties.getUploadKey();
+    }
 
     @PutMapping("raw")
     public ResponseWrapper<AtccRawDataResponse> findRawData(@RequestBody SearchRequest searchRequest) {
@@ -34,11 +42,16 @@ public class AtccDataController {
         return dataService.listSummaryData(searchRequest,interval);
     }
 
-    @PostMapping("/import")
-    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
+    @PostMapping("/import/csv")
+    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("key") String authKey) {
 
         logger.info("File uploaded, now importing..{}", file.getOriginalFilename());
         String fileName = dataService.importFile(file);
+
+        if (uploadKey != null && !uploadKey.equals(authKey)) {
+            logger.error("Keys not matching! supplied - {}", authKey);
+            throw new AuthException("Not allowed");
+        }
 
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/downloadFile/")
@@ -47,4 +60,19 @@ public class AtccDataController {
 
         return new UploadFileResponse(fileName, fileDownloadUri, file.getContentType(), file.getSize());
     }
+
+    @PostMapping("/import/video")
+    public UploadFileResponse uploadVideo(@RequestParam("file") MultipartFile file, @RequestParam("key") String authKey) {
+
+        if (uploadKey != null && !uploadKey.equals(authKey)) {
+            logger.error("Keys not matching! supplied - {}", authKey);
+            throw new AuthException("Not allowed");
+        }
+
+        logger.info("video File uploaded, now importing..{}", file.getOriginalFilename());
+        String fileName = dataService.importVideo(file);
+
+        return new UploadFileResponse(fileName, null, file.getContentType(), file.getSize());
+    }
+
 }

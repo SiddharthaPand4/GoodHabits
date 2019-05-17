@@ -3,12 +3,15 @@ package io.synlabs.atcc.service;
 import io.synlabs.atcc.config.FileStorageProperties;
 import io.synlabs.atcc.entity.AtccRawData;
 import io.synlabs.atcc.entity.AtccSummaryData;
+import io.synlabs.atcc.entity.AtccVideoData;
 import io.synlabs.atcc.entity.ImportStatus;
 import io.synlabs.atcc.enums.TimeSpan;
 import io.synlabs.atcc.ex.FileStorageException;
 import io.synlabs.atcc.jpa.AtccRawDataRepository;
 import io.synlabs.atcc.jpa.AtccSummaryDataRepository;
+import io.synlabs.atcc.jpa.AtccVideoDataRepository;
 import io.synlabs.atcc.jpa.ImportStatusRepository;
+import org.joda.time.DateTime;
 import org.simpleflatmapper.converter.Context;
 import org.simpleflatmapper.converter.ContextualConverter;
 import org.simpleflatmapper.csv.CsvMapper;
@@ -44,6 +47,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.Long.parseLong;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -60,6 +64,10 @@ public class AtccDataService extends BaseService {
 
     private final ImportStatusRepository statusRepository;
 
+    private AtccVideoDataRepository videoDataRepository;
+
+
+
     @Qualifier("dataSource")
     @Autowired
     private DataSource dataSource;
@@ -67,10 +75,12 @@ public class AtccDataService extends BaseService {
     public AtccDataService(AtccRawDataRepository rawDataRepository,
                            AtccSummaryDataRepository summaryDataRepository,
                            ImportStatusRepository statusRepository,
-                           FileStorageProperties fileStorageProperties) {
+                           FileStorageProperties fileStorageProperties,
+                           AtccVideoDataRepository videoDataRepository) {
 
         this.rawDataRepository = rawDataRepository;
         this.summaryDataRepository = summaryDataRepository;
+        this.videoDataRepository = videoDataRepository;
 
         this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
                 .toAbsolutePath().normalize();
@@ -187,7 +197,7 @@ public class AtccDataService extends BaseService {
         return wrapper;
     }
 
-    public String importFile(MultipartFile file) {
+    public String importVideo(MultipartFile file) {
         // Normalize file name
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
         ImportStatus status = new ImportStatus();
@@ -204,11 +214,7 @@ public class AtccDataService extends BaseService {
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-            List<AtccRawData> datalist = importData(targetLocation);
-
-            rawDataRepository.saveAll(datalist);
-
-            addStatusSpan(datalist, status);
+            videoDataRepository.save(populateFields(fileName));
             status.setStatus("OK");
 
             return fileName;
@@ -219,6 +225,16 @@ public class AtccDataService extends BaseService {
         } finally {
             statusRepository.save(status);
         }
+    }
+
+    private AtccVideoData populateFields(String fileName) {
+        long ts = Long.parseLong(fileName.split("_")[0]);
+        DateTime videoDate = new DateTime(ts * 1000L);
+        AtccVideoData videoData = new AtccVideoData();
+        videoData.setDate(videoDate.toDate());
+        videoData.setTime(videoDate.toDate());
+        videoData.setTimeStamp(ts);
+        return videoData;
     }
 
     private void addStatusSpan(List<AtccRawData> datalist, ImportStatus status) {
@@ -271,5 +287,39 @@ public class AtccDataService extends BaseService {
                     }
                 }))
                 .newMapper(AtccRawData.class);
+    }
+
+    public String importFile(MultipartFile file) {
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        ImportStatus status = new ImportStatus();
+        status.setFilename(fileName);
+        status.setImportDate(new Date());
+
+        try {
+            // Check if the file's name contains invalid characters
+            if (fileName.contains("..")) {
+                throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
+            }
+
+            // Copy file to the target location (Replacing existing file with the same name)
+            Path targetLocation = this.fileStorageLocation.resolve(fileName);
+            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+
+            List<AtccRawData> datalist = importData(targetLocation);
+
+            rawDataRepository.saveAll(datalist);
+
+            addStatusSpan(datalist, status);
+            status.setStatus("OK");
+
+            return fileName;
+        } catch (IOException ex) {
+            status.setStatus("FAILED");
+            status.setError(ex.getMessage());
+            throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
+        } finally {
+            statusRepository.save(status);
+        }
+
     }
 }
