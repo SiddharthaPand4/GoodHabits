@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import 'react-table/react-table.css'
-
+import "video-react/dist/video-react.css";
 import ReactTable from 'react-table'
 import {Row, Col} from "reactstrap";
-
+import { Player } from 'video-react';
 export default class RawDataList extends Component {
 
     constructor(props) {
@@ -12,7 +12,8 @@ export default class RawDataList extends Component {
         this.state = {
             data: [],
             loading: true,
-            pages: 0
+            pages: 0,
+            video: null
         };
         this.getRawData = this.getRawData.bind(this);
     }
@@ -81,7 +82,8 @@ export default class RawDataList extends Component {
             {
                 Header: 'Video',
                 accessor: 'vid',
-                id: 'video'
+                id: 'video',
+                Cell: e => e.value !== 0 ? <div style={{cursor:'pointer'}} onClick={() => this.showVideo(e)}>Click</div> : <div>NA</div>
         }
         ];
 
@@ -117,8 +119,25 @@ export default class RawDataList extends Component {
 
                 </Col>
                 <Col>
-                    <div>&nbsp;</div>
+                    <div>
+                        <Player
+                            startTime={this.state.seek}
+                            autoPlay
+                            playsInline
+                            poster="/logo.png"
+                            src={this.state.video}
+                        />
+                    </div>
                 </Col>
             </Row>)
+    }
+
+    showVideo(e) {
+
+        //seek(time)
+        this.setState({
+            seek : e.original.timeStamp - e.original.vid,
+            video:'/video/' + e.original.vid + "?" + Math.random()
+        });
     }
 }

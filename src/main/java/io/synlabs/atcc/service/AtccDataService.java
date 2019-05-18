@@ -7,6 +7,7 @@ import io.synlabs.atcc.entity.AtccVideoData;
 import io.synlabs.atcc.entity.ImportStatus;
 import io.synlabs.atcc.enums.TimeSpan;
 import io.synlabs.atcc.ex.FileStorageException;
+import io.synlabs.atcc.ex.NotFoundException;
 import io.synlabs.atcc.jpa.AtccRawDataRepository;
 import io.synlabs.atcc.jpa.AtccSummaryDataRepository;
 import io.synlabs.atcc.jpa.AtccVideoDataRepository;
@@ -24,6 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -33,6 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.DataSource;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -330,5 +334,28 @@ public class AtccDataService extends BaseService {
             statusRepository.save(status);
         }
 
+    }
+
+    public Resource loadFileAsResource(String id) {
+        String fileName = id;
+        try {
+            Optional<AtccVideoData> data = videoDataRepository.findOneByTimeStamp(Long.parseLong(id));
+            if (data.isPresent()) {
+                fileName = data.get().getFilename();
+                Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+                Resource resource = new UrlResource(filePath.toUri());
+                if (resource.exists()) {
+                    return resource;
+                } else {
+                    throw new NotFoundException("File not found " + fileName);
+                }
+            } else {
+                throw new NotFoundException("File not found " + fileName);
+            }
+        } catch (NumberFormatException ex) {
+            throw new NotFoundException("number format for " + id, ex);
+        } catch (MalformedURLException ex) {
+            throw new NotFoundException("File not found " + fileName, ex);
+        }
     }
 }
