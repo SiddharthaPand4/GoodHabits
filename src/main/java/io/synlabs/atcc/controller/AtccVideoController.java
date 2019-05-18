@@ -23,11 +23,21 @@ public class AtccVideoController {
     @Autowired
     private AtccDataService dataService;
 
+    @GetMapping("/screenshot/{id}")
+    public ResponseEntity<Resource> downloadScrenshot(@PathVariable Long id, HttpServletRequest request) throws IOException {
+
+        Resource resource = dataService.getScreenshot(id);
+        return send(resource, request);
+    }
+
     @GetMapping("/video/{id}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String id, HttpServletRequest request) {
         // Load file as Resource
         Resource resource = dataService.loadFileAsResource(id);
+        return send(resource, request);
+    }
 
+    private ResponseEntity<Resource> send(Resource resource, HttpServletRequest request) {
         // Try to determine file's content type
         String contentType = null;
         try {

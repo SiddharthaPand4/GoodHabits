@@ -84,7 +84,13 @@ export default class RawDataList extends Component {
                 accessor: 'vid',
                 id: 'video',
                 Cell: e => e.value !== 0 ? <div style={{cursor:'pointer'}} onClick={() => this.showVideo(e)}>Click</div> : <div>NA</div>
-        }
+        },
+            {
+                Header: 'Screenshot',
+                accessor: 'id',
+                id: 'ss',
+                Cell: e => e.original.vid !== 0 ? <div style={{cursor:'pointer'}} onClick={() => this.showScreenshot(e)}>Click</div> : <div>NA</div>
+            }
         ];
 
 
@@ -127,6 +133,7 @@ export default class RawDataList extends Component {
                             poster="/logo.png"
                             src={this.state.video}
                         />
+                        <img src={this.state.ss || '/logo.png'} alt="event screenshot"/>
                     </div>
                 </Col>
             </Row>)
@@ -138,6 +145,12 @@ export default class RawDataList extends Component {
         this.setState({
             seek : e.original.timeStamp - e.original.vid,
             video:'/video/' + e.original.vid + "?" + Math.random()
+        });
+    }
+
+    showScreenshot(e) {
+        this.setState({
+            ss:'/screenshot/' + e.original.id + "?" + Math.random()
         });
     }
 }

@@ -6,7 +6,7 @@
 
     <groupId>io.synlabs</groupId>
     <artifactId>atcc</artifactId>
-    <version>0.3</version>
+    <version>0.41</version>
     <name>atcc</name>
     <description>ATCC NHAI demo</description>
     <packaging>war</packaging>

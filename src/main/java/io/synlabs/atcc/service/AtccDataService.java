@@ -13,6 +13,10 @@ import io.synlabs.atcc.jpa.AtccSummaryDataRepository;
 import io.synlabs.atcc.jpa.AtccVideoDataRepository;
 import io.synlabs.atcc.jpa.ImportStatusRepository;
 import io.synlabs.atcc.views.*;
+import net.bramp.ffmpeg.FFmpeg;
+import net.bramp.ffmpeg.FFmpegExecutor;
+import net.bramp.ffmpeg.FFprobe;
+import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import org.joda.time.DateTime;
 import org.simpleflatmapper.converter.Context;
 import org.simpleflatmapper.converter.ContextualConverter;
@@ -25,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -46,6 +51,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -69,6 +75,12 @@ public class AtccDataService extends BaseService {
     @Qualifier("dataSource")
     @Autowired
     private DataSource dataSource;
+
+    @Value("${ffmpeg.path}")
+    private String ffmpegpath;
+
+    @Value("${ffprobe.path}")
+    private String ffprobepath;
 
     public AtccDataService(AtccRawDataRepository rawDataRepository,
                            AtccSummaryDataRepository summaryDataRepository,
@@ -106,6 +118,10 @@ public class AtccDataService extends BaseService {
         return wrapper;
     }
 
+    private VideoSummary getVideoSummary(AtccRawData ar) {
+        return videoDataRepository.getAssociatedVideo(ar.getTimeStamp(), ar.getFeed());
+    }
+
     private long getVideoId(AtccRawData ar) {
         VideoSummary vs = videoDataRepository.getAssociatedVideo(ar.getTimeStamp(), ar.getFeed());
         return vs == null ? 0 : vs.getTimeStamp();
@@ -116,9 +132,9 @@ public class AtccDataService extends BaseService {
         ResponseWrapper<AtccSummaryDataResponse> wrapper = new ResponseWrapper<>();
 
         long totalRecords = 0;
-        AtccSummaryData atccSummaryData = null;
+        AtccSummaryData atccSummaryData;
         List<AtccSummaryData> data = new ArrayList<>();
-        Connection connection = null;
+        Connection connection;
 
         switch (interval) {
             case "day":
@@ -132,12 +148,7 @@ public class AtccDataService extends BaseService {
                     ps.setInt(2, searchRequest.getPageSize());
                     ResultSet rs = ps.executeQuery();
                     while (rs.next()) {
-                        atccSummaryData = new AtccSummaryData();
-                        atccSummaryData.setCount(rs.getInt("count"));
-                        atccSummaryData.setType(rs.getString("type"));
-                        atccSummaryData.setDate(rs.getDate("date"));
-                        atccSummaryData.setFrom(rs.getDate("from"));
-                        atccSummaryData.setTo(rs.getDate("to"));
+                        atccSummaryData = getAtccSummaryData(rs);
                         atccSummaryData.setSpan(TimeSpan.Day);
                         data.add(atccSummaryData);
                     }
@@ -167,12 +178,7 @@ public class AtccDataService extends BaseService {
                     ResultSet rs = ps.executeQuery();
 
                     while (rs.next()) {
-                        atccSummaryData = new AtccSummaryData();
-                        atccSummaryData.setCount(rs.getInt("count"));
-                        atccSummaryData.setType(rs.getString("type"));
-                        atccSummaryData.setDate(rs.getDate("date"));
-                        atccSummaryData.setFrom(rs.getDate("from"));
-                        atccSummaryData.setTo(rs.getDate("to"));
+                        atccSummaryData = getAtccSummaryData(rs);
                         atccSummaryData.setSpan(TimeSpan.Month);
                         data.add(atccSummaryData);
                     }
@@ -203,6 +209,16 @@ public class AtccDataService extends BaseService {
         wrapper.setData(collect);
 
         return wrapper;
+    }
+
+    private AtccSummaryData getAtccSummaryData(ResultSet rs) throws SQLException {
+        AtccSummaryData atccSummaryData = new AtccSummaryData();
+        atccSummaryData.setCount(rs.getInt("count"));
+        atccSummaryData.setType(rs.getString("type"));
+        atccSummaryData.setDate(rs.getDate("date"));
+        atccSummaryData.setFrom(rs.getDate("from"));
+        atccSummaryData.setTo(rs.getDate("to"));
+        return atccSummaryData;
     }
 
     public String importVideo(MultipartFile file, String tag) {
@@ -282,21 +298,19 @@ public class AtccDataService extends BaseService {
                 .addColumnProperty("Time", new DateFormatProperty("HH:mm:ss"))
                 .addColumnProperty("Date", new DateFormatProperty("dd/MM/yyyy"))
                 .addAlias("Class", "type")
-                .addColumnProperty("Class", ConverterProperty.of(new ContextualConverter<String, String>() {
-                    @Override
-                    public String convert(String s, Context context) throws Exception {
-                        switch (s) {
-                            case "0":
-                                return "2-Wheeler";
-                            case "1":
-                                return "4-Wheeler";
-                            case "2":
-                                return "Bus/Truck";
-                            case "3":
-                                return "OSW";
-                            default:
-                                return "NA";
-                        }
+                .addColumnProperty("Class",
+                        ConverterProperty.of((ContextualConverter<String, String>) (s, context) -> {
+                    switch (s) {
+                        case "0":
+                            return "2-Wheeler";
+                        case "1":
+                            return "4-Wheeler";
+                        case "2":
+                            return "Bus/Truck";
+                        case "3":
+                            return "OSW";
+                        default:
+                            return "NA";
                     }
                 }))
                 .newMapper(AtccRawData.class);
@@ -357,5 +371,61 @@ public class AtccDataService extends BaseService {
         } catch (MalformedURLException ex) {
             throw new NotFoundException("File not found " + fileName, ex);
         }
+    }
+
+    public Resource getScreenshot(Long id) throws IOException {
+
+        if (id == null) throw new NotFoundException("Not a valid id");
+
+        Optional<AtccRawData> odata = rawDataRepository.findById(id);
+
+        if (odata.isPresent()) {
+            AtccRawData data = odata.get();
+            VideoSummary summary = getVideoSummary(data);
+
+            if (summary == null) {
+                throw new NotFoundException("video not found");
+            }
+
+            Path screenshotfile = getScreenshotFileName(data);
+
+            if (Files.exists(screenshotfile)) {
+                return new UrlResource(screenshotfile.toUri());
+            }
+
+            FFmpeg ffmpeg = new FFmpeg(ffmpegpath);
+            FFprobe ffprobe = new FFprobe(ffprobepath);
+
+            //offset is data.ts - video.ts
+            long offset = data.getTimeStamp() - summary.getTimeStamp();
+            Path filePath = this.fileStorageLocation.resolve(summary.getFileName()).normalize();
+            FFmpegBuilder builder = new FFmpegBuilder()
+                .setInput(filePath.toString())
+                    .overrideOutputFiles(true)
+                    .addOutput(screenshotfile.toString())
+                    .setStartOffset(offset, TimeUnit.SECONDS)
+                    .addExtraArgs("-vframes", "1")
+                    .done();
+
+            FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
+
+            // Run a one-pass encode
+            executor.createJob(builder).run();
+
+            Resource resource = new UrlResource(screenshotfile.toUri());
+            if (resource.exists()) {
+                return new UrlResource(screenshotfile.toUri());
+            } else {
+                throw new NotFoundException("ffmpeg not working :( no screenshot generated");
+            }
+        }
+        else {
+            throw new NotFoundException("Not a valid id");
+        }
+
+    }
+
+    private Path getScreenshotFileName(AtccRawData data) {
+        return this.fileStorageLocation.resolve(data.getFeed() + "_" + data.getTimeStamp() + ".jpg").normalize();
     }
 }
