@@ -22,4 +22,7 @@ public class AtccVideoData extends AbstractPersistable<Long> {
 
     private long timeStamp;
 
+    private String filename;
+
+    private String feed;
 }

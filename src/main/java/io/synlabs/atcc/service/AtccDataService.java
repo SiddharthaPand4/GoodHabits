@@ -11,6 +11,7 @@ import io.synlabs.atcc.jpa.AtccRawDataRepository;
 import io.synlabs.atcc.jpa.AtccSummaryDataRepository;
 import io.synlabs.atcc.jpa.AtccVideoDataRepository;
 import io.synlabs.atcc.jpa.ImportStatusRepository;
+import io.synlabs.atcc.views.*;
 import org.joda.time.DateTime;
 import org.simpleflatmapper.converter.Context;
 import org.simpleflatmapper.converter.ContextualConverter;
@@ -21,10 +22,6 @@ import org.simpleflatmapper.map.property.ConverterProperty;
 import org.simpleflatmapper.map.property.DateFormatProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.synlabs.atcc.views.AtccRawDataResponse;
-import io.synlabs.atcc.views.AtccSummaryDataResponse;
-import io.synlabs.atcc.views.ResponseWrapper;
-import io.synlabs.atcc.views.SearchRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -47,8 +44,6 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.lang.Long.parseLong;
-import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Service
@@ -65,7 +60,6 @@ public class AtccDataService extends BaseService {
     private final ImportStatusRepository statusRepository;
 
     private AtccVideoDataRepository videoDataRepository;
-
 
 
     @Qualifier("dataSource")
@@ -95,12 +89,22 @@ public class AtccDataService extends BaseService {
 
     public ResponseWrapper<AtccRawDataResponse> listRawData(SearchRequest searchRequest) {
         Page<AtccRawData> page = rawDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(), "id"))));
-        List<AtccRawDataResponse> collect = page.get().map(AtccRawDataResponse::new).collect(Collectors.toList());
+        List<AtccRawDataResponse> collect = page.get().map(ar -> {
+            AtccRawDataResponse ard = new AtccRawDataResponse(ar);
+            long vid = getVideoId(ar);
+            ard.setVid(vid);
+            return ard;
+        }).collect(Collectors.toList());
         ResponseWrapper<AtccRawDataResponse> wrapper = new ResponseWrapper<>();
         wrapper.setData(collect);
         wrapper.setCurrPage(searchRequest.getPage());
         wrapper.setTotalElements(page.getTotalElements());
         return wrapper;
+    }
+
+    private long getVideoId(AtccRawData ar) {
+        VideoSummary vs = videoDataRepository.getAssociatedVideo(ar.getTimeStamp(), ar.getFeed());
+        return vs == null ? 0 : vs.getTimeStamp();
     }
 
     public ResponseWrapper<AtccSummaryDataResponse> listSummaryData(SearchRequest searchRequest, String interval) {
@@ -197,7 +201,7 @@ public class AtccDataService extends BaseService {
         return wrapper;
     }
 
-    public String importVideo(MultipartFile file) {
+    public String importVideo(MultipartFile file, String tag) {
         // Normalize file name
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
         ImportStatus status = new ImportStatus();
@@ -214,7 +218,7 @@ public class AtccDataService extends BaseService {
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-            videoDataRepository.save(populateFields(fileName));
+            videoDataRepository.save(populateFields(fileName, tag));
             status.setStatus("OK");
 
             return fileName;
@@ -227,13 +231,15 @@ public class AtccDataService extends BaseService {
         }
     }
 
-    private AtccVideoData populateFields(String fileName) {
+    private AtccVideoData populateFields(String fileName, String tag) {
         long ts = Long.parseLong(fileName.split("_")[0]);
         DateTime videoDate = new DateTime(ts * 1000L);
         AtccVideoData videoData = new AtccVideoData();
         videoData.setDate(videoDate.toDate());
         videoData.setTime(videoDate.toDate());
         videoData.setTimeStamp(ts);
+        videoData.setFeed(tag);
+        videoData.setFilename(fileName);
         return videoData;
     }
 
@@ -246,14 +252,17 @@ public class AtccDataService extends BaseService {
         status.setDataDate(first.getDate());
     }
 
-    private List<AtccRawData> importData(Path fileName) {
+    private List<AtccRawData> importData(Path fileName, String tag) {
         try {
 
             List<AtccRawData> raws = new LinkedList<>();
 
             CsvParser
                     .mapWith(getCsvFactory())
-                    .forEach(fileName.toFile(), raws::add);
+                    .forEach(fileName.toFile(), data -> {
+                        data.setFeed(tag);
+                        raws.add(data);
+                    });
 
             return raws;
         } catch (Exception e) {
@@ -289,7 +298,7 @@ public class AtccDataService extends BaseService {
                 .newMapper(AtccRawData.class);
     }
 
-    public String importFile(MultipartFile file) {
+    public String importFile(MultipartFile file, String tag) {
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
         ImportStatus status = new ImportStatus();
         status.setFilename(fileName);
@@ -305,7 +314,7 @@ public class AtccDataService extends BaseService {
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-            List<AtccRawData> datalist = importData(targetLocation);
+            List<AtccRawData> datalist = importData(targetLocation, tag);
 
             rawDataRepository.saveAll(datalist);
 

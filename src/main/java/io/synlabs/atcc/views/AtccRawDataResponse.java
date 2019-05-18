@@ -22,6 +22,8 @@ public class AtccRawDataResponse {
     private BigDecimal speed;
     private int direction;
     private String type;
+    private String tag;
+    private long vid;
 
     public AtccRawDataResponse(AtccRawData atccRawData) {
         this.id = atccRawData.getId();
@@ -32,5 +34,6 @@ public class AtccRawDataResponse {
         this.speed = atccRawData.getSpeed();
         this.direction = atccRawData.getDirection();
         this.type = atccRawData.getType();
+        this.tag = atccRawData.getFeed();
     }
 }

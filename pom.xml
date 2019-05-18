@@ -6,14 +6,14 @@
 
     <groupId>io.synlabs</groupId>
     <artifactId>atcc</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.2</version>
     <name>atcc</name>
     <description>ATCC NHAI demo</description>
     <packaging>war</packaging>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.2.RELEASE</version>
+        <version>2.1.5.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -22,7 +22,7 @@
         <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
         <node.version>v10.5.0</node.version>
         <yarn.version>v1.13.0</yarn.version>
-        <springboot.version>2.1.2.RELEASE</springboot.version>
+        <springboot.version>2.1.5.RELEASE</springboot.version>
     </properties>
 
     <profiles>
@@ -115,6 +115,11 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.bramp.ffmpeg</groupId>
+            <artifactId>ffmpeg</artifactId>
+            <version>0.6.2</version>
         </dependency>
     </dependencies>
 

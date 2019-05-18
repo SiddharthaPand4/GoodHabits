@@ -77,7 +77,13 @@ export default class RawDataList extends Component {
             Header: 'Speed',
             accessor: 'speed',
             id: 'speed'
-        }];
+        },
+            {
+                Header: 'Video',
+                accessor: 'vid',
+                id: 'video'
+        }
+        ];
 
 
         return (
