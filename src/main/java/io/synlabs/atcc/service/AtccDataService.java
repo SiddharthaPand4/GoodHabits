@@ -38,6 +38,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -113,7 +114,13 @@ public class AtccDataService extends BaseService {
     }
 
     public ResponseWrapper<AtccRawDataResponse> listRawData(SearchRequest searchRequest) {
-        Page<AtccRawData> page = rawDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(), "id"))));
+        Page<AtccRawData> page;
+        try{
+            page = rawDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(), "id"))));
+
+        }catch (PropertyReferenceException e){
+            page = rawDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize()));
+        }
         List<AtccRawDataResponse> collect = page.get().map(ar -> {
             AtccRawDataResponse ard = new AtccRawDataResponse(ar);
             long vid = getVideoId(ar);
@@ -149,7 +156,7 @@ public class AtccDataService extends BaseService {
             case "day":
 
                 try {
-                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, MIN(`date`) AS `from`, MAX(`date`) AS `to` FROM atcc_raw_data GROUP BY type, date ORDER BY `" + getDefaultSortId(searchRequest.getSorted(), "id") + "` " + (isDescending(searchRequest.getSorted()) ? "DESC" : "ASC") + " LIMIT ?, ? ;";
+                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, MIN(`date`) AS `from`, MAX(`date`) AS `to` FROM atcc_raw_data GROUP BY type, date ORDER BY `date`, `time` "+(isDescending(searchRequest.getSorted()) ? "DESC" : "ASC") + " LIMIT ?, ? ;";
 
                     connection = dataSource.getConnection();
                     PreparedStatement ps = connection.prepareStatement(query);
@@ -178,7 +185,7 @@ public class AtccDataService extends BaseService {
             case "month":
 
                 try {
-                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, MIN(`date`) AS `from`, MAX(`date`) AS `to` FROM atcc_raw_data GROUP BY type, MONTH(`date`) ORDER BY `" + getDefaultSortId(searchRequest.getSorted(), "id") + "` " + (isDescending(searchRequest.getSorted()) ? "DESC" : "ASC") + " LIMIT ?, ? ;";
+                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, MIN(`date`) AS `from`, MAX(`date`) AS `to` FROM atcc_raw_data GROUP BY type, MONTH(`date`) ORDER BY `date`, `time` "+(isDescending(searchRequest.getSorted()) ? "DESC" : "ASC") + " LIMIT ?, ? ;";
 
                     connection = dataSource.getConnection();
                     PreparedStatement ps = connection.prepareStatement(query);
@@ -206,9 +213,31 @@ public class AtccDataService extends BaseService {
 
             case "hour":
             default:
-                Page<AtccSummaryData> page = summaryDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(), "id"))));
-                data = page.get().collect(Collectors.toList());
-                totalRecords = page.getTotalElements();
+                try {
+                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, SEC_TO_TIME(hour(time)*60*60) AS `from`, SEC_TO_TIME((hour(time) + 1)*60*60-1) AS `to` FROM atcc_raw_data GROUP BY type, `date` , hour(time) ORDER BY `date`, `time` "+ (isDescending(searchRequest.getSorted()) ? "DESC" : "ASC") + " LIMIT ?, ? ;";
+
+                    connection = dataSource.getConnection();
+                    PreparedStatement ps = connection.prepareStatement(query);
+                    ps.setInt(1, searchRequest.getPageSize() * searchRequest.getPage());
+                    ps.setInt(2, searchRequest.getPageSize());
+                    ResultSet rs = ps.executeQuery();
+
+                    while (rs.next()) {
+                        atccSummaryData = getAtccSummaryData(rs);
+                        atccSummaryData.setSpan(TimeSpan.Hour);
+                        data.add(atccSummaryData);
+                    }
+
+                    query = "SELECT COUNT(*) AS count FROM (SELECT type FROM atcc_raw_data GROUP BY type, `date` , hour(time) ORDER BY `date`, `time` "+ (isDescending(searchRequest.getSorted()) ? "DESC" : "ASC") + ") AS atcc_summary_data";
+                    ps = connection.prepareStatement(query);
+                    rs = ps.executeQuery();
+                    while (rs.next()) {
+                        totalRecords = rs.getLong("count");
+                    }
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
                 break;
         }
 
