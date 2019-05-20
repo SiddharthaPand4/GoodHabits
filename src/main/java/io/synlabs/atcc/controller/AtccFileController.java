@@ -13,12 +13,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import org.springframework.core.io.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Controller
-public class AtccVideoController {
+public class AtccFileController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AtccVideoController.class);
+    private static final Logger logger = LoggerFactory.getLogger(AtccFileController.class);
 
     @Autowired
     private AtccDataService dataService;
@@ -37,7 +38,7 @@ public class AtccVideoController {
         return send(resource, request);
     }
 
-    private ResponseEntity<Resource> send(Resource resource, HttpServletRequest request) {
+    public ResponseEntity<Resource> send(Resource resource, HttpServletRequest request) {
         // Try to determine file's content type
         String contentType = null;
         try {
@@ -55,5 +56,16 @@ public class AtccVideoController {
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
+    }
+
+    @GetMapping("/csv/")
+    public ResponseEntity<Resource> exportCSV(HttpServletResponse response, HttpServletRequest request) throws Exception {
+
+        //response.setContentType("text/csv");
+        //response.setHeader(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\"" + filename + "\"");
+
+        Resource resource = dataService.listRawData();
+        return send(resource, request);
+
     }
 }

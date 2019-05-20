@@ -26,8 +26,11 @@ import org.simpleflatmapper.converter.ContextualConverter;
 import org.simpleflatmapper.csv.CsvMapper;
 import org.simpleflatmapper.csv.CsvMapperFactory;
 import org.simpleflatmapper.csv.CsvParser;
+import org.simpleflatmapper.csv.CsvWriter;
 import org.simpleflatmapper.map.property.ConverterProperty;
 import org.simpleflatmapper.map.property.DateFormatProperty;
+import org.simpleflatmapper.map.property.RenameProperty;
+import org.simpleflatmapper.util.CheckedConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +47,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.DataSource;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -112,6 +112,8 @@ public class AtccDataService extends BaseService {
         }
         this.statusRepository = statusRepository;
     }
+
+
 
     public ResponseWrapper<AtccRawDataResponse> listRawData(SearchRequest searchRequest) {
         Page<AtccRawData> page;
@@ -440,6 +442,31 @@ public class AtccDataService extends BaseService {
             statusRepository.save(status);
         }
 
+    }
+
+    public Resource listRawData() throws IOException {
+
+        String filename = "rawdata-" + UUID.randomUUID().toString()  + ".csv";
+        Path filePath = this.fileStorageLocation.resolve(filename).normalize();
+
+        List<AtccRawData> data =  rawDataRepository.findAll(Sort.by(DESC, "timeStamp"));
+
+        CsvWriter.CsvWriterDSL<AtccRawData> writerDsl =
+                CsvWriter
+                        .from(AtccRawData.class)
+                        .columns("date" ,"time", "timestamp", "lane", "speed", "direction", "type", "feed");
+        try (FileWriter fileWriter = new FileWriter(filePath.toFile())) {
+            CsvWriter<AtccRawData> writer= writerDsl.to(fileWriter);
+            data.forEach(CheckedConsumer.toConsumer(writer::append));
+        }
+
+        Resource resource = new UrlResource(filePath.toUri());
+
+        if (resource.exists()) {
+            return resource;
+        } else {
+            throw new NotFoundException("File not found " + filename);
+        }
     }
 
     public Resource loadFileAsResource(String id) {

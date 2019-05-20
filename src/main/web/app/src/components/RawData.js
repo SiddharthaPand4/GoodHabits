@@ -127,6 +127,7 @@ export default class RawDataList extends Component {
                         }}
                     />
 
+                    <div style={{cursor:'pointer'}} onClick={()=>this.downloadCsv()}> Download Data</div>
                 </Col>
                 <Col>
                     <div>
@@ -156,5 +157,19 @@ export default class RawDataList extends Component {
         this.setState({
             ss:'/screenshot/' + e.original.id + "?" + Math.random()
         });
+    }
+
+    downloadCsv() {
+        fetch('/csv/')
+            .then((response) => response.blob())
+            .then((blob) => {
+                const url = window.URL.createObjectURL(new Blob([blob]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `data.csv`);
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode.removeChild(link);
+            })
     }
 }
