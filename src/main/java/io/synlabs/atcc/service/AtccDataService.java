@@ -315,7 +315,7 @@ public class AtccDataService extends BaseService {
 
             List<AtccRawData> raws = new LinkedList<>();
 
-            getCSVRecords(fileName, raws);
+            getCSVRecords(fileName, raws, tag);
 
 //            CsvParser
 //                    .mapWith(getCsvFactory())
@@ -332,7 +332,7 @@ public class AtccDataService extends BaseService {
 
     }
 
-    private void getCSVRecords(Path fileName, List<AtccRawData> raws) throws IOException, ParseException {
+    private void getCSVRecords(Path fileName, List<AtccRawData> raws,String tag) throws IOException, ParseException {
         Reader reader = Files.newBufferedReader(fileName);
         CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT
                 .withFirstRecordAsHeader()
@@ -358,6 +358,7 @@ public class AtccDataService extends BaseService {
             atccRawData.setLane(Integer.parseInt(lane));
             atccRawData.setSpeed(new BigDecimal(speed));
             atccRawData.setDirection(Integer.parseInt(direction));
+            atccRawData.setFeed(tag);
             switch (class_no) {
                 case "0":
                     type = "2-Wheeler";
