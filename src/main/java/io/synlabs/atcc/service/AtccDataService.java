@@ -151,7 +151,7 @@ public class AtccDataService extends BaseService {
             case "day":
 
                 try {
-                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, MIN(`date`) AS `from`, MAX(`date`) AS `to` FROM atcc_raw_data GROUP BY type, date ORDER BY `date`, `time` "+(isDescending(searchRequest.getSorted()) ? "DESC" : "ASC") + " LIMIT ?, ? ;";
+                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, MIN(`date`) AS `from`, MAX(`date`) AS `to` FROM atcc_raw_data GROUP BY type, date ORDER BY `date` DESC, `time` DESC LIMIT ?, ? ;";
 
                     connection = dataSource.getConnection();
                     PreparedStatement ps = connection.prepareStatement(query);
@@ -180,7 +180,7 @@ public class AtccDataService extends BaseService {
             case "month":
 
                 try {
-                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, MIN(`date`) AS `from`, MAX(`date`) AS `to` FROM atcc_raw_data GROUP BY type, MONTH(`date`) ORDER BY `date`, `time` "+(isDescending(searchRequest.getSorted()) ? "DESC" : "ASC") + " LIMIT ?, ? ;";
+                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, MIN(`date`) AS `from`, MAX(`date`) AS `to` FROM atcc_raw_data GROUP BY type, MONTH(`date`) ORDER BY `date` DESC, `time` DESC LIMIT ?, ? ;";
 
                     connection = dataSource.getConnection();
                     PreparedStatement ps = connection.prepareStatement(query);
@@ -209,7 +209,7 @@ public class AtccDataService extends BaseService {
             case "hour":
             default:
                 try {
-                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, SEC_TO_TIME(hour(time)*60*60) AS `from`, SEC_TO_TIME((hour(time) + 1)*60*60-1) AS `to` FROM atcc_raw_data GROUP BY type, `date` , hour(time) ORDER BY `date`, `time` "+ (isDescending(searchRequest.getSorted()) ? "DESC" : "ASC") + " LIMIT ?, ? ;";
+                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, SEC_TO_TIME(hour(time)*60*60) AS `from`, SEC_TO_TIME((hour(time) + 1)*60*60-1) AS `to` FROM atcc_raw_data GROUP BY type, `date`, hour(time) ORDER BY `date` DESC, `time` DESC LIMIT ?, ? ;";
 
                     connection = dataSource.getConnection();
                     PreparedStatement ps = connection.prepareStatement(query);
@@ -223,7 +223,7 @@ public class AtccDataService extends BaseService {
                         data.add(atccSummaryData);
                     }
 
-                    query = "SELECT COUNT(*) AS count FROM (SELECT type FROM atcc_raw_data GROUP BY type, `date` , hour(time) ORDER BY `date`, `time` "+ (isDescending(searchRequest.getSorted()) ? "DESC" : "ASC") + ") AS atcc_summary_data";
+                    query = "SELECT COUNT(*) AS count FROM (SELECT type FROM atcc_raw_data GROUP BY type, `date`, hour(time)) AS atcc_summary_data";
                     ps = connection.prepareStatement(query);
                     rs = ps.executeQuery();
                     while (rs.next()) {
