@@ -44,7 +44,7 @@ public class AtccDataController {
     @PostMapping("/import/csv")
     public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("key") String authKey, @RequestParam("tag") String tag) {
 
-        logger.info("File uploaded, now importing..{}", file.getOriginalFilename());
+        logger.info("File uploaded, now importing..{} with tag {}", file.getOriginalFilename(), tag);
         if (uploadKey != null && !uploadKey.equals(authKey)) {
             logger.error("Keys not matching! supplied - {}", authKey);
             throw new AuthException("Not allowed");
