@@ -47,6 +47,10 @@ export default class RawDataList extends Component {
 
     }
 
+    componentDidMount() {
+        setInterval(()=> this.refRawDataTable.fireFetchData(), 12000)
+    }
+
     render() {
         const data = this.state.data;
         const pages = this.state.pages;
@@ -103,6 +107,9 @@ export default class RawDataList extends Component {
             <Row>
                 <Col>
                     <ReactTable
+                        ref={(refRawDataTable) => {
+                            this.refRawDataTable = refRawDataTable;
+                        }}
                         defaultPageSize={10}
                         data={data}
                         columns={columns}
