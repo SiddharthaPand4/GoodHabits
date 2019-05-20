@@ -16,6 +16,7 @@ export default class RawDataList extends Component {
             video: null
         };
         this.getRawData = this.getRawData.bind(this);
+        setInterval(()=> this.refRawDataTable.fireFetchData(), 120000)
     }
 
     getRawData(page, pageSize, sorted, filtered, handleRetrievedData) {
@@ -47,9 +48,9 @@ export default class RawDataList extends Component {
 
     }
 
-    componentDidMount() {
-        setInterval(()=> this.refRawDataTable.fireFetchData(), 12000)
-    }
+
+
+
 
     render() {
         const data = this.state.data;

@@ -23,6 +23,7 @@ export default class SummaryDataList extends Component {
         this.makeChartData = this.makeChartData.bind(this);
         this.getSummaryData = this.getSummaryData.bind(this);
         this.changeInterval = this.changeInterval.bind(this);
+        setInterval(()=> this.changeInterval(), 120000)
     }
 
 
@@ -31,9 +32,6 @@ export default class SummaryDataList extends Component {
         this.refReactTable.fireFetchData();
     }
 
-    componentDidMount() {
-       setInterval(()=> this.changeInterval(), 12000)
-    }
 
 
     getSummaryData(page, pageSize, sorted, filtered, handleRetrievedData) {
