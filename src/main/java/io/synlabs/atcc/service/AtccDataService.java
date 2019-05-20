@@ -361,16 +361,19 @@ public class AtccDataService extends BaseService {
             atccRawData.setFeed(tag);
             switch (class_no) {
                 case "0":
-                    type = "2-Wheeler";
+                    type = "LMV";
                     break;
                 case "1":
-                    type = "4-Wheeler";
+                    type = "LCV";
                     break;
                 case "2":
-                    type = "Bus/Truck";
+                    type = "Truck/Bus";
                     break;
                 case "3":
-                    type = "OSW";
+                    type = "2-Wheeler";
+                    break;
+                case "4":
+                    type = "OSV";
                     break;
                 default:
                     type = "NA";
