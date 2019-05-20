@@ -2,8 +2,9 @@ import React, {Component} from 'react';
 import 'react-table/react-table.css'
 
 import ReactTable from 'react-table'
-import {Row, Col, Button,ButtonGroup} from "reactstrap";
+import {Row, Col, Button, ButtonGroup} from "reactstrap";
 import {Bar} from "react-chartjs-2";
+import * as name from "chartjs-plugin-colorschemes";
 
 export default class SummaryDataList extends Component {
 
@@ -18,6 +19,7 @@ export default class SummaryDataList extends Component {
             interval: "hour"
         };
 
+
         this.makeChartData = this.makeChartData.bind(this);
         this.getSummaryData = this.getSummaryData.bind(this);
         this.changeInterval = this.changeInterval.bind(this);
@@ -27,6 +29,10 @@ export default class SummaryDataList extends Component {
     async changeInterval(value) {
         await this.setState({interval: value});
         this.refReactTable.fireFetchData();
+    }
+
+    componentDidMount() {
+       setInterval(()=> this.changeInterval(), 12000)
     }
 
 
@@ -71,35 +77,71 @@ export default class SummaryDataList extends Component {
     makeChartData(data) {
         let chartdata = {
             labels: [],
-            datasets: [{
-                label: "Data",
-                data: []
-            }]
+            datasets: []
         };
 
+
+        let timeSeries = new Set();
         for (let i = 0; i < data.length; i++) {
-            chartdata.datasets[0].data.push(data[i].count);
-            chartdata.labels.push(data[i].type);
+
+            if (data[i].span !== "Month") {
+                timeSeries.add(data[i].date + " " + data[i].from);
+            } else {
+                timeSeries.add(data[i].from + " - " + data[i].to);
+            }
+
+            let index = -1;
+            for (let j in chartdata.datasets) {
+                if (chartdata.datasets[j].label) {
+                    if (chartdata.datasets[j].label === data[i].type) {
+                        index = j;
+                        break;
+                    }
+                }
+            }
+
+            if (index === -1) {
+                chartdata.datasets.push({
+                    label: data[i].type,
+                    data: [data[i].count]
+                });
+            } else {
+                chartdata.datasets[index].data.push(data[i].count);
+            }
         }
+
+        chartdata.labels = Array.from(timeSeries);
         this.setState({chartdata: chartdata})
     }
 
     render() {
-
-
-        const options =  {scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true
+        const options = {
+            scales: {
+                xAxes: [{
+                    stacked: true,
+                    gridLines: {display: false},
+                }],
+                yAxes: [{
+                    stacked: true,
+                    ticks: {
+                        beginAtZero: true
+                    },
+                }],
+            },
+            legend: {display: true},
+            plugins: {
+                colorschemes: {
+                    scheme: 'brewer.Paired12'
                 }
-            }]
-        }};
+            }
+        };
 
         const chartdata = this.state.chartdata;
         const data = this.state.data;
         const pages = this.state.pages;
         const loading = this.state.loading;
-        const chartComponent = this.state.loading ? (<div>Loading...</div>) : ( <Bar data={chartdata} options={options}/>);
+        const chartComponent = this.state.loading ? (<div>Loading...</div>) : (
+            <Bar data={chartdata} options={options}/>);
         const columns = [{
             Header: 'Date',
             accessor: 'date',
@@ -140,7 +182,9 @@ export default class SummaryDataList extends Component {
                     </ButtonGroup>
 
                     <ReactTable
-                        ref={(refReactTable) => {this.refReactTable = refReactTable;}}
+                        ref={(refReactTable) => {
+                            this.refReactTable = refReactTable;
+                        }}
                         defaultPageSize={10}
                         data={data}
                         columns={columns}
