@@ -17,6 +17,9 @@ import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.joda.time.DateTime;
 import org.simpleflatmapper.converter.Context;
 import org.simpleflatmapper.converter.ContextualConverter;
@@ -35,12 +38,17 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.DataSource;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,6 +58,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -104,7 +114,13 @@ public class AtccDataService extends BaseService {
     }
 
     public ResponseWrapper<AtccRawDataResponse> listRawData(SearchRequest searchRequest) {
-        Page<AtccRawData> page = rawDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(), "id"))));
+        Page<AtccRawData> page;
+        try{
+            page = rawDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(), "id"))));
+
+        }catch (PropertyReferenceException e){
+            page = rawDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize()));
+        }
         List<AtccRawDataResponse> collect = page.get().map(ar -> {
             AtccRawDataResponse ard = new AtccRawDataResponse(ar);
             long vid = getVideoId(ar);
@@ -140,7 +156,7 @@ public class AtccDataService extends BaseService {
             case "day":
 
                 try {
-                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, MIN(`date`) AS `from`, MAX(`date`) AS `to` FROM atcc_raw_data GROUP BY type, date ORDER BY `" + getDefaultSortId(searchRequest.getSorted(), "id") + "` " + (isDescending(searchRequest.getSorted()) ? "DESC" : "ASC") + " LIMIT ?, ? ;";
+                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, MIN(`date`) AS `from`, MAX(`date`) AS `to` FROM atcc_raw_data GROUP BY type, date ORDER BY `date`, `time` "+(isDescending(searchRequest.getSorted()) ? "DESC" : "ASC") + " LIMIT ?, ? ;";
 
                     connection = dataSource.getConnection();
                     PreparedStatement ps = connection.prepareStatement(query);
@@ -169,7 +185,7 @@ public class AtccDataService extends BaseService {
             case "month":
 
                 try {
-                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, MIN(`date`) AS `from`, MAX(`date`) AS `to` FROM atcc_raw_data GROUP BY type, MONTH(`date`) ORDER BY `" + getDefaultSortId(searchRequest.getSorted(), "id") + "` " + (isDescending(searchRequest.getSorted()) ? "DESC" : "ASC") + " LIMIT ?, ? ;";
+                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, MIN(`date`) AS `from`, MAX(`date`) AS `to` FROM atcc_raw_data GROUP BY type, MONTH(`date`) ORDER BY `date`, `time` "+(isDescending(searchRequest.getSorted()) ? "DESC" : "ASC") + " LIMIT ?, ? ;";
 
                     connection = dataSource.getConnection();
                     PreparedStatement ps = connection.prepareStatement(query);
@@ -197,9 +213,31 @@ public class AtccDataService extends BaseService {
 
             case "hour":
             default:
-                Page<AtccSummaryData> page = summaryDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(isDescending(searchRequest.getSorted()) ? DESC : Sort.Direction.ASC, getDefaultSortId(searchRequest.getSorted(), "id"))));
-                data = page.get().collect(Collectors.toList());
-                totalRecords = page.getTotalElements();
+                try {
+                    String query = "SELECT COUNT(1) AS COUNT, type,`date`, 1 AS span, SEC_TO_TIME(hour(time)*60*60) AS `from`, SEC_TO_TIME((hour(time) + 1)*60*60-1) AS `to` FROM atcc_raw_data GROUP BY type, `date` , hour(time) ORDER BY `date`, `time` "+ (isDescending(searchRequest.getSorted()) ? "DESC" : "ASC") + " LIMIT ?, ? ;";
+
+                    connection = dataSource.getConnection();
+                    PreparedStatement ps = connection.prepareStatement(query);
+                    ps.setInt(1, searchRequest.getPageSize() * searchRequest.getPage());
+                    ps.setInt(2, searchRequest.getPageSize());
+                    ResultSet rs = ps.executeQuery();
+
+                    while (rs.next()) {
+                        atccSummaryData = getAtccSummaryData(rs);
+                        atccSummaryData.setSpan(TimeSpan.Hour);
+                        data.add(atccSummaryData);
+                    }
+
+                    query = "SELECT COUNT(*) AS count FROM (SELECT type FROM atcc_raw_data GROUP BY type, `date` , hour(time) ORDER BY `date`, `time` "+ (isDescending(searchRequest.getSorted()) ? "DESC" : "ASC") + ") AS atcc_summary_data";
+                    ps = connection.prepareStatement(query);
+                    rs = ps.executeQuery();
+                    while (rs.next()) {
+                        totalRecords = rs.getLong("count");
+                    }
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
                 break;
         }
 
@@ -277,12 +315,14 @@ public class AtccDataService extends BaseService {
 
             List<AtccRawData> raws = new LinkedList<>();
 
-            CsvParser
-                    .mapWith(getCsvFactory())
-                    .forEach(fileName.toFile(), data -> {
-                        data.setFeed(tag);
-                        raws.add(data);
-                    });
+            getCSVRecords(fileName, raws, tag);
+
+//            CsvParser
+//                    .mapWith(getCsvFactory())
+//                    .forEach(fileName.toFile(), data -> {
+//                        data.setFeed(tag);
+//                        raws.add(data);
+//                    });
 
             return raws;
         } catch (Exception e) {
@@ -292,6 +332,58 @@ public class AtccDataService extends BaseService {
 
     }
 
+    private void getCSVRecords(Path fileName, List<AtccRawData> raws,String tag) throws IOException, ParseException {
+        Reader reader = Files.newBufferedReader(fileName);
+        CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT
+                .withFirstRecordAsHeader()
+                .withSkipHeaderRecord()
+                .withTrim());
+
+        for (CSVRecord csvRecord : csvParser) {
+            // Accessing Values by Column Index
+            String time = csvRecord.get(0);
+            String date = csvRecord.get(1);
+            String timestamp = csvRecord.get(2);
+            String lane = csvRecord.get(3);
+            String speed = csvRecord.get(4);
+            String direction = csvRecord.get(5);
+            String class_no = csvRecord.get(6);
+            String type = "";
+
+
+            AtccRawData atccRawData = new AtccRawData();
+            atccRawData.setTime(new SimpleDateFormat("HH:mm:ss").parse(time));
+            atccRawData.setDate(new SimpleDateFormat("dd/MM/yyyy").parse(date));
+            atccRawData.setTimeStamp(Long.parseLong(timestamp));
+            atccRawData.setLane(Integer.parseInt(lane));
+            atccRawData.setSpeed(new BigDecimal(speed));
+            atccRawData.setDirection(Integer.parseInt(direction));
+            atccRawData.setFeed(tag);
+            switch (class_no) {
+                case "0":
+                    type = "LMV";
+                    break;
+                case "1":
+                    type = "LCV";
+                    break;
+                case "2":
+                    type = "Truck/Bus";
+                    break;
+                case "3":
+                    type = "2-Wheeler";
+                    break;
+                case "4":
+                    type = "OSV";
+                    break;
+                default:
+                    type = "NA";
+            }
+            atccRawData.setType(type);
+            raws.add(atccRawData);
+        }
+    }
+
+
     private CsvMapper<AtccRawData> getCsvFactory() {
         return CsvMapperFactory
                 .newInstance()
@@ -300,19 +392,19 @@ public class AtccDataService extends BaseService {
                 .addAlias("Class", "type")
                 .addColumnProperty("Class",
                         ConverterProperty.of((ContextualConverter<String, String>) (s, context) -> {
-                    switch (s) {
-                        case "0":
-                            return "2-Wheeler";
-                        case "1":
-                            return "4-Wheeler";
-                        case "2":
-                            return "Bus/Truck";
-                        case "3":
-                            return "OSW";
-                        default:
-                            return "NA";
-                    }
-                }))
+                            switch (s) {
+                                case "0":
+                                    return "2-Wheeler";
+                                case "1":
+                                    return "4-Wheeler";
+                                case "2":
+                                    return "Bus/Truck";
+                                case "3":
+                                    return "OSW";
+                                default:
+                                    return "NA";
+                            }
+                        }))
                 .newMapper(AtccRawData.class);
     }
 
