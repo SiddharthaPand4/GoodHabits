@@ -17,6 +17,9 @@ import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.joda.time.DateTime;
 import org.simpleflatmapper.converter.Context;
 import org.simpleflatmapper.converter.ContextualConverter;
@@ -40,7 +43,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.DataSource;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,6 +57,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -277,12 +286,14 @@ public class AtccDataService extends BaseService {
 
             List<AtccRawData> raws = new LinkedList<>();
 
-            CsvParser
-                    .mapWith(getCsvFactory())
-                    .forEach(fileName.toFile(), data -> {
-                        data.setFeed(tag);
-                        raws.add(data);
-                    });
+            getCSVRecords(fileName, raws);
+
+//            CsvParser
+//                    .mapWith(getCsvFactory())
+//                    .forEach(fileName.toFile(), data -> {
+//                        data.setFeed(tag);
+//                        raws.add(data);
+//                    });
 
             return raws;
         } catch (Exception e) {
@@ -292,6 +303,54 @@ public class AtccDataService extends BaseService {
 
     }
 
+    private void getCSVRecords(Path fileName, List<AtccRawData> raws) throws IOException, ParseException {
+        Reader reader = Files.newBufferedReader(fileName);
+        CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT
+                .withFirstRecordAsHeader()
+                .withSkipHeaderRecord()
+                .withTrim());
+
+        for (CSVRecord csvRecord : csvParser) {
+            // Accessing Values by Column Index
+            String time = csvRecord.get(0);
+            String date = csvRecord.get(1);
+            String timestamp = csvRecord.get(2);
+            String lane = csvRecord.get(3);
+            String speed = csvRecord.get(4);
+            String direction = csvRecord.get(5);
+            String class_no = csvRecord.get(6);
+            String type = "";
+
+
+            AtccRawData atccRawData = new AtccRawData();
+            atccRawData.setTime(new SimpleDateFormat("HH:mm:ss").parse(time));
+            atccRawData.setDate(new SimpleDateFormat("dd/MM/yyyy").parse(date));
+            atccRawData.setTimeStamp(Long.parseLong(timestamp));
+            atccRawData.setLane(Integer.parseInt(lane));
+            atccRawData.setSpeed(new BigDecimal(speed));
+            atccRawData.setDirection(Integer.parseInt(direction));
+            switch (class_no) {
+                case "0":
+                    type = "2-Wheeler";
+                    break;
+                case "1":
+                    type = "4-Wheeler";
+                    break;
+                case "2":
+                    type = "Bus/Truck";
+                    break;
+                case "3":
+                    type = "OSW";
+                    break;
+                default:
+                    type = "NA";
+            }
+            atccRawData.setType(type);
+            raws.add(atccRawData);
+        }
+    }
+
+
     private CsvMapper<AtccRawData> getCsvFactory() {
         return CsvMapperFactory
                 .newInstance()
@@ -300,19 +359,19 @@ public class AtccDataService extends BaseService {
                 .addAlias("Class", "type")
                 .addColumnProperty("Class",
                         ConverterProperty.of((ContextualConverter<String, String>) (s, context) -> {
-                    switch (s) {
-                        case "0":
-                            return "2-Wheeler";
-                        case "1":
-                            return "4-Wheeler";
-                        case "2":
-                            return "Bus/Truck";
-                        case "3":
-                            return "OSW";
-                        default:
-                            return "NA";
-                    }
-                }))
+                            switch (s) {
+                                case "0":
+                                    return "2-Wheeler";
+                                case "1":
+                                    return "4-Wheeler";
+                                case "2":
+                                    return "Bus/Truck";
+                                case "3":
+                                    return "OSW";
+                                default:
+                                    return "NA";
+                            }
+                        }))
                 .newMapper(AtccRawData.class);
     }
 
