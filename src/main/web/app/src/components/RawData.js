@@ -180,7 +180,7 @@ export default class RawDataList extends Component {
                 const url = window.URL.createObjectURL(new Blob([blob]));
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', e.original.tag + "-" + e.original.vid + `video.mp4`);
+                link.setAttribute('download', e.original.tag + "-" + e.original.vid + `-video.mp4`);
                 document.body.appendChild(link);
                 link.click();
                 link.parentNode.removeChild(link);
