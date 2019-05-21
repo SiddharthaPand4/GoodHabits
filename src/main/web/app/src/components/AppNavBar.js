@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Collapse, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink } from 'reactstrap';
+import React, {Component} from 'react';
+import {Collapse, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink} from 'reactstrap';
 
 export default class AppNavbar extends Component {
     constructor(props) {
@@ -15,8 +15,9 @@ export default class AppNavbar extends Component {
     }
 
     render() {
-        return <Navbar color="light" expand="md">
-            <NavbarBrand href="/"> <img src="logo.png" style={{width:200, marginTop: -2}} /></NavbarBrand>
+
+        return <Navbar expand="md" light>
+            <NavbarBrand href="/"> <img src="logo.png" style={{width: 200, marginTop: -2}}/></NavbarBrand>
             <NavbarToggler onClick={this.toggle}/>
             <Collapse isOpen={this.state.isOpen} navbar>
                 <Nav className="ml-auto" navbar>
