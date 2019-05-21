@@ -140,6 +140,8 @@ public class AtccDataService extends BaseService {
         return vs == null ? 0 : vs.getTimeStamp();
     }
 
+
+
     public ResponseWrapper<AtccSummaryDataResponse> listSummaryData(SearchRequest searchRequest, String interval) {
 
         ResponseWrapper<AtccSummaryDataResponse> wrapper = new ResponseWrapper<>();
@@ -309,18 +311,8 @@ public class AtccDataService extends BaseService {
 
     private List<AtccRawData> importData(Path fileName, String tag) {
         try {
-
             List<AtccRawData> raws = new LinkedList<>();
-
             getCSVRecords(fileName, raws, tag);
-
-//            CsvParser
-//                    .mapWith(getCsvFactory())
-//                    .forEach(fileName.toFile(), data -> {
-//                        data.setFeed(tag);
-//                        raws.add(data);
-//                    });
-
             return raws;
         } catch (Exception e) {
             logger.error("Error occurred while loading object list from file " + fileName, e);
@@ -380,31 +372,6 @@ public class AtccDataService extends BaseService {
         }
     }
 
-
-    private CsvMapper<AtccRawData> getCsvFactory() {
-        return CsvMapperFactory
-                .newInstance()
-                .addColumnProperty("Time", new DateFormatProperty("HH:mm:ss"))
-                .addColumnProperty("Date", new DateFormatProperty("dd/MM/yyyy"))
-                .addAlias("Class", "type")
-                .addColumnProperty("Class",
-                        ConverterProperty.of((ContextualConverter<String, String>) (s, context) -> {
-                            switch (s) {
-                                case "0":
-                                    return "2-Wheeler";
-                                case "1":
-                                    return "4-Wheeler";
-                                case "2":
-                                    return "Bus/Truck";
-                                case "3":
-                                    return "OSW";
-                                default:
-                                    return "NA";
-                            }
-                        }))
-                .newMapper(AtccRawData.class);
-    }
-
     public String importFile(MultipartFile file, String tag) {
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
         ImportStatus status = new ImportStatus();
@@ -437,6 +404,35 @@ public class AtccDataService extends BaseService {
             statusRepository.save(status);
         }
 
+    }
+
+    public Resource makeSummaryData(String interval) throws IOException {
+
+        String filename = "summary-" + interval + "-" + UUID.randomUUID().toString()  + ".csv";
+        Path filePath = this.fileStorageLocation.resolve(filename).normalize();
+
+        SearchRequest request = new SearchRequest();
+        request.setPage(0);
+        request.setPageSize(1000);
+        ResponseWrapper<AtccSummaryDataResponse> wrapper = listSummaryData(request, interval);
+        List<AtccSummaryDataResponse> data = wrapper.getData();
+
+        CsvWriter.CsvWriterDSL<AtccSummaryDataResponse> writerDsl =
+                CsvWriter
+                        .from(AtccSummaryDataResponse.class)
+                        .columns("type" ,"date", "from", "to", "span", "count");
+        try (FileWriter fileWriter = new FileWriter(filePath.toFile())) {
+            CsvWriter<AtccSummaryDataResponse> writer= writerDsl.to(fileWriter);
+            data.forEach(CheckedConsumer.toConsumer(writer::append));
+        }
+
+        Resource resource = new UrlResource(filePath.toUri());
+
+        if (resource.exists()) {
+            return resource;
+        } else {
+            throw new NotFoundException("File not found " + filename);
+        }
     }
 
     public Resource listRawData() throws IOException {
@@ -542,4 +538,5 @@ public class AtccDataService extends BaseService {
     private Path getScreenshotFileName(AtccRawData data) {
         return this.fileStorageLocation.resolve(data.getFeed() + "_" + data.getTimeStamp() + ".jpg").normalize();
     }
+
 }

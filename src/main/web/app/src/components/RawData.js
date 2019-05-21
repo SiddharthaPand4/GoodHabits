@@ -92,13 +92,19 @@ export default class RawDataList extends Component {
                 Header: 'Video',
                 accessor: 'vid',
                 id: 'video',
-                Cell: e => e.value !== 0 ? <div style={{cursor:'pointer'}} onClick={() => this.showVideo(e)}>Click</div> : <div>NA</div>
+                Cell: e => e.value !== 0 ? <div style={{cursor:'pointer'}} onClick={() => this.showVideo(e)}>View</div> : <div>NA</div>
         },
             {
                 Header: 'Screenshot',
                 accessor: 'id',
                 id: 'ss',
-                Cell: e => e.original.vid !== 0 ? <div style={{cursor:'pointer'}} onClick={() => this.showScreenshot(e)}>Click</div> : <div>NA</div>
+                Cell: e => e.original.vid !== 0 ? <div style={{cursor:'pointer'}} onClick={() => this.showScreenshot(e)}>View</div> : <div>NA</div>
+            },
+            {
+                Header: 'Download',
+                accessor: 'vid',
+                id: 'dlvideo',
+                Cell: e => e.original.vid !== 0 ? <div style={{cursor:'pointer'}} onClick={() => this.downloadVideo(e)}>Download</div> : <div>NA</div>
             }
         ];
 
@@ -165,6 +171,20 @@ export default class RawDataList extends Component {
         this.setState({
             ss:'/screenshot/' + e.original.id + "?" + Math.random()
         });
+    }
+
+    downloadVideo(e) {
+        fetch('/video/' + e.original.vid)
+            .then((response) => response.blob())
+            .then((blob) => {
+                const url = window.URL.createObjectURL(new Blob([blob]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', e.original.tag + "-" + e.original.vid + `video.mp4`);
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode.removeChild(link);
+            })
     }
 
     downloadCsv() {

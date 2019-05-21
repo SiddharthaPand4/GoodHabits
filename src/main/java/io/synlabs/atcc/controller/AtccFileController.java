@@ -59,13 +59,15 @@ public class AtccFileController {
     }
 
     @GetMapping("/csv/")
-    public ResponseEntity<Resource> exportCSV(HttpServletResponse response, HttpServletRequest request) throws Exception {
-
-        //response.setContentType("text/csv");
-        //response.setHeader(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\"" + filename + "\"");
-
+    public ResponseEntity<Resource> exportCSV(HttpServletRequest request) throws Exception {
         Resource resource = dataService.listRawData();
         return send(resource, request);
-
     }
+
+    @GetMapping("/csv/summary/{interval}")
+    public ResponseEntity<Resource> exportSummaryCSV(HttpServletRequest request, @PathVariable String interval) throws Exception {
+        Resource resource = dataService.makeSummaryData(interval);
+        return send(resource, request);
+    }
+
 }
