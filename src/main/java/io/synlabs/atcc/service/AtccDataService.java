@@ -289,7 +289,8 @@ public class AtccDataService extends BaseService {
     }
 
     private AtccVideoData populateFields(String fileName, String tag) {
-        long ts = Long.parseLong(fileName.split("_")[0]);
+        double dts = Double.parseDouble(fileName.split("_")[1]);
+        long ts = (long)dts;
         DateTime videoDate = new DateTime(ts * 1000L);
         AtccVideoData videoData = new AtccVideoData();
         videoData.setDate(videoDate.toDate());
