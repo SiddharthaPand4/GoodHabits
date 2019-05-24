@@ -137,10 +137,8 @@ public class AtccDataService extends BaseService {
 
     private long getVideoId(AtccRawData ar) {
         VideoSummary vs = videoDataRepository.getAssociatedVideo(ar.getTimeStamp(), ar.getFeed());
-        return vs == null ? 0 : vs.getTimeStamp();
+        return vs == null ? 0 : vs.getId();
     }
-
-
 
     public ResponseWrapper<AtccSummaryDataResponse> listSummaryData(SearchRequest searchRequest, String interval) {
 

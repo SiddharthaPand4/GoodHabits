@@ -163,7 +163,7 @@ export default class RawDataList extends Component {
         //seek(time)
         this.setState({
             seek : e.original.timeStamp - e.original.vid,
-            video:'/video/' + e.original.id + "?" + Math.random()
+            video:'/video/' + e.original.vid + "?" + Math.random()
         });
     }
 
@@ -174,7 +174,7 @@ export default class RawDataList extends Component {
     }
 
     downloadVideo(e) {
-        fetch('/video/' + e.original.id)
+        fetch('/video/' + e.original.vid)
             .then((response) => response.blob())
             .then((blob) => {
                 const url = window.URL.createObjectURL(new Blob([blob]));
