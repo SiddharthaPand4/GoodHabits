@@ -25,4 +25,6 @@ public class AtccVideoData extends AbstractPersistable<Long> {
     private String filename;
 
     private String feed;
+
+    private int offset;
 }
