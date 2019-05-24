@@ -472,7 +472,7 @@ public class AtccDataService extends BaseService {
     public Resource loadFileAsResource(String id) {
         String fileName = id;
         try {
-            Optional<AtccVideoData> data = videoDataRepository.findOneByTimeStamp(Long.parseLong(id));
+            Optional<AtccVideoData> data = videoDataRepository.findById(Long.parseLong(id));
             if (data.isPresent()) {
                 fileName = data.get().getFilename();
                 Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
