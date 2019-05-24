@@ -389,7 +389,7 @@ public class AtccDataService extends BaseService {
         long cnt = statusRepository.countByFilenameAndFeedAndStatus(fileName, tag, "OK");
 
         if (cnt > 0) {
-            logger.warn("File {} {} is already imported, not importing again", tag, file);
+            logger.warn("File {}  - {} is already imported, not importing again", tag, fileName);
             return fileName;
         }
 
