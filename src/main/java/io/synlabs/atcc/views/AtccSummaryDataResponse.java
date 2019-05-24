@@ -41,8 +41,8 @@ public class AtccSummaryDataResponse {
                 this.to = localDate.with(lastDayOfMonth()).toString();
                 break;
             default:
-                this.from = new SimpleDateFormat("hh:mm:ss").format(atccSummaryData.getFrom());
-                this.to = new SimpleDateFormat("hh:mm:ss").format(atccSummaryData.getTo());
+                this.from = new SimpleDateFormat("HH:mm:ss").format(atccSummaryData.getFrom());
+                this.to = new SimpleDateFormat("HH:mm:ss").format(atccSummaryData.getTo());
         }
 
 
