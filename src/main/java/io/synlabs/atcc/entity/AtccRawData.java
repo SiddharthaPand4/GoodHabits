@@ -33,4 +33,5 @@ public class AtccRawData extends AbstractPersistable<Long> {
 
     private String feed;
 
+    private String vid;
 }

@@ -289,7 +289,8 @@ public class AtccDataService extends BaseService {
     }
 
     private AtccVideoData populateFields(String fileName, String tag) {
-        long ts = Long.parseLong(fileName.split("_")[0]);
+        double dts = Double.parseDouble(fileName.split("_")[1]);
+        long ts = (long)dts;
         DateTime videoDate = new DateTime(ts * 1000L);
         AtccVideoData videoData = new AtccVideoData();
         videoData.setDate(videoDate.toDate());
@@ -338,27 +339,34 @@ public class AtccDataService extends BaseService {
             String direction = csvRecord.get(5);
             String class_no = csvRecord.get(6);
             String type = "";
+            String vid = csvRecord.size() == 7 ? "" : csvRecord.get(7);
 
+            long ts = (long)Double.parseDouble(timestamp);
 
             AtccRawData atccRawData = new AtccRawData();
             atccRawData.setTime(new SimpleDateFormat("HH:mm:ss").parse(time));
             atccRawData.setDate(new SimpleDateFormat("dd/MM/yyyy").parse(date));
-            atccRawData.setTimeStamp(Long.parseLong(timestamp));
+            atccRawData.setTimeStamp(ts);
             atccRawData.setLane(Integer.parseInt(lane));
             atccRawData.setSpeed(new BigDecimal(speed));
             atccRawData.setDirection(Integer.parseInt(direction));
             atccRawData.setFeed(tag);
+            atccRawData.setVid(vid);
             switch (class_no) {
                 case "0":
+                case "lmv":
                     type = "LMV";
                     break;
+                case "lcv":
                 case "1":
                     type = "LCV";
                     break;
                 case "2":
+                case "truck":
                     type = "Truck/Bus";
                     break;
                 case "3":
+                case "2w":
                     type = "2-Wheeler";
                     break;
                 case "4":
@@ -367,6 +375,7 @@ public class AtccDataService extends BaseService {
                 default:
                     type = "NA";
             }
+
             atccRawData.setType(type);
             raws.add(atccRawData);
         }
