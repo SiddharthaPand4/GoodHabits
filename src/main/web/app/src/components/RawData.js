@@ -80,9 +80,9 @@ export default class RawDataList extends Component {
             accessor: 'lane',
             id: 'lane'
         }, {
-            Header: 'Speed',
-            accessor: 'speed',
-            id: 'speed'
+            Header: 'VID',
+            accessor: 'vehicleId',
+            id: 'VID'
         }, {
             Header: 'Direction',
             accessor: 'tag',
@@ -94,12 +94,12 @@ export default class RawDataList extends Component {
                 id: 'video',
                 Cell: e => e.value !== 0 ? <div style={{cursor:'pointer'}} onClick={() => this.showVideo(e)}>View</div> : <div>NA</div>
         },
-            {
+            /*{
                 Header: 'Screenshot',
                 accessor: 'id',
                 id: 'ss',
                 Cell: e => e.original.vid !== 0 ? <div style={{cursor:'pointer'}} onClick={() => this.showScreenshot(e)}>View</div> : <div>NA</div>
-            },
+            },*/
             {
                 Header: 'Download',
                 accessor: 'vid',
@@ -160,9 +160,15 @@ export default class RawDataList extends Component {
 
     showVideo(e) {
 
+        const seek = e.original.timeStamp - e.original.vts - e.original.offset - 5;
+        console.log("et", e.original.timeStamp);
+        console.log("vts", e.original.vts);
+        console.log("offset", e.original.offset);
+        console.log("seek to", seek);
+        console.log(e);
         //seek(time)
         this.setState({
-            seek : e.original.timeStamp - e.original.vid,
+            seek : seek,
             video:'/video/' + e.original.vid + "?" + Math.random()
         });
     }

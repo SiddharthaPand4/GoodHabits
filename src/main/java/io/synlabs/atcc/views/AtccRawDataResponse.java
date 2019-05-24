@@ -23,7 +23,11 @@ public class AtccRawDataResponse {
     private int direction;
     private String type;
     private String tag;
+    private String vehicleId;
+
     private long vid;
+    private long vts;
+    private int offset;
 
     public AtccRawDataResponse(AtccRawData atccRawData) {
         this.id = atccRawData.getId();
@@ -35,5 +39,6 @@ public class AtccRawDataResponse {
         this.direction = atccRawData.getDirection();
         this.type = atccRawData.getType();
         this.tag = atccRawData.getFeed();
+        this.vehicleId = atccRawData.getVid();
     }
 }

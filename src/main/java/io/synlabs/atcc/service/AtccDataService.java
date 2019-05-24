@@ -120,8 +120,7 @@ public class AtccDataService extends BaseService {
 
         List<AtccRawDataResponse> collect = page.get().map(ar -> {
             AtccRawDataResponse ard = new AtccRawDataResponse(ar);
-            long vid = getVideoId(ar);
-            ard.setVid(vid);
+            setVideoId(ard);
             return ard;
         }).collect(Collectors.toList());
         ResponseWrapper<AtccRawDataResponse> wrapper = new ResponseWrapper<>();
@@ -135,9 +134,13 @@ public class AtccDataService extends BaseService {
         return videoDataRepository.getAssociatedVideo(ar.getTimeStamp(), ar.getFeed());
     }
 
-    private long getVideoId(AtccRawData ar) {
-        VideoSummary vs = videoDataRepository.getAssociatedVideo(ar.getTimeStamp(), ar.getFeed());
-        return vs == null ? 0 : vs.getId();
+    private void setVideoId(AtccRawDataResponse ard) {
+        VideoSummary vs = videoDataRepository.getAssociatedVideo(ard.getTimeStamp(), ard.getTag());
+        if (vs != null) {
+            ard.setVid(vs.getId());
+            ard.setVts(vs.getTimeStamp());
+            ard.setOffset(vs.getOffset());
+        }
     }
 
     public ResponseWrapper<AtccSummaryDataResponse> listSummaryData(SearchRequest searchRequest, String interval) {
