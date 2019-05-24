@@ -34,4 +34,6 @@ public class ImportStatus extends AbstractPersistable<Long> {
     private String status;
 
     private String error;
+
+    private String feed;
 }

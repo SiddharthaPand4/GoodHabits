@@ -299,6 +299,7 @@ public class AtccDataService extends BaseService {
         videoData.setTimeStamp(ts);
         videoData.setFeed(tag);
         videoData.setFilename(fileName);
+        videoData.setOffset(13);
         return videoData;
     }
 
@@ -384,10 +385,18 @@ public class AtccDataService extends BaseService {
 
     public String importFile(MultipartFile file, String tag) {
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+
+        long cnt = statusRepository.countByFilenameAndFeedAndStatus(fileName, tag, "OK");
+
+        if (cnt > 0) {
+            logger.warn("File {} {} is already imported, not importing again", tag, file);
+            return fileName;
+        }
+
         ImportStatus status = new ImportStatus();
         status.setFilename(fileName);
         status.setImportDate(new Date());
-
+        status.setFeed(tag);
         try {
             // Check if the file's name contains invalid characters
             if (fileName.contains("..")) {
