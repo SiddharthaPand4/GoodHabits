@@ -453,7 +453,7 @@ public class AtccDataService extends BaseService {
         }
     }
 
-    public Resource listRawData() throws IOException {
+    public File listRawData() throws IOException {
 
         String filename = "rawdata-" + UUID.randomUUID().toString() + ".csv";
         Path filePath = this.fileStorageLocation.resolve(filename).normalize();
@@ -466,7 +466,8 @@ public class AtccDataService extends BaseService {
 
         logger.info("Page Size - 10000, Current Page - ", currPage);
         logger.info("Total Pages - ", totalPages);
-        try (FileWriter fileWriter = new FileWriter(filePath.toFile())) {
+        File file = filePath.toFile();
+        try (FileWriter fileWriter = new FileWriter(file)) {
 
             CsvWriter.CsvWriterDSL<AtccRawData> writerDsl =
                     CsvWriter
@@ -484,11 +485,10 @@ public class AtccDataService extends BaseService {
 
         }
 
+        /*Resource resource = new UrlResource(filePath.toUri());*/
 
-        Resource resource = new UrlResource(filePath.toUri());
-
-        if (resource.exists()) {
-            return resource;
+        if (file.exists()) {
+            return file;
         } else {
             throw new NotFoundException("File not found " + filename);
         }
