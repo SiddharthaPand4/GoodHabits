@@ -461,20 +461,24 @@ public class AtccDataService extends BaseService {
 
         //List<AtccRawData> data =  rawDataRepository.findAll(Sort.by(DESC, "timeStamp"));
         int currPage = 0;
-        Page<AtccRawData> page = rawDataRepository.findAll(PageRequest.of(currPage, 100, Sort.by(DESC, "timeStamp")));
+        Page<AtccRawData> page = rawDataRepository.findAll(PageRequest.of(currPage, 10000, Sort.by(DESC, "timeStamp")));
+        int totalPages = page.getTotalPages();
 
+        logger.info("Page Size - 10000, Current Page - ", currPage);
+        logger.info("Total Pages - ", totalPages);
         try (FileWriter fileWriter = new FileWriter(filePath.toFile())) {
 
             CsvWriter.CsvWriterDSL<AtccRawData> writerDsl =
                     CsvWriter
                             .from(AtccRawData.class)
-                            .columns("date", "time", "timestamp", "lane", "speed", "direction", "type", "feed");
+                            .columns("date", "time", "timestamp", "lane", "speed", "direction", "type", "feed", "vid");
 
             CsvWriter<AtccRawData> writer = writerDsl.to(fileWriter);
             page.get().forEach(CheckedConsumer.toConsumer(writer::append));
 
-            for (currPage = 1; currPage < page.getTotalPages(); currPage++) {
-                page = rawDataRepository.findAll(PageRequest.of(currPage, 100, Sort.by(DESC, "timeStamp")));
+            for (currPage = 1; currPage < totalPages; currPage++) {
+                logger.info("Current Page - ", currPage);
+                page = rawDataRepository.findAll(PageRequest.of(currPage, 10000, Sort.by(DESC, "timeStamp")));
                 page.get().forEach(CheckedConsumer.toConsumer(writer::append));
             }
 
