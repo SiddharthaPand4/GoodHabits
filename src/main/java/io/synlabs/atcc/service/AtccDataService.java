@@ -114,9 +114,8 @@ public class AtccDataService extends BaseService {
     }
 
 
-
     public ResponseWrapper<AtccRawDataResponse> listRawData(SearchRequest searchRequest) {
-        Page<AtccRawData> page = rawDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by( DESC , "date", "time")));
+        Page<AtccRawData> page = rawDataRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(DESC, "date", "time")));
 
         List<AtccRawDataResponse> collect = page.get().map(ar -> {
             AtccRawDataResponse ard = new AtccRawDataResponse(ar);
@@ -324,7 +323,7 @@ public class AtccDataService extends BaseService {
 
     }
 
-    private void getCSVRecords(Path fileName, List<AtccRawData> raws,String tag) throws IOException, ParseException {
+    private void getCSVRecords(Path fileName, List<AtccRawData> raws, String tag) throws IOException, ParseException {
         Reader reader = Files.newBufferedReader(fileName);
         CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT
                 .withFirstRecordAsHeader()
@@ -456,19 +455,31 @@ public class AtccDataService extends BaseService {
 
     public Resource listRawData() throws IOException {
 
-        String filename = "rawdata-" + UUID.randomUUID().toString()  + ".csv";
+        String filename = "rawdata-" + UUID.randomUUID().toString() + ".csv";
         Path filePath = this.fileStorageLocation.resolve(filename).normalize();
 
-        List<AtccRawData> data =  rawDataRepository.findAll(Sort.by(DESC, "timeStamp"));
 
-        CsvWriter.CsvWriterDSL<AtccRawData> writerDsl =
-                CsvWriter
-                        .from(AtccRawData.class)
-                        .columns("date" ,"time", "timestamp", "lane", "speed", "direction", "type", "feed");
+        //List<AtccRawData> data =  rawDataRepository.findAll(Sort.by(DESC, "timeStamp"));
+        int currPage = 0;
+        Page<AtccRawData> page = rawDataRepository.findAll(PageRequest.of(currPage, 100, Sort.by(DESC, "timeStamp")));
+
         try (FileWriter fileWriter = new FileWriter(filePath.toFile())) {
-            CsvWriter<AtccRawData> writer= writerDsl.to(fileWriter);
-            data.forEach(CheckedConsumer.toConsumer(writer::append));
+
+            CsvWriter.CsvWriterDSL<AtccRawData> writerDsl =
+                    CsvWriter
+                            .from(AtccRawData.class)
+                            .columns("date", "time", "timestamp", "lane", "speed", "direction", "type", "feed");
+
+            CsvWriter<AtccRawData> writer = writerDsl.to(fileWriter);
+            page.get().forEach(CheckedConsumer.toConsumer(writer::append));
+
+            for (currPage = 1; currPage < page.getTotalPages(); currPage++) {
+                page = rawDataRepository.findAll(PageRequest.of(currPage, 100, Sort.by(DESC, "timeStamp")));
+                page.get().forEach(CheckedConsumer.toConsumer(writer::append));
+            }
+
         }
+
 
         Resource resource = new UrlResource(filePath.toUri());
 
@@ -529,7 +540,7 @@ public class AtccDataService extends BaseService {
             long offset = data.getTimeStamp() - summary.getTimeStamp();
             Path filePath = this.fileStorageLocation.resolve(summary.getFileName()).normalize();
             FFmpegBuilder builder = new FFmpegBuilder()
-                .setInput(filePath.toString())
+                    .setInput(filePath.toString())
                     .overrideOutputFiles(true)
                     .addOutput(screenshotfile.toString())
                     .setStartOffset(offset, TimeUnit.SECONDS)
@@ -547,8 +558,7 @@ public class AtccDataService extends BaseService {
             } else {
                 throw new NotFoundException("ffmpeg not working :( no screenshot generated");
             }
-        }
-        else {
+        } else {
             throw new NotFoundException("Not a valid id");
         }
 
