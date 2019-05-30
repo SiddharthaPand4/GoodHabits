@@ -14,7 +14,7 @@ import static org.hibernate.jpa.QueryHints.HINT_FETCH_SIZE;
 public interface AtccRawDataRepository extends JpaRepository<AtccRawData, Long> {
 
     @QueryHints(value = @QueryHint(name = HINT_FETCH_SIZE, value = "" + Integer.MIN_VALUE))
-    @Query(value = "SELECT d from AtccRawData d")
+    @Query(value = "SELECT d from AtccRawData d order by timeStamp desc")
     public Stream<AtccRawData> getAll();
 
 }
