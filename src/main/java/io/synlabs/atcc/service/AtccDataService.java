@@ -43,6 +43,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -63,6 +64,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -493,6 +495,38 @@ public class AtccDataService extends BaseService {
             throw new NotFoundException("File not found " + filename);
         }
     }
+
+
+    @Transactional(readOnly = true)
+    public File streamRawData() throws IOException {
+
+        String filename = "rawdata-" + UUID.randomUUID().toString() + ".csv";
+        Path filePath = this.fileStorageLocation.resolve(filename).normalize();
+
+        File file = filePath.toFile();
+        try (FileWriter fileWriter = new FileWriter(file)) {
+
+            CsvWriter.CsvWriterDSL<AtccRawData> writerDsl =
+                    CsvWriter
+                            .from(AtccRawData.class)
+                            .columns("date", "time", "timestamp", "lane", "speed", "direction", "type", "feed", "vid");
+
+            CsvWriter<AtccRawData> writer = writerDsl.to(fileWriter);
+
+            try (Stream<AtccRawData> atccRawDataStream = rawDataRepository.getAll()) {
+                atccRawDataStream.forEach(CheckedConsumer.toConsumer(writer::append));
+            }
+        }
+
+        /*Resource resource = new UrlResource(filePath.toUri());*/
+
+        if (file.exists()) {
+            return file;
+        } else {
+            throw new NotFoundException("File not found " + filename);
+        }
+    }
+
 
     public Resource loadFileAsResource(String id) {
         String fileName = id;

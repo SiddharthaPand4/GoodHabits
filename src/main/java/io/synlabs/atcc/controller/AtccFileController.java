@@ -67,6 +67,11 @@ public class AtccFileController {
         String contentType = null;
         contentType = request.getServletContext().getMimeType(file.getAbsolutePath());
 
+        // Fallback to the default content type if type could not be determined
+        if(contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getPath() + "\"")
@@ -75,7 +80,7 @@ public class AtccFileController {
 
     @GetMapping("/csv/")
     public ResponseEntity<Resource> exportCSV(HttpServletRequest request) throws Exception {
-        File file = dataService.listRawData();
+        File file = dataService.streamRawData();
         return send(file, request);
     }
 
