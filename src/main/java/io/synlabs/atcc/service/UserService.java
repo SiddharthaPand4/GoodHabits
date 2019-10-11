@@ -1,6 +1,6 @@
 package io.synlabs.atcc.service;
 
-import io.synlabs.atcc.entity.AtccUser;
+import io.synlabs.atcc.entity.SynVisionUser;
 import io.synlabs.atcc.entity.CurrentUser;
 import io.synlabs.atcc.entity.Role;
 import io.synlabs.atcc.jpa.AtccUserRepository;
@@ -38,7 +38,7 @@ public class UserService extends BaseService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        AtccUser user = userRepository.findByEmail(email);
+        SynVisionUser user = userRepository.findByEmail(email);
         if (user == null) {
             throw new UsernameNotFoundException(String.format("User %s was not found", email));
 
@@ -46,8 +46,8 @@ public class UserService extends BaseService implements UserDetailsService {
         return new CurrentUser(user, new String[]{"ROLE_USER"});
     }
 
-    public AtccUser checkLogin(String username, String password) {
-        AtccUser user = userRepository.findByEmail(username);
+    public SynVisionUser checkLogin(String username, String password) {
+        SynVisionUser user = userRepository.findByEmail(username);
 
         if (user == null) return null;
 
@@ -68,8 +68,8 @@ public class UserService extends BaseService implements UserDetailsService {
     }
 
 
-    public AtccUser createUser(String username, String email) {
-        AtccUser user = new AtccUser();
+    public SynVisionUser createUser(String username, String email) {
+        SynVisionUser user = new SynVisionUser();
         user.setExternalId(username);
         user.setActive(true);
         user.setEmail(email);

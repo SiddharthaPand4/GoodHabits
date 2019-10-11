@@ -1,11 +1,10 @@
 package io.synlabs.atcc.jpa;
 
-import io.synlabs.atcc.entity.AtccVideoData;
+import io.synlabs.atcc.entity.atcc.AtccVideoData;
 import io.synlabs.atcc.views.VideoSummary;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface AtccVideoDataRepository extends JpaRepository<AtccVideoData, Long> {

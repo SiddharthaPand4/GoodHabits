@@ -1,15 +1,15 @@
 package io.synlabs.atcc.jpa;
 
 
-import io.synlabs.atcc.entity.AtccUser;
+import io.synlabs.atcc.entity.SynVisionUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AtccUserRepository extends JpaRepository<AtccUser, Long> {
+public interface AtccUserRepository extends JpaRepository<SynVisionUser, Long> {
 
-    AtccUser findByEmailAndActiveTrue(String email);
+    SynVisionUser findByEmailAndActiveTrue(String email);
 
-    AtccUser findByEmail(String email);
+    SynVisionUser findByEmail(String email);
 
 }

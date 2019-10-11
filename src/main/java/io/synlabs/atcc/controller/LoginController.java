@@ -1,6 +1,6 @@
 package io.synlabs.atcc.controller;
 
-import io.synlabs.atcc.entity.AtccUser;
+import io.synlabs.atcc.entity.SynVisionUser;
 import io.synlabs.atcc.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,7 @@ public class LoginController {
     @PostMapping("/login_check")
     public String login(@RequestParam("username") String username, @RequestParam("password") String password) {
         logger.info("Inside login {} {}", username, password);
-        AtccUser user = userService.checkLogin(username, password);
+        SynVisionUser user = userService.checkLogin(username, password);
 
         if (user == null) {
             return "redirect:/login?error";

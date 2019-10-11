@@ -5,18 +5,18 @@ import org.springframework.security.core.userdetails.User;
 
 public class CurrentUser extends User {
 
-    private AtccUser user;
+    private SynVisionUser user;
 
-    public CurrentUser(AtccUser user, String[] roles) {
+    public CurrentUser(SynVisionUser user, String[] roles) {
         super(user.getEmail(), user.getPasswordHash(), AuthorityUtils.createAuthorityList(roles));
         this.user = user;
     }
 
-    public AtccUser getUser() {
+    public SynVisionUser getUser() {
         return user;
     }
 
-    public void setUser(AtccUser user) {
+    public void setUser(SynVisionUser user) {
         this.user = user;
     }
 }

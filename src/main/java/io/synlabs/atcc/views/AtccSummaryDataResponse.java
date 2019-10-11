@@ -1,6 +1,6 @@
 package io.synlabs.atcc.views;
 
-import io.synlabs.atcc.entity.AtccSummaryData;
+import io.synlabs.atcc.entity.atcc.AtccSummaryData;
 import io.synlabs.atcc.enums.TimeSpan;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,8 +9,6 @@ import static java.time.temporal.TemporalAdjusters.*;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 @Getter
 @Setter

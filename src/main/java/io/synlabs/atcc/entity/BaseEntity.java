@@ -3,6 +3,7 @@ package io.synlabs.atcc.entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -14,14 +15,16 @@ import static io.synlabs.atcc.service.BaseService.getAtccUser;
 @MappedSuperclass
 @Getter
 @Setter
-public abstract class BaseEntity extends LazyAuditable<AtccUser, Long> {
+public abstract class BaseEntity extends LazyAuditable<SynVisionUser, Long> {
 
+    @ManyToOne
+    private Org org;
 
     @PrePersist
     private void preCreate() {
         this.setCreatedDate(LocalDateTime.now());
 
-        AtccUser current = getCurrentUser();
+        SynVisionUser current = getCurrentUser();
         if (current != null) {
             this.setCreatedBy(current);
         }
@@ -30,14 +33,14 @@ public abstract class BaseEntity extends LazyAuditable<AtccUser, Long> {
     @PreUpdate
     private void preUpdate() {
         this.setLastModifiedDate(LocalDateTime.now());
-        AtccUser current = getCurrentUser();
+        SynVisionUser current = getCurrentUser();
         if (current != null) {
             this.setLastModifiedBy(current);
         }
 
     }
 
-    private AtccUser getCurrentUser() {
+    private SynVisionUser getCurrentUser() {
         return getAtccUser();
     }
 

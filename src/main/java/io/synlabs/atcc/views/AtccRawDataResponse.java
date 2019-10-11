@@ -1,14 +1,11 @@
 package io.synlabs.atcc.views;
 
-import io.synlabs.atcc.entity.AtccRawData;
+import io.synlabs.atcc.entity.atcc.AtccRawData;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Getter
 @Setter

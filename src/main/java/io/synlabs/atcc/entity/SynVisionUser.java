@@ -9,7 +9,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-public class AtccUser extends BaseEntity {
+public class SynVisionUser extends BaseEntity {
 
     @Column(name = "email", nullable = false, unique = true, length = 50)
     private String email;

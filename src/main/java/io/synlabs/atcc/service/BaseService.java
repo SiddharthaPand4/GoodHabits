@@ -1,6 +1,6 @@
 package io.synlabs.atcc.service;
 
-import io.synlabs.atcc.entity.AtccUser;
+import io.synlabs.atcc.entity.SynVisionUser;
 import io.synlabs.atcc.entity.CurrentUser;
 import io.synlabs.atcc.views.SortRequest;
 import org.springframework.security.core.Authentication;
@@ -11,11 +11,11 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 
 public class BaseService {
-    public AtccUser getCurrentUser() {
+    public SynVisionUser getCurrentUser() {
         return getAtccUser();
     }
 
-    public static AtccUser getAtccUser() {
+    public static SynVisionUser getAtccUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             return null;

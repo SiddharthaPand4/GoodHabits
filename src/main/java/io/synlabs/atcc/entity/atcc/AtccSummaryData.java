@@ -1,4 +1,4 @@
-package io.synlabs.atcc.entity;
+package io.synlabs.atcc.entity.atcc;
 
 import io.synlabs.atcc.enums.TimeSpan;
 import lombok.Getter;

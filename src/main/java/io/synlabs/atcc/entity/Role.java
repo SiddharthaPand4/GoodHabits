@@ -24,7 +24,7 @@ public class Role extends BaseEntity {
     private String name;
 
     @ManyToMany(mappedBy = "roles")
-    private Set<AtccUser> users;
+    private Set<SynVisionUser> users;
 
     public Role() {
     }
