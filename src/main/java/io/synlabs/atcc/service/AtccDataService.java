@@ -34,6 +34,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -54,6 +55,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -444,7 +446,7 @@ public class AtccDataService extends BaseService {
         }
     }
 
-    public Resource listRawData() throws IOException {
+    public File listRawData() throws IOException {
 
         String filename = "rawdata-" + UUID.randomUUID().toString() + ".csv";
         Path filePath = this.fileStorageLocation.resolve(filename).normalize();
@@ -452,34 +454,70 @@ public class AtccDataService extends BaseService {
 
         //List<AtccRawData> data =  rawDataRepository.findAll(Sort.by(DESC, "timeStamp"));
         int currPage = 0;
-        Page<AtccRawData> page = rawDataRepository.findAll(PageRequest.of(currPage, 100, Sort.by(DESC, "timeStamp")));
+        Page<AtccRawData> page = rawDataRepository.findAll(PageRequest.of(currPage, 10000, Sort.by(DESC, "timeStamp")));
+        int totalPages = page.getTotalPages();
 
-        try (FileWriter fileWriter = new FileWriter(filePath.toFile())) {
+        logger.info("Page Size - 10000, Current Page - ", currPage);
+        logger.info("Total Pages - ", totalPages);
+        File file = filePath.toFile();
+        try (FileWriter fileWriter = new FileWriter(file)) {
 
             CsvWriter.CsvWriterDSL<AtccRawData> writerDsl =
                     CsvWriter
                             .from(AtccRawData.class)
-                            .columns("date", "time", "timestamp", "lane", "speed", "direction", "type", "feed");
+                            .columns("date", "time", "timestamp", "lane", "speed", "direction", "type", "feed", "vid");
 
             CsvWriter<AtccRawData> writer = writerDsl.to(fileWriter);
             page.get().forEach(CheckedConsumer.toConsumer(writer::append));
 
-            for (currPage = 1; currPage < page.getTotalPages(); currPage++) {
-                page = rawDataRepository.findAll(PageRequest.of(currPage, 100, Sort.by(DESC, "timeStamp")));
+            for (currPage = 1; currPage < totalPages; currPage++) {
+                logger.info("Current Page - ", currPage);
+                page = rawDataRepository.findAll(PageRequest.of(currPage, 10000, Sort.by(DESC, "timeStamp")));
                 page.get().forEach(CheckedConsumer.toConsumer(writer::append));
             }
 
         }
 
+        /*Resource resource = new UrlResource(filePath.toUri());*/
 
-        Resource resource = new UrlResource(filePath.toUri());
-
-        if (resource.exists()) {
-            return resource;
+        if (file.exists()) {
+            return file;
         } else {
             throw new NotFoundException("File not found " + filename);
         }
     }
+
+
+    @Transactional(readOnly = true)
+    public File streamRawData() throws IOException {
+
+        String filename = "rawdata-" + UUID.randomUUID().toString() + ".csv";
+        Path filePath = this.fileStorageLocation.resolve(filename).normalize();
+
+        File file = filePath.toFile();
+        try (FileWriter fileWriter = new FileWriter(file)) {
+
+            CsvWriter.CsvWriterDSL<AtccRawData> writerDsl =
+                    CsvWriter
+                            .from(AtccRawData.class)
+                            .columns("date", "time", "timestamp", "lane", "speed", "direction", "type", "feed", "vid");
+
+            CsvWriter<AtccRawData> writer = writerDsl.to(fileWriter);
+
+            try (Stream<AtccRawData> atccRawDataStream = rawDataRepository.getAll()) {
+                atccRawDataStream.forEach(CheckedConsumer.toConsumer(writer::append));
+            }
+        }
+
+        /*Resource resource = new UrlResource(filePath.toUri());*/
+
+        if (file.exists()) {
+            return file;
+        } else {
+            throw new NotFoundException("File not found " + filename);
+        }
+    }
+
 
     public Resource loadFileAsResource(String id) {
         String fileName = id;

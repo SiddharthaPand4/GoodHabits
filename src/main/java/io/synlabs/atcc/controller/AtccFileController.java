@@ -4,6 +4,7 @@ import io.synlabs.atcc.service.AtccDataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +13,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import org.springframework.core.io.Resource;
+
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 @Controller
@@ -58,10 +62,26 @@ public class AtccFileController {
                 .body(resource);
     }
 
+    public ResponseEntity<Resource> send(File file, HttpServletRequest request) throws FileNotFoundException {
+        // Try to determine file's content type
+        String contentType = null;
+        contentType = request.getServletContext().getMimeType(file.getAbsolutePath());
+
+        // Fallback to the default content type if type could not be determined
+        if(contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getPath() + "\"")
+                .body(new InputStreamResource(new FileInputStream(file)));
+    }
+
     @GetMapping("/csv/")
     public ResponseEntity<Resource> exportCSV(HttpServletRequest request) throws Exception {
-        Resource resource = dataService.listRawData();
-        return send(resource, request);
+        File file = dataService.streamRawData();
+        return send(file, request);
     }
 
     @GetMapping("/csv/summary/{interval}")

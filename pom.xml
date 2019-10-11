@@ -6,7 +6,7 @@
 
     <groupId>io.synlabs</groupId>
     <artifactId>synvision</artifactId>
-    <version>0.55</version>
+    <version>0.60</version>
     <name>synvision</name>
     <description>Synvision Management Application</description>
     <packaging>war</packaging>
