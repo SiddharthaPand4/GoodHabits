@@ -1,0 +1,39 @@
+{
+  "name": "synvisionweb",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "antd": "^3.23.2",
+    "axios": "^0.19.0",
+    "history": "^4.10.1",
+    "jsonwebtoken": "^8.5.1",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "react-moment": "^0.9.2",
+    "react-player": "^1.12.0",
+    "react-router-dom": "^5.0.1",
+    "react-scripts": "3.1.1"
+  },
+  "scripts": {
+    "start": "./node_modules/.bin/react-scripts start",
+    "build": "./node_modules/.bin/react-scripts build",
+    "test": "./node_modules/.bin/react-scripts test",
+    "eject": "./node_modules/.bin/react-scripts eject"
+  },
+  "proxy": "http://localhost:9000",
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

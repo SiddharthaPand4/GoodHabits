@@ -1,0 +1,274 @@
+import React, {Component} from "react";
+import {
+    Button,
+    Card,
+    Col,
+    Collapse,
+    DatePicker,
+    Divider,
+    Empty,
+    Icon,
+    Modal,
+    Pagination,
+    Row,
+    Table,
+    Tag,
+    TimePicker
+} from 'antd';
+import IncidentService from "../services/IncidentService";
+import ReactPlayer from "react-player";
+import Moment from 'react-moment';
+
+const {Column, ColumnGroup} = Table;
+const {Panel} = Collapse;
+const ButtonGroup = Button.Group;
+
+
+export default class IncidentListView extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            loading: true,
+            videoVisible: false,
+            layout: "table",
+            incidents: {},
+            filter: {
+                page: 1,
+                pageSize: 10
+            }
+        };
+        this.handleDone = this.handleDone.bind(this);
+        this.archiveIncident = this.archiveIncident.bind(this);
+        this.refresh = this.refresh.bind(this);
+        this.onFromDateChange = this.onFromDateChange.bind(this);
+        this.onFromTimeChange = this.onFromTimeChange.bind(this);
+
+        this.onToDateChange = this.onToDateChange.bind(this);
+        this.onToTimeChange = this.onToTimeChange.bind(this);
+        this.onPageChange = this.onPageChange.bind(this);
+        this.onPageSizeChange = this.onPageSizeChange.bind(this);
+    }
+
+    componentDidMount() {
+        this.refresh();
+    }
+
+    refresh() {
+        IncidentService.getIncidents(this.state.filter).then(request => {
+            this.setState({"incidents": request.data, loading: false})
+        })
+    }
+
+    //cant use refresh to read from state as state may not have been set
+    refreshNow(filter) {
+        IncidentService.getIncidents(filter).then(request => {
+            this.setState({"incidents": request.data, loading: false, filter: filter})
+        })
+    }
+
+    archiveIncident(incident) {
+        IncidentService.archiveIncident(incident).then(() => {
+            this.refresh()
+        })
+    }
+
+    changeLayout(layout) {
+        this.setState({"layout": layout});
+    }
+
+    showVideo(videoid) {
+
+        let cp = ReactPlayer.canPlay("/api/incident/video/" + this.state.videoid + "/video.mp4");
+        this.setState({
+            videoVisible: true,
+            videoid: videoid
+        });
+    };
+
+    handleDone() {
+        this.setState({
+            videoVisible: false,
+            videoid: ""
+        });
+    };
+
+    onFromDateChange(date) {
+        let filter = this.state.filter;
+        filter.fromDate = date.format("YYYY-MM-DD");
+        this.setState({filter: filter});
+    }
+
+    onFromTimeChange(time) {
+        let filter = this.state.filter;
+        filter.fromTime = time.format("HH:mm:ss");
+        this.setState({filter: filter});
+    }
+
+    onToDateChange(date) {
+        let filter = this.state.filter;
+        filter.toDate = date.format("YYYY-MM-DD");
+        this.setState({filter: filter});
+    }
+
+    onToTimeChange(time) {
+        let filter = this.state.filter;
+        filter.toTime = time.format("HH:mm:ss");
+        this.setState({filter: filter});
+    }
+
+    onPageChange(page, pageSize) {
+        let filter = this.state.filter;
+        filter.page = page;
+        filter.pageSize = pageSize;
+        this.refreshNow(filter)
+    }
+
+    onPageSizeChange(current, pageSize) {
+        let filter = this.state.filter;
+        filter.pageSize = pageSize;
+        this.refreshNow(filter);
+    }
+
+    render() {
+
+        let layout = this.state.layout;
+
+        return (
+
+            <div>
+                <Modal
+                    title="Video"
+                    visible={this.state.videoVisible}
+                    onOk={this.handleDone}
+                    onCancel={this.handleDone}
+                >
+                    {this.state.videoVisible ? (<ReactPlayer controls={true}
+                                                             url={"/api/incident/video/" + this.state.videoid + "/video.mp4"}
+                                                             width="300"/>) : (<div><Empty/></div>)}
+                </Modal>
+
+                <Collapse bordered={false} defaultActiveKey={['1', '2']}>
+                    <Panel header="Filter" key="1">
+                        <span>From: </span>
+                        <DatePicker onChange={this.onFromDateChange}/>&nbsp;&nbsp;
+                        <TimePicker minuteStep={15} secondStep={60} onChange={this.onFromTimeChange}/>&nbsp;&nbsp;
+                        <span>To: </span>
+                        <DatePicker onChange={this.onToDateChange}/>&nbsp;&nbsp;
+                        <TimePicker minuteStep={15} secondStep={60} onChange={this.onToTimeChange}/>&nbsp;&nbsp;
+
+                        <ButtonGroup>
+                            <Button type={layout === "list" ? "primary" : ""} size="small" icon="unordered-list"
+                                    onClick={() => {
+                                        this.changeLayout("list")
+                                    }}/>
+                            <Button type={layout === "table" ? "primary" : ""} size="small" icon="table"
+                                    onClick={() => {
+                                        this.changeLayout("table")
+                                    }}/>
+                        </ButtonGroup>&nbsp;&nbsp;
+                        <Button onClick={() => {
+                            this.refresh()
+                        }}><Icon type="reload"/>Reload</Button>
+                    </Panel>
+                    <Panel header="Incidents" key="2">
+                        {layout === "table" ? (this.renderGrid()) : (this.renderTable())}
+                    </Panel>
+                </Collapse>
+            </div>
+        )
+    }
+
+    renderGrid() {
+
+        if (this.state.loading || !this.state.incidents || this.state.incidents.Total === 0) {
+            return <Empty description={false}/>
+        }
+
+        let incidents = this.state.incidents.Incidents;
+        let count = this.state.incidents.Total;
+
+        return <div style={{background: '#ECECEC', padding: '30px'}}>
+            <Row>
+                <Col>
+                    <Pagination onChange={this.onPageChange} onShowSizeChange={this.onPageSizeChange} showSizeChanger
+                                defaultCurrent={1} total={count}/>
+                </Col>
+            </Row>
+
+            <Row gutter={16}>
+                {
+                    incidents.map((incident, index) =>
+                        <Col span={8} key={index}>
+                            <Card
+                                title={
+                                    <div>
+                                        <Tag color="#f50">{incident.event_type}</Tag>
+                                        <Tag color="#2db7f5">{incident.event_date}</Tag>
+                                        <Tag color="#87d068"><span><Moment format="LTS">{incident.event_start}</Moment></span><Icon
+                                            type="right" hidden/><span hidden><Moment
+                                            format="LTS">{incident.event_end}</Moment></span></Tag>
+                                        <Tag color="#108ee9" hidden>{incident.event_duration}s</Tag>
+                                    </div>
+                                }
+                                bordered={true}
+                                cover={<img alt="incident image"
+                                            src={"/api/incident/image/" + incident.image_id + "/image.jpg"}/>}
+                                actions={[
+                                    <Icon type="right" key="play" onClick={() => this.showVideo(incident.video_id)}/>,
+                                    <Icon type="edit" key="edit"/>,
+                                    <Icon type="delete" key="delete" onClick={() => this.archiveIncident(incident)}/>,
+                                ]}
+                            >
+
+                            </Card>
+                        </Col>
+                    )
+                }
+            </Row>
+        </div>
+    }
+
+    renderTable() {
+
+        if (this.state.loading || !this.state.incidents || this.state.incidents.Total === 0) {
+            return <Empty description={false}/>
+        }
+
+        let incidents = this.state.incidents.Incidents;
+        let count = this.state.incidents.Total;
+
+        const paginationOptions = {
+            showSizeChanger: true,
+            showQuickJumper: true,
+            onShowSizeChange: this.onPageSizeChange,
+            onChange: this.onPageChange,
+            total: count
+        };
+
+        const pagination = {
+            ...paginationOptions,
+            total: count,
+            current: this.state.filter.page,
+            pageSize: this.state.filter.pageSize
+        };
+
+        return (
+            <Table dataSource={incidents} pagination={pagination}>
+                <Column title="ID" dataIndex="ID" key="ID"/>
+                <Column title="Type" dataIndex="event_type" key="event_type"/>
+                <Column title="Date" dataIndex="event_date" key="event_date"/>
+                <Column title="Time" dataIndex="event_start" key="event_start"
+                        render={event_start => (<Moment format="LTS">{event_start}</Moment>)}/>
+                <Column title="Duration" dataIndex="event_duration" key="event_duration" render={dur => (<span>{dur}s</span>) }/>
+                <Column title="Time" dataIndex="event_start" key="event_start" render={(text, incident) => (
+                    <span>
+                        <a onClick={() => this.showVideo(incident.video_id)}>Play</a>
+                        <Divider type="vertical"/>
+                        <a onClick={() => this.archiveIncident(incident)}>Delete</a>
+                    </span>
+                )}/>
+            </Table>
+        )
+    }
+}
