@@ -26,6 +26,9 @@ export default class Sidebar extends Component {
                     <Menu.Item key="1" className="sidebar-nav-link">
                         <Link to='/incidents'><Icon type='alert' /><span className='nav-text'>Incidents</span></Link>
                     </Menu.Item>
+                    <Menu.Item key="6" className="sidebar-nav-link">
+                        <Link to='/anpr'><Icon type='box-plot' /><span className='nav-text'>ANPR</span></Link>
+                    </Menu.Item>
                     <Menu.Item key="2">
                         <Link to='/feed'><Icon type='video-camera' /><span className='nav-text'>Feed</span></Link>
                     </Menu.Item>
