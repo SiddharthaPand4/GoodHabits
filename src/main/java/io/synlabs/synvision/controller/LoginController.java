@@ -52,7 +52,7 @@ public class LoginController {
         }
 
         String authToken = Jwts.builder()
-                .setSubject(login.getEmail())
+                .setSubject(login.getEmail() == null ? login.getUsername() : login.getEmail())
                 .setIssuedAt(new Date())
                 .setExpiration(getAuthExpiration())
                 .signWith(key).compact();

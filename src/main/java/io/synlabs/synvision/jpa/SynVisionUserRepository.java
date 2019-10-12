@@ -13,4 +13,6 @@ public interface SynVisionUserRepository extends JpaRepository<SynVisionUser, Lo
     SynVisionUser findByEmail(String email);
 
     SynVisionUser findByUsernameAndActiveTrue(String username);
+
+    SynVisionUser findByEmailOrUsername(String email, String username);
 }

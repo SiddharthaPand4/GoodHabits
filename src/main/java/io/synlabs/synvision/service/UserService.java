@@ -63,10 +63,10 @@ public class UserService extends BaseService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        SynVisionUser user = userRepository.findByEmail(email);
+    public UserDetails loadUserByUsername(String subject) throws UsernameNotFoundException {
+        SynVisionUser user = userRepository.findByEmailOrUsername(subject, subject);
         if (user == null) {
-            throw new UsernameNotFoundException(String.format("User %s was not found", email));
+            throw new UsernameNotFoundException(String.format("User %s was not found", subject));
 
         }
         return new CurrentUser(user, new String[]{"ROLE_USER"});
