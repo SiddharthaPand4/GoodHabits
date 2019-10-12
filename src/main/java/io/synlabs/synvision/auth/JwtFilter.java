@@ -118,6 +118,7 @@ public class JwtFilter extends GenericFilterBean {
             SecurityContextHolder.getContext().setAuthentication(result);
 
         } catch (JwtException e) {
+            logger.error("Error parsing token", e);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }

@@ -1,5 +1,5 @@
 
-import axios from 'axios';
+import axios from "./axios";
 
 class AnprService {
 
@@ -10,7 +10,6 @@ class AnprService {
     getEvents() {
         return axios.get('/api/anpr/events');
     }
-
 }
 
 export default AnprService.Instance()

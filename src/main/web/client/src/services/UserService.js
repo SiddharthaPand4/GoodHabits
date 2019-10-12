@@ -1,4 +1,5 @@
-import axios from "axios";
+
+import axios from "./axios";
 
 class UserService {
 
@@ -25,16 +26,17 @@ class UserService {
     }
 
     async login(username, password) {
-
-        let response = await axios.post('/api/login', JSON.stringify({ username, password }));
+        let response = await axios.post('/login', JSON.stringify({ username, password }), {headers: {
+                'Content-Type': 'application/json',
+            }});
         console.log("got this response", response);
         let token = response.data;
         if (token) {
-            // store user details and jwt token in local storage to keep user logged in between page refreshes
             localStorage.setItem('syntoken', JSON.stringify(token));
         }
         return token;
     }
+
 }
 
 export default UserService.Instance()
