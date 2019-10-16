@@ -1,34 +1,6 @@
-
 import axios from "./axios";
 import { authHeader } from '../helpers/auth-header';
 import { config } from '../helpers/config'
-
-export function handleResponse(response) {
-    return new Promise((resolve, reject) => {
-     var contentType = response.headers.get("content-type");
-        if (response.ok) {
-            // return json if it was returned in the response
-
-           if (contentType && contentType.includes("application/json")) {
-                response.json().then(json => resolve(json));
-            } else {
-                resolve("success");
-            }
-        } else {
-
-            if (contentType && contentType.includes("application/json")) {
-                // return error message from response body
-                response.json().then(json => reject(json));
-            } else {
-                response.text().then(text => reject(text));
-            }
-        }
-    });
-}
-
-export function handleError(error) {
-    return Promise.reject(error && error.message);
-}
 
 class UserService {
 

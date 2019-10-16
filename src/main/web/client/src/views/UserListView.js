@@ -21,6 +21,7 @@ export default class UserListView extends Component {
             visible: false ,
         }
 
+
         this.addUser=this.addUser.bind(this);
         this.refresh=this.refresh.bind(this);
         this.refreshUsers=this.refreshUsers.bind(this);
@@ -40,6 +41,7 @@ export default class UserListView extends Component {
         error=>{
           message.error(error.response.data.message);
         });
+
         UserService.getRoles().then(request =>{
             this.setState({roles:request.data})
         },
@@ -171,20 +173,6 @@ class UserForm extends Component {
         this.close = this.close.bind(this);
 
     }
-
-
-
- //componentWillReceiveProps(nextProps){
- //  if (this.state.user !== nextProps.user) {
- //     this.setState({user:nextProps.user})
- //     this.props.form.setFieldsValue({
- //           username: nextProps.user.userName,
- //           firstname: nextProps.user.firstName,
- //           lastname: nextProps.user.lastName,
- //           email:this.state.user.email
- //    })
- //  }
- //}
 
     close(){
         this.props.close();

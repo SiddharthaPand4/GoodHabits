@@ -1,6 +1,5 @@
 
 import axios from 'axios';
-import {handleError, handleResponse} from "./UserService";
 
 class TriggerService {
 
@@ -9,23 +8,23 @@ class TriggerService {
     }
 
     getTrigger() {
-        return axios.get('/api/trigger/').then(handleResponse, handleError);
+        return axios.get('/api/trigger/');
     }
 
     getTriggers() {
-        return axios.get('/api/triggers').then(handleResponse, handleError);
+        return axios.get('/api/triggers');
     }
 
     createTrigger(trigger) {
-        return axios.post('/api/trigger/', trigger).then(handleResponse, handleError);
+        return axios.post('/api/trigger/', trigger);
     }
 
     saveTrigger(trigger) {
-        return axios.put('/api/trigger/' + trigger.ID, trigger).then(handleResponse, handleError);
+        return axios.put('/api/trigger/' + trigger.ID, trigger);
     }
 
     deleteTrigger(trigger) {
-        return axios.delete('/api/trigger/' + trigger.ID).then(handleResponse, handleError);
+        return axios.delete('/api/trigger/' + trigger.ID);
     }
 }
 
