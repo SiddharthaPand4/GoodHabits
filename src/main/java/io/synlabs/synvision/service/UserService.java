@@ -3,9 +3,14 @@ package io.synlabs.synvision.service;
 import io.synlabs.synvision.entity.SynVisionUser;
 import io.synlabs.synvision.entity.CurrentUser;
 import io.synlabs.synvision.entity.Role;
+import io.synlabs.synvision.ex.NotFoundException;
+import io.synlabs.synvision.ex.ValidationException;
 import io.synlabs.synvision.jpa.SynVisionUserRepository;
 import io.synlabs.synvision.jpa.RoleRepository;
 import io.synlabs.synvision.views.LoginRequest;
+import io.synlabs.synvision.views.UserRequest;
+import io.synlabs.synvision.views.UserResponse;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +27,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService extends BaseService implements UserDetailsService {
@@ -94,22 +98,96 @@ public class UserService extends BaseService implements UserDetailsService {
     }
 
 
-    public SynVisionUser createUser(String username, String email) {
-        SynVisionUser user = new SynVisionUser();
-        user.setExternalId(username);
-        user.setActive(true);
-        user.setEmail(email);
-        user.getRoles().add(roleRepository.getOneByName("USER"));
+    public SynVisionUser createUser(UserRequest request) {
 
-        //TODO do we send an email also?
-        //String randomPassword = RandomStringUtils.randomAlphanumeric(8);
-        logger.info("Temp password: {}", "nhaidemo");
-        user.setPasswordHash(encoder.encode("nhaidemo"));
+        validateUser(request);
+        SynVisionUser user = userRepository.findByEmail(request.getEmail());
+        if (user != null)
+        {
+            throw new ValidationException(String.format("Already exist [email=%s]", request.getEmail()));
+        }
+
+        user = request.toEntity();
+        user.setOrg(getAtccUser().getOrg());
+
+        for (String role : request.getRoles())
+        {
+            user.addRole(roleRepository.getOneByName(role));
+        }
+
+         //TODO do we send an email also?
+         //String randomPassword = RandomStringUtils.randomAlphanumeric(8);
+         logger.info("Temp password: {}", "nhaidemo");
+         user.setPasswordHash(encoder.encode("nhaidemo"));
+
         return userRepository.save(user);
+    }
+
+    public SynVisionUser updateUser(UserRequest request) {
+
+        validateUser(request);
+        SynVisionUser user = userRepository.findByEmail(request.getEmail());
+
+        request.toEntity(user);
+        user.setOrg(getAtccUser().getOrg());
+
+        user.getRoles().clear();
+        for (String role : request.getRoles())
+        {
+            user.addRole(roleRepository.getOneByName(role));
+        }
+
+        return userRepository.save(user);
+    }
+
+    private void validateUser(UserRequest request)
+    {
+        if (StringUtils.isEmpty(request.getFirstName()))
+        {
+            throw new ValidationException("First Name is required.");
+        }
+
+
+        if (StringUtils.isEmpty(request.getEmail()))
+        {
+            throw new ValidationException("User email is required.");
+        }
     }
 
     public Set<String> getUserPrivileges(SynVisionUser user)
     {
         return user.getPrivileges();
+    }
+
+    public void deleteUser(UserRequest request) {
+
+        SynVisionUser user = userRepository.getOne(request.getId());
+
+        if (user == null)
+        {
+            throw new NotFoundException("Cannot locate user");
+        }
+
+        if (Objects.equals(user.getId(), getAtccUser().getId()))
+        {
+            throw new ValidationException("You cannot deactivate yourself!");
+        }
+
+        user.setActive(false);
+        userRepository.saveAndFlush(user);
+    }
+
+    public List<UserResponse> listUsers() {
+        List<SynVisionUser> users=userRepository.findAllByOrgAndActiveTrue(getAtccUser().getOrg());
+        return  users.stream().map(UserResponse::new).collect(Collectors.toList());
+    }
+
+    public SynVisionUser getUserDetail(UserRequest request)
+    {
+        return userRepository.getOne(request.getId());
+    }
+
+    public List<Role> getRoles(){
+        return roleRepository.findAllByOrg(getAtccUser().getOrg());
     }
 }

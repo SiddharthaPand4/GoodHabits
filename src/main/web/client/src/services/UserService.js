@@ -1,5 +1,34 @@
 
 import axios from "./axios";
+import { authHeader } from '../helpers/auth-header';
+import { config } from '../helpers/config'
+
+export function handleResponse(response) {
+    return new Promise((resolve, reject) => {
+     var contentType = response.headers.get("content-type");
+        if (response.ok) {
+            // return json if it was returned in the response
+
+           if (contentType && contentType.includes("application/json")) {
+                response.json().then(json => resolve(json));
+            } else {
+                resolve("success");
+            }
+        } else {
+
+            if (contentType && contentType.includes("application/json")) {
+                // return error message from response body
+                response.json().then(json => reject(json));
+            } else {
+                response.text().then(text => reject(text));
+            }
+        }
+    });
+}
+
+export function handleError(error) {
+    return Promise.reject(error && error.message);
+}
 
 class UserService {
 
@@ -7,12 +36,42 @@ class UserService {
         return new UserService()
     }
 
-    getUser() {
-        return axios.get('/api/user/');
+    getUser(userId) {
+        return axios.get('/api/user/' + userId);
     }
 
     getUsers() {
-        return axios.get('/api/users');
+        return axios.get('/api/user/');
+    }
+
+    getRoles(){
+        return axios.get('/api/user/roles');
+    }
+
+     createUser(user){
+        const requestBody = {
+             userName:user.userName,
+             lastName:user.lastName,
+             firstName:user.firstName,
+             email:user.email,
+             id:user.id,
+             roles:user.roles,
+        };
+
+        const request = {
+            method: 'POST',
+            headers: authHeader(),
+            data: JSON.stringify(requestBody),
+            url: config.apiUrl + 'api/user/'
+        };
+        if(user.id){
+            request.method='PUT';
+        }
+        return axios(request);
+    }
+
+    deleteUser(userId){
+        return axios.delete('/api/user/' + userId);
     }
 
     isLoggedIn() {

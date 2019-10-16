@@ -7,6 +7,8 @@ import io.synlabs.synvision.ex.AuthException;
 import io.synlabs.synvision.service.UserService;
 import io.synlabs.synvision.views.LoginRequest;
 import io.synlabs.synvision.views.LoginResponse;
+import io.synlabs.synvision.views.UserRequest;
+import io.synlabs.synvision.views.UserResponse;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
