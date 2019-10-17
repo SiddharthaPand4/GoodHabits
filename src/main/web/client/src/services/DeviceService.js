@@ -1,5 +1,6 @@
-
-import axios from 'axios';
+import axios from './axios';
+import { authHeader } from '../helpers/auth-header';
+import { config } from '../helpers/config'
 
 class DeviceService {
 
@@ -8,7 +9,7 @@ class DeviceService {
     }
 
     getDevice() {
-        return axios.get('/api/device');
+       return axios.get('/api/device');
     }
 
     getDeviceConfig() {

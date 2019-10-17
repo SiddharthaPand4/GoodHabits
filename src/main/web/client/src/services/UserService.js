@@ -1,5 +1,6 @@
-
 import axios from "./axios";
+import { authHeader } from '../helpers/auth-header';
+import { config } from '../helpers/config'
 
 class UserService {
 
@@ -7,12 +8,42 @@ class UserService {
         return new UserService()
     }
 
-    getUser() {
-        return axios.get('/api/user/');
+    getUser(userId) {
+        return axios.get('/api/user/' + userId);
     }
 
     getUsers() {
-        return axios.get('/api/users');
+        return axios.get('/api/user/');
+    }
+
+    getRoles(){
+        return axios.get('/api/user/roles');
+    }
+
+     createUser(user){
+        const requestBody = {
+             userName:user.userName,
+             lastName:user.lastName,
+             firstName:user.firstName,
+             email:user.email,
+             id:user.id,
+             roles:user.roles,
+        };
+
+        const request = {
+            method: 'POST',
+            headers: authHeader(),
+            data: JSON.stringify(requestBody),
+            url: config.apiUrl + 'api/user/'
+        };
+        if(user.id){
+            request.method='PUT';
+        }
+        return axios(request);
+    }
+
+    deleteUser(userId){
+        return axios.delete('/api/user/' + userId);
     }
 
     isLoggedIn() {

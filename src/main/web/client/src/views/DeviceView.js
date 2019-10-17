@@ -14,6 +14,9 @@ export default class DeviceView extends Component {
     componentDidMount() {
         DeviceService.getDevice().then(request => {
             this.setState({"device" : request.data, loading : false})
+        },
+        error =>{
+            console.log("error");
         })
     }
 
@@ -30,9 +33,9 @@ export default class DeviceView extends Component {
             <div>
                 <Card title="Device details" style={{width: 300}} extra={<Link to="/device/conf"><Icon type="setting" /></Link>}>
                     <p>ID: {device.fingerprint}</p>
-                    <p>Name:{device.name}</p>
-                    <p>Model:{device.model}</p>
-                    <p>License:{device.license}</p>
+                    <p>Name: {device.name}</p>
+                    <p>Model: {device.model}</p>
+                    <p>License: {device.license}</p>
                     <p>Status: {device.status}</p>
                     <p>RegisteredTo: {device.registeredTo}</p>
 
