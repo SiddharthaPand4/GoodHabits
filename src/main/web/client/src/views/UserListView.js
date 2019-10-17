@@ -167,6 +167,7 @@ class UserForm extends Component {
 
         this.state = {
             user:{},
+            loading: false
         };
 
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -179,9 +180,8 @@ class UserForm extends Component {
     }
 
     handleSubmit(e) {
-
+        this.setState({loading: true});
         e.preventDefault();
-
         const form = this.props.form;
         var user = {};
         user.firstName = form.getFieldValue("firstname");
@@ -215,7 +215,6 @@ class UserForm extends Component {
             return
         }
         console.log('saving user', user);
-        this.setState({submitted: true, loading: true});
         UserService.createUser(user).then(response => {
             if(user.id){
                  message.success("User updated")
@@ -227,6 +226,7 @@ class UserForm extends Component {
 
         }).catch(error=> {
             console.log(error);
+            this.setState({loading: false});
         });
     }
 
@@ -240,54 +240,49 @@ class UserForm extends Component {
          return (
             <div>
              <Form onSubmit={this.handleSubmit} className="user-form">
-                        <Form.Item>
+                        <Form.Item label="Username">
                             {getFieldDecorator('username', {
                                 initialValue:this.props.user.userName,
                                 rules: [{required: true, message: 'Please input your username!'}],
                             })(
                                 <Input
                                     type="text"
-                                    addonBefore="Username"
                                     placeholder="Username"
-
 
                                 />,
                             )}
                         </Form.Item>
-                        <Form.Item>
+                        <Form.Item label="Firstname">
                             {getFieldDecorator('firstname', {
                                 initialValue:this.props.user.firstName,
                                 rules: [{required: true, message: 'Please input your Firstname!'}],
                             })(
                                 <Input
-                                    addonBefore="Firstname"
                                     type="text"
                                     placeholder="Firstname"
 
                                 />,
                             )}
                         </Form.Item>
-                        <Form.Item>
+                        <Form.Item label="Lastname">
                             {getFieldDecorator('lastname', {
                                 initialValue:this.props.user.lastName,
                                 rules: [{required: true, message: 'Please input your lastname!'}],
                             })(
                                 <Input
                                     type="text"
-                                    addonBefore="Lastname"
                                     placeholder="Lastname"
 
                                 />,
                             )}
                         </Form.Item>
-                        <Form.Item>
+                        <Form.Item label="Email">
                             {getFieldDecorator('email', {
                                 initialValue:this.props.user.email,
                                 rules: [{required: true, message: 'Please input your email!'}],
                             })(
                                 <Input
-                                    type="text"
-                                    addonBefore="Email"
+                                    type="email"
                                     placeholder="email"
 
                                 />,
@@ -310,7 +305,7 @@ class UserForm extends Component {
                         </Form.Item>
 
                         <div align="right">
-                            <Button type="primary" htmlType="submit" className="user-form-button">
+                            <Button type="primary" htmlType="submit" className="user-form-button" loading={this.state.loading}>
                                 Save
                             </Button>
                             <span>&nbsp;&nbsp;</span>
