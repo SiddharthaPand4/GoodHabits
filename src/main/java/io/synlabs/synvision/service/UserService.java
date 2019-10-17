@@ -152,6 +152,16 @@ public class UserService extends BaseService implements UserDetailsService {
         {
             throw new ValidationException("User email is required.");
         }
+
+        if (StringUtils.isEmpty(request.getUserName()))
+        {
+            throw new ValidationException("Username is required.");
+        }
+
+        if (StringUtils.isEmpty(request.getLastName()))
+        {
+            throw new ValidationException("Lastname is required.");
+        }
     }
 
     public Set<String> getUserPrivileges(SynVisionUser user)
