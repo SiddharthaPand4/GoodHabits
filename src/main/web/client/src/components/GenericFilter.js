@@ -42,29 +42,49 @@ export default class DeviceView extends Component {
         this.setState({"layout": layout});
     }
 
-    onFromDateChange(date) {
-        let filter = this.state.filter;
-        filter.fromDate = date.format("YYYY-MM-DD");
-        this.setState({filter: filter});
-    }
+   onFromDateChange(date) {
+       let filter = this.state.filter;
+       if(date!=null){
+         filter.fromDate = date.format("YYYY-MM-DD");
+       }
+       else{
+           filter.fromDate=null;
+       }
+       this.setState({filter: filter});
+   }
 
-    onFromTimeChange(time) {
-        let filter = this.state.filter;
-        filter.fromTime = time.format("HH:mm:ss");
-        this.setState({filter: filter});
-    }
+   onFromTimeChange(time) {
+       let filter = this.state.filter;
+       if(time!=null){
+         filter.fromTime = time.format("HH:mm:ss");
+       }
+       else{
+           filter.fromTime=null;
+       }
+       this.setState({filter: filter});
+   }
 
-    onToDateChange(date) {
-        let filter = this.state.filter;
-        filter.toDate = date.format("YYYY-MM-DD");
-        this.setState({filter: filter});
-    }
+   onToDateChange(date) {
+       let filter = this.state.filter;
+       if(date!=null){
+         filter.toDate = date.format("YYYY-MM-DD");
+       }
+       else{
+         filter.toDate=null;
+       }
+       this.setState({filter: filter});
+   }
 
-    onToTimeChange(time) {
-        let filter = this.state.filter;
+   onToTimeChange(time) {
+       let filter = this.state.filter;
+       if(time!=null){
         filter.toTime = time.format("HH:mm:ss");
-        this.setState({filter: filter});
-    }
+       }
+       else{
+         filter.toTime=null;
+       }
+       this.setState({filter: filter});
+   }
 
     render() {
 

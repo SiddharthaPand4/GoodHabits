@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import {Table, Divider,Row,Col,Card,Form,Button,Input,Icon,Typography,Select,Modal,message} from 'antd';
 import UserService from "../services/UserService";
 import {EventBus} from "../components/event";
+import '../form.css';
 const { Column} = Table;
 const {Text} = Typography;
 const { confirm } = Modal;
@@ -101,7 +102,7 @@ export default class UserListView extends Component {
           console.log('Cancel');
         },
       });
-    }
+     }
 
     render() {
 
@@ -112,7 +113,7 @@ export default class UserListView extends Component {
 
         return (
          <div>
-            <Row gutter={16}>
+            <Row gutter={2}>
                 <Col span={2}>
                     <Button type="primary" onClick={this.addUser}>
                          + ADD
@@ -120,39 +121,34 @@ export default class UserListView extends Component {
                 </Col>
             </Row>
             <br/>
-            <Row gutter={16}>
+            <Row gutter={24}>
                 <Col span={12}>
-                    <Table dataSource={this.state.users} >
-                        <Column title="Username" dataIndex="userName" key="userName" render={(text, record) => (
-                            <span><a href={"user/" + record.ID}>{text}</a></span>
-                        )}/>
-                        <Column title="Email" dataIndex="email" key="email" />
-                        <Column title="Token" dataIndex="token" key="token" />
-                        <Column title="Action" key="action" render={(text, record) => (
-                                <span>
-                                    <a onClick={this.showUser.bind(this,record.id)}>Edit</a>
-                                    <Divider type="vertical" />
-                                    <a onClick={this.showDeleteConfirm.bind(this,record.id,this.refresh)}>Delete</a>
-                                </span>
-                            )}
-                        />
-                    </Table>
-
-                </Col>
-
-               {showUserDetails && mode=="Edit"  ?  <Col span={12}>
-                    <Card title="Edit User">
-
-                        <WrappedUserForm user={this.state.user} roles={this.state.roles} refresh={this.refreshUsers} close={this.close}/>
+                    <Card
+                      className="limitable"
+                      bodyStyle={{ padding: "0px", marginTop: 20, width: "100%" }}
+                    >
+                     <Table dataSource={this.state.users} pagination={false} scroll={{ x: true}} >
+                            <Column title="Username" dataIndex="userName" key="userName" render={(text, record) => (
+                                <span><a href={"user/" + record.ID}>{text}</a></span>
+                            )}/>
+                            <Column title="Email" dataIndex="email" key="email" />
+                            <Column title="Token" dataIndex="token" key="token" />
+                            <Column title="Action" key="action" render={(text, record) => (
+                                    <span>
+                                        <a onClick={this.showUser.bind(this,record.id)}>Edit</a>
+                                        <Divider type="vertical" />
+                                        <a onClick={this.showDeleteConfirm.bind(this,record.id,this.refresh)}>Delete</a>
+                                    </span>
+                                )}
+                            />
+                     </Table>
                     </Card>
                 </Col>
-                :null}
 
-               {showUserDetails && mode=="Add"  ?  <Col span={12}>
-                    <Card title="Add User">
-                        <WrappedUserForm user={this.state.user} roles={this.state.roles} refresh={this.refreshUsers}  close={this.close}/>
-                    </Card>
-                </Col>
+               {showUserDetails ?
+                 <Col span={12}>
+                   <WrappedUserForm user={this.state.user} roles={this.state.roles} refresh={this.refreshUsers} close={this.close} mode={this.state.mode}/>
+                 </Col>
                 :null}
 
             </Row>
@@ -180,7 +176,6 @@ class UserForm extends Component {
     }
 
     handleSubmit(e) {
-        this.setState({loading: true});
         e.preventDefault();
         const form = this.props.form;
         var user = {};
@@ -204,9 +199,7 @@ class UserForm extends Component {
         if (!user.email) {
             validationError = "Missing email"
         }
-        if(!user.password && this.props.mode=="Add"){
-            validationError="Missing password"
-        }
+
         if(user.roles.length==0){
             validationError="Missing role"
         }
@@ -214,6 +207,7 @@ class UserForm extends Component {
             this.setState({validationError: validationError});
             return
         }
+        this.setState({loading: true});
         console.log('saving user', user);
         UserService.createUser(user).then(response => {
             if(user.id){
@@ -222,6 +216,7 @@ class UserForm extends Component {
             else{
                  message.success("User created")
             }
+            this.setState({loading: false});
             this.props.refresh();
 
         }).catch(error=> {
@@ -238,88 +233,88 @@ class UserForm extends Component {
         const validationError = this.state.validationError;
 
          return (
-            <div>
-             <Form onSubmit={this.handleSubmit} className="user-form">
-                        <Form.Item label="Username">
-                            {getFieldDecorator('username', {
-                                initialValue:this.props.user.userName,
-                                rules: [{required: true, message: 'Please input your username!'}],
-                            })(
-                                <Input
-                                    type="text"
-                                    placeholder="Username"
+            <Card title={this.props.mode=="Add"? "Add User" : "Edit User"}>
 
-                                />,
-                            )}
-                        </Form.Item>
-                        <Form.Item label="Firstname">
-                            {getFieldDecorator('firstname', {
-                                initialValue:this.props.user.firstName,
-                                rules: [{required: true, message: 'Please input your Firstname!'}],
-                            })(
-                                <Input
-                                    type="text"
-                                    placeholder="Firstname"
+               <Form onSubmit={this.handleSubmit} className="user-form" >
+                    <Form.Item label="Username" className="formitem">
+                        {getFieldDecorator('username', {
+                            initialValue:this.props.user.userName,
+                            rules: [{required: true, message: 'Please input your username!'}],
+                        })(
+                            <Input
+                                type="text"
+                                placeholder="Username"
 
-                                />,
-                            )}
-                        </Form.Item>
-                        <Form.Item label="Lastname">
-                            {getFieldDecorator('lastname', {
-                                initialValue:this.props.user.lastName,
-                                rules: [{required: true, message: 'Please input your lastname!'}],
-                            })(
-                                <Input
-                                    type="text"
-                                    placeholder="Lastname"
+                            />,
+                        )}
+                    </Form.Item>
+                    <Form.Item label="Firstname" className="formitem">
+                        {getFieldDecorator('firstname', {
+                            initialValue:this.props.user.firstName,
+                            rules: [{required: true, message: 'Please input your Firstname!'}],
+                        })(
+                            <Input
+                                type="text"
+                                placeholder="Firstname"
 
-                                />,
-                            )}
-                        </Form.Item>
-                        <Form.Item label="Email">
-                            {getFieldDecorator('email', {
-                                initialValue:this.props.user.email,
-                                rules: [{required: true, message: 'Please input your email!'}],
-                            })(
-                                <Input
-                                    type="email"
-                                    placeholder="email"
+                            />,
+                        )}
+                    </Form.Item>
+                    <Form.Item label="Lastname" className="formitem">
+                        {getFieldDecorator('lastname', {
+                            initialValue:this.props.user.lastName,
+                            rules: [{required: true, message: 'Please input your lastname!'}],
+                        })(
+                            <Input
+                                type="text"
+                                placeholder="Lastname"
 
-                                />,
-                            )}
-                        </Form.Item>
-                        <Form.Item label="Role">
-                                  {getFieldDecorator('role', {
-                                    initialValue:this.props.user.roles,
-                                    rules: [{ required: true, message: 'Please select role!' }],
-                                  })(
-                                    <Select mode="multiple"
-                                      placeholder="Select a role"
-                                    >
-                                    {this.props.roles.map(role =>
-                                         <option key={role.id} value={role.name} >{role.name}</option>
-                                     )}
+                            />,
+                        )}
+                    </Form.Item>
+                    <Form.Item label="Email" className="formitem">
+                        {getFieldDecorator('email', {
+                            initialValue:this.props.user.email,
+                            rules: [{required: true, message: 'Please input your email!'}],
+                        })(
+                            <Input
+                                type="email"
+                                placeholder="email"
 
-                                    </Select>,
-                                  )}
-                        </Form.Item>
+                            />,
+                        )}
+                    </Form.Item>
+                    <Form.Item label="Role" className="formitem">
+                          {getFieldDecorator('role', {
+                            initialValue:this.props.user.roles,
+                            rules: [{ required: true, message: 'Please select role!' }],
+                          })(
+                            <Select mode="multiple"
+                              placeholder="Select a role"
+                            >
+                            {this.props.roles.map(role =>
+                                 <option key={role.id} value={role.name} >{role.name}</option>
+                             )}
 
-                        <div align="right">
-                            <Button type="primary" htmlType="submit" className="user-form-button" loading={this.state.loading}>
-                                Save
-                            </Button>
-                            <span>&nbsp;&nbsp;</span>
-                            <Button type="secondary"  onClick={this.close}>
-                                Close
-                            </Button>
-                        </div>
+                            </Select>,
+                              )}
+                    </Form.Item>
+                    <br/>
+                    <div align="right">
+                        <Button type="primary" htmlType="submit" className="user-form-button"  size="small" loading={this.state.loading}>
+                            Save
+                        </Button>
+                        <span>&nbsp;&nbsp;</span>
+                        <Button type="secondary" className="user-form-button"  size="small" onClick={this.close}>
+                            Close
+                        </Button>
+                    </div>
+
+                    {validationError && <Text type="danger">{validationError}</Text>}
+               </Form>
+            </Card>
 
 
-
-                        {validationError && <Text type="danger">{validationError}</Text>}
-                    </Form>
-              </div>
-
-        )
+         )
     }
 }
