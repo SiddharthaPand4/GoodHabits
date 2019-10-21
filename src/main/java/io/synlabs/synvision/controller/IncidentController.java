@@ -4,6 +4,7 @@ import io.synlabs.synvision.service.IncidentService;
 import io.synlabs.synvision.views.IncidentRequest;
 import io.synlabs.synvision.views.IncidentsFilterRequest;
 import io.synlabs.synvision.views.IncidentsResponse;
+import io.synlabs.synvision.views.common.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +26,8 @@ public class IncidentController {
     private IncidentService incidentService;
 
     @PostMapping
-    public List<IncidentsResponse> list(@RequestBody IncidentsFilterRequest request){
-        return incidentService.list(request).stream().map(IncidentsResponse::new).collect(Collectors.toList());
+    public PageResponse<IncidentsResponse> list(@RequestBody IncidentsFilterRequest request){
+        return incidentService.list(request);
     }
 
     @DeleteMapping("/{id}")

@@ -17,4 +17,7 @@ public class IncidentsFilterRequest implements Request {
         public String toDate;
         public String toTime;
 
+        public int page;
+        public int pageSize;
+
 }

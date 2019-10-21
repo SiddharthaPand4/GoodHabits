@@ -30,6 +30,10 @@ public class IncidentsResponse implements Response {
 
     private String imageId;
 
+    public  IncidentsResponse(){
+
+    }
+
     public  IncidentsResponse(Incident incident){
         this.id=mask(incident.getId());
         this.eventDate=incident.getEventDate();

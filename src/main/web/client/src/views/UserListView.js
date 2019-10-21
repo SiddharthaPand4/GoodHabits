@@ -125,7 +125,7 @@ export default class UserListView extends Component {
                 <Col span={12}>
                     <Card
                       className="limitable"
-                      bodyStyle={{ padding: "0px", marginTop: 20, width: "100%" }}
+                      bodyStyle={{ padding: "0px", width: "100%" }}
                     >
                      <Table dataSource={this.state.users} pagination={false} scroll={{ x: true}} >
                             <Column title="Username" dataIndex="userName" key="userName" render={(text, record) => (
