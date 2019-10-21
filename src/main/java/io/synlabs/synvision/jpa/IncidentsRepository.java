@@ -12,10 +12,7 @@ import java.util.List;
  * Created by itrs on 10/16/2019.
  */
 public interface IncidentsRepository extends JpaRepository<Incident, Long> {
-    List<Incident> findAllByOrg(Org org, Pageable paging);
     List<Incident> findAllByOrg(Org org);
-
-    List<Incident> findAllByOrgAndEventStartBetween(Org org, Date eventStartDate, Date eventEndDate, Pageable paging);
 
     List<Incident> findAllByOrgAndEventStartBetween(Org org, Date eventStartDate, Date eventEndDate);
 }
