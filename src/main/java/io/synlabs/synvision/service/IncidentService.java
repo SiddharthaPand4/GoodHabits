@@ -40,7 +40,7 @@ public class IncidentService extends BaseService {
 
             List<IncidentsResponse> list = incidents.stream().map(IncidentsResponse::new).collect(Collectors.toList());
             int listSize=list.size();
-            int pageCount = (int) Math.ceil(listSize * 1.0 / 10);
+            int pageCount = (int) Math.ceil(listSize * 1.0 / request.getPageSize());
             return (PageResponse<IncidentsResponse>) new IncidentPageResponse(request.getPageSize(),pageCount, request.getPage(), list);
 
         }
