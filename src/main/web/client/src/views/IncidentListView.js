@@ -13,7 +13,8 @@ import {
     Row,
     Table,
     Tag,
-    TimePicker
+    TimePicker,
+    message
 } from 'antd';
 import IncidentService from "../services/IncidentService";
 import ReactPlayer from "react-player";
@@ -22,6 +23,7 @@ import Moment from 'react-moment';
 const {Column, ColumnGroup} = Table;
 const {Panel} = Collapse;
 const ButtonGroup = Button.Group;
+const { confirm } = Modal;
 
 
 export default class IncidentListView extends Component {
@@ -56,20 +58,27 @@ export default class IncidentListView extends Component {
 
     refresh() {
         IncidentService.getIncidents(this.state.filter).then(request => {
-            this.setState({"incidents": request.data, loading: false})
+            this.setState({"incidentsresponse": request.data, loading: false})
+        },
+        error=>{
+            message.error(error.response.data.message);
         })
     }
 
     //cant use refresh to read from state as state may not have been set
     refreshNow(filter) {
         IncidentService.getIncidents(filter).then(request => {
-            this.setState({"incidents": request.data, loading: false, filter: filter})
+            this.setState({"incidentsresponse": request.data, loading: false, filter: filter})
         })
     }
 
     archiveIncident(incident) {
         IncidentService.archiveIncident(incident).then(() => {
-            this.refresh()
+            this.refresh();
+            message.success("Incident successfully archived!");
+        },
+        error=>{
+           message.error(error.response.data.message);
         })
     }
 
@@ -95,25 +104,46 @@ export default class IncidentListView extends Component {
 
     onFromDateChange(date) {
         let filter = this.state.filter;
-        filter.fromDate = date.format("YYYY-MM-DD");
+        if(date!=null){
+          filter.fromDate = date.format("YYYY-MM-DD");
+        }
+        else{
+            filter.fromDate=null;
+        }
         this.setState({filter: filter});
     }
 
     onFromTimeChange(time) {
+
         let filter = this.state.filter;
-        filter.fromTime = time.format("HH:mm:ss");
+        if(time!=null){
+          filter.fromTime = time.format("HH:mm:ss");
+        }
+        else{
+            filter.fromTime=null;
+        }
         this.setState({filter: filter});
     }
 
     onToDateChange(date) {
         let filter = this.state.filter;
-        filter.toDate = date.format("YYYY-MM-DD");
+        if(date!=null){
+          filter.toDate = date.format("YYYY-MM-DD");
+        }
+        else{
+          filter.toDate=null;
+        }
         this.setState({filter: filter});
     }
 
     onToTimeChange(time) {
         let filter = this.state.filter;
-        filter.toTime = time.format("HH:mm:ss");
+        if(time!=null){
+         filter.toTime = time.format("HH:mm:ss");
+        }
+        else{
+          filter.toTime=null;
+        }
         this.setState({filter: filter});
     }
 
@@ -128,6 +158,28 @@ export default class IncidentListView extends Component {
         let filter = this.state.filter;
         filter.pageSize = pageSize;
         this.refreshNow(filter);
+    }
+
+    showDeleteConfirm(incident,refresh) {
+     confirm({
+       title: 'Are you sure you want to archive the incident ?',
+       okText: 'Yes',
+       okType: 'danger',
+       cancelText: 'No',
+       onOk() {
+         console.log('OK');
+         IncidentService.archiveIncident(incident).then(() => {
+             refresh();
+             message.success("Incident successfully archived!");
+         },
+         error=>{
+            message.error(error.response.data.message);
+         })
+       },
+       onCancel() {
+         console.log('Cancel');
+       },
+     });
     }
 
     render() {
@@ -185,20 +237,24 @@ export default class IncidentListView extends Component {
             return <Empty description={false}/>
         }
 
-        let incidents = this.state.incidents.Incidents;
-        let count = this.state.incidents.Total;
+        let incidents = this.state.incidentsresponse.incidents;
+        let count = this.state.incidentsresponse.incidents.length;
+
+        let indexOfLastTodo = this.state.filter.page * this.state.filter.pageSize;
+        let indexOfFirstTodo = indexOfLastTodo - this.state.filter.pageSize;
+        let currentIncidents = incidents.slice(indexOfFirstTodo, indexOfLastTodo)
 
         return <div style={{background: '#ECECEC', padding: '30px'}}>
             <Row>
                 <Col>
-                    <Pagination onChange={this.onPageChange} onShowSizeChange={this.onPageSizeChange} showSizeChanger
-                                defaultCurrent={1} total={count}/>
+                    <Pagination onChange={this.onPageChange} onShowSizeChange={this.onPageSizeChange} showSizeChanger showQuickJumper
+                                defaultCurrent={1}  total={count} current={this.state.filter.page} pageSize ={this.state.filter.pageSize}/>
                 </Col>
             </Row>
 
             <Row gutter={16}>
                 {
-                    incidents.map((incident, index) =>
+                    currentIncidents.map((incident, index) =>
                         <Col span={8} key={index}>
                             <Card
                                 title={
@@ -217,7 +273,7 @@ export default class IncidentListView extends Component {
                                 actions={[
                                     <Icon type="right" key="play" onClick={() => this.showVideo(incident.video_id)}/>,
                                     <Icon type="edit" key="edit"/>,
-                                    <Icon type="delete" key="delete" onClick={() => this.archiveIncident(incident)}/>,
+                                    <Icon type="delete" key="delete" onClick={this.showDeleteConfirm.bind(this,incident,this.refresh)}/>,
                                 ]}
                             >
 
@@ -235,8 +291,8 @@ export default class IncidentListView extends Component {
             return <Empty description={false}/>
         }
 
-        let incidents = this.state.incidents.Incidents;
-        let count = this.state.incidents.Total;
+        let incidents = this.state.incidentsresponse.incidents;
+        let count = this.state.incidentsresponse.incidents.length;
 
         const paginationOptions = {
             showSizeChanger: true,
@@ -255,17 +311,17 @@ export default class IncidentListView extends Component {
 
         return (
             <Table dataSource={incidents} pagination={pagination}>
-                <Column title="ID" dataIndex="ID" key="ID"/>
-                <Column title="Type" dataIndex="event_type" key="event_type"/>
-                <Column title="Date" dataIndex="event_date" key="event_date"/>
-                <Column title="Time" dataIndex="event_start" key="event_start"
-                        render={event_start => (<Moment format="LTS">{event_start}</Moment>)}/>
-                <Column title="Duration" dataIndex="event_duration" key="event_duration" render={dur => (<span>{dur}s</span>) }/>
-                <Column title="Time" dataIndex="event_start" key="event_start" render={(text, incident) => (
+                <Column title="ID" dataIndex="id" key="id"/>
+                <Column title="Type" dataIndex="eventType" key="eventType"/>
+                <Column title="Date" dataIndex="eventDate" key="eventDate"/>
+                <Column title="Time" dataIndex="eventStart" key="eventStart"
+                        render={eventStart => (<Moment format="LTS">{eventStart}</Moment>)}/>
+                <Column title="Duration" dataIndex="eventDuration" key="eventDuration" render={dur => (<span>{dur}s</span>) }/>
+                <Column title="Action" key="action" render={(text, incident) => (
                     <span>
-                        <a onClick={() => this.showVideo(incident.video_id)}>Play</a>
+                        <a onClick={() => this.showVideo(incident.videoId)}>Play</a>
                         <Divider type="vertical"/>
-                        <a onClick={() => this.archiveIncident(incident)}>Delete</a>
+                        <a onClick={this.showDeleteConfirm.bind(this,incident,this.refresh)}>Delete</a>
                     </span>
                 )}/>
             </Table>

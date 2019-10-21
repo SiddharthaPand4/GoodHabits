@@ -8,11 +8,11 @@ class IncidentService {
     }
 
     getIncidents(filter) {
-        return axios.post('/api/incidents', filter);
+        return axios.post('/api/incident', filter);
     }
 
     archiveIncident(incident) {
-        return axios.delete('/api/incident/' + incident.ID);
+        return axios.delete('/api/incident/' + incident.id);
     }
 }
 
