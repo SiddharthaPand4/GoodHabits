@@ -10,6 +10,8 @@ import {
     Row,
     Table,
     Tag,
+    Modal,
+    message
 } from 'antd';
 import GenericFilter from "../components/GenericFilter";
 import Moment from "react-moment";
@@ -27,9 +29,18 @@ export default class DeviceView extends Component {
             loading: true,
             layout: "table",
             events: {},
+            filter: {
+                page: 1,
+                pageSize: 10
+            }
         };
 
         this.refresh = this.refresh.bind(this);
+        this.handleFilterChange = this.handleFilterChange.bind(this);
+        this.handleLayoutChange = this.handleLayoutChange.bind(this);
+        this.handleRefresh = this.handleRefresh.bind(this);
+        this.onPageChange = this.onPageChange.bind(this);
+        this.onPageSizeChange = this.onPageSizeChange.bind(this);
     }
 
     componentDidMount() {
@@ -38,9 +49,42 @@ export default class DeviceView extends Component {
 
     refresh() {
         AnprService.getEvents(this.state.filter).then(request => {
-            this.setState({"events": request.data, loading: false})
+            this.setState({"anprresponse": request.data, loading: false})
         })
     }
+
+    //cant use refresh to read from state as state may not have been set
+    refreshNow(filter) {
+        AnprService.getEvents(this.state.filter).then(request => {
+            this.setState({"anprresponse": request.data, loading: false})
+        })
+    }
+
+    handleFilterChange(data){
+        this.setState({filter:data})
+    }
+
+     handleLayoutChange(data){
+         this.setState({layout:data})
+     }
+
+     handleRefresh(){
+        this.refresh();
+     }
+
+     onPageChange(page, pageSize) {
+         let filter = this.state.filter;
+         filter.page = page;
+         filter.pageSize = pageSize;
+         this.refreshNow(filter)
+     }
+
+     onPageSizeChange(current, pageSize) {
+         let filter = this.state.filter;
+         filter.pageSize = pageSize;
+         this.refreshNow(filter);
+     }
+
 
     render() {
 
@@ -49,10 +93,10 @@ export default class DeviceView extends Component {
         return (<div>ANPR
             <Collapse bordered={false} defaultActiveKey={['1', '2']}>
                 <Panel header="Filter" key="1">
-                    <GenericFilter/>
+                    <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout} handleFilterChange={this.handleFilterChange} handleLayoutChange={this.handleLayoutChange}/>
                 </Panel>
                 <Panel header="Events" key="2">
-                    {layout === "table" ? (this.renderGrid()) : (this.renderTable())}
+                    {layout === "table" ? (this.renderTable()) :(this.renderGrid()) }
                 </Panel>
             </Collapse>
         </div>)
@@ -60,44 +104,37 @@ export default class DeviceView extends Component {
 
     renderGrid() {
 
-        if (this.state.loading || !this.state.incidents || this.state.incidents.Total === 0) {
+        if (this.state.loading || !this.state.anprresponse || this.state.anprresponse.totalPage === 0) {
             return <Empty description={false}/>
         }
 
-        let incidents = this.state.incidents.Incidents;
-        let count = this.state.incidents.Total;
+        let events = this.state.anprresponse.events;
+        let count =  this.state.anprresponse.totalPages *  this.state.anprresponse.pageSize;
 
         return <div style={{background: '#ECECEC', padding: '30px'}}>
             <Row>
                 <Col>
-                    <Pagination onChange={this.onPageChange} onShowSizeChange={this.onPageSizeChange} showSizeChanger
-                                defaultCurrent={1} total={count}/>
+                    <Pagination onChange={this.onPageChange} onShowSizeChange={this.onPageSizeChange} showSizeChanger showQuickJumper
+                              defaultCurrent={1}  total={count} current={this.state.filter.page} pageSize ={this.state.filter.pageSize}/>
                 </Col>
             </Row>
 
             <Row gutter={16}>
                 {
-                    incidents.map((incident, index) =>
+                    events.map((event, index) =>
                         <Col span={8} key={index}>
                             <Card
                                 title={
                                     <div>
-                                        <Tag color="#f50">{incident.event_type}</Tag>
-                                        <Tag color="#2db7f5">{incident.event_date}</Tag>
-                                        <Tag color="#87d068"><span><Moment format="LTS">{incident.event_start}</Moment></span><Icon
+                                        <Tag color="#2db7f5"><Moment format="L">{event.eventDate}</Moment></Tag>
+                                        <Tag color="#87d068"><span><Moment format="LTS">{event.eventDate}</Moment></span><Icon
                                             type="right" hidden/><span hidden><Moment
-                                            format="LTS">{incident.event_end}</Moment></span></Tag>
-                                        <Tag color="#108ee9" hidden>{incident.event_duration}s</Tag>
+                                            format="LTS">{event.eventDate}</Moment></span></Tag>
                                     </div>
                                 }
                                 bordered={true}
-                                cover={<img alt="incident"
-                                            src={"/api/incident/image/" + incident.image_id + "/image.jpg"}/>}
-                                actions={[
-                                    <Icon type="right" key="play" onClick={() => this.showVideo(incident.video_id)}/>,
-                                    <Icon type="edit" key="edit"/>,
-                                    <Icon type="delete" key="delete" onClick={() => this.archiveIncident(incident)}/>,
-                                ]}
+                                cover={<img alt="event"
+                                            src={"/api/event/image/" + event.vehicleImage + "/image.jpg"}/>}
                             >
 
                             </Card>
@@ -114,8 +151,8 @@ export default class DeviceView extends Component {
             return <Empty description={false}/>
         }
 
-        let incidents = this.state.incidents.events;
-        let count = this.state.incidents.Total;
+        let events = this.state.anprresponse.events;
+        let count = this.state.anprresponse.totalPages *  this.state.anprresponse.pageSize;
 
         const paginationOptions = {
             showSizeChanger: true,
@@ -133,20 +170,13 @@ export default class DeviceView extends Component {
         };
 
         return (
-            <Table dataSource={incidents} pagination={pagination}>
-                <Column title="ID" dataIndex="ID" key="ID"/>
-                <Column title="Type" dataIndex="event_type" key="event_type"/>
-                <Column title="Date" dataIndex="event_date" key="event_date"/>
-                <Column title="Time" dataIndex="event_start" key="event_start"
-                        render={event_start => (<Moment format="LTS">{event_start}</Moment>)}/>
-                <Column title="Duration" dataIndex="event_duration" key="event_duration" render={dur => (<span>{dur}s</span>) }/>
-                <Column title="Time" dataIndex="event_start" key="event_start" render={(text, incident) => (
-                    <span>
-                        <a onClick={() => this.showVideo(incident.video_id)}>Play</a>
-                        <Divider type="vertical"/>
-                        <a onClick={() => this.archiveIncident(incident)}>Delete</a>
-                    </span>
-                )}/>
+            <Table dataSource={events} pagination={pagination}>
+                <Column title="ID" dataIndex="id" key="id"/>
+                <Column title="Date" dataIndex="eventDate" key="eventDate"
+                        render={eventDate => (<Moment format="L">{eventDate}</Moment>)}/>
+                <Column title="Time" dataIndex="eventDate" key="eventTime"
+                        render={eventDate => (<Moment format="LTS">{eventDate}</Moment>)}/>
+
             </Table>
         )
     }

@@ -19,7 +19,7 @@ export default class Sidebar extends Component {
                 }}
             >
                 <div className="logo"/>
-                <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
+                <Menu theme="dark" mode="inline" defaultSelectedKeys={['0']}>
                     <Menu.Item key="0">
                         <Link to='/'><Icon type='home' /><span className='nav-text'>Home</span></Link>
                     </Menu.Item>
