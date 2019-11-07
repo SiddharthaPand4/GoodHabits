@@ -20,9 +20,8 @@ constructor(props) {
         layout: "table",
         incidents: {},
         filter: {
-            from: moment().startOf('week'),
-            to: moment().endOf('week'),
-            selectedDate: moment(),
+            filterType:"today"
+
         },
         resultSetByDate: {
             loading: true,
@@ -33,73 +32,30 @@ constructor(props) {
             loading: true,
             chartData: {}
         },
-        aggregation:""
+        aggregation:"",
+        isOpenDatePicker:false
     };
 
     this.refresh = this.refresh.bind(this);
-    this.onFromDateChange = this.onFromDateChange.bind(this);
-    this.onFromTimeChange = this.onFromTimeChange.bind(this);
-    this.onToDateChange = this.onToDateChange.bind(this);
-    this.onToTimeChange = this.onToTimeChange.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onOk = this.onOk.bind(this);
     this.fetchDateWiseVehiclesCount = this.fetchDateWiseVehiclesCount.bind(this);
-    this.fetchTimelyVehiclesCount = this.fetchTimelyVehiclesCount.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.openDatePicker = this.openDatePicker.bind(this);
 
 }
-componentDidMount() {
-   this.refresh();
-}
-
-
-refresh(){
-    this.fetchTimelyVehiclesCount();
-    //this.fetchDateWiseVehiclesCount();
-}
-
-fetchTimelyVehiclesCount(){
-    DashboardService.getTotalNoOfVehiclesBySelectedDate(this.state.filter).then(response => {
-
-        let keys=[];
-        let values=[];
-        let datasets=[];
-        let labels=[];
-
-       //for(var i=0;i<response.data.length;i++){
-       //    keys.push(response.data[i].key);
-       //    values.push(response.data[i].countOfTotalVehicles);
-       //}
-
-        Object.keys(response.data).map(function(dates, data) {
-             var res=response.data[dates];
-             Object.keys(res).map(function(time, count){
-                 datasets.push({label:res[time].key, data:res[time].countOfTotalVehicles})
-                 labels.push(res[time].key);
-             });
-
-        });
-
-          let resultSet = {
-             loading: false,
-             chartData: {
-                 labels: labels,
-                 datasets: datasets
-             }
-          };
-
-         this.setState({resultSetByDate: resultSet});
-    },
-    error=>{
-        message.error(error.response.data.message);
-    })
+   componentDidMount() {
+      this.refresh();
    }
 
+
+   refresh(){
+       this.fetchDateWiseVehiclesCount();
+   }
+
+
    fetchDateWiseVehiclesCount(){
-     if(this.state.aggregation=="hourly"){
-        this.fetchTimelyVehiclesCount();
-     }
-     else{
+
         DashboardService.getTotalNoOfVehiclesBetweenTwoDates(this.state.filter).then(response => {
             let keys=[];
             let values=[];
@@ -118,101 +74,47 @@ fetchTimelyVehiclesCount(){
                      }]
                  }
               };
-             this.setState({resultSetByDate: resultSet});
+             this.setState({resultSetByDate: resultSet,isOpenDatePicker:false});
         },
         error=>{
             message.error(error.response.data.message);
         })
-     }
    }
 
    handleChange(value){
-        this.setState({aggregation:value})
+        let filter = this.state.filter;
+        filter.filterType=value;
+        this.setState({aggregation:value,filter:filter,isOpenDatePicker:false})
+        if(value!="custom"){
+            this.fetchDateWiseVehiclesCount();
+        }
+        if(value=="custom"){
+            this.setState({isOpenDatePicker:true})
+        }
    }
 
-onFromDateChange(date) {
-    let filter = this.state.filter;
-    if(date!=null){
-      filter.selectedDate = date.format("YYYY-MM-DD");
-    }
-    else{
-        filter.selectedDate=null;
-    }
-    this.setState({filter: filter});
-}
-onFromTimeChange(time) {
-    let filter = this.state.filter;
-    if(time!=null){
-      filter.fromTime = time.format("HH:mm:ss");
-    }
-    else{
-        filter.fromTime=null;
-    }
-    this.setState({filter: filter});
-}
-onToDateChange(date) {
-    let filter = this.state.filter;
-    if(date!=null){
-      filter.toDate = date.format("YYYY-MM-DD");
-    }
-    else{
-      filter.toDate=null;
-    }
-    this.setState({filter: filter});
-}
-onToTimeChange(time) {
-    let filter = this.state.filter;
-    if(time!=null){
-     filter.toTime = time.format("HH:mm:ss");
-    }
-    else{
-      filter.toTime=null;
-    }
-    this.setState({filter: filter});
-}
+   openDatePicker(){
+    this.setState({isOpenDatePicker:true})
+   }
 
- onChange(value, dateString) {
-  console.log('Selected Time: ', value);
-  console.log('Formatted Selected Time: ', dateString);
-  let filter = this.state.filter;
-  filter.from=value[0];
-  filter.to=value[1];
+    onChange(value, dateString) {
+     console.log('Selected Time: ', value);
+     console.log('Formatted Selected Time: ', dateString);
+     let filter = this.state.filter;
+     filter.from=value[0];
+     filter.to=value[1];
 
-}
+    }
 
- onOk(value) {
-  console.log('onOk: ', value);
-}
+    onOk(value) {
+     console.log('onOk: ', value);
+     this.setState({isOpenDatePicker:false})
+     this.fetchDateWiseVehiclesCount()
+    }
 
 
     render() {
       const onChange=this.onChange;
-      const menu = (
-        <Menu>
-          <Menu.Item>
-            <a target="_blank" rel="noopener noreferrer">
-             Current week
-            </a>
-          </Menu.Item>
-          <Menu.Item>
-            <a target="_blank" rel="noopener noreferrer">
-              Last Week
-            </a>
-          </Menu.Item>
-          <Menu.Item>
-            <a target="_blank" rel="noopener noreferrer">
-             Current Month
-            </a>
-          </Menu.Item>
-          <Menu.Item>
-            <a target="_blank" rel="noopener noreferrer">
-             Last Month
-            </a>
-          </Menu.Item>
-
-        </Menu>
-      );
-
 
         return (
             <div>
@@ -225,40 +127,39 @@ onToTimeChange(time) {
                     </Col>
                 </Row>
 
-                <Row gutter={24}>
+                <Row gutter={16}>
 
                     <Col span={16}>
                         <Card>
-                            <RangePicker
-                                  ranges={{
-                                    'This Month': [moment().startOf('month'), moment().endOf('month')],
-                                    'This Week': [moment().startOf('week'), moment().endOf('week')],
-                                  }}
-                                  defaultValue={[moment().startOf('week'), moment().endOf('week')]}
-                                  format="YYYY/MM/DD"
-                                  onChange={onChange}
-                                />
 
-                                &nbsp; &nbsp;
 
-                                <Select defaultValue="hourly" style={{ width: 120 }} onChange={this.handleChange}>
-                                      <Option value="hourly">Hourly</Option>
-                                      <Option value="weekly">Weekly</Option>
-                                      <Option value="monthly">
-                                        Monthly
+                                <Select defaultValue="today" style={{ width: 120 }} onChange={this.handleChange}>
+                                      <Option value="yesterday">Yesterday</Option>
+                                      <Option value="today">Today</Option>
+                                      <Option value="last7days">
+                                        Last 7 days
                                       </Option>
-                                      <Option value="yearly">Yearly</Option>
+                                      <Option value="last3months">Last 3 months</Option>
+                                      <Option value="last6months">Last 6 months</Option>
+                                      <Option value="custom" onClick={this.openDatePicker}>Custom</Option>
                                 </Select>
+
                                 &nbsp; &nbsp;
-                                <Dropdown overlay={menu}>
-                                    <a className="ant-dropdown-link" href="#">
-                                      Date Range <Icon type="down" />
-                                    </a>
-                                </Dropdown>
-                                 &nbsp; &nbsp;
-                            <Button onClick={() => {
-                                this.fetchDateWiseVehiclesCount()
-                            }}><Icon type="reload"/>Reload</Button>
+
+                                 {this.state.isOpenDatePicker ? <RangePicker open={this.state.isOpenDatePicker}
+                                       ranges={{
+                                         'This Month': [moment().startOf('month'), moment().endOf('month')],
+                                         'This Week': [moment().startOf('week'), moment().endOf('week')],
+                                       }}
+                                       defaultValue={[moment().startOf('week'), moment().endOf('week')]}
+                                       format="YYYY/MM/DD"
+                                       onChange={onChange}
+                                       onOk={this.onOk}
+                                       showTime
+                                     /> :null}
+                                     &nbsp; &nbsp;
+
+
 
                         {!this.state.resultSetByDate.loading ?
                             <Bar data={this.state.resultSetByDate.chartData} options={{
@@ -295,7 +196,7 @@ onToTimeChange(time) {
                                                       return "Total vehicles enters"
                                                   },
                                                   label: function (tooltipItems, data) {
-                                                      return data.datasets[tooltipItems.datasetIndex].label[tooltipItems.index] + " : $" +data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index]
+                                                      return data.datasets[tooltipItems.datasetIndex].label[tooltipItems.index] + " : $" + data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index]
                                                   }
                                               }
                                           },
@@ -311,8 +212,6 @@ onToTimeChange(time) {
 
                     </Col>
                 </Row>
-
-
             </div>
         )
     }
