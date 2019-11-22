@@ -23,8 +23,12 @@ export default class DeviceView extends Component {
         this.onToTimeChange = this.onToTimeChange.bind(this);
         this.onPageChange = this.onPageChange.bind(this);
         this.onPageSizeChange = this.onPageSizeChange.bind(this);
+        this.refresh = this.refresh.bind(this);
     }
 
+    refresh(){
+        this.props.handleRefresh();
+    }
     onPageChange(page, pageSize) {
         let filter = this.state.filter;
         filter.page = page;
@@ -40,6 +44,7 @@ export default class DeviceView extends Component {
 
     changeLayout(layout) {
         this.setState({"layout": layout});
+        this.props.handleLayoutChange(layout);
     }
 
    onFromDateChange(date) {
@@ -51,6 +56,7 @@ export default class DeviceView extends Component {
            filter.fromDate=null;
        }
        this.setState({filter: filter});
+       this.props.handleFilterChange(filter);
    }
 
    onFromTimeChange(time) {
@@ -62,6 +68,7 @@ export default class DeviceView extends Component {
            filter.fromTime=null;
        }
        this.setState({filter: filter});
+       this.props.handleFilterChange(filter);
    }
 
    onToDateChange(date) {
@@ -73,6 +80,7 @@ export default class DeviceView extends Component {
          filter.toDate=null;
        }
        this.setState({filter: filter});
+       this.props.handleFilterChange(filter);
    }
 
    onToTimeChange(time) {
@@ -84,6 +92,7 @@ export default class DeviceView extends Component {
          filter.toTime=null;
        }
        this.setState({filter: filter});
+       this.props.handleFilterChange(filter);
    }
 
     render() {

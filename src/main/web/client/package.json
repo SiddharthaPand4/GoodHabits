@@ -5,9 +5,12 @@
   "dependencies": {
     "antd": "^3.23.2",
     "axios": "^0.19.0",
+    "chart.js": "^2.8.0",
+    "chartjs-plugin-colorschemes": "^0.4.0",
     "history": "^4.10.1",
     "jsonwebtoken": "^8.5.1",
     "react": "^16.9.0",
+    "react-chartjs-2": "^2.8.0",
     "react-dom": "^16.9.0",
     "react-moment": "^0.9.2",
     "react-player": "^1.12.0",

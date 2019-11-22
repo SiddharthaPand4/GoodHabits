@@ -1,13 +1,11 @@
 package io.synlabs.synvision.service;
 
+import io.synlabs.synvision.entity.Anpr;
 import io.synlabs.synvision.entity.Incident;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.ex.ValidationException;
-import io.synlabs.synvision.jpa.IncidentsRepository;
-import io.synlabs.synvision.views.IncidentPageResponse;
-import io.synlabs.synvision.views.IncidentRequest;
-import io.synlabs.synvision.views.IncidentsFilterRequest;
-import io.synlabs.synvision.views.IncidentsResponse;
+import io.synlabs.synvision.jpa.AnprRepository;
+import io.synlabs.synvision.views.*;
 import io.synlabs.synvision.views.common.PageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -23,26 +20,25 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Created by itrs on 10/16/2019.
+ * Created by itrs on 10/21/2019.
  */
 @Service
-public class IncidentService extends BaseService {
+public class AnprService  extends BaseService {
 
     @Autowired
-    private IncidentsRepository incidentsRepository;
+    private AnprRepository anprRepository;
 
-    private static final Logger logger = LoggerFactory.getLogger(IncidentService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AnprService.class);
 
-    public PageResponse<IncidentsResponse> list(IncidentsFilterRequest request){
-
+    public PageResponse<AnprResponse> list(IncidentsFilterRequest request){
         Pageable paging = PageRequest.of(request.getPage()-1, request.getPageSize());
         if(request.getFromDate()==null && request.getFromTime()==null && request.getToDate()==null && request.getToTime()==null) {
-            int count=incidentsRepository.countAllByOrg(getAtccUser().getOrg());
-            List<Incident> incidents= incidentsRepository.findAllByOrg(getAtccUser().getOrg(),paging);
 
-            List<IncidentsResponse> list = incidents.stream().map(IncidentsResponse::new).collect(Collectors.toList());
+            int count=anprRepository.countAllByOrg(getAtccUser().getOrg());
+            List<Anpr> anprList= anprRepository.findAllByOrg(getAtccUser().getOrg(),paging);
+            List<AnprResponse> list = anprList.stream().map(AnprResponse::new).collect(Collectors.toList());
             int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
-            return (PageResponse<IncidentsResponse>) new IncidentPageResponse(request.getPageSize(),pageCount, request.getPage(), list);
+            return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(),pageCount, request.getPage(), list);
 
         }
 
@@ -69,23 +65,25 @@ public class IncidentService extends BaseService {
             Date eventStartDate = dateFormat.parse(eventStart);
             Date eventEndDate = dateFormat.parse(eventEnd);
 
-            int count=incidentsRepository.countAllByOrgAndEventStartBetween(getAtccUser().getOrg(),eventStartDate, eventEndDate);
-
-            List<Incident> incidents= incidentsRepository.findAllByOrgAndEventStartBetween(getAtccUser().getOrg(), eventStartDate, eventEndDate,paging);
-            List<IncidentsResponse> list = incidents.stream().map(IncidentsResponse::new).collect(Collectors.toList());
+            int count=anprRepository.countAllByOrgAndEventDateBetween(getAtccUser().getOrg(),eventStartDate, eventEndDate);
+            List<Anpr> anprList=  anprRepository.findAllByOrgAndEventDateBetween(getAtccUser().getOrg(), eventStartDate, eventEndDate,paging);
+            List<AnprResponse> list = anprList.stream().map(AnprResponse::new).collect(Collectors.toList());
             int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
-            return (PageResponse<IncidentsResponse>) new IncidentPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
+            return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
+
+
         } catch (Exception e) {
             logger.error("Error in parsing date", e);
         }
         return null;
     }
 
-    public void archiveIncident(IncidentRequest request) {
-        Incident incident=incidentsRepository.getOne(request.getId());
-        if(incident==null){
+    public void archiveAnpr(AnprRequest request) {
+        Anpr anpr=anprRepository.getOne(request.getId());
+        if(anpr==null){
             throw new NotFoundException("Cannot locate incident");
         }
-        incidentsRepository.delete(incident);
+        anprRepository.delete(anpr);
     }
+
 }

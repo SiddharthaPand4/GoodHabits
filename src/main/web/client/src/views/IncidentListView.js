@@ -238,11 +238,8 @@ export default class IncidentListView extends Component {
         }
 
         let incidents = this.state.incidentsresponse.incidents;
-        let count = this.state.incidentsresponse.incidents.length;
+        let count = this.state.incidentsresponse.totalPages *  this.state.incidentsresponse.pageSize;
 
-        let indexOfLastTodo = this.state.filter.page * this.state.filter.pageSize;
-        let indexOfFirstTodo = indexOfLastTodo - this.state.filter.pageSize;
-        let currentIncidents = incidents.slice(indexOfFirstTodo, indexOfLastTodo)
 
         return <div style={{background: '#ECECEC', padding: '30px'}}>
             <Row>
@@ -254,24 +251,24 @@ export default class IncidentListView extends Component {
 
             <Row gutter={16}>
                 {
-                    currentIncidents.map((incident, index) =>
+                    incidents.map((incident, index) =>
                         <Col span={8} key={index}>
                             <Card
                                 title={
                                     <div>
-                                        <Tag color="#f50">{incident.event_type}</Tag>
-                                        <Tag color="#2db7f5">{incident.event_date}</Tag>
-                                        <Tag color="#87d068"><span><Moment format="LTS">{incident.event_start}</Moment></span><Icon
+                                        <Tag color="#f50">{incident.eventType}</Tag>
+                                        <Tag color="#2db7f5">{incident.eventDate}</Tag>
+                                        <Tag color="#87d068"><span><Moment format="LTS">{incident.eventStart}</Moment></span><Icon
                                             type="right" hidden/><span hidden><Moment
-                                            format="LTS">{incident.event_end}</Moment></span></Tag>
-                                        <Tag color="#108ee9" hidden>{incident.event_duration}s</Tag>
+                                            format="LTS">{incident.eventEnd}</Moment></span></Tag>
+                                        <Tag color="#108ee9" hidden>{incident.eventDuration}s</Tag>
                                     </div>
                                 }
                                 bordered={true}
                                 cover={<img alt="incident image"
-                                            src={"/api/incident/image/" + incident.image_id + "/image.jpg"}/>}
+                                            src={"/api/incident/image/" + incident.imageId + "/image.jpg"}/>}
                                 actions={[
-                                    <Icon type="right" key="play" onClick={() => this.showVideo(incident.video_id)}/>,
+                                    <Icon type="right" key="play" onClick={() => this.showVideo(incident.videoId)}/>,
                                     <Icon type="edit" key="edit"/>,
                                     <Icon type="delete" key="delete" onClick={this.showDeleteConfirm.bind(this,incident,this.refresh)}/>,
                                 ]}
@@ -292,7 +289,7 @@ export default class IncidentListView extends Component {
         }
 
         let incidents = this.state.incidentsresponse.incidents;
-        let count = this.state.incidentsresponse.incidents.length;
+        let count = this.state.incidentsresponse.totalPages *  this.state.incidentsresponse.pageSize ;
 
         const paginationOptions = {
             showSizeChanger: true,

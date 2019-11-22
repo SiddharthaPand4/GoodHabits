@@ -7,9 +7,13 @@ class AnprService {
         return new AnprService()
     }
 
-    getEvents() {
-        return axios.get('/api/anpr/events');
+    getEvents(filter) {
+        return axios.post('/api/anpr/events',filter);
     }
+
+     archiveEvent(event) {
+         return axios.delete('/api/anpr/' + event.id);
+     }
 }
 
 export default AnprService.Instance()
