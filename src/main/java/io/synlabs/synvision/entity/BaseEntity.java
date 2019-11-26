@@ -1,5 +1,6 @@
 package io.synlabs.synvision.entity;
 
+import io.synlabs.synvision.entity.core.LazyAuditable;
 import io.synlabs.synvision.entity.core.Org;
 import io.synlabs.synvision.entity.core.SynVisionUser;
 import lombok.Getter;
