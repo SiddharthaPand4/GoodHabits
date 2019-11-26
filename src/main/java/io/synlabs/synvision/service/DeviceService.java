@@ -1,12 +1,9 @@
 package io.synlabs.synvision.service;
 
-import io.synlabs.synvision.entity.Device;
+import io.synlabs.synvision.entity.core.Device;
 import io.synlabs.synvision.jpa.DeviceRepository;
-import io.synlabs.synvision.views.DeviceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * Created by itrs on 10/16/2019.

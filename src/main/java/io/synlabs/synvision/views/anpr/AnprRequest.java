@@ -1,6 +1,6 @@
 package io.synlabs.synvision.views.anpr;
 
-import io.synlabs.synvision.views.Request;
+import io.synlabs.synvision.views.common.Request;
 
 /**
  * Created by itrs on 10/21/2019.

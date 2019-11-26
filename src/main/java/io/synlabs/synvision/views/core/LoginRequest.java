@@ -1,6 +1,7 @@
-package io.synlabs.synvision.views;
+package io.synlabs.synvision.views.core;
 
 
+import io.synlabs.synvision.views.common.Request;
 import lombok.Getter;
 import lombok.Setter;
 

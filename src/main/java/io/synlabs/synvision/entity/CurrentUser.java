@@ -1,5 +1,6 @@
 package io.synlabs.synvision.entity;
 
+import io.synlabs.synvision.entity.core.SynVisionUser;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 

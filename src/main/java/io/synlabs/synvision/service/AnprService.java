@@ -1,13 +1,13 @@
 package io.synlabs.synvision.service;
 
-import io.synlabs.synvision.entity.Anpr;
+import io.synlabs.synvision.entity.anpr.Anpr;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.ex.ValidationException;
 import io.synlabs.synvision.jpa.AnprRepository;
 import io.synlabs.synvision.views.anpr.AnprPageResponse;
 import io.synlabs.synvision.views.anpr.AnprRequest;
 import io.synlabs.synvision.views.anpr.AnprResponse;
-import io.synlabs.synvision.views.IncidentsFilterRequest;
+import io.synlabs.synvision.views.incident.IncidentsFilterRequest;
 import io.synlabs.synvision.views.common.PageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

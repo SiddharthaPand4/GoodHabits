@@ -2,7 +2,7 @@ package io.synlabs.synvision.auth;
 
 import com.google.common.util.concurrent.RateLimiter;
 import io.synlabs.synvision.entity.CurrentUser;
-import io.synlabs.synvision.entity.SynVisionUser;
+import io.synlabs.synvision.entity.core.SynVisionUser;
 import io.synlabs.synvision.ex.RateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

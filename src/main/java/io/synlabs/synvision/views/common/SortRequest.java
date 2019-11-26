@@ -1,4 +1,4 @@
-package io.synlabs.synvision.views;
+package io.synlabs.synvision.views.common;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,4 @@ import lombok.Setter;
 public class SortRequest {
     private String id;
     private Boolean desc;
-
-
-
 }

@@ -1,4 +1,4 @@
-package io.synlabs.synvision.entity;
+package io.synlabs.synvision.entity.core;
 
 import lombok.Getter;
 import lombok.Setter;

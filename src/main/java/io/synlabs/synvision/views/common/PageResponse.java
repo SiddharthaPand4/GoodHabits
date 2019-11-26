@@ -1,6 +1,5 @@
 package io.synlabs.synvision.views.common;
 
-import io.synlabs.synvision.views.Response;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

@@ -15,6 +15,8 @@ import io.synlabs.synvision.jpa.ImportStatusRepository;
 import io.synlabs.synvision.views.*;
 import io.synlabs.synvision.views.atcc.AtccRawDataResponse;
 import io.synlabs.synvision.views.atcc.AtccSummaryDataResponse;
+import io.synlabs.synvision.views.common.ResponseWrapper;
+import io.synlabs.synvision.views.common.SearchRequest;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;

@@ -1,19 +1,12 @@
 package io.synlabs.synvision.controller;
 
 import io.synlabs.synvision.service.IncidentService;
-import io.synlabs.synvision.views.IncidentRequest;
-import io.synlabs.synvision.views.IncidentsFilterRequest;
-import io.synlabs.synvision.views.IncidentsResponse;
+import io.synlabs.synvision.views.incident.IncidentRequest;
+import io.synlabs.synvision.views.incident.IncidentsFilterRequest;
+import io.synlabs.synvision.views.incident.IncidentsResponse;
 import io.synlabs.synvision.views.common.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.INCIDENT_READ;
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.INCIDENT_WRITE;
 
 /**
  * Created by itrs on 10/16/2019.

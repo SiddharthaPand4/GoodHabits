@@ -6,6 +6,8 @@ import io.synlabs.synvision.service.AtccDataService;
 import io.synlabs.synvision.views.*;
 import io.synlabs.synvision.views.atcc.AtccRawDataResponse;
 import io.synlabs.synvision.views.atcc.AtccSummaryDataResponse;
+import io.synlabs.synvision.views.common.ResponseWrapper;
+import io.synlabs.synvision.views.common.SearchRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;

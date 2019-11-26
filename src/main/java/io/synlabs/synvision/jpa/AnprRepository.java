@@ -1,8 +1,7 @@
 package io.synlabs.synvision.jpa;
 
-import io.synlabs.synvision.entity.Anpr;
-import io.synlabs.synvision.entity.Incident;
-import io.synlabs.synvision.entity.Org;
+import io.synlabs.synvision.entity.anpr.Anpr;
+import io.synlabs.synvision.entity.core.Org;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 

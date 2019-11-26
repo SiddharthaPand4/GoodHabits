@@ -1,14 +1,10 @@
 package io.synlabs.synvision.controller;
 
-import io.synlabs.synvision.ex.ValidationException;
 import io.synlabs.synvision.service.UserService;
-import io.synlabs.synvision.views.RoleResponse;
-import io.synlabs.synvision.views.UserRequest;
-import io.synlabs.synvision.views.UserResponse;
+import io.synlabs.synvision.views.core.RoleResponse;
+import io.synlabs.synvision.views.core.UserRequest;
+import io.synlabs.synvision.views.core.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

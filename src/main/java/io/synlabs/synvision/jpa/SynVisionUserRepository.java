@@ -1,8 +1,8 @@
 package io.synlabs.synvision.jpa;
 
 
-import io.synlabs.synvision.entity.Org;
-import io.synlabs.synvision.entity.SynVisionUser;
+import io.synlabs.synvision.entity.core.Org;
+import io.synlabs.synvision.entity.core.SynVisionUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

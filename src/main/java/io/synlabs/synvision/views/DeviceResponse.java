@@ -1,6 +1,7 @@
 package io.synlabs.synvision.views;
 
-import io.synlabs.synvision.entity.Device;
+import io.synlabs.synvision.entity.core.Device;
+import io.synlabs.synvision.views.common.Response;
 import lombok.Getter;
 
 /**

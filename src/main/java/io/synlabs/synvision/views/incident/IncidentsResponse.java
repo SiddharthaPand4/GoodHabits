@@ -1,6 +1,7 @@
-package io.synlabs.synvision.views;
+package io.synlabs.synvision.views.incident;
 
 import io.synlabs.synvision.entity.Incident;
+import io.synlabs.synvision.views.common.Response;
 import lombok.Getter;
 
 import java.util.Date;

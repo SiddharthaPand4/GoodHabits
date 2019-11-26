@@ -1,9 +1,8 @@
-package io.synlabs.synvision.views;
+package io.synlabs.synvision.views.incident;
 
+import io.synlabs.synvision.views.common.Request;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Date;
 
 /**
  * Created by itrs on 10/16/2019.

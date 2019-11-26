@@ -1,21 +1,19 @@
-package io.synlabs.synvision.views;
+package io.synlabs.synvision.views.core;
 
-import io.synlabs.synvision.entity.Org;
-import io.synlabs.synvision.entity.SynVisionUser;
+import io.synlabs.synvision.entity.core.SynVisionUser;
+import io.synlabs.synvision.views.common.Request;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by itrs on 10/14/2019.
  */
 @Getter
 @Setter
-public class UserRequest  implements  Request{
+public class UserRequest  implements Request {
     public Long    id;
     public String  userName;
     public String  firstName;

@@ -1,5 +1,6 @@
-package io.synlabs.synvision.views;
+package io.synlabs.synvision.views.incident;
 
+import io.synlabs.synvision.views.common.Request;
 import lombok.Getter;
 
 /**

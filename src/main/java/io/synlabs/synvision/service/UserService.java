@@ -1,16 +1,15 @@
 package io.synlabs.synvision.service;
 
-import io.synlabs.synvision.entity.SynVisionUser;
+import io.synlabs.synvision.entity.core.SynVisionUser;
 import io.synlabs.synvision.entity.CurrentUser;
-import io.synlabs.synvision.entity.Role;
+import io.synlabs.synvision.entity.core.Role;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.ex.ValidationException;
 import io.synlabs.synvision.jpa.SynVisionUserRepository;
 import io.synlabs.synvision.jpa.RoleRepository;
-import io.synlabs.synvision.views.LoginRequest;
-import io.synlabs.synvision.views.UserRequest;
-import io.synlabs.synvision.views.UserResponse;
-import org.apache.commons.lang3.RandomStringUtils;
+import io.synlabs.synvision.views.core.LoginRequest;
+import io.synlabs.synvision.views.core.UserRequest;
+import io.synlabs.synvision.views.core.UserResponse;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

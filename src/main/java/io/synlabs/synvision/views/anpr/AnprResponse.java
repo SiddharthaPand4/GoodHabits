@@ -1,7 +1,7 @@
 package io.synlabs.synvision.views.anpr;
 
-import io.synlabs.synvision.entity.Anpr;
-import io.synlabs.synvision.views.Response;
+import io.synlabs.synvision.entity.anpr.Anpr;
+import io.synlabs.synvision.views.common.Response;
 import lombok.Getter;
 
 import java.util.Date;

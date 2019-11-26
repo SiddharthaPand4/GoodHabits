@@ -1,6 +1,7 @@
-package io.synlabs.synvision.views;
+package io.synlabs.synvision.views.core;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.synlabs.synvision.views.common.Response;
 import lombok.Getter;
 
 import java.util.HashSet;

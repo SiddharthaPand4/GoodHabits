@@ -2,11 +2,11 @@ package io.synlabs.synvision.controller;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import io.synlabs.synvision.entity.SynVisionUser;
+import io.synlabs.synvision.entity.core.SynVisionUser;
 import io.synlabs.synvision.ex.AuthException;
 import io.synlabs.synvision.service.UserService;
-import io.synlabs.synvision.views.LoginRequest;
-import io.synlabs.synvision.views.LoginResponse;
+import io.synlabs.synvision.views.core.LoginRequest;
+import io.synlabs.synvision.views.core.LoginResponse;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

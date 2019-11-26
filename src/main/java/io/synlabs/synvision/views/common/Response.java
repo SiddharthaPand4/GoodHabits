@@ -1,4 +1,4 @@
-package io.synlabs.synvision.views;
+package io.synlabs.synvision.views.common;
 
 
 import io.synlabs.synvision.util.LongObfuscator;

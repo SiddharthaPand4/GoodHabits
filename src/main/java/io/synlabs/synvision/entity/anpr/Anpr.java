@@ -1,5 +1,6 @@
-package io.synlabs.synvision.entity;
+package io.synlabs.synvision.entity.anpr;
 
+import io.synlabs.synvision.entity.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,8 +1,8 @@
 package io.synlabs.synvision.service;
 
-import io.synlabs.synvision.entity.SynVisionUser;
+import io.synlabs.synvision.entity.core.SynVisionUser;
 import io.synlabs.synvision.entity.CurrentUser;
-import io.synlabs.synvision.views.SortRequest;
+import io.synlabs.synvision.views.common.SortRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.CollectionUtils;

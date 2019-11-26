@@ -3,7 +3,7 @@ package io.synlabs.synvision.controller.anpr;
 import io.synlabs.synvision.service.AnprService;
 import io.synlabs.synvision.views.anpr.AnprRequest;
 import io.synlabs.synvision.views.anpr.AnprResponse;
-import io.synlabs.synvision.views.IncidentsFilterRequest;
+import io.synlabs.synvision.views.incident.IncidentsFilterRequest;
 import io.synlabs.synvision.views.anpr.CreateAnprRequest;
 import io.synlabs.synvision.views.common.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;

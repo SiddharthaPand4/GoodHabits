@@ -12,7 +12,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Entity
-public class Incident extends BaseEntity{
+public class Incident extends BaseEntity {
 
     @Column(nullable = false, length = 50, unique = true)
     private String eventId;

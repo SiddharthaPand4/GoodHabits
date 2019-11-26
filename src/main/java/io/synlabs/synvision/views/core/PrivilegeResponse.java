@@ -1,6 +1,7 @@
-package io.synlabs.synvision.views;
+package io.synlabs.synvision.views.core;
 
-import io.synlabs.synvision.entity.Privilege;
+import io.synlabs.synvision.entity.core.Privilege;
+import io.synlabs.synvision.views.common.Response;
 import lombok.Getter;
 
 /**
