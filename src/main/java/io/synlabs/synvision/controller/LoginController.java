@@ -7,13 +7,13 @@ import io.synlabs.synvision.ex.AuthException;
 import io.synlabs.synvision.service.UserService;
 import io.synlabs.synvision.views.LoginRequest;
 import io.synlabs.synvision.views.LoginResponse;
-import io.synlabs.synvision.views.UserRequest;
-import io.synlabs.synvision.views.UserResponse;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import java.security.Key;
@@ -50,7 +50,7 @@ public class LoginController {
         SynVisionUser user = userService.validate(login);
 
         if (user == null) {
-            throw new AuthException("Invalid login by user " + login.getEmail());
+            throw new AuthException("Invalid login by user " + login.getEmail() + " " + login.getUsername());
         }
 
         String authToken = Jwts.builder()
