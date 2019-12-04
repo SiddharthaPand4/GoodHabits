@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Icon, Layout, Menu, } from "antd";
 import {Link} from "react-router-dom";
+import UserService from "../services/UserService";
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -26,23 +27,26 @@ export default class Sidebar extends Component {
                     <Menu.Item key="1" className="sidebar-nav-link">
                         <Link to='/incidents'><Icon type='alert' /><span className='nav-text'>Incidents</span></Link>
                     </Menu.Item>
-                    <Menu.Item key="6" className="sidebar-nav-link">
+                    <Menu.Item key="3" className="sidebar-nav-link">
                         <Link to='/anpr'><Icon type='box-plot' /><span className='nav-text'>ANPR</span></Link>
                     </Menu.Item>
-                    <Menu.Item key="2">
+                    <Menu.Item key="4">
                         <Link to='/feed'><Icon type='video-camera' /><span className='nav-text'>Feed</span></Link>
                     </Menu.Item>
                     <SubMenu key="admin" title={<span><Icon type="deployment-unit"/>Admin</span>}>
-                        <Menu.Item key="3">
+                        <Menu.Item key="51">
                             <Link to='/user'><Icon type='user' /><span className='nav-text'>Users</span></Link>
                         </Menu.Item>
-                        <Menu.Item key="4">
+                        <Menu.Item key="52">
                             <Link to='/device'><Icon type='laptop' /><span className='nav-text'>Device</span></Link>
                         </Menu.Item>
-                        <Menu.Item key="5">
+                        <Menu.Item key="53">
                             <Link to='/trigger'><Icon type="clock-circle" /><span className='nav-text'>Triggers</span></Link>
                         </Menu.Item>
                     </SubMenu>
+                    <Menu.Item key="6">
+                        <Link to='/logout' onClick={() => UserService.logout()}><Icon type='logout' /><span className='nav-text'>Logout</span></Link>
+                    </Menu.Item>
                 </Menu>
             </Sider>
         );

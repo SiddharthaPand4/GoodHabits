@@ -3,6 +3,7 @@ package io.synlabs.synvision.controller.anpr;
 import io.synlabs.synvision.service.AnprService;
 import io.synlabs.synvision.views.anpr.AnprRequest;
 import io.synlabs.synvision.views.anpr.AnprResponse;
+import io.synlabs.synvision.views.anpr.CreateTrafficIncident;
 import io.synlabs.synvision.views.incident.IncidentsFilterRequest;
 import io.synlabs.synvision.views.anpr.CreateAnprRequest;
 import io.synlabs.synvision.views.common.PageResponse;
@@ -29,9 +30,13 @@ public class AnprController {
         anprService.archiveAnpr(new AnprRequest(id));
     }
 
-    @PostMapping
-    public void addAnprEvent(@RequestBody CreateAnprRequest request) {
-
+    @PostMapping("/vehicle")
+    public void addVehicle(@RequestBody CreateAnprRequest request) {
+        anprService.addAnprEvent(request);
     }
 
+    @PostMapping("/event")
+    public void addTrafficIncident(@RequestBody CreateTrafficIncident request) {
+        anprService.addTrafficIncident(request);
+    }
 }

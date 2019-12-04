@@ -82,9 +82,7 @@ public class IncidentService extends BaseService {
 
     public void archiveIncident(IncidentRequest request) {
         Incident incident=incidentsRepository.getOne(request.getId());
-        if(incident==null){
-            throw new NotFoundException("Cannot locate incident");
-        }
-        incidentsRepository.delete(incident);
+        incident.setArchived(true);
+        incidentsRepository.save(incident);
     }
 }

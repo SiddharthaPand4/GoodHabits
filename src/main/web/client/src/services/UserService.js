@@ -1,6 +1,7 @@
 import axios from "./axios";
 import { authHeader } from '../helpers/auth-header';
 import { config } from '../helpers/config'
+import {history} from "../helpers/history";
 
 class UserService {
 
@@ -68,6 +69,10 @@ class UserService {
         return token;
     }
 
+    logout() {
+        localStorage.removeItem("syntoken")
+        history.push( "/#/");
+    }
 }
 
 export default UserService.Instance()

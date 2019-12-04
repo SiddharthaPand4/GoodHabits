@@ -10,13 +10,10 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
 
-/**
- * Created by itrs on 10/21/2019.
- */
 @Entity
 @Getter
 @Setter
-public class Anpr extends BaseEntity {
+public class TrafficEvent extends BaseEntity {
 
     @Column(nullable = false, length = 50, unique = true)
     private String eventId;
@@ -27,9 +24,8 @@ public class Anpr extends BaseEntity {
     @Column(length = 50)
     private String vehicleImage;
 
-    @Column(length = 50)
-    private String ocrImage;
+    @Column(length = 100)
+    private String eventType;
 
-    @Column(length = 50)
-    private String anprText;
+    private boolean archived;
 }

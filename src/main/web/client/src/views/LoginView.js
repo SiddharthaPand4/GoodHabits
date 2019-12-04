@@ -12,7 +12,7 @@ class LoginView extends Component {
 
     componentDidMount() {
         if (UserService.isLoggedIn()) {
-            history.push( "/");
+            history.push( "/#/");
         }
     }
 
@@ -55,7 +55,7 @@ class LoginForm extends Component {
         this.setState({loading: true});
         UserService.login(username, password)
             .then(token => {
-                history.push( "/");
+                history.push( "/#/");
                 EventBus.publish('login-logout', {})
             }).catch(error => {
                 this.setState({

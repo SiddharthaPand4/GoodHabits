@@ -29,6 +29,7 @@ public abstract class BaseEntity extends LazyAuditable<SynVisionUser, Long> {
 
         SynVisionUser current = getCurrentUser();
         if (current != null) {
+            this.setOrg(current.getOrg());
             this.setCreatedBy(current);
         }
     }

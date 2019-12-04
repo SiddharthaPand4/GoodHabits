@@ -39,4 +39,7 @@ public class Incident extends BaseEntity {
 
     @Column(length = 50)
     private String imageId;
+
+    private boolean archived;
+
 }

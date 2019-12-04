@@ -1,6 +1,6 @@
 package io.synlabs.synvision.views.anpr;
 
-import io.synlabs.synvision.entity.anpr.Anpr;
+import io.synlabs.synvision.entity.anpr.AnprEvent;
 import io.synlabs.synvision.views.common.Response;
 import lombok.Getter;
 
@@ -21,14 +21,12 @@ public class AnprResponse implements Response {
     private String anprText;
     private String vehicleImage;
 
-    public  AnprResponse(Anpr anpr){
-        this.id=mask(anpr.getId());
-        this.eventDate=anpr.getEventDate();
-        this.eventId=anpr.getEventId();
-        this.vehicleImage=anpr.getVehicleImage();
-        this.ocrImage=anpr.getOcrImage();
-        this.anprText=anpr.getAnprText();
-
-
+    public AnprResponse(AnprEvent anprEvent){
+        this.id=mask(anprEvent.getId());
+        this.eventDate= anprEvent.getEventDate();
+        this.eventId= anprEvent.getEventId();
+        this.vehicleImage= anprEvent.getVehicleImage();
+        this.ocrImage= anprEvent.getOcrImage();
+        this.anprText= anprEvent.getAnprText();
     }
 }

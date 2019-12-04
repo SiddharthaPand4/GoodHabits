@@ -29,8 +29,14 @@ class HttpService {
             if (err.response.config.url.includes('/login'))
                 return Promise.reject(err);
 
-            if (err.response.status === 403) return forceLogout();
-            if (err.response.status !== 401) return Promise.reject(err);
+            if (err.response.status === 403) {
+                console.log('I am at 403');
+                return forceLogout();
+            }
+            if (err.response.status !== 401) {
+                console.log('I am at 401');
+                return Promise.reject(err);
+            }
         });
 
         return ax;

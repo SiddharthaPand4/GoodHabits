@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/api/data")
+@RequestMapping("/api/atcc/data")
 public class AtccDataController {
 
     private static final Logger logger = LoggerFactory.getLogger(AtccDataController.class);

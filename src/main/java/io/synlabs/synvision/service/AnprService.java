@@ -1,14 +1,15 @@
 package io.synlabs.synvision.service;
 
-import io.synlabs.synvision.entity.anpr.Anpr;
+import io.synlabs.synvision.entity.anpr.AnprEvent;
+import io.synlabs.synvision.entity.anpr.TrafficEvent;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.ex.ValidationException;
-import io.synlabs.synvision.jpa.AnprRepository;
-import io.synlabs.synvision.views.anpr.AnprPageResponse;
-import io.synlabs.synvision.views.anpr.AnprRequest;
-import io.synlabs.synvision.views.anpr.AnprResponse;
-import io.synlabs.synvision.views.incident.IncidentsFilterRequest;
+import io.synlabs.synvision.jpa.AnprEventRepository;
+import io.synlabs.synvision.jpa.TrafficEventRepository;
+import io.synlabs.synvision.views.anpr.*;
 import io.synlabs.synvision.views.common.PageResponse;
+import io.synlabs.synvision.views.incident.IncidentRequest;
+import io.synlabs.synvision.views.incident.IncidentsFilterRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,10 @@ import java.util.stream.Collectors;
 public class AnprService extends BaseService {
 
     @Autowired
-    private AnprRepository anprRepository;
+    private AnprEventRepository anprEventRepository;
+
+    @Autowired
+    private TrafficEventRepository trafficEventRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(AnprService.class);
 
@@ -36,9 +40,9 @@ public class AnprService extends BaseService {
         Pageable paging = PageRequest.of(request.getPage() - 1, request.getPageSize());
         if (request.getFromDate() == null && request.getFromTime() == null && request.getToDate() == null && request.getToTime() == null) {
 
-            int count = anprRepository.countAllByOrg(getAtccUser().getOrg());
-            List<Anpr> anprList = anprRepository.findAllByOrg(getAtccUser().getOrg(), paging);
-            List<AnprResponse> list = anprList.stream().map(AnprResponse::new).collect(Collectors.toList());
+            int count = anprEventRepository.countAllByArchivedFalse();
+            List<AnprEvent> anprEventList = anprEventRepository.findAllByArchivedFalse(paging);
+            List<AnprResponse> list = anprEventList.stream().map(AnprResponse::new).collect(Collectors.toList());
             int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
             return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
 
@@ -67,9 +71,9 @@ public class AnprService extends BaseService {
             Date eventStartDate = dateFormat.parse(eventStart);
             Date eventEndDate = dateFormat.parse(eventEnd);
 
-            int count = anprRepository.countAllByOrgAndEventDateBetween(getAtccUser().getOrg(), eventStartDate, eventEndDate);
-            List<Anpr> anprList = anprRepository.findAllByOrgAndEventDateBetween(getAtccUser().getOrg(), eventStartDate, eventEndDate, paging);
-            List<AnprResponse> list = anprList.stream().map(AnprResponse::new).collect(Collectors.toList());
+            int count = anprEventRepository.countAllByEventDateBetweenAndArchivedFalse(eventStartDate, eventEndDate);
+            List<AnprEvent> anprEventList = anprEventRepository.findAllByEventDateBetweenAndArchivedFalse(eventStartDate, eventEndDate, paging);
+            List<AnprResponse> list = anprEventList.stream().map(AnprResponse::new).collect(Collectors.toList());
             int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
             return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
 
@@ -81,11 +85,26 @@ public class AnprService extends BaseService {
     }
 
     public void archiveAnpr(AnprRequest request) {
-        Anpr anpr = anprRepository.getOne(request.getId());
-        if (anpr == null) {
+        AnprEvent anprEvent = anprEventRepository.getOne(request.getId());
+        if (anprEvent == null) {
             throw new NotFoundException("Cannot locate incident");
         }
-        anprRepository.delete(anpr);
+        anprEventRepository.delete(anprEvent);
     }
 
+    public void addAnprEvent(CreateAnprRequest request) {
+        AnprEvent anprEvent = request.toEntity();
+        anprEventRepository.save(anprEvent);
+    }
+
+    public void addTrafficIncident(CreateTrafficIncident request) {
+        TrafficEvent trafficEvent = request.toEntity();
+        trafficEventRepository.save(trafficEvent);
+    }
+
+    public void archiveIncident(IncidentRequest request) {
+        TrafficEvent trafficEvent = trafficEventRepository.getOne(request.getId());
+        trafficEvent.setArchived(true);
+        trafficEventRepository.save(trafficEvent);
+    }
 }

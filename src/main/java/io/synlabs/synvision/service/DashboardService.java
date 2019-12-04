@@ -1,6 +1,6 @@
 package io.synlabs.synvision.service;
 
-import io.synlabs.synvision.jpa.AnprRepository;
+import io.synlabs.synvision.jpa.AnprEventRepository;
 import io.synlabs.synvision.views.DashboardRequest;
 import io.synlabs.synvision.views.DashboardResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -20,8 +20,7 @@ import java.util.*;
 public class DashboardService extends BaseService {
 
     @Autowired
-    private AnprRepository anprRepository;
-
+    private AnprEventRepository anprEventRepository;
 
     public List<DashboardResponse> getTotalNoOfVehiclesByDateFilter(DashboardRequest request) {
         List<DashboardResponse> responses = new ArrayList<>();
@@ -74,13 +73,13 @@ public class DashboardService extends BaseService {
                 SimpleDateFormat localDateFormat1 = new SimpleDateFormat("HH:mm");
                 String time = localDateFormat1.format(dateIter);
 
-                int count = anprRepository.countAllByOrgAndEventDateBetween(getAtccUser().getOrg(), dateIter, DateUtils.addHours(dateIter, 1));
+                int count = anprEventRepository.countAllByEventDateBetweenAndArchivedFalse(dateIter, DateUtils.addHours(dateIter, 1));
                 DashboardResponse response = new DashboardResponse(time, count);
                 responses.add(response);
             }
 
         } catch (Exception e) {
-
+            //TODO
         }
 
         return responses;
@@ -123,11 +122,11 @@ public class DashboardService extends BaseService {
             try {
                 Date fD = dateFormat.parse(fdate);
                 Date tD = dateFormat.parse(tDate);
-                int count = anprRepository.countAllByOrgAndEventDateBetween(getAtccUser().getOrg(), fD, tD);
+                int count = anprEventRepository.countAllByEventDateBetweenAndArchivedFalse(fD, tD);
                 DashboardResponse response = new DashboardResponse(date2, count);
                 responses.add(response);
             } catch (Exception e) {
-
+                //TODO
             }
 
         }
@@ -174,12 +173,12 @@ public class DashboardService extends BaseService {
                 Date lastDayOfMonth = calendar1.getTime();
 
                 String month = new SimpleDateFormat("MMM").format(calendar1.getTime());
-                int count = anprRepository.countAllByOrgAndEventDateBetween(getAtccUser().getOrg(), convertedFromDate, lastDayOfMonth);
+                int count = anprEventRepository.countAllByEventDateBetweenAndArchivedFalse(convertedFromDate, lastDayOfMonth);
                 DashboardResponse response = new DashboardResponse(month, count);
                 responses.add(response);
 
             } catch (Exception e) {
-
+                //TODO
             }
         }
 
