@@ -62,6 +62,6 @@ public class LoginController {
     }
 
     private Date getAuthExpiration() {
-        return new DateTime().plusHours(ttlhours).toDate();
+        return new DateTime().plusDays(ttlhours).toDate();
     }
 }

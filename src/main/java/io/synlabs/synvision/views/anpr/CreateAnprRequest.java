@@ -25,6 +25,14 @@ public class CreateAnprRequest implements Request {
     @JsonProperty("vehicle_image_name")
     private String vehicleImage;
 
+    private String direction;
+
+    @JsonProperty("vehicle_class")
+    private String vehicleClass;
+
+    @JsonProperty("helmet")
+    private String helmetStatus;
+
     public Long getId() {
         return unmask(id);
     }
@@ -36,6 +44,13 @@ public class CreateAnprRequest implements Request {
         event.setEventId(eventId);
         event.setOcrImage(ocrImage);
         event.setVehicleImage(vehicleImage);
+        event.setDirection(direction);
+        event.setVehicleClass(vehicleClass);
+
+        if ("motorbike".equals(vehicleClass) && "None".equals(helmetStatus)) {
+            event.setHelmetMissing(true);
+        }
+
         return event;
     }
 }

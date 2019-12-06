@@ -1,11 +1,9 @@
 package io.synlabs.synvision.service;
 
 import io.synlabs.synvision.entity.anpr.AnprEvent;
-import io.synlabs.synvision.entity.anpr.TrafficEvent;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.ex.ValidationException;
 import io.synlabs.synvision.jpa.AnprEventRepository;
-import io.synlabs.synvision.jpa.TrafficEventRepository;
 import io.synlabs.synvision.views.anpr.*;
 import io.synlabs.synvision.views.common.PageResponse;
 import io.synlabs.synvision.views.incident.IncidentRequest;
@@ -30,9 +28,6 @@ public class AnprService extends BaseService {
 
     @Autowired
     private AnprEventRepository anprEventRepository;
-
-    @Autowired
-    private TrafficEventRepository trafficEventRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(AnprService.class);
 
@@ -86,9 +81,6 @@ public class AnprService extends BaseService {
 
     public void archiveAnpr(AnprRequest request) {
         AnprEvent anprEvent = anprEventRepository.getOne(request.getId());
-        if (anprEvent == null) {
-            throw new NotFoundException("Cannot locate incident");
-        }
         anprEventRepository.delete(anprEvent);
     }
 
@@ -97,14 +89,4 @@ public class AnprService extends BaseService {
         anprEventRepository.save(anprEvent);
     }
 
-    public void addTrafficIncident(CreateTrafficIncident request) {
-        TrafficEvent trafficEvent = request.toEntity();
-        trafficEventRepository.save(trafficEvent);
-    }
-
-    public void archiveIncident(IncidentRequest request) {
-        TrafficEvent trafficEvent = trafficEventRepository.getOne(request.getId());
-        trafficEvent.setArchived(true);
-        trafficEventRepository.save(trafficEvent);
-    }
 }

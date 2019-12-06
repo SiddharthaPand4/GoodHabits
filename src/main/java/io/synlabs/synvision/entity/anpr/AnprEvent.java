@@ -34,4 +34,36 @@ public class AnprEvent extends BaseEntity {
     private String anprText;
 
     private boolean archived;
+
+    @Column(length = 50)
+    private String direction;
+
+    @Column(length = 50)
+    private String vehicleClass;
+
+    private boolean helmetMissing;
+
+    public void setDirection(String direction) {
+        this.direction = direction;
+    }
+
+    public String getDirection() {
+        return direction;
+    }
+
+    public void setVehicleClass(String vehicleClass) {
+        this.vehicleClass = vehicleClass;
+    }
+
+    public String getVehicleClass() {
+        return vehicleClass;
+    }
+
+    public void setHelmetMissing(boolean helmetMissing) {
+        this.helmetMissing = helmetMissing;
+    }
+
+    public boolean getHelmetMissing() {
+        return helmetMissing;
+    }
 }

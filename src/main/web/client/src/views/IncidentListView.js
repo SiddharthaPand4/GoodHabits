@@ -8,22 +8,22 @@ import {
     Divider,
     Empty,
     Icon,
+    message,
     Modal,
     Pagination,
     Row,
     Table,
     Tag,
-    TimePicker,
-    message
+    TimePicker
 } from 'antd';
-import IncidentService from "../services/IncidentService";
+import IncidentService from "../services/TrafficIncidentService";
 import ReactPlayer from "react-player";
 import Moment from 'react-moment';
 
 const {Column, ColumnGroup} = Table;
 const {Panel} = Collapse;
 const ButtonGroup = Button.Group;
-const { confirm } = Modal;
+const {confirm} = Modal;
 
 
 export default class IncidentListView extends Component {
@@ -57,10 +57,12 @@ export default class IncidentListView extends Component {
     }
 
     refresh() {
-        IncidentService.getIncidents(this.state.filter).then(request => {
-            this.setState({"incidentsresponse": request.data, loading: false})
+        let self = this;
+        IncidentService.getIncidents(this.state.filter).then(response => {
+            console.log("daada", response.data);
+            self.setState({"incidents": response.data, loading: false})
         },
-        error=>{
+        error => {
             message.error(error.response.data.message);
         })
     }
@@ -74,12 +76,12 @@ export default class IncidentListView extends Component {
 
     archiveIncident(incident) {
         IncidentService.archiveIncident(incident).then(() => {
-            this.refresh();
-            message.success("Incident successfully archived!");
-        },
-        error=>{
-           message.error(error.response.data.message);
-        })
+                this.refresh();
+                message.success("Incident successfully archived!");
+            },
+            error => {
+                message.error(error.response.data.message);
+            })
     }
 
     changeLayout(layout) {
@@ -104,11 +106,10 @@ export default class IncidentListView extends Component {
 
     onFromDateChange(date) {
         let filter = this.state.filter;
-        if(date!=null){
-          filter.fromDate = date.format("YYYY-MM-DD");
-        }
-        else{
-            filter.fromDate=null;
+        if (date != null) {
+            filter.fromDate = date.format("YYYY-MM-DD");
+        } else {
+            filter.fromDate = null;
         }
         this.setState({filter: filter});
     }
@@ -116,33 +117,30 @@ export default class IncidentListView extends Component {
     onFromTimeChange(time) {
 
         let filter = this.state.filter;
-        if(time!=null){
-          filter.fromTime = time.format("HH:mm:ss");
-        }
-        else{
-            filter.fromTime=null;
+        if (time != null) {
+            filter.fromTime = time.format("HH:mm:ss");
+        } else {
+            filter.fromTime = null;
         }
         this.setState({filter: filter});
     }
 
     onToDateChange(date) {
         let filter = this.state.filter;
-        if(date!=null){
-          filter.toDate = date.format("YYYY-MM-DD");
-        }
-        else{
-          filter.toDate=null;
+        if (date != null) {
+            filter.toDate = date.format("YYYY-MM-DD");
+        } else {
+            filter.toDate = null;
         }
         this.setState({filter: filter});
     }
 
     onToTimeChange(time) {
         let filter = this.state.filter;
-        if(time!=null){
-         filter.toTime = time.format("HH:mm:ss");
-        }
-        else{
-          filter.toTime=null;
+        if (time != null) {
+            filter.toTime = time.format("HH:mm:ss");
+        } else {
+            filter.toTime = null;
         }
         this.setState({filter: filter});
     }
@@ -160,26 +158,26 @@ export default class IncidentListView extends Component {
         this.refreshNow(filter);
     }
 
-    showDeleteConfirm(incident,refresh) {
-     confirm({
-       title: 'Are you sure you want to archive the incident ?',
-       okText: 'Yes',
-       okType: 'danger',
-       cancelText: 'No',
-       onOk() {
-         console.log('OK');
-         IncidentService.archiveIncident(incident).then(() => {
-             refresh();
-             message.success("Incident successfully archived!");
-         },
-         error=>{
-            message.error(error.response.data.message);
-         })
-       },
-       onCancel() {
-         console.log('Cancel');
-       },
-     });
+    showDeleteConfirm(incident, refresh) {
+        confirm({
+            title: 'Are you sure you want to archive the incident ?',
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk() {
+                console.log('OK');
+                IncidentService.archiveIncident(incident).then(() => {
+                        refresh();
+                        message.success("Incident successfully archived!");
+                    },
+                    error => {
+                        message.error(error.response.data.message);
+                    })
+            },
+            onCancel() {
+                console.log('Cancel');
+            },
+        });
     }
 
     render() {
@@ -237,15 +235,17 @@ export default class IncidentListView extends Component {
             return <Empty description={false}/>
         }
 
-        let incidents = this.state.incidentsresponse.incidents;
-        let count = this.state.incidentsresponse.totalPages *  this.state.incidentsresponse.pageSize;
+        let incidents = this.state.incidents.events;
+        let count = this.state.incidents.totalPages * this.state.incidents.pageSize;
 
 
         return <div style={{background: '#ECECEC', padding: '30px'}}>
             <Row>
                 <Col>
-                    <Pagination onChange={this.onPageChange} onShowSizeChange={this.onPageSizeChange} showSizeChanger showQuickJumper
-                                defaultCurrent={1}  total={count} current={this.state.filter.page} pageSize ={this.state.filter.pageSize}/>
+                    <Pagination onChange={this.onPageChange} onShowSizeChange={this.onPageSizeChange} showSizeChanger
+                                showQuickJumper
+                                defaultCurrent={1} total={count} current={this.state.filter.page}
+                                pageSize={this.state.filter.pageSize}/>
                 </Col>
             </Row>
 
@@ -258,7 +258,8 @@ export default class IncidentListView extends Component {
                                     <div>
                                         <Tag color="#f50">{incident.eventType}</Tag>
                                         <Tag color="#2db7f5">{incident.eventDate}</Tag>
-                                        <Tag color="#87d068"><span><Moment format="LTS">{incident.eventStart}</Moment></span><Icon
+                                        <Tag color="#87d068"><span><Moment
+                                            format="LTS">{incident.eventStart}</Moment></span><Icon
                                             type="right" hidden/><span hidden><Moment
                                             format="LTS">{incident.eventEnd}</Moment></span></Tag>
                                         <Tag color="#108ee9" hidden>{incident.eventDuration}s</Tag>
@@ -270,7 +271,8 @@ export default class IncidentListView extends Component {
                                 actions={[
                                     <Icon type="right" key="play" onClick={() => this.showVideo(incident.videoId)}/>,
                                     <Icon type="edit" key="edit"/>,
-                                    <Icon type="delete" key="delete" onClick={this.showDeleteConfirm.bind(this,incident,this.refresh)}/>,
+                                    <Icon type="delete" key="delete"
+                                          onClick={this.showDeleteConfirm.bind(this, incident, this.refresh)}/>,
                                 ]}
                             >
 
@@ -288,8 +290,8 @@ export default class IncidentListView extends Component {
             return <Empty description={false}/>
         }
 
-        let incidents = this.state.incidentsresponse.incidents;
-        let count = this.state.incidentsresponse.totalPages *  this.state.incidentsresponse.pageSize ;
+        let incidents = this.state.incidents.events;
+        let count = this.state.incidents.totalPages * this.state.incidents.pageSize;
 
         const paginationOptions = {
             showSizeChanger: true,
@@ -313,12 +315,13 @@ export default class IncidentListView extends Component {
                 <Column title="Date" dataIndex="eventDate" key="eventDate"/>
                 <Column title="Time" dataIndex="eventStart" key="eventStart"
                         render={eventStart => (<Moment format="LTS">{eventStart}</Moment>)}/>
-                <Column title="Duration" dataIndex="eventDuration" key="eventDuration" render={dur => (<span>{dur}s</span>) }/>
+                <Column title="Duration" dataIndex="eventDuration" key="eventDuration"
+                        render={dur => (<span>{dur}s</span>)}/>
                 <Column title="Action" key="action" render={(text, incident) => (
                     <span>
                         <a onClick={() => this.showVideo(incident.videoId)}>Play</a>
                         <Divider type="vertical"/>
-                        <a onClick={this.showDeleteConfirm.bind(this,incident,this.refresh)}>Delete</a>
+                        <a onClick={this.showDeleteConfirm.bind(this, incident, this.refresh)}>Delete</a>
                     </span>
                 )}/>
             </Table>
