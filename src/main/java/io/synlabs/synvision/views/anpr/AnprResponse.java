@@ -20,6 +20,8 @@ public class AnprResponse implements Response {
 
     private String anprText;
     private String vehicleImage;
+    private String direction;
+    private boolean helmet;
 
     public AnprResponse(AnprEvent anprEvent){
         this.id=mask(anprEvent.getId());
@@ -28,5 +30,7 @@ public class AnprResponse implements Response {
         this.vehicleImage= anprEvent.getVehicleImage();
         this.ocrImage= anprEvent.getOcrImage();
         this.anprText= anprEvent.getAnprText();
+        this.direction = anprEvent.getDirection();
+        this.helmet = anprEvent.getHelmetMissing();
     }
 }

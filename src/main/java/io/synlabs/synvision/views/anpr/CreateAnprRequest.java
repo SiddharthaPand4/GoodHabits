@@ -48,7 +48,7 @@ public class CreateAnprRequest implements Request {
         event.setDirection(direction);
         event.setVehicleClass(vehicleClass);
         event.setEventId(UUID.randomUUID().toString());
-        if ("motorbike".equals(vehicleClass) && "None".equals(helmetStatus)) {
+        if ("motorbike".equals(vehicleClass) && "without_helmet".equals(helmetStatus)) {
             event.setHelmetMissing(true);
         }
 

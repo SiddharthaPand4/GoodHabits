@@ -351,9 +351,9 @@ public class AtccDataService extends BaseService {
             atccRawData.setTime(new SimpleDateFormat("HH:mm:ss").parse(time));
             atccRawData.setDate(new SimpleDateFormat("dd/MM/yyyy").parse(date));
             atccRawData.setTimeStamp(ts);
-            atccRawData.setLane(Integer.parseInt(lane));
+            atccRawData.setLane(0);
             atccRawData.setSpeed(new BigDecimal(speed));
-            atccRawData.setDirection(Integer.parseInt(direction));
+            atccRawData.setDirection(getDirection(direction));
             atccRawData.setFeed(tag);
             atccRawData.setVid(vid);
             switch (class_no) {
@@ -383,6 +383,18 @@ public class AtccDataService extends BaseService {
             atccRawData.setType(type);
             raws.add(atccRawData);
         }
+    }
+
+    private int getDirection(String direction) {
+        switch (direction) {
+            case "fwd":
+                return 1;
+            case "stop":
+                return 0;
+            case "rev":
+                return -1;
+        }
+        return 1;
     }
 
     public String importFile(MultipartFile file, String tag) {

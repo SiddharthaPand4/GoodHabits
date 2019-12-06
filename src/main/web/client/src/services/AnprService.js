@@ -1,4 +1,3 @@
-
 import axios from "./axios";
 
 class AnprService {
@@ -8,12 +7,16 @@ class AnprService {
     }
 
     getEvents(filter) {
-        return axios.post('/api/anpr/events',filter);
+        return axios.post('/api/anpr/events', filter);
     }
 
-     archiveEvent(event) {
-         return axios.delete('/api/anpr/' + event.id);
-     }
+    getIncidents(filter) {
+        return axios.post('/api/anpr/incidents', filter);
+    }
+
+    archiveEvent(event) {
+        return axios.delete('/api/anpr/' + event.id);
+    }
 }
 
 export default AnprService.Instance()

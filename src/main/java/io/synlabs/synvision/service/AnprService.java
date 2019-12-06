@@ -92,4 +92,22 @@ public class AnprService extends BaseService {
         anprEventRepository.save(anprEvent);
     }
 
+    public PageResponse<AnprResponse> listIncidents(AnprFilterRequest request) {
+        BooleanExpression query = getIncidentQuery(request);
+        int count = (int)anprEventRepository.count(query);
+        int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
+        Pageable paging = PageRequest.of(request.getPage() - 1, request.getPageSize(), Sort.by(DESC, "eventDate"));
+
+        Page<AnprEvent> page = anprEventRepository.findAll(query, paging);
+        List<AnprResponse> list = page.get().map(AnprResponse::new).collect(Collectors.toList());
+
+        return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
+    }
+
+    private BooleanExpression getIncidentQuery(AnprFilterRequest request) {
+        BooleanExpression query = getQuery(request);
+        QAnprEvent root = QAnprEvent.anprEvent;
+        query = query.and(root.direction.eq("rev")).or(root.helmetMissing.isTrue());
+        return query;
+    }
 }

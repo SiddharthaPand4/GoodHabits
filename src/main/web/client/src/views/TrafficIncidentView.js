@@ -21,7 +21,7 @@ const {Column} = Table;
 const {Panel} = Collapse;
 
 
-export default class AnprView extends Component {
+export default class TrafficIncidentView extends Component {
 
     constructor(props) {
         super(props);
@@ -49,7 +49,7 @@ export default class AnprView extends Component {
     }
 
     refresh() {
-        AnprService.getEvents(this.state.filter).then(request => {
+        AnprService.getIncidents(this.state.filter).then(request => {
             this.setState({"anprresponse": request.data, loading: false})
         })
     }
@@ -100,13 +100,13 @@ export default class AnprView extends Component {
         let layout = this.state.layout;
         let lpr = this.state.filter.lpr;
 
-        return (<div>ANPR
+        return (<div>Incidents
             <Collapse bordered={false} defaultActiveKey={['1', '2']}>
                 <Panel header="Filter" key="1">
                     LPR: <Input value={lpr} style={{ "width": "200px"}} onChange={this.onLprInputChange}/> <br/><br/>
                     <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout} handleFilterChange={this.handleFilterChange} handleLayoutChange={this.handleLayoutChange}/>
                 </Panel>
-                <Panel header="Events" key="2">
+                <Panel header="Incidents" key="2">
                     {layout === "table" ? (this.renderTable()) :(this.renderGrid()) }
                 </Panel>
             </Collapse>
@@ -150,7 +150,7 @@ export default class AnprView extends Component {
                                 cover={<img alt="event"
                                             src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}/>}
                             >
-                                {helmet => helmet ? <span>No</span> : <span>N/A</span>}
+
                                 <img alt="event"
                                      src={"/public/anpr/lpr/" + event.id + "/image.jpg"}/>
                             </Card>
@@ -193,13 +193,12 @@ export default class AnprView extends Component {
                         render={eventDate => (<Moment format="LTS">{eventDate}</Moment>)}/>
                 <Column title="LPR" dataIndex="anprText" key="anprText"
                         render={anprText => anprText}/>
-                <Column title="LP Image" dataIndex="id" key="anprimage"
+                <Column title="image" dataIndex="id" key="anprimage"
                         render={id => (<img alt="event" src={"/public/anpr/lpr/" + id + "/image.jpg"}/>)}/>
                 <Column title="direction" dataIndex="direction" key="direction"
                         render={direction => direction}/>
-                <Column title="Helmet?" dataIndex="helmet" key="helmet"
-                        render={helmet => helmet ? <span>No</span> : <span>N/A</span>}/>
-
+                <Column title="Helmet" dataIndex="helmet" key="helmet"
+                        render={helmet => helmet ? <span>No</span> : <span>Yes</span>}/>
             </Table>
         )
     }

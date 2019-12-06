@@ -43,6 +43,11 @@ public class AnprController {
         return anprService.list(request);
     }
 
+    @PostMapping("/incidents")
+    public PageResponse<AnprResponse> listIncidents(@RequestBody AnprFilterRequest request) {
+        return anprService.listIncidents(request);
+    }
+
     @DeleteMapping("/{id}")
     public void archiveAnpr(@PathVariable Long id) {
         anprService.archiveAnpr(new AnprRequest(id));
