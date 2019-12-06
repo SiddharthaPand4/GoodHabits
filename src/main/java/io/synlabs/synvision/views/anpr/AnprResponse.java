@@ -31,6 +31,6 @@ public class AnprResponse implements Response {
         this.ocrImage= anprEvent.getOcrImage();
         this.anprText= anprEvent.getAnprText();
         this.direction = anprEvent.getDirection();
-        this.helmet = anprEvent.getHelmetMissing();
+        this.helmet = anprEvent.isHelmetMissing();
     }
 }

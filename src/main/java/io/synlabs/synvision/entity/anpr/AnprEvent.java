@@ -46,27 +46,6 @@ public class AnprEvent extends BaseEntity {
 
     private boolean helmetMissing;
 
-    public void setDirection(String direction) {
-        this.direction = direction;
-    }
+    private boolean hotlisted;
 
-    public String getDirection() {
-        return direction;
-    }
-
-    public void setVehicleClass(String vehicleClass) {
-        this.vehicleClass = vehicleClass;
-    }
-
-    public String getVehicleClass() {
-        return vehicleClass;
-    }
-
-    public void setHelmetMissing(boolean helmetMissing) {
-        this.helmetMissing = helmetMissing;
-    }
-
-    public boolean getHelmetMissing() {
-        return helmetMissing;
-    }
 }

@@ -3,9 +3,11 @@ package io.synlabs.synvision.service;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import io.synlabs.synvision.entity.anpr.AnprEvent;
+import io.synlabs.synvision.entity.anpr.HotListVehicle;
 import io.synlabs.synvision.entity.anpr.QAnprEvent;
 import io.synlabs.synvision.ex.ValidationException;
 import io.synlabs.synvision.jpa.AnprEventRepository;
+import io.synlabs.synvision.jpa.HotListVehicleRepository;
 import io.synlabs.synvision.views.anpr.*;
 import io.synlabs.synvision.views.common.PageResponse;
 import org.slf4j.Logger;
@@ -17,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +34,9 @@ public class AnprService extends BaseService {
 
     @Autowired
     private AnprEventRepository anprEventRepository;
+
+    @Autowired
+    private HotListVehicleRepository hotListVehicleRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(AnprService.class);
 
@@ -89,7 +93,13 @@ public class AnprService extends BaseService {
 
     public void addAnprEvent(CreateAnprRequest request) {
         AnprEvent anprEvent = request.toEntity();
+        anprEvent.setHotlisted(checkHotListed(anprEvent));
         anprEventRepository.save(anprEvent);
+    }
+
+    private boolean checkHotListed(AnprEvent anprEvent) {
+        HotListVehicle hottie = hotListVehicleRepository.findOneByLpr(anprEvent.getAnprText());
+        return hottie != null;
     }
 
     public PageResponse<AnprResponse> listIncidents(AnprFilterRequest request) {
