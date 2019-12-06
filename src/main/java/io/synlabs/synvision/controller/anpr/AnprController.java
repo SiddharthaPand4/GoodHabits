@@ -1,21 +1,17 @@
 package io.synlabs.synvision.controller.anpr;
 
 import io.synlabs.synvision.config.FileStorageProperties;
-import io.synlabs.synvision.controller.atcc.AtccDataController;
-import io.synlabs.synvision.ex.AuthException;
 import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.service.AnprService;
 import io.synlabs.synvision.views.UploadFileResponse;
+import io.synlabs.synvision.views.anpr.AnprFilterRequest;
 import io.synlabs.synvision.views.anpr.AnprRequest;
 import io.synlabs.synvision.views.anpr.AnprResponse;
-import io.synlabs.synvision.views.incident.IncidentsFilterRequest;
 import io.synlabs.synvision.views.anpr.CreateAnprRequest;
 import io.synlabs.synvision.views.common.PageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,7 +39,7 @@ public class AnprController {
     private AnprService anprService;
 
     @PostMapping("/events")
-    public PageResponse<AnprResponse> list(@RequestBody IncidentsFilterRequest request) {
+    public PageResponse<AnprResponse> list(@RequestBody AnprFilterRequest request) {
         return anprService.list(request);
     }
 

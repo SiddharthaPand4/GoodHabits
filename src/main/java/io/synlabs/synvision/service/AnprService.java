@@ -1,22 +1,23 @@
 package io.synlabs.synvision.service;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import io.synlabs.synvision.entity.anpr.AnprEvent;
+import io.synlabs.synvision.entity.anpr.QAnprEvent;
 import io.synlabs.synvision.ex.ValidationException;
 import io.synlabs.synvision.jpa.AnprEventRepository;
-import io.synlabs.synvision.views.anpr.AnprPageResponse;
-import io.synlabs.synvision.views.anpr.AnprRequest;
-import io.synlabs.synvision.views.anpr.AnprResponse;
-import io.synlabs.synvision.views.anpr.CreateAnprRequest;
+import io.synlabs.synvision.views.anpr.*;
 import io.synlabs.synvision.views.common.PageResponse;
-import io.synlabs.synvision.views.incident.IncidentsFilterRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -35,48 +36,46 @@ public class AnprService extends BaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(AnprService.class);
 
-    public PageResponse<AnprResponse> list(IncidentsFilterRequest request) {
+    public PageResponse<AnprResponse> list(AnprFilterRequest request) {
+        BooleanExpression query = getQuery(request);
+        int count = (int)anprEventRepository.count(query);
+        int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
         Pageable paging = PageRequest.of(request.getPage() - 1, request.getPageSize(), Sort.by(DESC, "eventDate"));
-        if (request.getFromDate() == null && request.getFromTime() == null && request.getToDate() == null && request.getToTime() == null) {
 
-            int count = anprEventRepository.countAllByArchivedFalse();
-            List<AnprEvent> anprEventList = anprEventRepository.findAllByArchivedFalse(paging);
-            List<AnprResponse> list = anprEventList.stream().map(AnprResponse::new).collect(Collectors.toList());
-            int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
-            return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
+        Page<AnprEvent> page = anprEventRepository.findAll(query, paging);
+        List<AnprResponse> list = page.get().map(AnprResponse::new).collect(Collectors.toList());
 
-        }
+        return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
+    }
 
-        String fromDate = request.getFromDate();
-        String toDate = request.getToDate();
-        String fromTime = request.getFromTime() == null ? "00:00:00" : request.getFromTime();
-        String toTime = request.getToTime() == null ? "00:00:00" : request.getToTime();
-
-        String eventStart = fromDate + " " + fromTime;
-        String eventEnd = toDate + " " + toTime;
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        if (fromDate == null) {
-            throw new ValidationException("From date should not be null!");
-        }
-
-        if (toDate == null) {
-            Date date = new Date();
-            eventEnd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
-        }
+    public BooleanExpression getQuery(AnprFilterRequest request) {
 
         try {
-            Date eventStartDate = dateFormat.parse(eventStart);
-            Date eventEndDate = dateFormat.parse(eventEnd);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-            int count = anprEventRepository.countAllByEventDateBetweenAndArchivedFalse(eventStartDate, eventEndDate);
-            List<AnprEvent> anprEventList = anprEventRepository.findAllByEventDateBetweenAndArchivedFalse(eventStartDate, eventEndDate, paging);
-            List<AnprResponse> list = anprEventList.stream().map(AnprResponse::new).collect(Collectors.toList());
-            int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
-            return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
+            String fromDate = request.getFromDate();
+            String toDate = request.getToDate();
+            QAnprEvent root = QAnprEvent.anprEvent;
+            BooleanExpression query = root.archived.isFalse();
 
+            if (request.getLpr() != null) {
+                query = query.and(root.anprText.likeIgnoreCase("%" + request.getLpr() + "%"));
+            }
 
+            if (request.getFromDate() != null) {
+                String fromTime = request.getFromTime() == null ? "00:00:00" : request.getFromTime();
+                String starting = fromDate + " " + fromTime;
+                Date startingDate = dateFormat.parse(starting);
+                query = query.and(root.eventDate.after(startingDate));
+            }
+
+            if (request.getToTime() != null) {
+                String toTime = request.getToTime() == null ? "00:00:00" : request.getToTime();
+                String ending = toDate + " " + toTime;
+                Date endingDate = dateFormat.parse(ending);
+                query = query.and(root.eventDate.after(endingDate));
+            }
+            return query;
         } catch (Exception e) {
             logger.error("Error in parsing date", e);
         }

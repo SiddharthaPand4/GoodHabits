@@ -4,6 +4,7 @@ import io.synlabs.synvision.entity.anpr.AnprEvent;
 import io.synlabs.synvision.entity.core.Org;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 import java.util.Date;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 /**
  * Created by itrs on 10/21/2019.
  */
-public interface AnprEventRepository extends JpaRepository<AnprEvent, Long> {
+public interface AnprEventRepository extends JpaRepository<AnprEvent, Long>, QuerydslPredicateExecutor<AnprEvent> {
 
     List<AnprEvent> findAllByEventDateBetweenAndArchivedFalse(Date eventStartDate, Date eventEndDate, Pageable paging);
 
