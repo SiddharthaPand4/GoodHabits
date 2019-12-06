@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -41,12 +42,12 @@ public class CreateAnprRequest implements Request {
         AnprEvent event = new AnprEvent();
         event.setAnprText(anprText);
         event.setEventDate(new Date(timestamp * 1000));
-        event.setEventId(eventId);
+        event.setVehicleId(eventId);
         event.setOcrImage(ocrImage);
         event.setVehicleImage(vehicleImage);
         event.setDirection(direction);
         event.setVehicleClass(vehicleClass);
-
+        event.setEventId(UUID.randomUUID().toString());
         if ("motorbike".equals(vehicleClass) && "None".equals(helmetStatus)) {
             event.setHelmetMissing(true);
         }

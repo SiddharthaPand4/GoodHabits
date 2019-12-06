@@ -18,6 +18,9 @@ import java.util.Date;
 @Setter
 public class AnprEvent extends BaseEntity {
 
+    @Column(nullable = false, length = 50)
+    private String vehicleId;
+
     @Column(nullable = false, length = 50, unique = true)
     private String eventId;
 
