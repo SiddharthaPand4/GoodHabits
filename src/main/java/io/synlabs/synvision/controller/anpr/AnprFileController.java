@@ -21,7 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 @Controller
-@RequestMapping("/api/anpr")
+@RequestMapping("/public/anpr")
 public class AnprFileController {
 
     private static final Logger logger = LoggerFactory.getLogger(AnprFileController.class);
@@ -29,17 +29,17 @@ public class AnprFileController {
     @Autowired
     private AtccDataService dataService;
 
-    @GetMapping("/screenshot/{id}")
-    public ResponseEntity<Resource> downloadScrenshot(@PathVariable Long id, HttpServletRequest request) throws IOException {
+    @GetMapping("/vehicle/{id}/image.jpg")
+    public ResponseEntity<Resource> downloadVehicleImage(@PathVariable Long id, HttpServletRequest request) throws IOException {
 
-        Resource resource = dataService.getScreenshot(id);
+        Resource resource = dataService.downloadVehicleImage(id);
         return send(resource, request);
     }
 
-    @GetMapping("/video/{id}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String id, HttpServletRequest request) {
+    @GetMapping("/lpr/{id}/image.jpg")
+    public ResponseEntity<Resource> downloadLprImage(@PathVariable Long id, HttpServletRequest request) {
         // Load file as Resource
-        Resource resource = dataService.loadFileAsResource(id);
+        Resource resource = dataService.downloadLprImage(id);
         return send(resource, request);
     }
 
@@ -77,18 +77,6 @@ public class AnprFileController {
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getPath() + "\"")
                 .body(new InputStreamResource(new FileInputStream(file)));
-    }
-
-    @GetMapping("/csv/")
-    public ResponseEntity<Resource> exportCSV(HttpServletRequest request) throws Exception {
-        File file = dataService.streamRawData();
-        return send(file, request);
-    }
-
-    @GetMapping("/csv/summary/{interval}")
-    public ResponseEntity<Resource> exportSummaryCSV(HttpServletRequest request, @PathVariable String interval) throws Exception {
-        Resource resource = dataService.makeSummaryData(interval);
-        return send(resource, request);
     }
 
 }

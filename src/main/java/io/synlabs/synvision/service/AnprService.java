@@ -1,24 +1,28 @@
 package io.synlabs.synvision.service;
 
 import io.synlabs.synvision.entity.anpr.AnprEvent;
-import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.ex.ValidationException;
 import io.synlabs.synvision.jpa.AnprEventRepository;
-import io.synlabs.synvision.views.anpr.*;
+import io.synlabs.synvision.views.anpr.AnprPageResponse;
+import io.synlabs.synvision.views.anpr.AnprRequest;
+import io.synlabs.synvision.views.anpr.AnprResponse;
+import io.synlabs.synvision.views.anpr.CreateAnprRequest;
 import io.synlabs.synvision.views.common.PageResponse;
-import io.synlabs.synvision.views.incident.IncidentRequest;
 import io.synlabs.synvision.views.incident.IncidentsFilterRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Created by itrs on 10/21/2019.
@@ -32,7 +36,7 @@ public class AnprService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(AnprService.class);
 
     public PageResponse<AnprResponse> list(IncidentsFilterRequest request) {
-        Pageable paging = PageRequest.of(request.getPage() - 1, request.getPageSize());
+        Pageable paging = PageRequest.of(request.getPage() - 1, request.getPageSize(), Sort.by(DESC, "eventDate"));
         if (request.getFromDate() == null && request.getFromTime() == null && request.getToDate() == null && request.getToTime() == null) {
 
             int count = anprEventRepository.countAllByArchivedFalse();

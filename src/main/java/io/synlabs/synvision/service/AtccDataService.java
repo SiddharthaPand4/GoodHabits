@@ -1,20 +1,20 @@
 package io.synlabs.synvision.service;
 
 import io.synlabs.synvision.config.FileStorageProperties;
+import io.synlabs.synvision.entity.ImportStatus;
+import io.synlabs.synvision.entity.anpr.AnprEvent;
 import io.synlabs.synvision.entity.atcc.AtccRawData;
 import io.synlabs.synvision.entity.atcc.AtccSummaryData;
 import io.synlabs.synvision.entity.atcc.AtccVideoData;
-import io.synlabs.synvision.entity.ImportStatus;
 import io.synlabs.synvision.enums.TimeSpan;
 import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.ex.NotFoundException;
-import io.synlabs.synvision.jpa.AtccRawDataRepository;
-import io.synlabs.synvision.jpa.AtccSummaryDataRepository;
-import io.synlabs.synvision.jpa.AtccVideoDataRepository;
-import io.synlabs.synvision.jpa.ImportStatusRepository;
-import io.synlabs.synvision.views.*;
+import io.synlabs.synvision.jpa.*;
+import io.synlabs.synvision.views.VideoSummary;
 import io.synlabs.synvision.views.atcc.AtccRawDataResponse;
 import io.synlabs.synvision.views.atcc.AtccSummaryDataResponse;
+import io.synlabs.synvision.views.common.DummyRequest;
+import io.synlabs.synvision.views.common.Request;
 import io.synlabs.synvision.views.common.ResponseWrapper;
 import io.synlabs.synvision.views.common.SearchRequest;
 import net.bramp.ffmpeg.FFmpeg;
@@ -43,7 +43,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.DataSource;
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -77,6 +80,9 @@ public class AtccDataService extends BaseService {
     private final ImportStatusRepository statusRepository;
 
     private AtccVideoDataRepository videoDataRepository;
+
+    @Autowired
+    private AnprEventRepository anprEventRepository;
 
 
     @Qualifier("dataSource")
@@ -287,7 +293,7 @@ public class AtccDataService extends BaseService {
 
     private AtccVideoData populateFields(String fileName, String tag) {
         double dts = Double.parseDouble(fileName.split("_")[1]);
-        long ts = (long)dts;
+        long ts = (long) dts;
         DateTime videoDate = new DateTime(ts * 1000L);
         AtccVideoData videoData = new AtccVideoData();
         videoData.setDate(videoDate.toDate());
@@ -339,7 +345,7 @@ public class AtccDataService extends BaseService {
             String type = "";
             String vid = csvRecord.size() == 7 ? "" : csvRecord.get(7);
 
-            long ts = (long)Double.parseDouble(timestamp);
+            long ts = (long) Double.parseDouble(timestamp);
 
             AtccRawData atccRawData = new AtccRawData();
             atccRawData.setTime(new SimpleDateFormat("HH:mm:ss").parse(time));
@@ -423,7 +429,7 @@ public class AtccDataService extends BaseService {
 
     public Resource makeSummaryData(String interval) throws IOException {
 
-        String filename = "summary-" + interval + "-" + UUID.randomUUID().toString()  + ".csv";
+        String filename = "summary-" + interval + "-" + UUID.randomUUID().toString() + ".csv";
         Path filePath = this.fileStorageLocation.resolve(filename).normalize();
 
         SearchRequest request = new SearchRequest();
@@ -435,9 +441,9 @@ public class AtccDataService extends BaseService {
         CsvWriter.CsvWriterDSL<AtccSummaryDataResponse> writerDsl =
                 CsvWriter
                         .from(AtccSummaryDataResponse.class)
-                        .columns("type" ,"date", "from", "to", "span", "count");
+                        .columns("type", "date", "from", "to", "span", "count");
         try (FileWriter fileWriter = new FileWriter(filePath.toFile())) {
-            CsvWriter<AtccSummaryDataResponse> writer= writerDsl.to(fileWriter);
+            CsvWriter<AtccSummaryDataResponse> writer = writerDsl.to(fileWriter);
             data.forEach(CheckedConsumer.toConsumer(writer::append));
         }
 
@@ -475,7 +481,7 @@ public class AtccDataService extends BaseService {
             page.get().forEach(CheckedConsumer.toConsumer(writer::append));
 
             for (currPage = 1; currPage < totalPages; currPage++) {
-                logger.info("Current Page - ", currPage);
+                logger.info("Current Page - {}", currPage);
                 page = rawDataRepository.findAll(PageRequest.of(currPage, 10000, Sort.by(DESC, "timeStamp")));
                 page.get().forEach(CheckedConsumer.toConsumer(writer::append));
             }
@@ -601,4 +607,37 @@ public class AtccDataService extends BaseService {
         return this.fileStorageLocation.resolve(data.getFeed() + "_" + data.getTimeStamp() + ".jpg").normalize();
     }
 
+    public Resource downloadVehicleImage(Long id) {
+        return downloadByTag("vehicle", id);
+    }
+
+    public Resource downloadLprImage(Long id) {
+        return downloadByTag("anpr", id);
+    }
+
+    public Resource downloadByTag(String tag, Long mid) {
+
+        long id = new DummyRequest().unmask(mid);
+        String filename = null;
+        try {
+            Optional<AnprEvent> eventop = anprEventRepository.findById(id);
+            if (eventop.isPresent()) {
+                filename = eventop.get().getVehicleImage() + ".jpg";
+
+                Path filePath = Paths.get(this.fileStorageLocation.toString(), tag, filename).toAbsolutePath().normalize();
+                Resource resource = new UrlResource(filePath.toUri());
+                if (resource.exists()) {
+                    return resource;
+                } else {
+                    throw new NotFoundException("File not found " + filename);
+                }
+            }
+            else {
+                throw new NotFoundException("File not found " + filename);
+            }
+
+        } catch (MalformedURLException ex) {
+            throw new NotFoundException("File not found " + filename, ex);
+        }
+    }
 }

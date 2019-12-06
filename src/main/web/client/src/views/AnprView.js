@@ -11,7 +11,7 @@ import {
     Table,
     Tag,
     Modal,
-    message
+    message, Input
 } from 'antd';
 import GenericFilter from "../components/GenericFilter";
 import Moment from "react-moment";
@@ -41,6 +41,7 @@ export default class DeviceView extends Component {
         this.handleRefresh = this.handleRefresh.bind(this);
         this.onPageChange = this.onPageChange.bind(this);
         this.onPageSizeChange = this.onPageSizeChange.bind(this);
+        this.onLprInputChange = this.onLprInputChange.bind(this);
     }
 
     componentDidMount() {
@@ -58,6 +59,14 @@ export default class DeviceView extends Component {
         AnprService.getEvents(this.state.filter).then(request => {
             this.setState({"anprresponse": request.data, loading: false})
         })
+    }
+
+    onLprInputChange(e) {
+
+        let filter = this.state.filter;
+        filter.lpr = e.target.value;
+        console.log(filter);
+        this.setState({filter:filter})
     }
 
     handleFilterChange(data){
@@ -89,10 +98,12 @@ export default class DeviceView extends Component {
     render() {
 
         let layout = this.state.layout;
+        let lpr = this.state.filter.lpr;
 
         return (<div>ANPR
             <Collapse bordered={false} defaultActiveKey={['1', '2']}>
                 <Panel header="Filter" key="1">
+                    LPR: <Input value={lpr} style={{ "width": "200px"}} onChange={this.onLprInputChange}/> <br/><br/>
                     <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout} handleFilterChange={this.handleFilterChange} handleLayoutChange={this.handleLayoutChange}/>
                 </Panel>
                 <Panel header="Events" key="2">
@@ -130,13 +141,15 @@ export default class DeviceView extends Component {
                                         <Tag color="#87d068"><span><Moment format="LTS">{event.eventDate}</Moment></span><Icon
                                             type="right" hidden/><span hidden><Moment
                                             format="LTS">{event.eventDate}</Moment></span></Tag>
+                                        <Tag>{event.anprText}</Tag>
                                     </div>
                                 }
                                 bordered={true}
                                 cover={<img alt="event"
-                                            src={"/api/event/image/" + event.vehicleImage + "/image.jpg"}/>}
+                                            src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}/>}
                             >
-
+                                <img alt="event"
+                                     src={"/public/anpr/lpr/" + event.id + "/image.jpg"}/>
                             </Card>
                         </Col>
                     )
@@ -171,11 +184,14 @@ export default class DeviceView extends Component {
 
         return (
             <Table dataSource={events} pagination={pagination}>
-                <Column title="ID" dataIndex="id" key="id"/>
                 <Column title="Date" dataIndex="eventDate" key="eventDate"
                         render={eventDate => (<Moment format="L">{eventDate}</Moment>)}/>
                 <Column title="Time" dataIndex="eventDate" key="eventTime"
                         render={eventDate => (<Moment format="LTS">{eventDate}</Moment>)}/>
+                <Column title="LPR" dataIndex="anprText" key="anprText"
+                        render={anprText => anprText}/>
+                <Column title="image" dataIndex="id" key="anprimage"
+                        render={id => (<img alt="event" src={"/public/anpr/lpr/" + id + "/image.jpg"}/>)}/>
 
             </Table>
         )
