@@ -159,16 +159,14 @@ export default class HomeView extends Component {
         return (
             <div>
                 <div>
-
-                    <Dropdown overlay={menu}>
+                    <Card title={<div>ATCC &nbsp;<Dropdown overlay={menu}>
                         <Button>
                             {selectedCustomDateRange ? selectedCustomDateRange : "Select"} <Icon type="down"/>
                         </Button>
-                    </Dropdown>
-                    <Line data={this.state.atcc.chartData} options={barChartOptions}/>
+                    </Dropdown></div>}>
+                        <Bar data={this.state.atcc.chartData} options={barChartOptions}/>
+                    </Card>
                 </div>
-
-
             </div>
         )
     }
