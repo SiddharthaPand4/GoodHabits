@@ -6,7 +6,7 @@
 
     <groupId>io.synlabs</groupId>
     <artifactId>synvision</artifactId>
-    <version>0.60</version>
+    <version>0.63</version>
     <name>synvision</name>
     <description>Synvision Management Application</description>
     <packaging>war</packaging>
@@ -156,7 +156,7 @@
                             <outputDirectory>${basedir}/target/classes/static</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${basedir}/src/main/web/build</directory>
+                                    <directory>${basedir}/src/main/web/client/build</directory>
                                 </resource>
                             </resources>
                         </configuration>

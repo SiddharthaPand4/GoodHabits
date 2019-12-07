@@ -2,6 +2,7 @@ import axios from "./axios";
 import { authHeader } from '../helpers/auth-header';
 import { config } from '../helpers/config'
 import {history} from "../helpers/history";
+import {EventBus} from "../components/event";
 
 class UserService {
 
@@ -70,8 +71,10 @@ class UserService {
     }
 
     logout() {
-        localStorage.removeItem("syntoken")
-        history.push( "/#/");
+        localStorage.removeItem("syntoken");
+        history.push( "/#/login");
+        EventBus.publish('login-logout', {})
+
     }
 }
 

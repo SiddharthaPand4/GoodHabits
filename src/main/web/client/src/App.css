@@ -1,7 +1,7 @@
 @import '../node_modules/antd/dist/antd.css';
 
 .logo {
-  height: 32px;
+  height: 40px;
   background: rgba(255, 255, 255, 0.2);
   margin: 16px;
 }

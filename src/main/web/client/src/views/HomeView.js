@@ -1,217 +1,174 @@
 import React, {Component} from "react";
-import {Col, Row, Statistic,TimePicker,DatePicker,Button,Icon,message,Card,Menu, Dropdown,Select} from "antd";
+import {Col, Row, Statistic, TimePicker, DatePicker, Button, Icon, message, Card, Menu, Dropdown, Select} from "antd";
 import DashboardService from "../services/DashboardService";
 import moment from 'moment';
 import classnames from 'classnames';
-import {Bar, Pie,Line} from 'react-chartjs-2';
+import {Bar, Pie, Line} from 'react-chartjs-2';
 import * as name from "chartjs-plugin-colorschemes";
+import cloneDeep from 'lodash/cloneDeep';
 
-const { RangePicker } = DatePicker;
-
-const { Option } = Select;
+const {Option} = Select;
 
 export default class HomeView extends Component {
 
-constructor(props) {
-    super(props);
-    this.state = {
-        loading: true,
-        videoVisible: false,
-        layout: "table",
-        incidents: {},
-        filter: {
-            filterType:"today"
-
-        },
-        resultSetByDate: {
-            loading: true,
-            chartData: {}
-        },
-
-        resultSetByTime: {
-            loading: true,
-            chartData: {}
-        },
-        aggregation:"",
-        isOpenDatePicker:false
-    };
-
-    this.refresh = this.refresh.bind(this);
-    this.onChange = this.onChange.bind(this);
-    this.onOk = this.onOk.bind(this);
-    this.fetchDateWiseVehiclesCount = this.fetchDateWiseVehiclesCount.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.openDatePicker = this.openDatePicker.bind(this);
-
-}
-   componentDidMount() {
-      this.refresh();
-   }
-
-
-   refresh(){
-       this.fetchDateWiseVehiclesCount();
-   }
-
-
-   fetchDateWiseVehiclesCount(){
-
-        DashboardService.getTotalNoOfVehiclesBetweenTwoDates(this.state.filter).then(response => {
-            let keys=[];
-            let values=[];
-            for(var i=0;i<response.data.length;i++){
-                keys.push(response.data[i].key);
-                values.push(response.data[i].countOfTotalVehicles);
+    constructor(props) {
+        super(props);
+        this.state = {
+            selectedCustomDateRange: "",
+            atcc: {
+                chartData: {
+                    labels: [],
+                    datasets: []
+                }
             }
+        };
 
-              let resultSet = {
-                 loading: false,
-                 chartData: {
-                     labels: keys,
-                     datasets: [{
-                         label: keys,
-                         data: values
-                     }]
-                 }
-              };
-             this.setState({resultSetByDate: resultSet,isOpenDatePicker:false});
-        },
-        error=>{
-            message.error(error.response.data.message);
-        })
-   }
+        this.getAtccVehicleCount = this.getAtccVehicleCount.bind(this);
 
-   handleChange(value){
-        let filter = this.state.filter;
-        filter.filterType=value;
-        this.setState({aggregation:value,filter:filter,isOpenDatePicker:false})
-        if(value!="custom"){
-            this.fetchDateWiseVehiclesCount();
-        }
-        if(value=="custom"){
-            this.setState({isOpenDatePicker:true})
-        }
-   }
-
-   openDatePicker(){
-    this.setState({isOpenDatePicker:true})
-   }
-
-    onChange(value, dateString) {
-     console.log('Selected Time: ', value);
-     console.log('Formatted Selected Time: ', dateString);
-     let filter = this.state.filter;
-     filter.from=value[0];
-     filter.to=value[1];
 
     }
 
-    onOk(value) {
-     console.log('onOk: ', value);
-     this.setState({isOpenDatePicker:false})
-     this.fetchDateWiseVehiclesCount()
+    componentDidMount() {
+        this.selectDateRange("This week");
     }
 
+
+    selectDateRange(selectedCustomDateRange) {
+        this.setState({selectedCustomDateRange});
+
+        let fromToDate = DashboardService.extractFromToDate(selectedCustomDateRange);
+
+        this.getAtccVehicleCount(fromToDate.from_date, fromToDate.to_date);
+    }
+
+
+    getAtccVehicleCount(from_date, to_date) {
+
+
+        let {atcc} = this.state;
+
+        DashboardService.getAtccVehicleCount(from_date, to_date).then(resposne => {
+            let rawData = resposne.data;
+            let labelDates = DashboardService.enumerateDaysBetweenDates(from_date, to_date);
+            atcc.chartData.labels = labelDates;
+
+
+            let rawDataByVehicleData = [];
+            for (let i in rawData) {
+                if (!rawDataByVehicleData[rawData[i].vehicleType]) {
+                    rawDataByVehicleData[rawData[i].vehicleType] = {};
+                }
+                if (!rawDataByVehicleData[rawData[i].vehicleType][rawData[i].date]) {
+                    rawDataByVehicleData[rawData[i].vehicleType][rawData[i].date] = rawData[i];
+                }
+            }
+            let vehicleTypeIndex = 0;
+            for (let vehicleType in rawDataByVehicleData) {
+
+                let color = DashboardService.getColor(vehicleTypeIndex);
+                let dataSet = {
+                    label: vehicleType,
+                    data: [],
+                    backgroundColor: color
+                };
+
+                for (let i in labelDates) {
+                    if (rawDataByVehicleData[vehicleType][labelDates[i]]) {
+                        dataSet.data.push(rawDataByVehicleData[vehicleType][labelDates[i]].vehicleCount);
+                    } else {
+                        dataSet.data.push(0);
+                    }
+                }
+                atcc.chartData.datasets.push(dataSet);
+                vehicleTypeIndex++;
+            }
+            this.setState({atcc});
+        }).catch(error => {
+            console.log(error);
+        });
+    }
+
+    getMenuOptions() {
+        return (
+            <Menu>
+                <Menu.Item key="1" onClick={() => this.selectDateRange("This week")}>
+                    This week
+                </Menu.Item>
+                <Menu.Item key="2" onClick={() => this.selectDateRange("This month")}>
+                    This month
+                </Menu.Item>
+                <Menu.Item key="2" onClick={() => this.selectDateRange("This quarter")}>
+                    This quarter
+                </Menu.Item>
+                <Menu.Divider/>
+                <Menu.Item key="5" onClick={() => this.selectDateRange("Last week")}>
+                    Last week
+                </Menu.Item>
+                <Menu.Item key="6" onClick={() => this.selectDateRange("Last month")}>
+                    Last month
+                </Menu.Item>
+                <Menu.Item key="7" onClick={() => this.selectDateRange("Last quarter")}>
+                    Last quarter
+                </Menu.Item>
+                <Menu.Divider/>
+                <Menu.Item key="9" onClick={() => this.selectDateRange("Second Last week")}>
+                    Second Last week
+                </Menu.Item>
+                <Menu.Item key="10" onClick={() => this.selectDateRange("Second Last month")}>
+                    Second Last month
+                </Menu.Item>
+                <Menu.Item key="11" onClick={() => this.selectDateRange("Second Last quarter")}>
+                    Second Last quarter
+                </Menu.Item>
+            </Menu>
+        );
+    }
+
+    getBarChartOptions() {
+        let options = {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+                duration: 0
+            },
+            hover: {
+                animationDuration: 0
+            },
+            responsiveAnimationDuration: 0,
+            legend: {
+                position: 'right' // place legend on the right side of chart
+            },
+            scales: {
+                xAxes: [{
+                    stacked: true // this should be set to make the bars stacked
+                }],
+                yAxes: [{
+                    stacked: true // this also..
+                }]
+            }
+        };
+        return options;
+    }
 
     render() {
-      const onChange=this.onChange;
+        let {selectedCustomDateRange} = this.state;
+
+        const menu = this.getMenuOptions();
+        const barChartOptions = this.getBarChartOptions();
 
         return (
             <div>
-                <Row gutter={24}>
-                    <Col span={12}>
-                        <Statistic title="Incidents (This Week)" value={24} />
-                    </Col>
-                    <Col span={12}>
-                        <Statistic title="Incidents (Last Week)" value={34} />
-                    </Col>
-                </Row>
+                <div>
 
-                <Row gutter={16}>
-
-                    <Col span={16}>
-                        <Card>
+                    <Dropdown overlay={menu}>
+                        <Button>
+                            {selectedCustomDateRange ? selectedCustomDateRange : "Select"} <Icon type="down"/>
+                        </Button>
+                    </Dropdown>
+                    <Line data={this.state.atcc.chartData} options={barChartOptions}/>
+                </div>
 
 
-                                <Select defaultValue="today" style={{ width: 120 }} onChange={this.handleChange}>
-                                      <Option value="yesterday">Yesterday</Option>
-                                      <Option value="today">Today</Option>
-                                      <Option value="last7days">
-                                        Last 7 days
-                                      </Option>
-                                      <Option value="last3months">Last 3 months</Option>
-                                      <Option value="last6months">Last 6 months</Option>
-                                      <Option value="custom" onClick={this.openDatePicker}>Custom</Option>
-                                </Select>
-
-                                &nbsp; &nbsp;
-
-                                 {this.state.isOpenDatePicker ? <RangePicker open={this.state.isOpenDatePicker}
-                                       ranges={{
-                                         'This Month': [moment().startOf('month'), moment().endOf('month')],
-                                         'This Week': [moment().startOf('week'), moment().endOf('week')],
-                                       }}
-                                       defaultValue={[moment().startOf('week'), moment().endOf('week')]}
-                                       format="YYYY/MM/DD"
-                                       onChange={onChange}
-                                       onOk={this.onOk}
-                                       showTime
-                                     /> :null}
-                                     &nbsp; &nbsp;
-
-
-
-                        {!this.state.resultSetByDate.loading ?
-                            <Bar data={this.state.resultSetByDate.chartData} options={{
-                                          title: {
-                                              display: true,
-                                              text: 'Vehicles'
-                                          },
-                                          options: {
-                                            maintainAspectRatio : false,
-                                            responsive: true,
-                                          },
-                                          legend: {
-                                              display: false
-                                          }, scales: {
-                                              yAxes: [{
-                                                  ticks: {
-                                                      beginAtZero: true
-                                                  },
-                                                  scaleLabel: {
-                                                      display: true,
-                                                      labelString: 'Total no of vehicles'
-                                                  }
-                                              }],
-                                              xAxes: [{
-                                                  scaleLabel: {
-                                                      display: true,
-                                                      labelString: 'Date'
-                                                  }
-                                              }]
-                                          },
-                                          tooltips: {
-                                              callbacks: {
-                                                  title: function (tooltipItem, chartData) {
-                                                      return "Total vehicles enters"
-                                                  },
-                                                  label: function (tooltipItems, data) {
-                                                      return data.datasets[tooltipItems.datasetIndex].label[tooltipItems.index] + " : $" + data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index]
-                                                  }
-                                              }
-                                          },
-                                          plugins: {
-                                             colorschemes: {
-                                                  scheme: 'brewer.Paired12'
-                                             }
-                                          }
-                                   }}/>
-
-                               :null}
-                        </Card>
-
-                    </Col>
-                </Row>
             </div>
         )
     }
