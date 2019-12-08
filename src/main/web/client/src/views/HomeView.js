@@ -110,16 +110,6 @@ export default class HomeView extends Component {
                 <Menu.Item key="7" onClick={() => this.selectDateRange("Last quarter")}>
                     Last quarter
                 </Menu.Item>
-                <Menu.Divider/>
-                <Menu.Item key="9" onClick={() => this.selectDateRange("Second Last week")}>
-                    Second Last week
-                </Menu.Item>
-                <Menu.Item key="10" onClick={() => this.selectDateRange("Second Last month")}>
-                    Second Last month
-                </Menu.Item>
-                <Menu.Item key="11" onClick={() => this.selectDateRange("Second Last quarter")}>
-                    Second Last quarter
-                </Menu.Item>
             </Menu>
         );
     }

@@ -109,11 +109,11 @@ export default class DeviceView extends Component {
                 <TimePicker minuteStep={15} secondStep={60} onChange={this.onToTimeChange}/>&nbsp;&nbsp;
 
                 <ButtonGroup>
-                    <Button type={layout === "list" ? "primary" : ""} size="small" icon="unordered-list"
+                    <Button type={layout === "list" ? "primary" : ""} size="small" icon="table"
                             onClick={() => {
                                 this.changeLayout("list")
                             }}/>
-                    <Button type={layout === "table" ? "primary" : ""} size="small" icon="table"
+                    <Button type={layout === "table" ? "primary" : ""} size="small" icon="unordered-list"
                             onClick={() => {
                                 this.changeLayout("table")
                             }}/>

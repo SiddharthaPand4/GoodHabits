@@ -17,6 +17,10 @@ class AnprService {
     archiveEvent(event) {
         return axios.delete('/api/anpr/' + event.id);
     }
+
+    getEventFile(id) {
+        return axios.get('/public/anpr/lpr/' + id + '/image.jpg');
+    }
 }
 
 export default AnprService.Instance()
