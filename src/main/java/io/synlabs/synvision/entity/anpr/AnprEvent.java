@@ -39,7 +39,7 @@ public class AnprEvent extends BaseEntity {
     private boolean archived;
 
     @Column(length = 50)
-    private String direction;
+    private String direction; //=> fwd or rev
 
     @Column(length = 50)
     private String vehicleClass;

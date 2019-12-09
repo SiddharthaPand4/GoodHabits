@@ -13,6 +13,7 @@ import io.synlabs.synvision.views.common.PageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,16 +40,25 @@ public class AnprService extends BaseService {
     @Autowired
     private HotListVehicleRepository hotListVehicleRepository;
 
+    @Value("${pilot.location}")
+    private String location;
+
+
     private static final Logger logger = LoggerFactory.getLogger(AnprService.class);
 
     public PageResponse<AnprResponse> list(AnprFilterRequest request) {
         BooleanExpression query = getQuery(request);
-        int count = (int)anprEventRepository.count(query);
+        int count = (int) anprEventRepository.count(query);
         int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
         Pageable paging = PageRequest.of(request.getPage() - 1, request.getPageSize(), Sort.by(DESC, "eventDate"));
 
         Page<AnprEvent> page = anprEventRepository.findAll(query, paging);
-        List<AnprResponse> list = page.get().map(AnprResponse::new).collect(Collectors.toList());
+        //List<AnprResponse> list = page.get().map(AnprResponse::new).collect(Collectors.toList());
+
+        List<AnprResponse> list = new ArrayList<>(page.getSize());
+        page.get().forEach(item->{
+            list.add(new AnprResponse(item,location));
+        });
 
         return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
     }
@@ -104,13 +115,17 @@ public class AnprService extends BaseService {
 
     public PageResponse<AnprResponse> listIncidents(AnprFilterRequest request) {
         BooleanExpression query = getIncidentQuery(request);
-        int count = (int)anprEventRepository.count(query);
+        int count = (int) anprEventRepository.count(query);
         int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
         Pageable paging = PageRequest.of(request.getPage() - 1, request.getPageSize(), Sort.by(DESC, "eventDate"));
 
         Page<AnprEvent> page = anprEventRepository.findAll(query, paging);
-        List<AnprResponse> list = page.get().map(AnprResponse::new).collect(Collectors.toList());
+        //List<AnprResponse> list = page.get().map(AnprResponse::new).collect(Collectors.toList());
 
+        List<AnprResponse> list = new ArrayList<>(page.getSize());
+        page.get().forEach(item->{
+            list.add(new AnprResponse(item,location));
+        });
         return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
     }
 

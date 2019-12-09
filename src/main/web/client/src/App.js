@@ -20,6 +20,7 @@ import IncidentListView from "./views/IncidentListView";
 import TriggerView from "./views/TriggerView";
 import AnprView from "./views/AnprView";
 import TrafficIncidentView from "./views/TrafficIncidentView";
+
 const {Content} = Layout;
 
 class App extends Component {
@@ -44,17 +45,17 @@ class App extends Component {
         const isLoggedIn = this.state.loggedIn;
 
         const sideBar = isLoggedIn ? <Sidebar/> : null;
-        const header = isLoggedIn ? <Headbar isLoggedIn={isLoggedIn}/>: null;
+        const header = isLoggedIn ? <Headbar isLoggedIn={isLoggedIn}/> : null;
 
 
         return (
             <div className="App">
-                <Layout>
+                <Layout style={{minHeight: '100vh'}}>
                     {sideBar}
                     <Layout>
                         {header}
-                        <Content style={{ margin: '24px 16px 0' }}>
-                            <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                        <Content style={{margin: '24px 16px 0'}}>
+                            <div style={{padding: 24}} >
                                 <Route path='/login' exact={true} component={LoginView}/>
                                 <PrivateRoute path='/' exact={true} component={HomeView}/>
                                 <PrivateRoute path='/incidents' exact={true} component={TrafficIncidentView}/>

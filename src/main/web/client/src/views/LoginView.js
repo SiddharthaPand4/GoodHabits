@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
 import UserService from "../services/UserService";
 import {EventBus} from "../components/event";
-import {Button, Col, Form, Icon, Input, Row, Typography} from 'antd';
-import { withRouter } from 'react-router-dom';
+import {Button, Col, Form, Icon, Input, Row, Typography, Card} from 'antd';
+import {withRouter} from 'react-router-dom';
 import {history} from "../helpers/history";
+import {Router} from 'react-router';
 
 const {Text} = Typography;
 
@@ -12,7 +13,7 @@ class LoginView extends Component {
 
     componentDidMount() {
         if (UserService.isLoggedIn()) {
-            history.push( "/#/");
+            history.push("/#/");
         }
     }
 
@@ -53,16 +54,20 @@ class LoginForm extends Component {
         }
 
         this.setState({loading: true});
+        let self = this;
         UserService.login(username, password)
             .then(token => {
-                history.push( "/#/");
-                EventBus.publish('login-logout', {})
+                const {from} = history.state || {from: {pathname: "/"}};
+                history.push(from);
+               /* EventBus.publish('login-logout', {});*/
+                window.location.reload();
+
             }).catch(error => {
-                this.setState({
-                    loginError: "Something went wrong, please try again",
-                    loading: false
-                })
-            });
+            this.setState({
+                loginError: "Something went wrong, please try again",
+                loading: false
+            })
+        });
     }
 
     render() {
@@ -72,37 +77,42 @@ class LoginForm extends Component {
 
         return (
             <Row>
-                <Col span={8} offset={8}><h4>Login</h4>
-                    <Form onSubmit={this.handleSubmit} className="login-form">
-                        <Form.Item>
-                            {getFieldDecorator('username', {
-                                rules: [{required: true, message: 'Please input your username!'}],
-                            })(
-                                <Input
-                                    prefix={<Icon type="user" style={{color: 'rgba(0,0,0,.25)'}}/>}
-                                    placeholder="Username"
-                                />,
-                            )}
-                        </Form.Item>
-                        <Form.Item>
-                            {getFieldDecorator('password', {
-                                rules: [{required: true, message: 'Please input your Password!'}],
-                            })(
-                                <Input
-                                    prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>}
-                                    type="password"
-                                    placeholder="Password"
-                                />,
-                            )}
-                        </Form.Item>
-                        <Form.Item>
-                            <Button type="primary" htmlType="submit" className="login-form-button">
-                                Log in
-                            </Button>
-                        </Form.Item>
-                    </Form>
-                    {loginError && <Text type="danger">{loginError}</Text>
-                    }
+                <Col xl={{span: 8}} lg={{span: 6}} md={{span: 4}} sm={{span: 2}} xs={{span: 2}}/>
+                <Col xl={{span: 8}} lg={{span: 12}} md={{span: 16}} sm={{span: 20}} xs={{span: 20}}>
+                    <Card title={ <img style={{}} src={"synlabs-logo-full.png"}/>}>
+                        <Form onSubmit={this.handleSubmit} className="login-form">
+                            <Form.Item>
+                                {getFieldDecorator('username', {
+                                    rules: [{required: true, message: 'Please input your username!'}],
+                                })(
+                                    <Input
+                                        prefix={<Icon type="user" style={{color: 'rgba(0,0,0,.25)'}}/>}
+                                        placeholder="Username"
+                                    />,
+                                )}
+                            </Form.Item>
+                            <Form.Item>
+                                {getFieldDecorator('password', {
+                                    rules: [{required: true, message: 'Please input your Password!'}],
+                                })(
+                                    <Input
+                                        prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>}
+                                        type="password"
+                                        placeholder="Password"
+                                    />,
+                                )}
+                            </Form.Item>
+                            <Form.Item>
+                                <Button type="primary" htmlType="submit" block className="login-form-button">
+                                    Log in
+                                </Button>
+                            </Form.Item>
+                        </Form>
+                        {loginError && <Text type="danger">{loginError}</Text>
+                        }
+                    </Card>
+
+
                 </Col>
             </Row>
 

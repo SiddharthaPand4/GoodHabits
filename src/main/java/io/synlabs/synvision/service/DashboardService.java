@@ -1,14 +1,23 @@
 package io.synlabs.synvision.service;
 
+import com.querydsl.core.Tuple;
+import com.querydsl.jpa.impl.JPAQuery;
+import io.synlabs.synvision.entity.anpr.QAnprEvent;
+import io.synlabs.synvision.entity.atcc.AtccRawData;
+import io.synlabs.synvision.entity.atcc.QAtccRawData;
 import io.synlabs.synvision.jpa.AnprEventRepository;
 import io.synlabs.synvision.views.DashboardRequest;
 import io.synlabs.synvision.views.DashboardResponse;
+import io.synlabs.synvision.views.atcc.AtccVehicleCountResponse;
+import io.synlabs.synvision.views.incident.IncidentCountResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import javax.persistence.EntityManager;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -21,6 +30,96 @@ public class DashboardService extends BaseService {
 
     @Autowired
     private AnprEventRepository anprEventRepository;
+    @Autowired
+    private EntityManager entityManager;
+
+
+    public List<AtccVehicleCountResponse> getAtccVehicleCount(DashboardRequest request) {
+
+        QAtccRawData rawData = QAtccRawData.atccRawData;
+        JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
+        List<Tuple> result = query.select(
+                rawData.date,
+                rawData.type,
+                rawData.count())
+                .from(rawData)
+                .where(rawData.date.after(request.from))
+                .where(rawData.date.before(request.to))
+                .groupBy(rawData.date, rawData.type)
+                .fetch();
+
+
+        Date date = null;
+        String vehicleType = null;
+        Long vehicleCount = null;
+        List<AtccVehicleCountResponse> response = new ArrayList<>(result.size());
+
+        for (int i = 0; i < result.size(); i++) {
+            Tuple tuple = result.get(i);
+            date = tuple.get(rawData.date);
+            vehicleType = tuple.get(rawData.type);
+            vehicleCount = tuple.get(2, Long.class);
+            response.add(new AtccVehicleCountResponse(date, vehicleType, vehicleCount));
+            result.set(i, null);
+        }
+        return response;
+    }
+
+    public List<IncidentCountResponse> getIncidentVehicleCount(DashboardRequest request) {
+
+        String incidentType = "Helmet-missing";
+        Date date = null;
+        Long vehicleCount = null;
+        List<IncidentCountResponse> response = new ArrayList<>();
+        List<Tuple> result = null;
+
+        QAnprEvent anprEvent = QAnprEvent.anprEvent;
+
+        result = getIncidentCount(request, incidentType, anprEvent);
+        for (int i = 0; i < result.size(); i++) {
+            Tuple tuple = result.get(i);
+            date = tuple.get(anprEvent.eventDate);
+            vehicleCount = tuple.get(1, Long.class);
+            response.add(new IncidentCountResponse(date, incidentType, vehicleCount));
+            result.set(i, null);
+        }
+
+        incidentType = "reverse-direction";
+        result = getIncidentCount(request, incidentType, anprEvent);
+        for (int i = 0; i < result.size(); i++) {
+            Tuple tuple = result.get(i);
+            date = tuple.get(anprEvent.eventDate);
+            vehicleCount = tuple.get(1, Long.class);
+            response.add(new IncidentCountResponse(date, incidentType, vehicleCount));
+            result.set(i, null);
+        }
+        return response;
+    }
+
+    private List<Tuple> getIncidentCount(DashboardRequest request, String incidentType, QAnprEvent anprEvent) {
+        JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
+
+        query = query.select(
+                anprEvent.eventDate,
+                anprEvent.count())
+                .from(anprEvent)
+                .where(anprEvent.eventDate.after(request.from))
+                .where(anprEvent.eventDate.before(request.to));
+
+        switch (incidentType) {
+            case "Helmet-missing":
+                query = query.where(anprEvent.helmetMissing.isTrue());
+                break;
+            case "reverse-direction":
+                query = query.where(anprEvent.direction.eq("rev"));
+                break;
+
+        }
+
+
+        return query.groupBy(anprEvent.eventDate.dayOfMonth(), anprEvent.eventDate.month(), anprEvent.eventDate.year())
+                .fetch();
+    }
 
     public List<DashboardResponse> getTotalNoOfVehiclesByDateFilter(DashboardRequest request) {
         List<DashboardResponse> responses = new ArrayList<>();

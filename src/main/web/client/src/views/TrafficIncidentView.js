@@ -11,7 +11,7 @@ import {
     Table,
     Tag,
     Modal,
-    message, Input
+    message, Input,Button
 } from 'antd';
 import GenericFilter from "../components/GenericFilter";
 import Moment from "react-moment";
@@ -58,6 +58,12 @@ export default class TrafficIncidentView extends Component {
     refreshNow(filter) {
         AnprService.getEvents(this.state.filter).then(request => {
             this.setState({"anprresponse": request.data, loading: false})
+        })
+    }
+
+    archiveEvent(event) {
+        AnprService.archiveEvent(event).then(request => {
+            this.refresh();
         })
     }
 
@@ -150,9 +156,26 @@ export default class TrafficIncidentView extends Component {
                                 cover={<img alt="event"
                                             src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}/>}
                             >
+                                <div style={{textAlign: "center"}}>
+                                    <img alt="event"
+                                         src={"/public/anpr/lpr/" + event.id + "/image.jpg"}/>
+                                </div>
 
-                                <img alt="event"
-                                     src={"/public/anpr/lpr/" + event.id + "/image.jpg"}/>
+                                <Button.Group>
+
+                                    <Button type="primary" icon="download" size={"small"}><a
+                                        title={"click here to download"}
+                                        href={"/public/anpr/vehicle/" + event.id + "/image.jpg"}
+                                        download={true} style={{color: "white"}}> Full image</a></Button>
+                                    <Button type="primary" icon="download" size={"small"}><a
+                                        title={"click here to download"}
+                                        href={"/public/anpr/lpr/" + event.id + "/image.jpg"}
+                                        download={true} style={{color: "white"}}> Cropped image</a>
+                                    </Button>
+                                    <Button type="danger" size={"small"} onClick={() => this.archiveEvent(event)}><Icon
+                                        type="warning"/>{' '}
+                                        Archive</Button>
+                                </Button.Group>
                             </Card>
                         </Col>
                     )
@@ -187,6 +210,8 @@ export default class TrafficIncidentView extends Component {
 
         return (
             <Table dataSource={events} pagination={pagination}>
+                <Column title="Location" dataIndex="location" key="location"
+                        render={location => location}/>
                 <Column title="Date" dataIndex="eventDate" key="eventDate"
                         render={eventDate => (<Moment format="L">{eventDate}</Moment>)}/>
                 <Column title="Time" dataIndex="eventDate" key="eventTime"
@@ -194,11 +219,21 @@ export default class TrafficIncidentView extends Component {
                 <Column title="LPR" dataIndex="anprText" key="anprText"
                         render={anprText => anprText}/>
                 <Column title="image" dataIndex="id" key="anprimage"
-                        render={id => (<img alt="event" src={"/public/anpr/lpr/" + id + "/image.jpg"}/>)}/>
+                        render={id => (<a title={"click here to download"} href={"/public/anpr/lpr/" + id + "/image.jpg"}
+                                          download={true}>
+                            <img alt="event"
+                                 src={"/public/anpr/lpr/" + id + "/image.jpg"}/></a>)}/>
                 <Column title="direction" dataIndex="direction" key="direction"
                         render={direction => direction}/>
                 <Column title="Helmet" dataIndex="helmet" key="helmet"
                         render={helmet => helmet ? <span>No</span> : <span>Yes</span>}/>
+                <Column title="Action"
+                        key="action"
+                        render={(text, event) => (
+                            <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon type="warning"/>{' '}
+                                Archive</Button>
+                        )}
+                />
             </Table>
         )
     }
