@@ -33,7 +33,7 @@ export default class IncidentListView extends Component {
         this.state = {
             loading: true,
             videoVisible: false,
-            layout: "table",
+            layout: "list",
             incidents: {},
             filter: {
                 page: 1,

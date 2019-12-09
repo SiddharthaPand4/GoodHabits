@@ -11,13 +11,15 @@ import {
     Table,
     Tag,
     Modal,
-    message, Input, Button
+    message, Input, Button, Menu, Dropdown, Typography
 } from 'antd';
 import GenericFilter from "../components/GenericFilter";
 import Moment from "react-moment";
 import AnprService from "../services/AnprService";
 import {Link} from "react-router-dom";
 import FileSaver from 'file-saver';
+
+const {Paragraph, Text} = Typography;
 
 const {Column} = Table;
 const {Panel} = Collapse;
@@ -29,11 +31,11 @@ export default class AnprView extends Component {
         super(props);
         this.state = {
             loading: true,
-            layout: "table",
+            layout: "list",
             events: {},
             filter: {
                 page: 1,
-                pageSize: 10
+                pageSize: 24
             }
         };
 
@@ -44,6 +46,7 @@ export default class AnprView extends Component {
         this.onPageChange = this.onPageChange.bind(this);
         this.onPageSizeChange = this.onPageSizeChange.bind(this);
         this.onLprInputChange = this.onLprInputChange.bind(this);
+        this.updateEvent = this.updateEvent.bind(this);
     }
 
     componentDidMount() {
@@ -102,6 +105,14 @@ export default class AnprView extends Component {
         this.refreshNow(filter);
     }
 
+    updateEvent(event){
+        AnprService.updateEvent(event).then(request => {
+
+        }).catch(error=>{
+            alert("error in saving");
+        })
+    }
+
 
     render() {
 
@@ -124,6 +135,7 @@ export default class AnprView extends Component {
     }
 
     renderGrid() {
+
 
         if (this.state.loading || !this.state.anprresponse || this.state.anprresponse.totalPage === 0) {
             return <Empty description={false}/>
@@ -150,16 +162,39 @@ export default class AnprView extends Component {
                                 style={{margin: "5px"}}
                                 title={
                                     <div>
-                                        <Tag color="#2db7f5"><Moment format="L">{event.eventDate}</Moment></Tag>
-                                        <Tag color="#87d068"><span><Moment
-                                            format="LTS">{event.eventDate}</Moment></span><Icon
-                                            type="right" hidden/><span hidden><Moment
-                                            format="LTS">{event.eventDate}</Moment></span></Tag>
-                                        <Tag>{event.anprText}</Tag>
-                                        <Tag>{event.direction}</Tag>
-                                        {event.helmet ? <Tag><span>Helmet:No</span></Tag> : <span>&nbsp;</span>}
+                                        {(event.direction && event.direction === "rev") ?
+                                            <Tag color="#f50">Reverse</Tag> : null}
+                                        {event.helmet ? <Tag><span>Helmet:No</span></Tag> : null}
+
+
                                     </div>
                                 }
+                                extra={<Dropdown overlay={<Menu>
+                                    <Menu.Item key="1">
+                                        <a
+                                            title={"click here to download"}
+                                            href={"/public/anpr/vehicle/" + event.id + "/image.jpg"}
+                                            download={true}><Icon type="download"/>{' '} Full
+                                            image</a>
+                                    </Menu.Item>
+                                    <Menu.Item key="2">
+                                        <a
+                                            title={"click here to download"}
+                                            href={"/public/anpr/lpr/" + event.id + "/image.jpg"}
+                                            download={true}><Icon type="download"/>{' '} Cropped image</a>
+                                    </Menu.Item>
+                                    <Menu.Item key="3">
+                                        <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon
+                                            type="warning"/>{' '}
+                                            Delete
+                                        </Button>
+                                    </Menu.Item>
+
+                                </Menu>}>
+                                    <Button>
+                                        More <Icon type="down"/>
+                                    </Button>
+                                </Dropdown>}
                                 bordered={true}
                                 cover={
                                     <img alt="event"
@@ -169,23 +204,15 @@ export default class AnprView extends Component {
                                     <img alt="event"
                                          src={"/public/anpr/lpr/" + event.id + "/image.jpg"}/>
                                 </div>
-                                <hr/>
-                                <Button.Group>
-
-                                    <Button type="primary" icon="download" size={"small"}><a
-                                        title={"click here to download"}
-                                        href={"/public/anpr/vehicle/" + event.id + "/image.jpg"}
-                                        download={true} style={{color: "white"}}> Full image</a></Button>
-                                    <Button type="primary" icon="download" size={"small"}><a
-                                        title={"click here to download"}
-                                        href={"/public/anpr/lpr/" + event.id + "/image.jpg"}
-                                        download={true} style={{color: "white"}}> Cropped image</a>
-                                    </Button>
-                                    <Button type="danger" size={"small"} onClick={() => this.archiveEvent(event)}><Icon
-                                        type="warning"/>{' '}
-                                        Archive</Button>
-                                </Button.Group>
-
+                                <div style={{marginTop: "5px", textAlign: "center"}} onClick={}>
+                                    <Paragraph
+                                        strong
+                                        editable={{onChange: ()=> this.updateEvent()}} copyable>{event.anprText}</Paragraph>
+                                    <div>
+                                        <Text code> <Moment format="L">{event.eventDate}</Moment>{' '}|{' '}<Moment
+                                            format="LTS">{event.eventDate}</Moment></Text>
+                                    </div>
+                                </div>
 
                             </Card>
                         </Col>

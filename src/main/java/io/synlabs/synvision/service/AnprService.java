@@ -108,6 +108,12 @@ public class AnprService extends BaseService {
         anprEventRepository.save(anprEvent);
     }
 
+    public void updateAnprEvent(AnprRequest request) {
+        AnprEvent anprEvent = anprEventRepository.getOne(request.getId());
+        anprEvent.setAnprText(request.getLpr());
+        anprEventRepository.saveAndFlush(anprEvent);
+    }
+
     private boolean checkHotListed(AnprEvent anprEvent) {
         HotListVehicle hottie = hotListVehicleRepository.findOneByLpr(anprEvent.getAnprText());
         return hottie != null;

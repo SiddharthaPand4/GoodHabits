@@ -18,6 +18,10 @@ class AnprService {
         return axios.delete('/api/anpr/' + event.id);
     }
 
+    updateEvent(event) {
+        return axios.put('/api/anpr/', event);
+    }
+
     getEventFile(id) {
         return axios.get('/public/anpr/lpr/' + id + '/image.jpg');
     }

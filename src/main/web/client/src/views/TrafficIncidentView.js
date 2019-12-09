@@ -27,7 +27,7 @@ export default class TrafficIncidentView extends Component {
         super(props);
         this.state = {
             loading: true,
-            layout: "table",
+            layout: "list",
             events: {},
             filter: {
                 page: 1,

@@ -81,4 +81,9 @@ public class AnprController {
         }
     }
 
+    @PutMapping("/event")
+    public void updateEvent(@RequestBody AnprRequest request) {
+        anprService.updateAnprEvent(request);
+    }
+
 }
