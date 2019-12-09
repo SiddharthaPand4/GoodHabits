@@ -18,4 +18,5 @@ public class DashboardRequest {
     public Date selectedDate;
 
     public String filterType;
+    public String xAxis;
 }

@@ -56,7 +56,7 @@ export default class TrafficIncidentView extends Component {
 
     //cant use refresh to read from state as state may not have been set
     refreshNow(filter) {
-        AnprService.getEvents(this.state.filter).then(request => {
+        AnprService.getIncidents(this.state.filter).then(request => {
             this.setState({"anprresponse": request.data, loading: false})
         })
     }

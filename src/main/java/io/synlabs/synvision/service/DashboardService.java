@@ -38,30 +38,59 @@ public class DashboardService extends BaseService {
 
         QAtccRawData rawData = QAtccRawData.atccRawData;
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
-        List<Tuple> result = query.select(
-                rawData.date,
-                rawData.type,
-                rawData.count())
-                .from(rawData)
-                .where(rawData.date.after(request.from))
-                .where(rawData.date.before(request.to))
-                .groupBy(rawData.date, rawData.type)
-                .fetch();
-
-
+        List<Tuple> result = null;
         Date date = null;
+        Integer timeSpan = null;
         String vehicleType = null;
         Long vehicleCount = null;
-        List<AtccVehicleCountResponse> response = new ArrayList<>(result.size());
+        List<AtccVehicleCountResponse> response = new ArrayList<>();
+        String xAxis = StringUtils.isEmpty(request.getXAxis()) ? "" : request.getXAxis();
 
-        for (int i = 0; i < result.size(); i++) {
-            Tuple tuple = result.get(i);
-            date = tuple.get(rawData.date);
-            vehicleType = tuple.get(rawData.type);
-            vehicleCount = tuple.get(2, Long.class);
-            response.add(new AtccVehicleCountResponse(date, vehicleType, vehicleCount));
-            result.set(i, null);
+        switch (xAxis) {
+            case "Hourly":
+                result = query
+                        .select(
+                                rawData.time.hour(),
+                                rawData.type,
+                                rawData.count())
+                        .from(rawData)
+                        .where(rawData.date.eq(request.from))
+                        .groupBy(rawData.time.hour(), rawData.type)
+                        .fetch();
+                for (int i = 0; i < result.size(); i++) {
+                    Tuple tuple = result.get(i);
+                    timeSpan = tuple.get(0, Integer.class);
+                    vehicleType = tuple.get(rawData.type);
+                    vehicleCount = tuple.get(2, Long.class);
+                    response.add(new AtccVehicleCountResponse(timeSpan.toString(), vehicleType, vehicleCount));
+                    result.set(i, null);
+                }
+                break;
+
+            case "Daily":
+            default:
+                result = query
+                        .select(
+                                rawData.date,
+                                rawData.type,
+                                rawData.count())
+                        .from(rawData)
+                        .where(rawData.date.after(request.from))
+                        .where(rawData.date.before(request.to))
+                        .groupBy(rawData.date, rawData.type)
+                        .fetch();
+                for (int i = 0; i < result.size(); i++) {
+                    Tuple tuple = result.get(i);
+                    date = tuple.get(0, Date.class);
+                    vehicleType = tuple.get(rawData.type);
+                    vehicleCount = tuple.get(2, Long.class);
+                    response.add(new AtccVehicleCountResponse(date.toString(), vehicleType, vehicleCount));
+                    result.set(i, null);
+                }
+                break;
         }
+
+
         return response;
     }
 
