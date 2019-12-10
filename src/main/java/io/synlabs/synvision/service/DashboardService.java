@@ -40,8 +40,6 @@ public class DashboardService extends BaseService {
 
     public List<AtccVehicleCountResponse> getAtccVehicleCount(DashboardRequest request) {
 
-        logger.info("request fromDate:"+request.from);
-        logger.info("request toDate:"+request.to);
         QAtccRawData rawData = QAtccRawData.atccRawData;
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
         List<Tuple> result = null;
@@ -63,7 +61,7 @@ public class DashboardService extends BaseService {
                         .where(rawData.date.between(request.from, request.to))
                         .groupBy(rawData.time.hour(), rawData.type)
                         .fetch();
-                logger.info(query.toString());
+
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
                     timeSpan = tuple.get(0, Integer.class);
