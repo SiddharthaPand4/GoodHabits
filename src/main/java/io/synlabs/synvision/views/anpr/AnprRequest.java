@@ -12,7 +12,7 @@ import lombok.Setter;
 public class AnprRequest implements Request {
 
     public Long id;
-    public String lpr;
+    public String anprText;
 
     public AnprRequest(Long id){
         this.id=id;

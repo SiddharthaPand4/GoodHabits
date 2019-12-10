@@ -1,11 +1,9 @@
 package io.synlabs.synvision.service;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQuery;
 import io.synlabs.synvision.entity.anpr.AnprEvent;
 import io.synlabs.synvision.entity.anpr.HotListVehicle;
 import io.synlabs.synvision.entity.anpr.QAnprEvent;
-import io.synlabs.synvision.ex.ValidationException;
 import io.synlabs.synvision.jpa.AnprEventRepository;
 import io.synlabs.synvision.jpa.HotListVehicleRepository;
 import io.synlabs.synvision.views.anpr.*;
@@ -24,7 +22,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -56,8 +53,8 @@ public class AnprService extends BaseService {
         //List<AnprResponse> list = page.get().map(AnprResponse::new).collect(Collectors.toList());
 
         List<AnprResponse> list = new ArrayList<>(page.getSize());
-        page.get().forEach(item->{
-            list.add(new AnprResponse(item,location));
+        page.get().forEach(item -> {
+            list.add(new AnprResponse(item, location));
         });
 
         return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
@@ -108,10 +105,11 @@ public class AnprService extends BaseService {
         anprEventRepository.save(anprEvent);
     }
 
-    public void updateAnprEvent(AnprRequest request) {
+    public AnprResponse updateAnprEvent(AnprRequest request) {
         AnprEvent anprEvent = anprEventRepository.getOne(request.getId());
-        anprEvent.setAnprText(request.getLpr());
-        anprEventRepository.saveAndFlush(anprEvent);
+        anprEvent.setAnprText(request.getAnprText());
+        anprEvent = anprEventRepository.saveAndFlush(anprEvent);
+        return new AnprResponse(anprEvent, location);
     }
 
     private boolean checkHotListed(AnprEvent anprEvent) {
@@ -129,8 +127,8 @@ public class AnprService extends BaseService {
         //List<AnprResponse> list = page.get().map(AnprResponse::new).collect(Collectors.toList());
 
         List<AnprResponse> list = new ArrayList<>(page.getSize());
-        page.get().forEach(item->{
-            list.add(new AnprResponse(item,location));
+        page.get().forEach(item -> {
+            list.add(new AnprResponse(item, location));
         });
         return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
     }

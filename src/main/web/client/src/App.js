@@ -55,7 +55,7 @@ class App extends Component {
                     <Layout>
                         {header}
                         <Content style={{margin: '24px 16px 0'}}>
-                            <div style={{padding: 24}} >
+                            <div style={{padding: 4}} >
                                 <Route path='/login' exact={true} component={LoginView}/>
                                 <PrivateRoute path='/' exact={true} component={HomeView}/>
                                 <PrivateRoute path='/incidents' exact={true} component={TrafficIncidentView}/>
