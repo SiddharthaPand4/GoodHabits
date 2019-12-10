@@ -11,7 +11,7 @@ export default class DeviceView extends Component {
         super(props);
         this.state = {
             loading: true,
-            layout: "table",
+            layout: "list",
             filter: {
                 page: 1,
                 pageSize: 10

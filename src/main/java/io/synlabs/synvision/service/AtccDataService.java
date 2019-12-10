@@ -53,13 +53,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -333,6 +331,12 @@ public class AtccDataService extends BaseService {
                 .withSkipHeaderRecord()
                 .withTrim());
 
+        SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm:ss");
+        SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy");
+
+        sdfTime.setTimeZone(TimeZone.getTimeZone("GMT"));
+        sdfDate.setTimeZone(TimeZone.getTimeZone("GMT"));
+
         for (CSVRecord csvRecord : csvParser) {
             // Accessing Values by Column Index
             String time = csvRecord.get(0);
@@ -348,8 +352,10 @@ public class AtccDataService extends BaseService {
             long ts = (long) Double.parseDouble(timestamp);
 
             AtccRawData atccRawData = new AtccRawData();
-            atccRawData.setTime(new SimpleDateFormat("HH:mm:ss").parse(time));
-            atccRawData.setDate(new SimpleDateFormat("dd/MM/yyyy").parse(date));
+            atccRawData.setTime(sdfTime.parse(time));
+
+            atccRawData.setDate(sdfDate.parse(date));
+
             atccRawData.setTimeStamp(ts);
             atccRawData.setLane(0);
             atccRawData.setSpeed(new BigDecimal(speed));
@@ -643,8 +649,7 @@ public class AtccDataService extends BaseService {
                 } else {
                     throw new NotFoundException("File not found " + filename);
                 }
-            }
-            else {
+            } else {
                 throw new NotFoundException("File not found " + filename);
             }
 

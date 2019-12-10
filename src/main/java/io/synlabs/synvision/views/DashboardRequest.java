@@ -1,5 +1,6 @@
 package io.synlabs.synvision.views;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,11 +12,14 @@ import java.util.Date;
 @Getter
 @Setter
 public class DashboardRequest {
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     public Date from;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     public Date to;
     public int month;
     public int year;
     public Date selectedDate;
 
     public String filterType;
+    public String xAxis;
 }

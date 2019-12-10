@@ -19,10 +19,11 @@ class DashboardService {
         return axios.post('/api/dashboard/vehiclescount/month', filter);
     }
 
-    getAtccVehicleCount(fromDate, toDate) {
+    getAtccVehicleCount(fromDate, toDate, xAxis) {
         let filter = {
-            from: fromDate,
-            to: toDate
+            from: moment(fromDate).format('YYYY-MM-DD HH:mm'),
+            to: moment(toDate).format('YYYY-MM-DD HH:mm'),
+            xAxis: xAxis
         };
         return axios.post('/api/dashboard/atcc/vehicle/count', filter);
     }
@@ -43,7 +44,7 @@ class DashboardService {
         return dates;
     };
 
-    getColor(index){
+    getColor(index) {
         let color = "";
         let colors = [
             '#e83e8c',
@@ -60,7 +61,7 @@ class DashboardService {
             '#6f42c1'];
 
         color = colors[index];
-        if(color){
+        if (color) {
             return color;
         }
         return this.getRandomColor();
@@ -84,6 +85,16 @@ class DashboardService {
         let from_date;
         let to_date;
         switch (selectedCustomDateRange) {
+            case  "Today":
+                baseDate = moment();
+                from_date = baseDate.startOf('day').toDate();
+                to_date = baseDate.endOf('day').toDate();
+                break;
+            case  "Yesterday":
+                baseDate = moment().subtract(1, 'days');
+                from_date = baseDate.startOf('day').toDate();
+                to_date = baseDate.endOf('day').toDate();
+                break;
             case  "This week":
                 baseDate = moment();
                 from_date = baseDate.startOf('week').toDate();

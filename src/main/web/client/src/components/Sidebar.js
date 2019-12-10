@@ -35,7 +35,7 @@ export default class Sidebar extends Component {
                     <Menu.Item key="4">
                         <Link to='/feed'><Icon type='video-camera'/><span className='nav-text'>Feed</span></Link>
                     </Menu.Item>
-                    <SubMenu key="admin" title={<span><Icon type="deployment-unit"/>Admin</span>}>
+                    {/*<SubMenu key="admin" title={<span><Icon type="deployment-unit"/>Admin</span>}>
                         <Menu.Item key="51">
                             <Link to='/user'><Icon type='user'/><span className='nav-text'>Users</span></Link>
                         </Menu.Item>
@@ -46,7 +46,7 @@ export default class Sidebar extends Component {
                             <Link to='/trigger'><Icon type="clock-circle"/><span
                                 className='nav-text'>Triggers</span></Link>
                         </Menu.Item>
-                    </SubMenu>
+                    </SubMenu>*/}
                     <Menu.Item key="6">
                         <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span
                             className='nav-text'>Logout</span></Link>

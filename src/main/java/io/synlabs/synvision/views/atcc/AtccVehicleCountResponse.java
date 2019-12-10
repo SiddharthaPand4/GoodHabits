@@ -9,11 +9,11 @@ import java.util.Date;
 @Setter
 public class AtccVehicleCountResponse {
 
-    private Date date;
+    private String date;
     private String vehicleType;
     private Long vehicleCount;
 
-    public AtccVehicleCountResponse(Date date, String vehicleType, Long vehicleCount) {
+    public AtccVehicleCountResponse(String date, String vehicleType, Long vehicleCount) {
         this.date = date;
         this.vehicleType = vehicleType;
         this.vehicleCount = vehicleCount == null ? 0 : vehicleCount;
