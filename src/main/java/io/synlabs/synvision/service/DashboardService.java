@@ -2,6 +2,7 @@ package io.synlabs.synvision.service;
 
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
+import io.synlabs.synvision.controller.atcc.AtccDataController;
 import io.synlabs.synvision.entity.anpr.QAnprEvent;
 import io.synlabs.synvision.entity.atcc.AtccRawData;
 import io.synlabs.synvision.entity.atcc.QAtccRawData;
@@ -13,6 +14,8 @@ import io.synlabs.synvision.views.incident.IncidentCountResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.joda.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -32,10 +35,13 @@ public class DashboardService extends BaseService {
     private AnprEventRepository anprEventRepository;
     @Autowired
     private EntityManager entityManager;
+    private static final Logger logger = LoggerFactory.getLogger(DashboardService.class);
 
 
     public List<AtccVehicleCountResponse> getAtccVehicleCount(DashboardRequest request) {
 
+        logger.info("request fromDate:"+request.from);
+        logger.info("request toDate:"+request.to);
         QAtccRawData rawData = QAtccRawData.atccRawData;
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
         List<Tuple> result = null;
@@ -54,9 +60,10 @@ public class DashboardService extends BaseService {
                                 rawData.type,
                                 rawData.count())
                         .from(rawData)
-                        .where(rawData.date.eq(request.from))
+                        .where(rawData.date.between(request.from, request.to))
                         .groupBy(rawData.time.hour(), rawData.type)
                         .fetch();
+                logger.info(query.toString());
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
                     timeSpan = tuple.get(0, Integer.class);
@@ -75,8 +82,7 @@ public class DashboardService extends BaseService {
                                 rawData.type,
                                 rawData.count())
                         .from(rawData)
-                        .where(rawData.date.after(request.from))
-                        .where(rawData.date.before(request.to))
+                        .where(rawData.date.between(request.from,request.to))
                         .groupBy(rawData.date, rawData.type)
                         .fetch();
                 for (int i = 0; i < result.size(); i++) {

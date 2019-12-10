@@ -134,17 +134,18 @@ export default class TrafficIncidentView extends Component {
         let layout = this.state.layout;
         let lpr = this.state.filter.lpr;
 
-        return (<div>Incidents
-            <Collapse bordered={false} defaultActiveKey={['1', '2']}>
+        return (<div>
+            <h3>Incidents</h3>
+            <Collapse bordered={false} defaultActiveKey={['1']}>
                 <Panel header="Filter" key="1">
                     LPR: <Input value={lpr} style={{"width": "200px"}} onChange={this.onLprInputChange}/> <br/><br/>
                     <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
                                    handleFilterChange={this.handleFilterChange}
                                    handleLayoutChange={this.handleLayoutChange}/>
                 </Panel>
-                <Panel header="Incidents" key="2">
+                <div>
                     {layout === "table" ? (this.renderTable()) : (this.renderGrid())}
-                </Panel>
+                </div>
             </Collapse>
         </div>)
     }
@@ -172,7 +173,7 @@ export default class TrafficIncidentView extends Component {
                                     <div>
                                         {(event.direction && event.direction === "rev") ?
                                             <Tag color="#f50">Reverse</Tag> : null}
-                                        {(event.helmet) ? <Tag color="#f50">Wihtout helmet</Tag> : null}
+                                        {(event.helmet) ? <Tag color="#f50">Without helmet</Tag> : null}
                                     </div>
                                 }
                                 extra={<Dropdown overlay={<Menu>
@@ -222,6 +223,10 @@ export default class TrafficIncidentView extends Component {
                                         <Text code> <Moment format="L">{event.eventDate}</Moment>{' '}|{' '}<Moment
                                             format="LTS">{event.eventDate}</Moment></Text>
                                     </div>
+                                    <div>
+                                        <Text code><Icon type="environment"/> {event.location}</Text>
+                                    </div>
+
                                 </div>
 
                             </Card>

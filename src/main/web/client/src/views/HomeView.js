@@ -64,7 +64,12 @@ export default class HomeView extends Component {
 
 
         let {atcc} = this.state;
-
+        atcc = {
+            chartData: {
+                labels: [],
+                datasets: []
+            }
+        };
         DashboardService.getAtccVehicleCount(from_date, to_date, xAxis).then(resposne => {
 
             let rawData = resposne.data;
@@ -107,15 +112,7 @@ export default class HomeView extends Component {
                     atcc.chartData.datasets.push(dataSet);
                     vehicleTypeIndex++;
                 }
-            } else {
-                atcc = {
-                    chartData: {
-                        labels: [],
-                        datasets: []
-                    }
-                }
             }
-
             this.setState({atcc});
         }).catch(error => {
             console.log(error);
@@ -226,7 +223,7 @@ export default class HomeView extends Component {
                             </Button>
                         </Dropdown>
                     </div>}>
-                        <Bar data={this.state.atcc.chartData} options={barChartOptions}/>
+                        <Line data={this.state.atcc.chartData} options={barChartOptions}/>
                     </Card>
                 </div>
             </div>

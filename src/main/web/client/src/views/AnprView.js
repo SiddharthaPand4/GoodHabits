@@ -177,7 +177,7 @@ export default class AnprView extends Component {
                                     <div>
                                         {(event.direction && event.direction === "rev") ?
                                             <Tag color="#f50">Reverse</Tag> : null}
-                                        {(event.helmet) ? <Tag color="#f50">Wihtout helmet</Tag> : null}
+                                        {(event.helmet) ? <Tag color="#f50">Without helmet</Tag> : null}
                                     </div>
                                 }
                                 extra={<Dropdown overlay={<Menu>
@@ -224,9 +224,15 @@ export default class AnprView extends Component {
                                     <Text
                                         type="secondary">{(workingEventLoading && workingEvent.id === event.id) ? "saving..." : ""}</Text>
                                     <div>
-                                        <Text code> <Moment format="L">{event.eventDate}</Moment>{' '}|{' '}<Moment
+                                        <Text code><Icon type="schedule"/> <Moment
+                                            format="L">{event.eventDate}</Moment>{' '}|{' '}<Moment
                                             format="LTS">{event.eventDate}</Moment></Text>
                                     </div>
+                                    <div>
+                                        <Text code><Icon type="environment"/> {event.location}</Text>
+                                    </div>
+
+
                                 </div>
 
                             </Card>

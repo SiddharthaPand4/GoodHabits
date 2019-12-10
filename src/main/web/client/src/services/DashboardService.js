@@ -21,8 +21,8 @@ class DashboardService {
 
     getAtccVehicleCount(fromDate, toDate, xAxis) {
         let filter = {
-            from: fromDate,
-            to: toDate,
+            from: moment(fromDate).format('YYYY-MM-DD HH:mm'),
+            to: moment(toDate).format('YYYY-MM-DD HH:mm'),
             xAxis: xAxis
         };
         return axios.post('/api/dashboard/atcc/vehicle/count', filter);
