@@ -136,7 +136,7 @@ public class AnprService extends BaseService {
     private BooleanExpression getIncidentQuery(AnprFilterRequest request) {
         BooleanExpression query = getQuery(request);
         QAnprEvent root = QAnprEvent.anprEvent;
-        query = query.and(root.direction.eq("rev")).or(root.helmetMissing.isTrue());
+        query = query.and(root.direction.eq("rev").or(root.helmetMissing.isTrue()));
         return query;
     }
 }

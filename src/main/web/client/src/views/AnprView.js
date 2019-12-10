@@ -166,11 +166,11 @@ export default class AnprView extends Component {
         let workingEvent = this.state.workingEvent;
         let count = this.state.anprresponse.totalPages * this.state.anprresponse.pageSize;
 
-        return <div style={{background: '#ECECEC', padding: '30px'}}>
+        return <div style={{background: '#ECECEC', padding: '5px'}}>
             <Row>
                 {
                     events.map((event, index) =>
-                        <Col xl={{span: 8}} lg={{span: 12}} md={{span: 16}} sm={{span: 20}} xs={{span: 20}} key={index}>
+                        <Col xl={{span: 8}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}} key={index}>
                             <Card
                                 style={{margin: "5px"}}
                                 title={

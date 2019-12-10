@@ -239,7 +239,7 @@ export default class IncidentListView extends Component {
         let count = this.state.incidents.totalPages * this.state.incidents.pageSize;
 
 
-        return <div style={{background: '#ECECEC', padding: '30px'}}>
+        return <div style={{background: '#ECECEC', padding: '5px'}}>
             <Row>
                 <Col>
                     <Pagination onChange={this.onPageChange} onShowSizeChange={this.onPageSizeChange} showSizeChanger

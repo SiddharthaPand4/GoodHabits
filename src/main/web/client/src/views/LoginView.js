@@ -78,7 +78,7 @@ class LoginForm extends Component {
         return (
             <Row>
                 <Col xl={{span: 8}} lg={{span: 6}} md={{span: 4}} sm={{span: 2}} xs={{span: 2}}/>
-                <Col xl={{span: 8}} lg={{span: 12}} md={{span: 16}} sm={{span: 20}} xs={{span: 20}}>
+                <Col xl={{span: 8}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}}>
                     <Card title={ <img style={{}} src={"synlabs-logo-full.png"}/>}>
                         <Form onSubmit={this.handleSubmit} className="login-form">
                             <Form.Item>
