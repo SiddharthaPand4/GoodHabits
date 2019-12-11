@@ -18,13 +18,12 @@ import Moment from "react-moment";
 import AnprService from "../services/AnprService";
 import Magnifier from "react-magnifier";
 
-const {Paragraph, Text} = Typography;
-
 const {Column} = Table;
 const {Panel} = Collapse;
+const {Paragraph, Text} = Typography;
 
 
-export default class AnprView extends Component {
+export default class IncidentHotlistView extends Component {
 
     constructor(props) {
         super(props);
@@ -64,14 +63,14 @@ export default class AnprView extends Component {
     }
 
     refresh() {
-        AnprService.getEvents(this.state.filter).then(request => {
+        AnprService.getIncidentsHotlisted(this.state.filter).then(request => {
             this.setState({"anprresponse": request.data, loading: false})
         })
     }
 
     //cant use refresh to read from state as state may not have been set
     refreshNow(filter) {
-        AnprService.getEvents(this.state.filter).then(request => {
+        AnprService.getIncidentsHotlisted(this.state.filter).then(request => {
             this.setState({"anprresponse": request.data, loading: false})
         })
     }
@@ -133,6 +132,7 @@ export default class AnprView extends Component {
         this.setState({magnifyEvent});
     }
 
+
     updateEvent(anprText) {
 
         let {workingEvent, workingEventLoading} = this.state;
@@ -158,21 +158,20 @@ export default class AnprView extends Component {
         let layout = this.state.layout;
         let lpr = this.state.filter.lpr;
 
-        return (
-            <div>
-                <h3>ANPR</h3>
-                <Collapse bordered={false} defaultActiveKey={['1']}>
-                    <Panel header="Filter" key="1">
-                        LPR: <Input value={lpr} style={{"width": "200px"}} onChange={this.onLprInputChange}/> <br/><br/>
-                        <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
-                                       handleFilterChange={this.handleFilterChange}
-                                       handleLayoutChange={this.handleLayoutChange}/>
-                    </Panel>
-                </Collapse>
+        return (<div>
+            <h3>Hotlisted Incidents</h3>
+            <Collapse bordered={false} defaultActiveKey={['1']}>
+                <Panel header="Filter" key="1">
+                    LPR: <Input value={lpr} style={{"width": "200px"}} onChange={this.onLprInputChange}/> <br/><br/>
+                    <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
+                                   handleFilterChange={this.handleFilterChange}
+                                   handleLayoutChange={this.handleLayoutChange}/>
+                </Panel>
                 <div>
                     {layout === "table" ? (this.renderTable()) : (this.renderGrid())}
                 </div>
-            </div>)
+            </Collapse>
+        </div>)
     }
 
     renderGrid() {
@@ -274,14 +273,12 @@ export default class AnprView extends Component {
                                     <Text
                                         type="secondary">{(workingEventLoading && workingEvent.id === event.id) ? "saving..." : ""}</Text>
                                     <div>
-                                        <Text code><Icon type="schedule"/> <Moment
-                                            format="L">{event.eventDate}</Moment>{' '}|{' '}<Moment
+                                        <Text code> <Moment format="L">{event.eventDate}</Moment>{' '}|{' '}<Moment
                                             format="LTS">{event.eventDate}</Moment></Text>
                                     </div>
                                     <div>
                                         <Text code><Icon type="environment"/> {event.location}</Text>
                                     </div>
-
 
                                 </div>
 
@@ -334,24 +331,23 @@ export default class AnprView extends Component {
                         render={eventDate => (<Moment format="LTS">{eventDate}</Moment>)}/>
                 <Column title="LPR" dataIndex="anprText" key="anprText"
                         render={anprText => anprText}/>
-                <Column title="LP Image" dataIndex="id" key="anprimage"
+                <Column title="image" dataIndex="id" key="anprimage"
                         render={id => (
                             <a title={"click here to download"} href={"/public/anpr/lpr/" + id + "/image.jpg"}
                                download={true}>
                                 <img alt="event"
-                                     src={"/public/anpr/lpr/" + id + "/image.jpg"}/></a> )}/>
+                                     src={"/public/anpr/lpr/" + id + "/image.jpg"}/></a>)}/>
                 <Column title="direction" dataIndex="direction" key="direction"
                         render={direction => direction}/>
-                <Column title="Helmet?" dataIndex="helmet" key="helmet"
-                        render={helmet => helmet ? <span>No</span> : <span>N/A</span>}/>
+                <Column title="Helmet" dataIndex="helmet" key="helmet"
+                        render={helmet => helmet ? <span>No</span> : <span>Yes</span>}/>
                 <Column title="Action"
                         key="action"
                         render={(text, event) => (
-                            <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon type="warning"/>{' '}
+                            <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon type="delete"/>{' '}
                                 Delete</Button>
                         )}
                 />
-
             </Table>
         )
     }

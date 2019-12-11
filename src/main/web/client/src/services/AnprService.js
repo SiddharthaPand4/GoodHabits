@@ -14,6 +14,10 @@ class AnprService {
         return axios.post('/api/anpr/incidents', filter);
     }
 
+    getIncidentsHotlisted(filter) {
+        return axios.post('/api/anpr/incidents/hotListed', filter);
+    }
+
     archiveEvent(event) {
         return axios.delete('/api/anpr/' + event.id);
     }

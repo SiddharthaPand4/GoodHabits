@@ -11,11 +11,12 @@ import {
     Table,
     Tag,
     Modal,
-    message, Input, Button, Menu, Dropdown, Typography
+    message, Input, Button, Menu, Dropdown, Typography, Slider
 } from 'antd';
 import GenericFilter from "../components/GenericFilter";
 import Moment from "react-moment";
 import AnprService from "../services/AnprService";
+import Magnifier from "react-magnifier";
 
 const {Column} = Table;
 const {Panel} = Collapse;
@@ -35,7 +36,13 @@ export default class TrafficIncidentView extends Component {
                 pageSize: 24
             },
             workingEvent: {},
-            workingEventLoading: false
+            workingEventLoading: false,
+            magnifyEvent: {
+                magnifyEventId: "",
+                zoomFactor: 2,
+                minZoomFactor: 1,
+                maxZoomFactor: 5
+            },
         };
 
         this.refresh = this.refresh.bind(this);
@@ -47,6 +54,8 @@ export default class TrafficIncidentView extends Component {
         this.onLprInputChange = this.onLprInputChange.bind(this);
         this.editEvent = this.editEvent.bind(this);
         this.updateEvent = this.updateEvent.bind(this);
+        this.magnifyEvent = this.magnifyEvent.bind(this);
+        this.updateZoomFactor = this.updateZoomFactor.bind(this);
     }
 
     componentDidMount() {
@@ -109,6 +118,21 @@ export default class TrafficIncidentView extends Component {
         this.setState({workingEvent: event});
     }
 
+    magnifyEvent(event) {
+        let magnifyEvent = this.state.magnifyEvent;
+        magnifyEvent.magnifyEventId = event.id;
+
+        this.setState({magnifyEvent});
+    }
+
+    updateZoomFactor(zoomFactor) {
+        let magnifyEvent = this.state.magnifyEvent;
+        magnifyEvent.zoomFactor = zoomFactor;
+
+        this.setState({magnifyEvent});
+    }
+
+
     updateEvent(anprText) {
 
         let {workingEvent, workingEventLoading} = this.state;
@@ -162,11 +186,22 @@ export default class TrafficIncidentView extends Component {
         let workingEvent = this.state.workingEvent;
         let count = this.state.anprresponse.totalPages * this.state.anprresponse.pageSize;
 
-        return <div style={{background: '#ECECEC', padding: '30px'}}>
+        let {magnifyEventId, zoomFactor, minZoomFactor, maxZoomFactor} = this.state.magnifyEvent;
+        const mid = ((maxZoomFactor - minZoomFactor) / 2).toFixed(5);
+        const preColor = zoomFactor >= mid ? '' : 'rgba(0, 0, 0, .45)';
+        const nextColor = zoomFactor >= mid ? 'rgba(0, 0, 0, .45)' : '';
+        const marks = {
+            1: {label: <span><Icon style={{color: preColor}} type="zoom-out"/></span>},
+            2: {label: <span>2</span>},
+            3: {label: <span>3</span>},
+            4: {label: <span>4</span>},
+            5: {label: <span><Icon style={{color: nextColor}} type="zoom-in"/></span>,}
+        };
+        return <div style={{background: '#ECECEC', padding: '5px'}}>
             <Row>
                 {
                     events.map((event, index) =>
-                        <Col xl={{span: 8}} lg={{span: 12}} md={{span: 16}} sm={{span: 20}} xs={{span: 20}} key={index}>
+                        <Col xl={{span: 8}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}} key={index}>
                             <Card
                                 style={{margin: "5px"}}
                                 title={
@@ -177,6 +212,9 @@ export default class TrafficIncidentView extends Component {
                                     </div>
                                 }
                                 extra={<Dropdown overlay={<Menu>
+                                    <Menu.Item key="0" onClick={() => this.magnifyEvent(event)}><Icon type="zoom-in"/>Zoom
+                                        image
+                                    </Menu.Item>
                                     <Menu.Item key="1">
                                         <a
                                             title={"click here to download"}
@@ -203,10 +241,25 @@ export default class TrafficIncidentView extends Component {
                                     </Button>
                                 </Dropdown>}
                                 bordered={true}
-                                cover={
-                                    <img alt="event"
-                                         src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}/>}
+                                cover={(magnifyEventId === event.id) ?
+                                    <Magnifier src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}
+                                               zoomFactor={zoomFactor}/> : <img alt="event"
+                                                                    src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}/>
+
+                                }
                             >
+                                <div>
+                                    {(magnifyEventId === event.id) ?
+                                        <Slider
+                                            marks={marks}
+                                            min={minZoomFactor}
+                                            max={maxZoomFactor}
+                                            onChange={this.updateZoomFactor}
+                                            value={typeof zoomFactor === 'number' ? zoomFactor : 0}
+                                        />
+                                        : null
+                                    }
+                                </div>
                                 <div style={{textAlign: "center"}}>
                                     <img alt="event"
                                          src={"/public/anpr/lpr/" + event.id + "/image.jpg"}/>

@@ -48,6 +48,11 @@ public class AnprController {
         return anprService.listIncidents(request);
     }
 
+    @PostMapping("/incidents/hotListed")
+    public PageResponse<AnprResponse> listHotListedIncidents(@RequestBody AnprFilterRequest request) {
+        return anprService.listHotListedIncidents(request);
+    }
+
     @DeleteMapping("/{id}")
     public void archiveAnpr(@PathVariable Long id) {
         anprService.archiveAnpr(new AnprRequest(id));
