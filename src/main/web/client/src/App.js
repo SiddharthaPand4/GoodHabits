@@ -20,6 +20,7 @@ import IncidentListView from "./views/IncidentListView";
 import TriggerView from "./views/TriggerView";
 import AnprView from "./views/AnprView";
 import TrafficIncidentView from "./views/TrafficIncidentView";
+import IncidentHotlistView from "./views/IncidentHotlistView";
 
 const {Content} = Layout;
 
@@ -59,12 +60,14 @@ class App extends Component {
                                 <Route path='/login' exact={true} component={LoginView}/>
                                 <PrivateRoute path='/' exact={true} component={HomeView}/>
                                 <PrivateRoute path='/incidents' exact={true} component={TrafficIncidentView}/>
+                                <PrivateRoute path='/incidents/hotlisted' exact={true} component={IncidentHotlistView}/>
                                 <PrivateRoute path='/anpr' exact={true} component={AnprView}/>
                                 <PrivateRoute path='/user' exact={true} component={UserListView}/>
                                 <PrivateRoute path='/feed' exact={true} component={FeedView}/>
                                 <PrivateRoute path='/trigger' exact={true} component={TriggerView}/>
                                 <PrivateRoute path='/device' exact={true} component={DeviceView}/>
                                 <PrivateRoute path='/device/conf' exact={true} component={DeviceConfigView}/>
+
                             </div>
                         </Content>
                         <Footerbar/>
