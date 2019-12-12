@@ -24,7 +24,7 @@ export default class HotListedVehiclesList extends Component {
             hotListedVehicleResponse: {},
             filter: {
                 page: 1,
-                pageSize: 2,
+                pageSize: 40,
                 lpr: ""
             },
             workingVehicle: {
