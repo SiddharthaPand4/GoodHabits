@@ -24,7 +24,7 @@ export default class HotListedVehiclesList extends Component {
             hotListedVehicleResponse: {},
             filter: {
                 page: 1,
-                pageSize: 40,
+                pageSize: 2,
                 lpr: ""
             },
             workingVehicle: {
@@ -196,9 +196,6 @@ export default class HotListedVehiclesList extends Component {
             const antIcon = <Icon type="loading" style={{fontSize: 24}} spin/>;
             return <Spin indicator={antIcon}/>
         }
-        if (!hotListedVehicleResponse || hotListedVehicleResponse.totalPage === 0) {
-            return <Empty description={false}/>
-        }
 
         return (
             <div>
@@ -226,14 +223,16 @@ export default class HotListedVehiclesList extends Component {
                             {(vehicles || []).map((vehicle, index) =>
                                 <Col xl={{span: 3}} lg={{span: 4}} md={{span: 6}} sm={{span: 8}} xs={{span: 16}}
                                      key={index}>
-                                    <Card hoverable onClick={() => this.openHotListVehicleForm(vehicle)}
-                                          style={{backgroundColor: vehicle.archived ? "#fafafa" : ""}}>
-                                        <div style={{textAlign: "center"}}>
-                                            <Text delete={vehicle.archived} strong>
-                                                {vehicle.lpr}
-                                            </Text>
-                                        </div>
-                                    </Card>
+                                    <div style={{textAlign: "center"}}>
+                                        <Card hoverable onClick={() => this.openHotListVehicleForm(vehicle)}
+                                              style={{backgroundColor: vehicle.archived ? "#fafafa" : ""}}>
+                                            <div style={{textAlign: "center"}}>
+                                                <Text delete={vehicle.archived} strong>
+                                                    {vehicle.lpr}
+                                                </Text>
+                                            </div>
+                                        </Card>
+                                    </div>
                                 </Col>
                             )}
                         </Row>
@@ -258,14 +257,16 @@ export default class HotListedVehiclesList extends Component {
 
 
                     </div>
+                    {(hotListedVehicleResponse && hotListedVehicleResponse.totalPages > 1) ?
+                        <div style={{textAlign: "right"}}>
+                            <Pagination onChange={this.onPageChange} onShowSizeChange={this.onPageSizeChange}
+                                        showSizeChanger
+                                        showQuickJumper
+                                        defaultCurrent={1} total={count} current={this.state.filter.page}
+                                        pageSize={this.state.filter.pageSize}/>
+                        </div> : null}
 
-                    <div style={{textAlign: "right"}}>
-                        <Pagination onChange={this.onPageChange} onShowSizeChange={this.onPageSizeChange}
-                                    showSizeChanger
-                                    showQuickJumper
-                                    defaultCurrent={1} total={count} current={this.state.filter.page}
-                                    pageSize={this.state.filter.pageSize}/>
-                    </div>
+
                 </div>
 
             </div>)
