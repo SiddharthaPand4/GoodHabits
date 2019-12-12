@@ -150,7 +150,8 @@ public class AnprService extends BaseService {
         query = addFiltersInAnprQuery(request, event, query);
 
         // for hotListed vehicles
-        query.innerJoin(hotListVehicle).on(event.anprText.eq(hotListVehicle.lpr));
+        query = query.innerJoin(hotListVehicle).on(event.anprText.eq(hotListVehicle.lpr));
+        query = query.where(hotListVehicle.archived.isFalse());
 
 
         //pagination

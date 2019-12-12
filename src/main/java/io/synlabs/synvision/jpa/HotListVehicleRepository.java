@@ -10,4 +10,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface HotListVehicleRepository extends JpaRepository<HotListVehicle, Long> {
     HotListVehicle findOneByLpr(String lpr);
+    HotListVehicle findOneById(Long id);
 }
