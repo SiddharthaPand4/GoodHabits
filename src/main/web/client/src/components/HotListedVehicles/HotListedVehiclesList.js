@@ -219,7 +219,7 @@ export default class HotListedVehiclesList extends Component {
                                       onClick={() => this.openHotListVehicleForm(undefined)}>
                                     <div style={{textAlign: "center"}}>
                                         <Text style={{color: "white"}} strong>
-                                            <Icon type="plus"/> Add Vehicle</Text>
+                                            <Icon type="plus"/> New</Text>
                                     </div>
                                 </Card>
                             </Col>
