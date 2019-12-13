@@ -11,16 +11,29 @@ import {
     Table,
     Tag,
     Modal,
-    message, Input, Button, Menu, Dropdown, Typography, Slider
+    message, Input, Button, Menu, Dropdown, Typography, Slider, Popconfirm,
 } from 'antd';
 import GenericFilter from "../components/GenericFilter";
 import Moment from "react-moment";
 import AnprService from "../services/AnprService";
+import HotListVehicleService from "../services/HotListVehicleService";
 import Magnifier from "react-magnifier";
+import HotListedVehiclesList from "../components/HotListedVehicles/HotListedVehiclesList";
+
 
 const {Column} = Table;
 const {Panel} = Collapse;
 const {Paragraph, Text} = Typography;
+const tabList = [
+    {
+        key: 'incidents',
+        tab: 'Incidents',
+    },
+    {
+        key: 'vehicles',
+        tab: 'Vehicles',
+    },
+];
 
 
 export default class IncidentHotlistView extends Component {
@@ -28,6 +41,7 @@ export default class IncidentHotlistView extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            activeTab: "incidents",
             loading: true,
             layout: "list",
             events: {},
@@ -43,6 +57,7 @@ export default class IncidentHotlistView extends Component {
                 minZoomFactor: 1,
                 maxZoomFactor: 5
             },
+
         };
 
         this.refresh = this.refresh.bind(this);
@@ -56,6 +71,7 @@ export default class IncidentHotlistView extends Component {
         this.updateEvent = this.updateEvent.bind(this);
         this.magnifyEvent = this.magnifyEvent.bind(this);
         this.updateZoomFactor = this.updateZoomFactor.bind(this);
+
     }
 
     componentDidMount() {
@@ -152,14 +168,40 @@ export default class IncidentHotlistView extends Component {
         })
     }
 
+    onTabChange(key) {
+        if (key === "incidents") {
+            this.refresh();
+        }
+        this.setState({activeTab: key})
+    }
+
 
     render() {
 
+
+        return (<div>
+            <Card
+                style={{width: '100%'}}
+                title="Hotlist"
+                tabList={tabList}
+                activeTabKey={this.state.activeTab}
+                onTabChange={key => {
+                    this.onTabChange(key);
+                }}
+            >
+                {this.state.activeTab === "incidents" ? (this.renderIncidents()) : <HotListedVehiclesList/>}
+            </Card>
+
+
+        </div>)
+    }
+
+
+    renderIncidents() {
         let layout = this.state.layout;
         let lpr = this.state.filter.lpr;
 
-        return (<div>
-            <h3>Hotlisted Incidents</h3>
+        return <div>
             <Collapse bordered={false} defaultActiveKey={['1']}>
                 <Panel header="Filter" key="1">
                     LPR: <Input value={lpr} style={{"width": "200px"}} onChange={this.onLprInputChange}/> <br/><br/>
@@ -171,7 +213,8 @@ export default class IncidentHotlistView extends Component {
                     {layout === "table" ? (this.renderTable()) : (this.renderGrid())}
                 </div>
             </Collapse>
-        </div>)
+
+        </div>;
     }
 
     renderGrid() {
@@ -244,7 +287,7 @@ export default class IncidentHotlistView extends Component {
                                 cover={(magnifyEventId === event.id) ?
                                     <Magnifier src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}
                                                zoomFactor={zoomFactor}/> : <img alt="event"
-                                                                    src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}/>
+                                                                                src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}/>
 
                                 }
                             >
