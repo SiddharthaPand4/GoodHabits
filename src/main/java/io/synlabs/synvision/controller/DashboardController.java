@@ -4,8 +4,7 @@ import io.synlabs.synvision.service.DashboardService;
 import io.synlabs.synvision.views.DashboardRequest;
 import io.synlabs.synvision.views.DashboardResponse;
 import io.synlabs.synvision.views.atcc.AtccVehicleCountResponse;
-import io.synlabs.synvision.views.incident.IncidentCountResponse;
-import org.joda.time.LocalDateTime;
+import io.synlabs.synvision.views.incident.IncidentGroupCountResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,8 +35,8 @@ public class DashboardController {
     }
 
     @PostMapping("incident/vehicle/count")
-    public List<IncidentCountResponse> getIncidentVehicleCount(@RequestBody DashboardRequest request){
-        return dashboardService.getIncidentVehicleCount(request);
+    public IncidentGroupCountResponse getIncidentVehicleCount(@RequestBody DashboardRequest request){
+        return dashboardService.getIncidentsCount(request);
     }
 
 }

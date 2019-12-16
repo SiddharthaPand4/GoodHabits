@@ -28,21 +28,14 @@ class DashboardService {
         return axios.post('/api/dashboard/atcc/vehicle/count', filter);
     }
 
-    enumerateDaysBetweenDates(startDate, endDate) {
-        let dates = [];
-
-        let currDate = moment(startDate).startOf('day');
-        let lastDate = moment(endDate).startOf('day');
-
-        let addition = 0;
-
-        while (currDate.add(addition, 'days').diff(lastDate) <= 0) {
-
-            dates.push(currDate.clone().format("YYYY-MM-DD"));
-            addition = 1;
-        }
-        return dates;
-    };
+    getIncidentVehicleCount(fromDate, toDate, xAxis) {
+        let filter = {
+            from: moment(fromDate).format('YYYY-MM-DD HH:mm'),
+            to: moment(toDate).format('YYYY-MM-DD HH:mm'),
+            xAxis: xAxis
+        };
+        return axios.post('/api/dashboard/incident/vehicle/count', filter);
+    }
 
     getColor(index) {
         let color = "";

@@ -2,15 +2,14 @@ package io.synlabs.synvision.service;
 
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
-import io.synlabs.synvision.controller.atcc.AtccDataController;
 import io.synlabs.synvision.entity.anpr.QAnprEvent;
-import io.synlabs.synvision.entity.atcc.AtccRawData;
 import io.synlabs.synvision.entity.atcc.QAtccRawData;
 import io.synlabs.synvision.jpa.AnprEventRepository;
 import io.synlabs.synvision.views.DashboardRequest;
 import io.synlabs.synvision.views.DashboardResponse;
 import io.synlabs.synvision.views.atcc.AtccVehicleCountResponse;
 import io.synlabs.synvision.views.incident.IncidentCountResponse;
+import io.synlabs.synvision.views.incident.IncidentGroupCountResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.joda.time.LocalDateTime;
@@ -18,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import javax.persistence.EntityManager;
 import java.text.SimpleDateFormat;
@@ -98,60 +96,120 @@ public class DashboardService extends BaseService {
         return response;
     }
 
-    public List<IncidentCountResponse> getIncidentVehicleCount(DashboardRequest request) {
+    public IncidentGroupCountResponse getIncidentsCount(DashboardRequest request){
 
-        String incidentType = "Helmet-missing";
-        Date date = null;
-        Long vehicleCount = null;
-        List<IncidentCountResponse> response = new ArrayList<>();
-        List<Tuple> result = null;
-
-        QAnprEvent anprEvent = QAnprEvent.anprEvent;
-
-        result = getIncidentCount(request, incidentType, anprEvent);
-        for (int i = 0; i < result.size(); i++) {
-            Tuple tuple = result.get(i);
-            date = tuple.get(anprEvent.eventDate);
-            vehicleCount = tuple.get(1, Long.class);
-            response.add(new IncidentCountResponse(date, incidentType, vehicleCount));
-            result.set(i, null);
-        }
-
-        incidentType = "reverse-direction";
-        result = getIncidentCount(request, incidentType, anprEvent);
-        for (int i = 0; i < result.size(); i++) {
-            Tuple tuple = result.get(i);
-            date = tuple.get(anprEvent.eventDate);
-            vehicleCount = tuple.get(1, Long.class);
-            response.add(new IncidentCountResponse(date, incidentType, vehicleCount));
-            result.set(i, null);
-        }
+        IncidentGroupCountResponse response = new IncidentGroupCountResponse();
+        response.setHelmetMissingIncidents(getHelmetMissingIncidents(request));
+        response.setReverseDirectionIncidents(getReverseDirectionIncidents(request));
         return response;
     }
 
-    private List<Tuple> getIncidentCount(DashboardRequest request, String incidentType, QAnprEvent anprEvent) {
+    public List<IncidentCountResponse> getHelmetMissingIncidents(DashboardRequest request) {
+
+        List<IncidentCountResponse> helmetMissingIncidents = new ArrayList<>();
+        QAnprEvent anprEvent = QAnprEvent.anprEvent;
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
+        List<Tuple> result = null;
 
-        query = query.select(
-                anprEvent.eventDate,
-                anprEvent.count())
-                .from(anprEvent)
-                .where(anprEvent.eventDate.after(request.from))
-                .where(anprEvent.eventDate.before(request.to));
+        String xAxis = StringUtils.isEmpty(request.getXAxis()) ? "" : request.getXAxis();
 
-        switch (incidentType) {
-            case "Helmet-missing":
-                query = query.where(anprEvent.helmetMissing.isTrue());
+        switch (xAxis) {
+            case "Hourly":
+                result = query
+                        .select(
+                                anprEvent.eventDate.hour(),
+                                anprEvent.count())
+                        .from(anprEvent)
+                        .where(anprEvent.eventDate.between(request.from, request.to))
+                        .where(anprEvent.helmetMissing.isTrue())
+                        .groupBy(anprEvent.eventDate.hour())
+                        .fetch();
+
+                for (int i = 0; i < result.size(); i++) {
+                    Tuple tuple = result.get(i);
+                    IncidentCountResponse incidentCount = new IncidentCountResponse(tuple.get(0, Integer.class).toString(), "helmetMissing", tuple.get(1, Long.class));
+
+                    helmetMissingIncidents.add(incidentCount);
+                    result.set(i, null);
+                }
                 break;
-            case "reverse-direction":
-                query = query.where(anprEvent.direction.eq("rev"));
-                break;
 
+            case "Daily":
+            default:
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                result = query
+                        .select(
+                                anprEvent.eventDate,
+                                anprEvent.count())
+                        .from(anprEvent)
+                        .where(anprEvent.eventDate.between(request.from, request.to))
+                        .where(anprEvent.helmetMissing.isTrue())
+                        .groupBy(anprEvent.eventDate.dayOfMonth(), anprEvent.eventDate.month(), anprEvent.eventDate.year())
+                        .fetch();
+                for (int i = 0; i < result.size(); i++) {
+                    Tuple tuple = result.get(i);
+                    IncidentCountResponse incidentCount = new IncidentCountResponse(formatter.format(tuple.get(0, Date.class)), "helmetMissing", tuple.get(1, Long.class));
+
+                    helmetMissingIncidents.add(incidentCount);
+                    result.set(i, null);
+                }
+                break;
         }
+        return helmetMissingIncidents;
+    }
 
+    public List<IncidentCountResponse> getReverseDirectionIncidents(DashboardRequest request) {
 
-        return query.groupBy(anprEvent.eventDate.dayOfMonth(), anprEvent.eventDate.month(), anprEvent.eventDate.year())
-                .fetch();
+        List<IncidentCountResponse> reverseDirectionIncidents = new ArrayList<>();
+        QAnprEvent anprEvent = QAnprEvent.anprEvent;
+        JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
+        List<Tuple> result = null;
+
+        String xAxis = StringUtils.isEmpty(request.getXAxis()) ? "" : request.getXAxis();
+
+        switch (xAxis) {
+            case "Hourly":
+                result = query
+                        .select(
+                                anprEvent.eventDate.hour(),
+                                anprEvent.count())
+                        .from(anprEvent)
+                        .where(anprEvent.eventDate.between(request.from, request.to))
+                        .where(anprEvent.direction.eq("rev"))
+                        .groupBy(anprEvent.eventDate.hour())
+                        .fetch();
+
+                for (int i = 0; i < result.size(); i++) {
+                    Tuple tuple = result.get(i);
+                    IncidentCountResponse incidentCount = new IncidentCountResponse(tuple.get(0, Integer.class).toString(), "rev", tuple.get(1, Long.class));
+
+                    reverseDirectionIncidents.add(incidentCount);
+                    result.set(i, null);
+                }
+                break;
+
+            case "Daily":
+            default:
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                result = query
+                        .select(
+                                anprEvent.eventDate,
+                                anprEvent.count())
+                        .from(anprEvent)
+                        .where(anprEvent.eventDate.between(request.from, request.to))
+                        .where(anprEvent.direction.eq("rev"))
+                        .groupBy(anprEvent.eventDate.dayOfMonth(), anprEvent.eventDate.month(), anprEvent.eventDate.year())
+                        .fetch();
+                for (int i = 0; i < result.size(); i++) {
+                    Tuple tuple = result.get(i);
+                    IncidentCountResponse incidentCount = new IncidentCountResponse(formatter.format(tuple.get(0, Date.class)), "rev", tuple.get(1, Long.class));
+
+                    reverseDirectionIncidents.add(incidentCount);
+                    result.set(i, null);
+                }
+                break;
+        }
+        return reverseDirectionIncidents;
     }
 
     public List<DashboardResponse> getTotalNoOfVehiclesByDateFilter(DashboardRequest request) {
@@ -172,10 +230,7 @@ public class DashboardService extends BaseService {
             case "last6months":
                 responses = getTotalNoOfVehiclesByMonth(request);
                 break;
-
-
         }
-
         return responses;
     }
 
