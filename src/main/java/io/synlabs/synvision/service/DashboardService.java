@@ -97,7 +97,8 @@ public class DashboardService extends BaseService {
     }
 
     public IncidentGroupCountResponse getIncidentsCount(DashboardRequest request){
-
+        request.setFrom(BaseService.setMinTime(request.from));
+        request.setTo(BaseService.setMaxTime(request.to));
         IncidentGroupCountResponse response = new IncidentGroupCountResponse();
         response.setHelmetMissingIncidents(getHelmetMissingIncidents(request));
         response.setReverseDirectionIncidents(getReverseDirectionIncidents(request));
@@ -117,7 +118,7 @@ public class DashboardService extends BaseService {
             case "Hourly":
                 result = query
                         .select(
-                                anprEvent.eventDate.hour(),
+                                anprEvent.eventDate,
                                 anprEvent.count())
                         .from(anprEvent)
                         .where(anprEvent.eventDate.between(request.from, request.to))
@@ -125,9 +126,13 @@ public class DashboardService extends BaseService {
                         .groupBy(anprEvent.eventDate.hour())
                         .fetch();
 
+                Calendar calendar = Calendar.getInstance();
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
-                    IncidentCountResponse incidentCount = new IncidentCountResponse(tuple.get(0, Integer.class).toString(), "helmetMissing", tuple.get(1, Long.class));
+                    Date date = tuple.get(0, Date.class);
+
+                    calendar.setTime(date);
+                    IncidentCountResponse incidentCount = new IncidentCountResponse(String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)), "helmetMissing", tuple.get(1, Long.class));
 
                     helmetMissingIncidents.add(incidentCount);
                     result.set(i, null);
@@ -171,7 +176,7 @@ public class DashboardService extends BaseService {
             case "Hourly":
                 result = query
                         .select(
-                                anprEvent.eventDate.hour(),
+                                anprEvent.eventDate,
                                 anprEvent.count())
                         .from(anprEvent)
                         .where(anprEvent.eventDate.between(request.from, request.to))
@@ -179,9 +184,12 @@ public class DashboardService extends BaseService {
                         .groupBy(anprEvent.eventDate.hour())
                         .fetch();
 
+                Calendar calendar = Calendar.getInstance();
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
-                    IncidentCountResponse incidentCount = new IncidentCountResponse(tuple.get(0, Integer.class).toString(), "rev", tuple.get(1, Long.class));
+                    Date date = tuple.get(0, Date.class);
+                    calendar.setTime(date);
+                    IncidentCountResponse incidentCount = new IncidentCountResponse(String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)), "rev", tuple.get(1, Long.class));
 
                     reverseDirectionIncidents.add(incidentCount);
                     result.set(i, null);
