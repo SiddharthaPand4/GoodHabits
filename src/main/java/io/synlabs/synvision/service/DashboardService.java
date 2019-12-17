@@ -38,6 +38,8 @@ public class DashboardService extends BaseService {
 
     public List<AtccVehicleCountResponse> getAtccVehicleCount(DashboardRequest request) {
 
+        request.setFrom(BaseService.setMinTime(request.from));
+        request.setTo(BaseService.setMaxTime(request.to));
         QAtccRawData rawData = QAtccRawData.atccRawData;
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
         List<Tuple> result = null;
