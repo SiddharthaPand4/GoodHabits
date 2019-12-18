@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -38,8 +39,15 @@ public class DashboardService extends BaseService {
 
     public List<AtccVehicleCountResponse> getAtccVehicleCount(DashboardRequest request) {
 
-        request.setFrom(BaseService.setMinTime(request.from));
-        request.setTo(BaseService.setMaxTime(request.to));
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            request.setFrom(sdf.parse(request.getFromDateString()));
+            request.setTo(sdf.parse(request.getToDateString()));
+        } catch (ParseException e) {
+            logger.info("Couldn't parse date", request.getFrom());
+        }
+
         QAtccRawData rawData = QAtccRawData.atccRawData;
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
         List<Tuple> result = null;
@@ -58,7 +66,7 @@ public class DashboardService extends BaseService {
                                 rawData.type,
                                 rawData.count())
                         .from(rawData)
-                        .where(rawData.date.between(request.from, request.to))
+                        .where(rawData.date.between(request.getFrom(), request.getTo()))
                         .groupBy(rawData.time.hour(), rawData.type)
                         .fetch();
 
@@ -80,7 +88,7 @@ public class DashboardService extends BaseService {
                                 rawData.type,
                                 rawData.count())
                         .from(rawData)
-                        .where(rawData.date.between(request.from,request.to))
+                        .where(rawData.date.between(request.getFrom(),request.getTo()))
                         .groupBy(rawData.date, rawData.type)
                         .fetch();
                 for (int i = 0; i < result.size(); i++) {
@@ -99,8 +107,9 @@ public class DashboardService extends BaseService {
     }
 
     public IncidentGroupCountResponse getIncidentsCount(DashboardRequest request){
-        request.setFrom(BaseService.setMinTime(request.from));
-        request.setTo(BaseService.setMaxTime(request.to));
+        request.setFrom(BaseService.setMinTime(request.getFrom()));
+        request.setTo(BaseService.setMaxTime(request.getTo()));
+
         IncidentGroupCountResponse response = new IncidentGroupCountResponse();
         response.setHelmetMissingIncidents(getHelmetMissingIncidents(request));
         response.setReverseDirectionIncidents(getReverseDirectionIncidents(request));
@@ -123,7 +132,7 @@ public class DashboardService extends BaseService {
                                 anprEvent.eventDate,
                                 anprEvent.count())
                         .from(anprEvent)
-                        .where(anprEvent.eventDate.between(request.from, request.to))
+                        .where(anprEvent.eventDate.between(request.getFrom(), request.getTo()))
                         .where(anprEvent.helmetMissing.isTrue())
                         .groupBy(anprEvent.eventDate.hour())
                         .fetch();
@@ -149,7 +158,7 @@ public class DashboardService extends BaseService {
                                 anprEvent.eventDate,
                                 anprEvent.count())
                         .from(anprEvent)
-                        .where(anprEvent.eventDate.between(request.from, request.to))
+                        .where(anprEvent.eventDate.between(request.getFrom(), request.getTo()))
                         .where(anprEvent.helmetMissing.isTrue())
                         .groupBy(anprEvent.eventDate.dayOfMonth(), anprEvent.eventDate.month(), anprEvent.eventDate.year())
                         .fetch();
@@ -181,7 +190,7 @@ public class DashboardService extends BaseService {
                                 anprEvent.eventDate,
                                 anprEvent.count())
                         .from(anprEvent)
-                        .where(anprEvent.eventDate.between(request.from, request.to))
+                        .where(anprEvent.eventDate.between(request.getFrom(), request.getTo()))
                         .where(anprEvent.direction.eq("rev"))
                         .groupBy(anprEvent.eventDate.hour())
                         .fetch();
@@ -206,7 +215,7 @@ public class DashboardService extends BaseService {
                                 anprEvent.eventDate,
                                 anprEvent.count())
                         .from(anprEvent)
-                        .where(anprEvent.eventDate.between(request.from, request.to))
+                        .where(anprEvent.eventDate.between(request.getFrom(), request.getTo()))
                         .where(anprEvent.direction.eq("rev"))
                         .groupBy(anprEvent.eventDate.dayOfMonth(), anprEvent.eventDate.month(), anprEvent.eventDate.year())
                         .fetch();

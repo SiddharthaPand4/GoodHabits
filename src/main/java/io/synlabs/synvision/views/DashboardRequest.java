@@ -22,4 +22,8 @@ public class DashboardRequest {
 
     public String filterType;
     public String xAxis;
+
+    public String fromDateString;
+    public String toDateString;
+
 }
