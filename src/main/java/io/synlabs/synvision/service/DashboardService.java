@@ -107,8 +107,18 @@ public class DashboardService extends BaseService {
     }
 
     public IncidentGroupCountResponse getIncidentsCount(DashboardRequest request){
-        request.setFrom(BaseService.setMinTime(request.getFrom()));
-        request.setTo(BaseService.setMaxTime(request.getTo()));
+        //request.setFrom(BaseService.setMinTime(request.getFrom()));
+        //request.setTo(BaseService.setMaxTime(request.getTo()));
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        //sdf.setTimeZone(TimeZone.getTimeZone("IST"));
+        try {
+            request.setFrom(sdf.parse(request.getFromDateString()));
+            request.setTo(sdf.parse(request.getToDateString()));
+        } catch (ParseException e) {
+            logger.info("Couldn't parse date", request.getFrom());
+        }
+
 
         IncidentGroupCountResponse response = new IncidentGroupCountResponse();
         response.setHelmetMissingIncidents(getHelmetMissingIncidents(request));
