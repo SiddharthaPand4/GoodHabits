@@ -29,6 +29,9 @@ export default class Sidebar extends Component {
                     <Menu.Item key="1" className="sidebar-nav-link">
                         <Link to='/incidents'><Icon type='alert'/><span className='nav-text'>Incidents</span></Link>
                     </Menu.Item>
+                    <Menu.Item key="5" className="sidebar-nav-link">
+                        <Link to='/incidents/repeated'><Icon type='alert'/><span className='nav-text'>Repeated Incidents</span></Link>
+                    </Menu.Item>
                     <Menu.Item key="2" className="sidebar-nav-link">
                         <Link to="/incidents/hotlisted"><Icon type='alert'/><span className='nav-text'>Hotlist</span></Link>
                     </Menu.Item>

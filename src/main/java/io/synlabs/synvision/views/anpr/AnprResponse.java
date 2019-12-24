@@ -3,6 +3,7 @@ package io.synlabs.synvision.views.anpr;
 import io.synlabs.synvision.entity.anpr.AnprEvent;
 import io.synlabs.synvision.views.common.Response;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Date;
@@ -11,6 +12,7 @@ import java.util.Date;
  * Created by itrs on 10/21/2019.
  */
 @Getter
+@Setter
 public class AnprResponse implements Response {
     private Long id;
     private String eventId;
@@ -25,7 +27,9 @@ public class AnprResponse implements Response {
     private boolean helmet;
     private String location;
 
+    public AnprResponse(){
 
+    }
 
     public AnprResponse(AnprEvent anprEvent, String location){
         this.id=mask(anprEvent.getId());

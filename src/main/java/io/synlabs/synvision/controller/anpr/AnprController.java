@@ -4,10 +4,7 @@ import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.service.AnprService;
 import io.synlabs.synvision.views.UploadFileResponse;
-import io.synlabs.synvision.views.anpr.AnprFilterRequest;
-import io.synlabs.synvision.views.anpr.AnprRequest;
-import io.synlabs.synvision.views.anpr.AnprResponse;
-import io.synlabs.synvision.views.anpr.CreateAnprRequest;
+import io.synlabs.synvision.views.anpr.*;
 import io.synlabs.synvision.views.common.PageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +43,10 @@ public class AnprController {
     @PostMapping("/incidents")
     public PageResponse<AnprResponse> listIncidents(@RequestBody AnprFilterRequest request) {
         return anprService.listIncidents(request);
+    }
+    @PostMapping("/incidents/repeated")
+    public PageResponse<IncidentRepeatCount> listRepeatedIncidents(@RequestBody AnprFilterRequest request) {
+        return anprService.listRepeatedIncidents(request);
     }
 
     @PostMapping("/incidents/hotListed")

@@ -20,6 +20,8 @@ import IncidentListView from "./views/IncidentListView";
 import TriggerView from "./views/TriggerView";
 import AnprView from "./views/AnprView";
 import TrafficIncidentView from "./views/TrafficIncidentView";
+import IncidentRepeatedView from "./views/IncidentRepeatedView";
+//import IncidentsRepeated from "./views/IncidentsRepeated";
 import IncidentHotlistView from "./views/IncidentHotlistView";
 
 const {Content} = Layout;
@@ -61,6 +63,7 @@ class App extends Component {
                                 <PrivateRoute path='/' exact={true} component={HomeView}/>
                                 <PrivateRoute path='/incidents' exact={true} component={TrafficIncidentView}/>
                                 <PrivateRoute path='/incidents/hotlisted' exact={true} component={IncidentHotlistView}/>
+                                <PrivateRoute path='/incidents/repeated' exact={true} component={IncidentRepeatedView}/>
                                 <PrivateRoute path='/anpr' exact={true} component={AnprView}/>
                                 <PrivateRoute path='/user' exact={true} component={UserListView}/>
                                 <PrivateRoute path='/feed' exact={true} component={FeedView}/>
