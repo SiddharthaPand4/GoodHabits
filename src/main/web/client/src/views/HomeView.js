@@ -91,7 +91,7 @@ export default class HomeView extends Component {
             let rawData = resposne.data;
             if (rawData && rawData.length > 0) {
                 //let labelDates = DashboardService.enumerateDaysBetweenDates(from_date, to_date);
-                let labelDates = []
+                let labelDates = [];
 
                 let rawDataByVehicleData = [];
                 for (let i in rawData) {
