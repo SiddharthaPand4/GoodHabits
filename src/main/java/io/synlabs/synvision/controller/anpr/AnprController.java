@@ -44,15 +44,6 @@ public class AnprController {
     public PageResponse<AnprResponse> listIncidents(@RequestBody AnprFilterRequest request) {
         return anprService.listIncidents(request);
     }
-    @PostMapping("/incidents/repeated/reverse")
-    public PageResponse<IncidentRepeatCount> listRepeatedIncidents(@RequestBody AnprFilterRequest request) {
-        return anprService.listRepeatedIncidents(request);
-    }
-
-    @PostMapping("/incidents/repeated/helmet-missing")
-    public PageResponse<IncidentRepeatCount> listRepeatedHelmetMissingIncidents(@RequestBody AnprFilterRequest request) {
-        return anprService.listRepeatedHelmetMissingIncidents(request);
-    }
 
     @PostMapping("/incidents/hotListed")
     public PageResponse<AnprResponse> listHotListedIncidents(@RequestBody AnprFilterRequest request) {

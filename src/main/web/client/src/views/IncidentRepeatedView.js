@@ -53,11 +53,12 @@ export default class IncidentRepeatedView extends Component {
     };
 
     this.refresh = this.refresh.bind(this);
-
     this.handleRefresh = this.handleRefresh.bind(this);
     this.onPageChange = this.onPageChange.bind(this);
     this.onPageSizeChange = this.onPageSizeChange.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this);
+    this.refreshHelmetMissingIncidentsNow = this.refreshHelmetMissingIncidentsNow.bind(this);
+    this.refreshReverseDirectionIncidentsNow = this.refreshReverseDirectionIncidentsNow.bind(this);
   }
   handleTabClick(tabIndex) {
     this.setState({
@@ -72,71 +73,62 @@ export default class IncidentRepeatedView extends Component {
   }
 
   refresh() {
-     let helmetMissing = this.state.helmetMissing;
-     let reverseDirection = this.state.reverseDirection;
-     helmetMissing.loading = true;
-     reverseDirection.loading=true;
-     this.setState({helmetMissing:helmetMissing});
-     this.setState({reverseDirection:reverseDirection});
-     AnprService.getHelmetMissingIncidentsRepeated(this.state.helmetMissing.filter).then(request => {
-
-       helmetMissing.loading = false;
-       helmetMissing.anprresponse= request.data;
-
-       this.setState({helmetMissing:helmetMissing});
-     }).catch(error=> {
-                          helmetMissing.loading = false;
-                          this.setState({helmetMissing:helmetMissing});
-            });
-
-      AnprService.getReverseDirectionIncidentsRepeated(this.state.reverseDirection.filter).then(request => {
-             reverseDirection.loading = false;
-             reverseDirection.anprresponse= request.data;
-
-             this.setState({reverseDirection:reverseDirection});
-           }).catch(error=> {
-                                reverseDirection.loading = false;
-     this.setState({reverseDirection:reverseDirection});
-    });
+     this.refreshHelmetMissingIncidentsNow();
+     this.refreshReverseDirectionIncidentsNow();
   }
 
   //cant use refresh to read from state as state may not have been set
-  refreshHelmetMissingIncidentsNow(filter) {
-    AnprService.getHelmetMissingIncidentsRepeated(this.state.helmetMissing.filter).then(request => {
-      this.setState({
-        anprresponse: request.data,
-        loading: false
-      });
-    });
-  }
-  refreshReverseDirectionIncidentsNow(filter) {
-      AnprService.getReverseDirectionIncidentsRepeated(this.state.reverseDirection.filter).then(request => {
-        this.setState({
-          anprresponse: request.data,
-          loading: false
-      });
-      });
-    }
+  refreshHelmetMissingIncidentsNow() {
 
-  handleRefresh() {
+     let helmetMissing = this.state.helmetMissing;
+     helmetMissing.loading = true;
+     this.setState({helmetMissing:helmetMissing});
+
+     AnprService.getHelmetMissingIncidentsRepeated(this.state.helmetMissing.filter).then(request =>
+         {
+           helmetMissing.loading = false;
+           helmetMissing.anprresponse= request.data;
+           this.setState({helmetMissing:helmetMissing});
+         }).catch(error=> {
+            helmetMissing.loading = false;
+            this.setState({helmetMissing:helmetMissing});
+            alert("Something went wrong");
+         });
+  }
+  refreshReverseDirectionIncidentsNow() {
+      let reverseDirection = this.state.reverseDirection;
+      reverseDirection.loading=true;
+      this.setState({reverseDirection:reverseDirection});
+      AnprService.getReverseDirectionIncidentsRepeated(this.state.reverseDirection.filter).then(request =>
+          {
+           reverseDirection.loading = false;
+           reverseDirection.anprresponse= request.data;
+           this.setState({reverseDirection:reverseDirection});
+          }).catch(error=> {
+             reverseDirection.loading = false;
+             this.setState({ hasError: true });
+             alert("Something went wrong");
+          });
+  }
+
+  handleRefresh(){
     this.refresh();
   }
 
-  onPageChange(page, pageSize) {
+  onPageChange(page, pageSize){
     let filter = this.state.helmetMissing.filter;
     filter.page = page;
     filter.pageSize = pageSize;
     this.refreshHelmetMissingIncidentsNow(filter);
   }
-  onPageChange(pages, pageSizes) {
+  onPageChange(pages, pageSizes){
       let filter = this.state.reverseDirection.filter;
-
       filter.pages = pages;
       filter.pageSizes = pageSizes;
       this.refreshReverseDirectionIncidentsNow(filter);
-    }
+  }
 
-  onPageSizeChange(current, pageSize) {
+  onPageSizeChange(current, pageSize){
     let filter = this.state.helmetMissing.filter;
     filter.pageSize = pageSize;
     this.refreshHelmetMissingIncidentsNow(filter);
@@ -167,7 +159,7 @@ export default class IncidentRepeatedView extends Component {
   }
 
   renderReverseData(){
-   if (this.state.reverseDirection.loading || (!this.state.reverseDirection.anprresponse.events))  {
+   if (this.state.reverseDirection.loading || (!this.state.reverseDirection.anprresponse.events)){
           return <Empty description={false}/>
    }
 
@@ -205,7 +197,7 @@ export default class IncidentRepeatedView extends Component {
   }
 
   renderHelmetMissingData(){
-   if (this.state.helmetMissing.loading || (!this.state.helmetMissing.anprresponse.events)) {
+   if (this.state.helmetMissing.loading || (!this.state.helmetMissing.anprresponse.events)){
           return <Empty description={false}/>
    }
 

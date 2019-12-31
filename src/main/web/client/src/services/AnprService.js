@@ -31,10 +31,10 @@ class AnprService {
     }
 
     getHelmetMissingIncidentsRepeated(filter) {
-            return axios.post('/api/anpr/incidents/repeated/helmet-missing', filter);
+            return axios.post('/api/incident/repeated/helmet-missing', filter);
     }
     getReverseDirectionIncidentsRepeated(filter) {
-            return axios.post('/api/anpr/incidents/repeated/reverse', filter);
+            return axios.post('/api/incident/repeated/reverse', filter);
     }
 
 }
