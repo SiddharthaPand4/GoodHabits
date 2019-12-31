@@ -220,4 +220,74 @@ public class AnprService extends BaseService {
         query = query.and(root.direction.eq("rev").or(root.helmetMissing.isTrue()));
         return query;
     }
+
+    public PageResponse<IncidentRepeatCount> listRepeatedIncidents(AnprFilterRequest request) {
+
+        QAnprEvent event = QAnprEvent.anprEvent;
+        JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
+
+        query = query.select(event.anprText,event.anprText.count() ).from(event);
+
+        // for repeated incidents
+        query = query.where(event.direction.eq("rev"))
+                .groupBy(event.anprText)
+                .having(event.anprText.count().gt(1))
+                .orderBy(event.anprText.count().desc());
+
+        //pagination start
+        int count = (int) anprEventRepository.countReverseDirectionRepeatedIncidents();
+        int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
+        int offset = (request.getPage() - 1) * request.getPageSize();
+        query.offset(offset);
+        if (request.getPageSize() > 0) {
+            query.limit(request.getPageSize());
+        }
+        //pagination ends
+
+        List<Tuple> data = query.fetch();
+        List<IncidentRepeatCount> list = new ArrayList<>(request.getPageSize());
+        data.forEach(item -> {
+            String anprText = item.get(event.anprText);
+            Long repeatedTimes =  item.get(1, Long.class);
+
+            IncidentRepeatCount res = new IncidentRepeatCount(anprText, repeatedTimes);
+            list.add(res);
+        });
+        return (PageResponse<IncidentRepeatCount>) new IncidentRepeatPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
+    }
+
+    public PageResponse<IncidentRepeatCount> listRepeatedHelmetMissingIncidents(AnprFilterRequest request) {
+
+        QAnprEvent event = QAnprEvent.anprEvent;
+        JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
+
+        query = query.select(event.anprText,event.anprText.count() ).from(event);
+
+        // for repeated incidents
+        query = query.where(event.helmetMissing.isTrue())
+                .groupBy(event.anprText)
+                .having(event.anprText.count().gt(1))
+                .orderBy(event.anprText.count().desc());
+        //pagination start
+        int count = (int) anprEventRepository.countHelmetMissingRepeatedIncidents();
+        int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
+        int offset = (request.getPage() - 1) * request.getPageSize();
+        query.offset(offset);
+        if (request.getPageSize() > 0) {
+            query.limit(request.getPageSize());
+        }
+        //pagination ends
+
+
+        List<Tuple> data = query.fetch();
+        List<IncidentRepeatCount> list = new ArrayList<>(request.getPageSize());
+        data.forEach(item -> {
+            String anprText = item.get(event.anprText);
+            Long repeatedTimes =  item.get(1, Long.class);
+
+            IncidentRepeatCount res = new IncidentRepeatCount(anprText,repeatedTimes);
+            list.add(res);
+        });
+        return (PageResponse<IncidentRepeatCount>) new IncidentRepeatPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
+    }
 }

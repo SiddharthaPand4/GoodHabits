@@ -29,6 +29,14 @@ class AnprService {
     getEventFile(id) {
         return axios.get('/public/anpr/anprText/' + id + '/image.jpg');
     }
+
+    getHelmetMissingIncidentsRepeated(filter) {
+            return axios.post('/api/incident/repeated/helmet-missing', filter);
+    }
+    getReverseDirectionIncidentsRepeated(filter) {
+            return axios.post('/api/incident/repeated/reverse', filter);
+    }
+
 }
 
 export default AnprService.Instance()
