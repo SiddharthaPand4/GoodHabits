@@ -30,8 +30,11 @@ class AnprService {
         return axios.get('/public/anpr/anprText/' + id + '/image.jpg');
     }
 
-    getIncidentsRepeated(filter) {
-            return axios.post('/api/anpr/incidents/repeated', filter);
+    getHelmetMissingIncidentsRepeated(filter) {
+            return axios.post('/api/anpr/incidents/repeated/helmet-missing', filter);
+    }
+    getReverseDirectionIncidentsRepeated(filter) {
+            return axios.post('/api/anpr/incidents/repeated/reverse', filter);
     }
 
 }

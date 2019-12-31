@@ -28,5 +28,8 @@ public interface AnprEventRepository extends JpaRepository<AnprEvent, Long>, Que
     List<AnprEvent> findAllByArchivedFalse(Pageable paging);
 
     @Query(nativeQuery = true, value = "SELECT count(*) FROM (SELECT anpr_text, count(anpr_text) as count FROM synvision.anpr_event where direction = 'rev' group by anpr_text having count > 1) as x ")
-    public long countRepeatedIncidents();
+    public long countReverseDirectionRepeatedIncidents();
+
+    @Query(nativeQuery = true, value = "SELECT count(*) FROM (SELECT anpr_text, count(anpr_text) as count FROM synvision.anpr_event where helmet_missing = b'1' group by anpr_text having count > 1) as x  ")
+    public long countHelmetMissingRepeatedIncidents();
 }

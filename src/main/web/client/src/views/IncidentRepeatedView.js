@@ -34,12 +34,21 @@ export default class IncidentRepeatedView extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: true,
-      layout: "list",
-      events: {},
+      helmetMissing:{
+        loading:false,
+        anprresponse: {},
       filter: {
         page: 1,
         pageSize: 24
+      }
+     },
+      reverseDirection:{
+        loading:false,
+        anprresponse: {},
+        filter: {
+          pages: 1,
+          pageSizes: 24
+        }
       }
     };
 
@@ -63,82 +72,93 @@ export default class IncidentRepeatedView extends Component {
   }
 
   refresh() {
-    AnprService.getIncidentsRepeated(this.state.filter).then(request => {
-      this.setState({
-        anprresponse: request.data,
-        loading: false
-      });
+     let helmetMissing = this.state.helmetMissing;
+     let reverseDirection = this.state.reverseDirection;
+     helmetMissing.loading = true;
+     reverseDirection.loading=true;
+     this.setState({helmetMissing:helmetMissing});
+     this.setState({reverseDirection:reverseDirection});
+     AnprService.getHelmetMissingIncidentsRepeated(this.state.helmetMissing.filter).then(request => {
+
+       helmetMissing.loading = false;
+       helmetMissing.anprresponse= request.data;
+
+       this.setState({helmetMissing:helmetMissing});
+     }).catch(error=> {
+                          helmetMissing.loading = false;
+                          this.setState({helmetMissing:helmetMissing});
+            });
+
+      AnprService.getReverseDirectionIncidentsRepeated(this.state.reverseDirection.filter).then(request => {
+             reverseDirection.loading = false;
+             reverseDirection.anprresponse= request.data;
+
+             this.setState({reverseDirection:reverseDirection});
+           }).catch(error=> {
+                                reverseDirection.loading = false;
+     this.setState({reverseDirection:reverseDirection});
     });
   }
 
   //cant use refresh to read from state as state may not have been set
-  refreshNow(filter) {
-    AnprService.getIncidentsRepeated(this.state.filter).then(request => {
+  refreshHelmetMissingIncidentsNow(filter) {
+    AnprService.getHelmetMissingIncidentsRepeated(this.state.helmetMissing.filter).then(request => {
       this.setState({
         anprresponse: request.data,
         loading: false
       });
     });
   }
+  refreshReverseDirectionIncidentsNow(filter) {
+      AnprService.getReverseDirectionIncidentsRepeated(this.state.reverseDirection.filter).then(request => {
+        this.setState({
+          anprresponse: request.data,
+          loading: false
+      });
+      });
+    }
 
   handleRefresh() {
     this.refresh();
   }
 
   onPageChange(page, pageSize) {
-    let filter = this.state.filter;
+    let filter = this.state.helmetMissing.filter;
     filter.page = page;
     filter.pageSize = pageSize;
-    this.refreshNow(filter);
+    this.refreshHelmetMissingIncidentsNow(filter);
   }
+  onPageChange(pages, pageSizes) {
+      let filter = this.state.reverseDirection.filter;
+
+      filter.pages = pages;
+      filter.pageSizes = pageSizes;
+      this.refreshReverseDirectionIncidentsNow(filter);
+    }
 
   onPageSizeChange(current, pageSize) {
-    let filter = this.state.filter;
+    let filter = this.state.helmetMissing.filter;
     filter.pageSize = pageSize;
-    this.refreshNow(filter);
+    this.refreshHelmetMissingIncidentsNow(filter);
   }
+  onPageSizeChange(current, pageSizes) {
+      let filter = this.state.reverseDirection.filter;
+      filter.pageSizes = pageSizes;
+      this.refreshReverseDirectionIncidentsNow(filter);
+    }
 
-  updateEvent(anprText) {
-    let { workingEvent, workingEventLoading } = this.state;
-    workingEvent.anprText = anprText;
-    workingEventLoading = true;
-    this.setState({
-      workingEvent,
-      workingEventLoading
-    });
-    AnprService.updateEvent(workingEvent)
-      .then(request => {
-        let { workingEvent, workingEventLoading } = this.state;
-        workingEvent.anprText = anprText;
-        workingEventLoading = false;
-        this.setState({
-          workingEventLoading
-        });
-      })
-      .catch(error => {
-        alert("error in saving");
-        let { workingEventLoading } = this.state;
-        workingEventLoading = false;
-        this.setState({
-          workingEventLoading
-        });
-      });
-  }
 
   render() {
-    let layout = this.state.layout;
-    let lpr = this.state.filter.lpr;
 
     return (
       <Tabs defaultActiveKey="1">
         <TabPane tab="Reverse" key="1">
           <div>
-            {this.renderReverseData()}
+           {this.renderReverseData()}
           </div>
         </TabPane>
         <TabPane tab="Helmet-Missing" key="2">
           <div>
-            helmet missing div
               {this.renderHelmetMissingData()}
           </div>
         </TabPane>
@@ -147,14 +167,14 @@ export default class IncidentRepeatedView extends Component {
   }
 
   renderReverseData(){
-   if (this.state.loading || !this.state.events || this.state.events.Total === 0) {
+   if (this.state.reverseDirection.loading || (!this.state.reverseDirection.anprresponse.events))  {
           return <Empty description={false}/>
    }
 
-   let events = this.state.anprresponse.events;
-   let count = this.state.anprresponse.totalPages * this.state.anprresponse.pageSize;
+   let events = this.state.reverseDirection.anprresponse.events;
+   let count = this.state.reverseDirection.anprresponse.totalPages * this.state.reverseDirection.anprresponse.pageSizes;
 
-   const paginationOptions = {
+   const paginationOption = {
        showSizeChanger: true,
        showQuickJumper: true,
        onShowSizeChange: this.onPageSizeChange,
@@ -163,17 +183,16 @@ export default class IncidentRepeatedView extends Component {
    };
 
    const pagination = {
-       ...paginationOptions,
+       ...paginationOption,
        total: count,
-       current: this.state.filter.page,
-       pageSize: this.state.filter.pageSize
+       current: this.state.reverseDirection.filter.pages,
+       pageSizes: this.state.reverseDirection.filter.pageSizes
    };
 
    return (
-   <div> hello this is reverse table
+   <div>
    <Table dataSource={events} pagination={pagination}>
 
-               if(key=reverse)
 
               <Column title="LPR" dataIndex="anprText" key="anprText"
                       render={anprText => anprText}/>
@@ -186,12 +205,12 @@ export default class IncidentRepeatedView extends Component {
   }
 
   renderHelmetMissingData(){
-   if (this.state.loading || !this.state.events || this.state.events.Total === 0) {
+   if (this.state.helmetMissing.loading || (!this.state.helmetMissing.anprresponse.events)) {
           return <Empty description={false}/>
    }
 
-   let events = this.state.anprresponse.events;
-   let count = this.state.anprresponse.totalPages * this.state.anprresponse.pageSize;
+   let events = this.state.helmetMissing.anprresponse.events;
+   let count = this.state.helmetMissing.anprresponse.totalPages * this.state.helmetMissing.anprresponse.pageSize;
 
    const paginationOptions = {
        showSizeChanger: true,
@@ -204,15 +223,14 @@ export default class IncidentRepeatedView extends Component {
    const pagination = {
        ...paginationOptions,
        total: count,
-       current: this.state.filter.page,
-       pageSize: this.state.filter.pageSize
+       current: this.state.helmetMissing.filter.page,
+       pageSize: this.state.helmetMissing.filter.pageSize
    };
 
    return (
-   <div> hello this is helmet missing table
+   <div>
    <Table dataSource={events} pagination={pagination}>
 
-               if(key=reverse)
 
               <Column title="LPR" dataIndex="anprText" key="anprText"
                       render={anprText => anprText}/>
@@ -223,9 +241,4 @@ export default class IncidentRepeatedView extends Component {
 
    )
   }
-
-
-
-
-
 }
