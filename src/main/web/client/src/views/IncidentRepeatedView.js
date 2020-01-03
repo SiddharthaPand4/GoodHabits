@@ -6,6 +6,7 @@ import {
   Divider,
   Empty,
   Icon,
+  Spin,
   Pagination,
   Row,
   Table,
@@ -29,25 +30,43 @@ const { Panel } = Collapse;
 const { Paragraph, Text } = Typography;
 const {Column} = Table;
 const { TabPane } = Tabs;
+const { Search } = Input;
+const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin />;
+const tabList = [
+    {
+        key: 'reverse',
+        tab: 'Reverse',
+    },
+    {
+        key: 'helmet-missing',
+        tab: 'Helmet-Missing',
+    },
+];
 
 export default class IncidentRepeatedView extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      activeTab:"reverse",
+      filter: {
+        lpr: ""
+      },
       helmetMissing:{
         loading:false,
         anprresponse: {},
-      filter: {
-        page: 1,
-        pageSize: 24
-      }
-     },
+        filter: {
+          page: 1,
+          pageSize: 24,
+          lpr: "",
+        }
+      },
       reverseDirection:{
         loading:false,
         anprresponse: {},
         filter: {
           pages: 1,
-          pageSizes: 24
+          pageSizes: 24,
+           lpr: "",
         }
       }
     };
@@ -59,15 +78,18 @@ export default class IncidentRepeatedView extends Component {
     this.handleTabClick = this.handleTabClick.bind(this);
     this.refreshHelmetMissingIncidentsNow = this.refreshHelmetMissingIncidentsNow.bind(this);
     this.refreshReverseDirectionIncidentsNow = this.refreshReverseDirectionIncidentsNow.bind(this);
+    this.onLprInputChange=this.onLprInputChange.bind(this);
+    this.search=this.search.bind(this);
+    this.onTabChange=this.onTabChange.bind(this);
   }
-  handleTabClick(tabIndex) {
-    this.setState({
-      activeTabIndex:
+   handleTabClick(tabIndex) {
+     this.setState({
+       activeTabIndex:
         tabIndex === this.state.activeTabIndex
           ? this.props.defaultActiveTabIndex
-          : tabIndex
-    });
-  }
+        : tabIndex
+     });
+   }
   componentDidMount() {
     this.refresh();
   }
@@ -90,10 +112,10 @@ export default class IncidentRepeatedView extends Component {
            helmetMissing.anprresponse= request.data;
            this.setState({helmetMissing:helmetMissing});
          }).catch(error=> {
-            helmetMissing.loading = false;
-            this.setState({helmetMissing:helmetMissing});
-            alert("Something went wrong");
-         });
+              helmetMissing.loading = false;
+              this.setState({helmetMissing:helmetMissing});
+              alert("Something went wrong");
+            });
   }
   refreshReverseDirectionIncidentsNow() {
       let reverseDirection = this.state.reverseDirection;
@@ -115,18 +137,35 @@ export default class IncidentRepeatedView extends Component {
     this.refresh();
   }
 
-  onPageChange(page, pageSize){
-    let filter = this.state.helmetMissing.filter;
-    filter.page = page;
-    filter.pageSize = pageSize;
-    this.refreshHelmetMissingIncidentsNow(filter);
+  onLprInputChange(e) {
+    let filter = this.state.filter;
+    filter.lpr = e.target.value;
+    console.log(filter);
+    this.setState({filter: filter})
   }
-  onPageChange(pages, pageSizes){
+
+   search(searchText) {
+     let {filter, reverseDirection, helmetMissing} = this.state;
+     filter.lpr = searchText;
+     reverseDirection.filter.lpr = searchText;
+     helmetMissing.filter.lpr = searchText;
+     this.setState({filter,reverseDirection,helmetMissing},()=>{
+       this.refresh();
+     });
+   }
+   onPageChange(page, pageSize){
+     let filter = this.state.helmetMissing.filter;
+     filter.page = page;
+     filter.pageSize = pageSize;
+     this.refreshHelmetMissingIncidentsNow(filter);
+   }
+
+   onPageChange(pages, pageSizes){
       let filter = this.state.reverseDirection.filter;
       filter.pages = pages;
       filter.pageSizes = pageSizes;
       this.refreshReverseDirectionIncidentsNow(filter);
-  }
+   }
 
   onPageSizeChange(current, pageSize){
     let filter = this.state.helmetMissing.filter;
@@ -134,27 +173,49 @@ export default class IncidentRepeatedView extends Component {
     this.refreshHelmetMissingIncidentsNow(filter);
   }
   onPageSizeChange(current, pageSizes) {
-      let filter = this.state.reverseDirection.filter;
-      filter.pageSizes = pageSizes;
-      this.refreshReverseDirectionIncidentsNow(filter);
-    }
+     let filter = this.state.reverseDirection.filter;
+     filter.pageSizes = pageSizes;
+     this.refreshReverseDirectionIncidentsNow(filter);
+  }
 
+  onTabChange(key) {
+      this.setState({activeTab: key})
+  }
 
   render() {
+             if (this.state.reverseDirection.loading)
+             {
+                const antIcon = <Icon type="loading" style={{fontSize: 24}} spin/>;
+                 return <Spin indicator={antIcon}/>
+             }
 
     return (
-      <Tabs defaultActiveKey="1">
-        <TabPane tab="Reverse" key="1">
-          <div>
-           {this.renderReverseData()}
-          </div>
-        </TabPane>
-        <TabPane tab="Helmet-Missing" key="2">
-          <div>
-              {this.renderHelmetMissingData()}
-          </div>
-        </TabPane>
-      </Tabs>
+            <div>
+                <Card
+                style={{width: '100%'}}
+                title={<Row>
+                  <Col xl={{span: 16}} lg={{span: 16}} md={{span: 12}} sm={{span: 12}} xs={{span: 12}}>
+                       <h4>Repeated Incidents</h4>
+                  </Col>
+                  <Col xl={{span: 8}} lg={{span: 8}} md={{span: 12}} sm={{span: 12}} xs={{span: 12}}>
+                         <Search  allowClear
+                          placeholder="Search Vehicle "
+                          onChange={this.onLprInputChange}
+                          style={{textAlign:"right"}}
+                          onSearch={value => this.search(value)} enterButton />
+                  </Col>
+                </Row>}
+
+                tabList={tabList}
+                activeTabKey={this.state.activeTab}
+
+                onTabChange={key => {
+                    this.onTabChange(key);
+                }}
+                >
+                 {this.state.activeTab === "reverse" ? (this.renderReverseData()) : this.renderHelmetMissingData()}
+              </Card>
+            </div>
     );
   }
 
@@ -182,24 +243,23 @@ export default class IncidentRepeatedView extends Component {
    };
 
    return (
-   <div>
-   <Table dataSource={events} pagination={pagination}>
+     <div>
+       <Table dataSource={events} pagination={pagination}>
 
-
-              <Column title="LPR" dataIndex="anprText" key="anprText"
-                      render={anprText => anprText}/>
-               <Column title="count" dataIndex="repeatedTimes" key="repeatedTimes"
-                      render={repeatedTimes => repeatedTimes}/>
-          </Table>
-    </div>
+         <Column title="LPR" dataIndex="anprText" key="anprText"
+            render={anprText => anprText}/>
+         <Column title="Repeated Times" dataIndex="repeatedTimes" key="repeatedTimes"
+            render={repeatedTimes => repeatedTimes}/>
+       </Table>
+     </div>
 
    )
   }
 
   renderHelmetMissingData(){
-   if (this.state.helmetMissing.loading || (!this.state.helmetMissing.anprresponse.events)){
+     if (this.state.helmetMissing.loading || (!this.state.helmetMissing.anprresponse.events)){
           return <Empty description={false}/>
-   }
+     }
 
    let events = this.state.helmetMissing.anprresponse.events;
    let count = this.state.helmetMissing.anprresponse.totalPages * this.state.helmetMissing.anprresponse.pageSize;
@@ -219,18 +279,17 @@ export default class IncidentRepeatedView extends Component {
        pageSize: this.state.helmetMissing.filter.pageSize
    };
 
-   return (
-   <div>
-   <Table dataSource={events} pagination={pagination}>
-
+    return (
+      <div>
+         <Table dataSource={events} pagination={pagination}>
 
               <Column title="LPR" dataIndex="anprText" key="anprText"
                       render={anprText => anprText}/>
-               <Column title="count" dataIndex="repeatedTimes" key="repeatedTimes"
+               <Column title="Repeated Times" dataIndex="repeatedTimes" key="repeatedTimes"
                       render={repeatedTimes => repeatedTimes}/>
-          </Table>
-    </div>
+         </Table>
+      </div>
 
-   )
+    )
   }
 }

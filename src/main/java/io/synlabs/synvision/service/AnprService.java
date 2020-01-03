@@ -229,8 +229,14 @@ public class AnprService extends BaseService {
         query = query.select(event.anprText,event.anprText.count() ).from(event);
 
         // for repeated incidents
-        query = query.where(event.direction.eq("rev"))
-                .groupBy(event.anprText)
+        query = query.where(event.direction.eq("rev"));
+
+        if(!StringUtils.isEmpty(request.getLpr()))
+        {
+            query = query.where(event.anprText.eq(request.getLpr()));
+        }
+
+        query = query.groupBy(event.anprText)
                 .having(event.anprText.count().gt(1))
                 .orderBy(event.anprText.count().desc());
 
@@ -264,10 +270,16 @@ public class AnprService extends BaseService {
         query = query.select(event.anprText,event.anprText.count() ).from(event);
 
         // for repeated incidents
-        query = query.where(event.helmetMissing.isTrue())
-                .groupBy(event.anprText)
-                .having(event.anprText.count().gt(1))
-                .orderBy(event.anprText.count().desc());
+        query = query.where(event.helmetMissing.isTrue());
+
+        if(!StringUtils.isEmpty(request.getLpr()))
+        {
+            query = query.where(event.anprText.eq(request.getLpr()));
+        }
+
+         query=query.groupBy(event.anprText)
+                    .having(event.anprText.count().gt(1))
+                    .orderBy(event.anprText.count().desc());
         //pagination start
         int count = (int) anprEventRepository.countHelmetMissingRepeatedIncidents();
         int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
