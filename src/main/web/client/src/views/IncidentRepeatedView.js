@@ -140,7 +140,6 @@ export default class IncidentRepeatedView extends Component {
   onLprInputChange(e) {
     let filter = this.state.filter;
     filter.lpr = e.target.value;
-    console.log(filter);
     this.setState({filter: filter})
   }
 
@@ -183,11 +182,7 @@ export default class IncidentRepeatedView extends Component {
   }
 
   render() {
-             if (this.state.reverseDirection.loading)
-             {
-                const antIcon = <Icon type="loading" style={{fontSize: 24}} spin/>;
-                 return <Spin indicator={antIcon}/>
-             }
+
 
     return (
             <div>
@@ -220,9 +215,7 @@ export default class IncidentRepeatedView extends Component {
   }
 
   renderReverseData(){
-   if (this.state.reverseDirection.loading || (!this.state.reverseDirection.anprresponse.events)){
-          return <Empty description={false}/>
-   }
+
 
    let events = this.state.reverseDirection.anprresponse.events;
    let count = this.state.reverseDirection.anprresponse.totalPages * this.state.reverseDirection.anprresponse.pageSizes;
@@ -242,6 +235,16 @@ export default class IncidentRepeatedView extends Component {
        pageSizes: this.state.reverseDirection.filter.pageSizes
    };
 
+   if (this.state.reverseDirection.loading)
+   {
+      const antIcon = <Icon type="loading" style={{fontSize: 24}} spin/>;
+      return <Spin indicator={antIcon}/>
+   }
+
+   if (!this.state.reverseDirection.anprresponse.events){
+       return <Empty description={false}/>
+   }
+
    return (
      <div>
        <Table dataSource={events} pagination={pagination}>
@@ -257,9 +260,7 @@ export default class IncidentRepeatedView extends Component {
   }
 
   renderHelmetMissingData(){
-     if (this.state.helmetMissing.loading || (!this.state.helmetMissing.anprresponse.events)){
-          return <Empty description={false}/>
-     }
+
 
    let events = this.state.helmetMissing.anprresponse.events;
    let count = this.state.helmetMissing.anprresponse.totalPages * this.state.helmetMissing.anprresponse.pageSize;
@@ -278,6 +279,16 @@ export default class IncidentRepeatedView extends Component {
        current: this.state.helmetMissing.filter.page,
        pageSize: this.state.helmetMissing.filter.pageSize
    };
+
+   if (this.state.helmetMissing.loading)
+   {
+      const antIcon = <Icon type="loading" style={{fontSize: 24}} spin/>;
+      return <Spin indicator={antIcon}/>
+   }
+
+   if (!this.state.helmetMissing.anprresponse.events){
+             return <Empty description={false}/>
+   }
 
     return (
       <div>
