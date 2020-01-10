@@ -20,8 +20,7 @@ import IncidentListView from "./views/IncidentListView";
 import TriggerView from "./views/TriggerView";
 import AnprView from "./views/AnprView";
 import TrafficIncidentView from "./views/TrafficIncidentView";
-import IncidentRepeatedView from "./views/IncidentRepeatedView";
-//import IncidentsRepeated from "./views/IncidentsRepeated";
+import IncidentRepeatedView from "./views/incidentsRepeated/IncidentRepeatedView";
 import IncidentHotlistView from "./views/IncidentHotlistView";
 
 const {Content} = Layout;

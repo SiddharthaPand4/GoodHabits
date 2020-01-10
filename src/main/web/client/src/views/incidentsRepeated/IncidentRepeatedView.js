@@ -23,9 +23,10 @@ import {
   Typography,
   Slider
 } from "antd";
-import GenericFilter from "../components/GenericFilter";
+import GenericFilter from "../../components/GenericFilter";
 import Moment from "react-moment";
-import AnprService from "../services/AnprService";
+import AnprService from "../../services/AnprService";
+import IncidentTimeline from "./IncidentTimeline";
 import Magnifier from "react-magnifier";
 
 const { Link } = Anchor;
@@ -52,6 +53,7 @@ export default class IncidentRepeatedView extends Component {
     this.state = {
       activeTab:"Reverse",
       visible:false,
+      timelineLpr:"",
       filter: {
         lpr: ""
       },
@@ -86,27 +88,31 @@ export default class IncidentRepeatedView extends Component {
 
     this.refresh = this.refresh.bind(this);
     this.handleRefresh = this.handleRefresh.bind(this);
-    this.onPageChange = this.onPageChange.bind(this);
-    this.onPageSizeChange = this.onPageSizeChange.bind(this);
+    this.onHelmetMissingPageChange = this.onHelmetMissingPageChange.bind(this);
+    this.onReverseDirectionPageChange = this.onReverseDirectionPageChange.bind(this);
+    this.onHelmetMissingPageSizeChange = this.onHelmetMissingPageSizeChange.bind(this);
+    this.onReverseDirectionPageSizeChange = this.onReverseDirectionPageSizeChange.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this);
     this.refreshHelmetMissingIncidentsNow = this.refreshHelmetMissingIncidentsNow.bind(this);
     this.refreshReverseDirectionIncidentsNow = this.refreshReverseDirectionIncidentsNow.bind(this);
     this.onLprInputChange=this.onLprInputChange.bind(this);
     this.search=this.search.bind(this);
     this.onTabChange=this.onTabChange.bind(this);
-    this.refreshBriefIncidentsNow = this.refreshBriefIncidentsNow.bind(this);
+    this.toggleIncidentTimelineModal = this.toggleIncidentTimelineModal.bind(this);
   }
-   handleTabClick(tabIndex) {
-     this.setState({
-       activeTabIndex:
-        tabIndex === this.state.activeTabIndex
-          ? this.props.defaultActiveTabIndex
-        : tabIndex
-     });
-   }
+
   componentDidMount() {
     this.refresh();
   }
+
+  handleTabClick(tabIndex) {
+       this.setState({
+         activeTabIndex:
+          tabIndex === this.state.activeTabIndex
+            ? this.props.defaultActiveTabIndex
+          : tabIndex
+       });
+     }
 
   refresh() {
      this.refreshHelmetMissingIncidentsNow();
@@ -116,26 +122,14 @@ export default class IncidentRepeatedView extends Component {
   showModal = (lpr) => {
       this.setState({
         visible: true,
+        timelineLpr: lpr
       });
-      this.refreshBriefIncidentsNow(lpr);
   }
 
-  title = (lpr) => {
-    this.setState({
-       visible: true,
-    });
+  toggleIncidentTimelineModal(){
+    let visible = this.state.visible;
+    this.setState({visible: !visible});
   }
-
-  handleClose = () => {
-      this.setState({ visible: false });
-    };
-
-  handleCancel = e => {
-    console.log(e);
-    this.setState({
-      visible: false,
-    });
-  };
 
   //cant use refresh to read from state as state may not have been set
   refreshHelmetMissingIncidentsNow() {
@@ -171,27 +165,6 @@ export default class IncidentRepeatedView extends Component {
           });
   }
 
-  refreshBriefIncidentsNow(lpr) {
-
-       let briefIncident = this.state.briefIncident;
-       briefIncident.loading = true;
-       briefIncident.filter.lpr = lpr;
-       briefIncident.filter.title= lpr;
-
-       briefIncident.filter.incidentType = this.state.activeTab;
-       this.setState({briefIncident:briefIncident});
-
-       AnprService.getBriefIncidentsRepeated(briefIncident.filter).then(request =>
-           {
-             briefIncident.loading = false;
-             briefIncident.anprresponse= request.data;
-             this.setState({briefIncident:briefIncident});
-           }).catch(error=> {
-                 briefIncident.loading = false;
-                 this.setState({briefIncident:briefIncident});
-                 alert("Something went wrong");
-               });
-  }
 
   handleRefresh(){
     this.refresh();
@@ -212,26 +185,28 @@ export default class IncidentRepeatedView extends Component {
       this.refresh();
     });
   }
-  onPageChange(page, pageSize){
+
+  onHelmetMissingPageChange(page, pageSize){
     let filter = this.state.helmetMissing.filter;
     filter.page = page;
     filter.pageSize = pageSize;
     this.refreshHelmetMissingIncidentsNow(filter);
   }
 
-  onPageChange(pages, pageSizes){
+  onReverseDirectionPageChange(pages, pageSizes){
      let filter = this.state.reverseDirection.filter;
      filter.pages = pages;
      filter.pageSizes = pageSizes;
      this.refreshReverseDirectionIncidentsNow(filter);
   }
 
-  onPageSizeChange(current, pageSize){
+  onHelmetMissingPageSizeChange(current, pageSize){
     let filter = this.state.helmetMissing.filter;
     filter.pageSize = pageSize;
     this.refreshHelmetMissingIncidentsNow(filter);
   }
-  onPageSizeChange(current, pageSizes) {
+
+  onReverseDirectionPageSizeChange(current, pageSizes) {
      let filter = this.state.reverseDirection.filter;
      filter.pageSizes = pageSizes;
      this.refreshReverseDirectionIncidentsNow(filter);
@@ -246,20 +221,7 @@ export default class IncidentRepeatedView extends Component {
     return (
           <div>
             <div>
-                    <Modal
 
-                      title={this.state.briefIncident.filter.incidentType}
-                      visible={this.state.visible}
-                      onCancel={this.handleCancel}
-                      onClose={this.handleClose}
-                      footer={[
-                               <Button key="close"  type="primary" onClick={this.handleClose}>
-                                 Close
-                               </Button>
-                              ]}
-                    >
-                       {this.state.visible ? (this.renderGetBrief()) : null}
-                    </Modal>
             </div>
 
                 <Card
@@ -287,7 +249,15 @@ export default class IncidentRepeatedView extends Component {
                 }}
                 >
                  {this.state.activeTab === "Reverse" ? (this.renderReverseData()) : this.renderHelmetMissingData()}
+
+                 <IncidentTimeline
+                   lpr={this.state.timelineLpr}
+                   incidentType={this.state.activeTab}
+                   visible={this.state.visible}
+                   toggleVisible={this.toggleIncidentTimelineModal}
+                   />
               </Card>
+
           </div>
     );
   }
@@ -301,8 +271,8 @@ export default class IncidentRepeatedView extends Component {
    const paginationOption = {
        showSizeChanger: true,
        showQuickJumper: true,
-       onShowSizeChange: this.onPageSizeChange,
-       onChange: this.onPageChange,
+       onShowSizeChange: this.onReverseDirectionPageSizeChange,
+       onChange: this.onReverseDirectionPageChange,
        total: count
    };
 
@@ -338,65 +308,6 @@ export default class IncidentRepeatedView extends Component {
    )
   }
 
-  renderGetBrief(anprText){
-     let events = this.state.briefIncident.anprresponse.events;
-    // let count = this.state.briefIncident.anprresponse.totalPages * this.state.briefIncident.anprresponse.pageSize;
-
-       let workingEventLoading = this.state.workingEventLoading;
-     const paginationOptions = {
-         onShowSizeChange: this.onPageSizeChange,
-         onChange: this.onPageChange,
-
-     };
-
-     const pagination = {
-         ...paginationOptions,
-         current: this.state.briefIncident.filter.page,
-         pageSize: this.state.briefIncident.filter.pageSize
-     };
-
-     if (this.state.briefIncident.loading)
-     {
-        const antIcon = <Icon type="loading" style={{fontSize: 24}} spin/>;
-        return <Spin indicator={antIcon}/>
-     }
-
-     if (!this.state.briefIncident.anprresponse.events){
-               return <Empty description={false}/>
-     }
-
-
-      return (
-        <div>
-
-           <Table dataSource={events} pagination={pagination}>
-
-                <Column title={this.state.briefIncident.filter.title}
-                         render={(text, record, index)=> <Timeline.Item>
-                       <div>
-                         <p><Icon type="clock-circle" />  <Moment format="lll">{record.eventDate}</Moment></p>
-                         <p><Icon type="environment"/> {record.location}</p>
-                         <a title={"click here to download"}
-                           href={"/public/anpr/lpr/" + record.id + "/image.jpg"}
-                         download={true}>
-                         <img alt="event"
-                             src={"/public/anpr/lpr/" + record.id + "/image.jpg"}style={{width:160,height:"auto"}}/>
-                         </a>
-                       </div>
-                         </Timeline.Item>
-                         }/>
-
-                <Column  dataIndex="id" key="anprimage"
-                          render={id => (
-                                  <a title={"click here to download"}  href={"/public/anpr/vehicle/" + id + "/image.jpg"}
-                                  download={true}>
-                                  <img alt="event"
-                                  src={"/public/anpr/vehicle/" + id + "/image.jpg" }style={{width:200,height:"auto"}}/></a>)}/>
-           </Table>
-        </div>
-      )
-  }
-
   renderHelmetMissingData(){
 
 
@@ -406,8 +317,8 @@ export default class IncidentRepeatedView extends Component {
    const paginationOptions = {
        showSizeChanger: true,
        showQuickJumper: true,
-       onShowSizeChange: this.onPageSizeChange,
-       onChange: this.onPageChange,
+       onShowSizeChange: this.onHelmetMissingPageSizeChange,
+       onChange: this.onHelmetMissingPageChange,
        total: count
    };
 
