@@ -3,6 +3,7 @@ package io.synlabs.synvision.controller;
 import io.synlabs.synvision.service.AnprService;
 import io.synlabs.synvision.service.IncidentService;
 import io.synlabs.synvision.views.anpr.AnprFilterRequest;
+import io.synlabs.synvision.views.anpr.AnprResponse;
 import io.synlabs.synvision.views.anpr.IncidentRepeatCount;
 import io.synlabs.synvision.views.incident.IncidentRequest;
 import io.synlabs.synvision.views.incident.IncidentsFilterRequest;
@@ -43,5 +44,10 @@ public class IncidentController {
     @PostMapping("/repeated/helmet-missing")
     public PageResponse<IncidentRepeatCount> listRepeatedHelmetMissingIncidents(@RequestBody AnprFilterRequest request) {
         return anprService.listRepeatedHelmetMissingIncidents(request);
+    }
+
+    @PostMapping("/timeline")
+    public PageResponse<AnprResponse> getIncidentsTimeline(@RequestBody AnprFilterRequest request) {
+        return anprService.getIncidentsTimeline(request);
     }
 }

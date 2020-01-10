@@ -302,4 +302,48 @@ public class AnprService extends BaseService {
         });
         return (PageResponse<IncidentRepeatCount>) new IncidentRepeatPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
     }
+
+    public PageResponse<AnprResponse> getIncidentsTimeline(AnprFilterRequest request) {
+
+        QAnprEvent event = QAnprEvent.anprEvent;
+        JPAQuery<AnprEvent> query = new JPAQuery<>(entityManager);
+
+        query = query.select(event).from(event);
+        //query = query.where(event.helmetMissing.isTrue());
+
+        query = query.where(event.anprText.eq(request.getLpr()));
+        if(StringUtils.isEmpty(request.getIncidentType())){
+           request.setIncidentType("all");
+        }
+        switch (request.getIncidentType()){
+            case "Reverse":
+                query =query.where(event.direction.eq("rev"));
+                break;
+            case "Helmet-Missing":
+                query =query.where(event.helmetMissing.isTrue());
+                break;
+            default:
+                query =query.where((event.helmetMissing.isTrue()).or(event.direction.eq("rev")));
+        }
+
+        //pagination start
+        int count = (int) query.fetchCount();
+        int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
+        int offset = (request.getPage() - 1) * request.getPageSize();
+        query.offset(offset);
+        if (request.getPageSize() > 0) {
+            query.limit(request.getPageSize());
+        }
+        //pagination ends
+
+        query.orderBy(event.eventDate.desc());
+
+        List<AnprEvent> data = query.fetch();
+        List<AnprResponse> list = new ArrayList<>(request.getPageSize());
+        data.forEach(item -> {
+            AnprResponse res = new AnprResponse(item, location);
+            list.add(res);
+        });
+        return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
+    }
 }

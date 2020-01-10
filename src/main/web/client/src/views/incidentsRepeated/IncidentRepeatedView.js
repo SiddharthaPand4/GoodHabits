@@ -1,5 +1,6 @@
-import React, { Component } from "react";
+import React, { Component } from "react"
 import {
+  Anchor,
   Card,
   Col,
   Collapse,
@@ -11,6 +12,7 @@ import {
   Row,
   Table,
   Tag,
+  Timeline,
   Modal,
   Tabs,
   message,
@@ -26,6 +28,7 @@ import Moment from "react-moment";
 import AnprService from "../services/AnprService";
 import Magnifier from "react-magnifier";
 
+const { Link } = Anchor;
 const { Panel } = Collapse;
 const { Paragraph, Text } = Typography;
 const {Column} = Table;
@@ -34,11 +37,11 @@ const { Search } = Input;
 const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin />;
 const tabList = [
     {
-        key: 'reverse',
+        key: 'Reverse',
         tab: 'Reverse',
     },
     {
-        key: 'helmet-missing',
+        key: 'Helmet-Missing',
         tab: 'Helmet-Missing',
     },
 ];
@@ -47,7 +50,8 @@ export default class IncidentRepeatedView extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeTab:"reverse",
+      activeTab:"Reverse",
+      visible:false,
       filter: {
         lpr: ""
       },
@@ -55,18 +59,27 @@ export default class IncidentRepeatedView extends Component {
         loading:false,
         anprresponse: {},
         filter: {
-          page: 1,
-          pageSize: 24,
+          pages: 1,
+          pageSizes: 24,
           lpr: "",
+          incidentType:""
         }
+      },
+      briefIncident:{
+        loading:false,
+        anprresponse: {},
+          filter:{
+            lpr: "",
+          }
       },
       reverseDirection:{
         loading:false,
         anprresponse: {},
         filter: {
-          pages: 1,
+          pagess: 1,
           pageSizes: 24,
            lpr: "",
+           incidentType:""
         }
       }
     };
@@ -81,6 +94,7 @@ export default class IncidentRepeatedView extends Component {
     this.onLprInputChange=this.onLprInputChange.bind(this);
     this.search=this.search.bind(this);
     this.onTabChange=this.onTabChange.bind(this);
+    this.refreshBriefIncidentsNow = this.refreshBriefIncidentsNow.bind(this);
   }
    handleTabClick(tabIndex) {
      this.setState({
@@ -98,6 +112,30 @@ export default class IncidentRepeatedView extends Component {
      this.refreshHelmetMissingIncidentsNow();
      this.refreshReverseDirectionIncidentsNow();
   }
+
+  showModal = (lpr) => {
+      this.setState({
+        visible: true,
+      });
+      this.refreshBriefIncidentsNow(lpr);
+  }
+
+  title = (lpr) => {
+    this.setState({
+       visible: true,
+    });
+  }
+
+  handleClose = () => {
+      this.setState({ visible: false });
+    };
+
+  handleCancel = e => {
+    console.log(e);
+    this.setState({
+      visible: false,
+    });
+  };
 
   //cant use refresh to read from state as state may not have been set
   refreshHelmetMissingIncidentsNow() {
@@ -133,6 +171,28 @@ export default class IncidentRepeatedView extends Component {
           });
   }
 
+  refreshBriefIncidentsNow(lpr) {
+
+       let briefIncident = this.state.briefIncident;
+       briefIncident.loading = true;
+       briefIncident.filter.lpr = lpr;
+       briefIncident.filter.title= lpr;
+
+       briefIncident.filter.incidentType = this.state.activeTab;
+       this.setState({briefIncident:briefIncident});
+
+       AnprService.getBriefIncidentsRepeated(briefIncident.filter).then(request =>
+           {
+             briefIncident.loading = false;
+             briefIncident.anprresponse= request.data;
+             this.setState({briefIncident:briefIncident});
+           }).catch(error=> {
+                 briefIncident.loading = false;
+                 this.setState({briefIncident:briefIncident});
+                 alert("Something went wrong");
+               });
+  }
+
   handleRefresh(){
     this.refresh();
   }
@@ -143,28 +203,28 @@ export default class IncidentRepeatedView extends Component {
     this.setState({filter: filter})
   }
 
-   search(searchText) {
-     let {filter, reverseDirection, helmetMissing} = this.state;
-     filter.lpr = searchText;
-     reverseDirection.filter.lpr = searchText;
-     helmetMissing.filter.lpr = searchText;
-     this.setState({filter,reverseDirection,helmetMissing},()=>{
-       this.refresh();
-     });
-   }
-   onPageChange(page, pageSize){
-     let filter = this.state.helmetMissing.filter;
-     filter.page = page;
-     filter.pageSize = pageSize;
-     this.refreshHelmetMissingIncidentsNow(filter);
-   }
+  search(searchText) {
+    let {filter, reverseDirection, helmetMissing} = this.state;
+    filter.lpr = searchText;
+    reverseDirection.filter.lpr = searchText;
+    helmetMissing.filter.lpr = searchText;
+    this.setState({filter,reverseDirection,helmetMissing},()=>{
+      this.refresh();
+    });
+  }
+  onPageChange(page, pageSize){
+    let filter = this.state.helmetMissing.filter;
+    filter.page = page;
+    filter.pageSize = pageSize;
+    this.refreshHelmetMissingIncidentsNow(filter);
+  }
 
-   onPageChange(pages, pageSizes){
-      let filter = this.state.reverseDirection.filter;
-      filter.pages = pages;
-      filter.pageSizes = pageSizes;
-      this.refreshReverseDirectionIncidentsNow(filter);
-   }
+  onPageChange(pages, pageSizes){
+     let filter = this.state.reverseDirection.filter;
+     filter.pages = pages;
+     filter.pageSizes = pageSizes;
+     this.refreshReverseDirectionIncidentsNow(filter);
+  }
 
   onPageSizeChange(current, pageSize){
     let filter = this.state.helmetMissing.filter;
@@ -183,9 +243,25 @@ export default class IncidentRepeatedView extends Component {
 
   render() {
 
-
     return (
+          <div>
             <div>
+                    <Modal
+
+                      title={this.state.briefIncident.filter.incidentType}
+                      visible={this.state.visible}
+                      onCancel={this.handleCancel}
+                      onClose={this.handleClose}
+                      footer={[
+                               <Button key="close"  type="primary" onClick={this.handleClose}>
+                                 Close
+                               </Button>
+                              ]}
+                    >
+                       {this.state.visible ? (this.renderGetBrief()) : null}
+                    </Modal>
+            </div>
+
                 <Card
                 style={{width: '100%'}}
                 title={<Row>
@@ -193,11 +269,13 @@ export default class IncidentRepeatedView extends Component {
                        <h4>Repeated Incidents</h4>
                   </Col>
                   <Col xl={{span: 8}} lg={{span: 8}} md={{span: 12}} sm={{span: 12}} xs={{span: 12}}>
-                         <Search  allowClear
-                          placeholder="Search Vehicle "
-                          onChange={this.onLprInputChange}
-                          style={{textAlign:"right"}}
-                          onSearch={value => this.search(value)} enterButton />
+
+                     <Search  allowClear
+                       placeholder="Search Vehicle "
+                       onChange={this.onLprInputChange}
+                       style={{textAlign:"right"}}
+                       onSearch={value => this.search(value)} enterButton
+                      />
                   </Col>
                 </Row>}
 
@@ -208,9 +286,9 @@ export default class IncidentRepeatedView extends Component {
                     this.onTabChange(key);
                 }}
                 >
-                 {this.state.activeTab === "reverse" ? (this.renderReverseData()) : this.renderHelmetMissingData()}
+                 {this.state.activeTab === "Reverse" ? (this.renderReverseData()) : this.renderHelmetMissingData()}
               </Card>
-            </div>
+          </div>
     );
   }
 
@@ -249,14 +327,74 @@ export default class IncidentRepeatedView extends Component {
      <div>
        <Table dataSource={events} pagination={pagination}>
 
-         <Column title="LPR" dataIndex="anprText" key="anprText"
-            render={anprText => anprText}/>
+         <Column  title="LPR" dataIndex="anprText" key="anprText"
+            render={anprText => <Button onClick={()=> this.showModal(anprText)}>{anprText}</Button>}/>
+
          <Column title="Repeated Times" dataIndex="repeatedTimes" key="repeatedTimes"
-            render={repeatedTimes => repeatedTimes}/>
+             render={repeatedTimes => repeatedTimes}/>
        </Table>
      </div>
 
    )
+  }
+
+  renderGetBrief(anprText){
+     let events = this.state.briefIncident.anprresponse.events;
+    // let count = this.state.briefIncident.anprresponse.totalPages * this.state.briefIncident.anprresponse.pageSize;
+
+       let workingEventLoading = this.state.workingEventLoading;
+     const paginationOptions = {
+         onShowSizeChange: this.onPageSizeChange,
+         onChange: this.onPageChange,
+
+     };
+
+     const pagination = {
+         ...paginationOptions,
+         current: this.state.briefIncident.filter.page,
+         pageSize: this.state.briefIncident.filter.pageSize
+     };
+
+     if (this.state.briefIncident.loading)
+     {
+        const antIcon = <Icon type="loading" style={{fontSize: 24}} spin/>;
+        return <Spin indicator={antIcon}/>
+     }
+
+     if (!this.state.briefIncident.anprresponse.events){
+               return <Empty description={false}/>
+     }
+
+
+      return (
+        <div>
+
+           <Table dataSource={events} pagination={pagination}>
+
+                <Column title={this.state.briefIncident.filter.title}
+                         render={(text, record, index)=> <Timeline.Item>
+                       <div>
+                         <p><Icon type="clock-circle" />  <Moment format="lll">{record.eventDate}</Moment></p>
+                         <p><Icon type="environment"/> {record.location}</p>
+                         <a title={"click here to download"}
+                           href={"/public/anpr/lpr/" + record.id + "/image.jpg"}
+                         download={true}>
+                         <img alt="event"
+                             src={"/public/anpr/lpr/" + record.id + "/image.jpg"}style={{width:160,height:"auto"}}/>
+                         </a>
+                       </div>
+                         </Timeline.Item>
+                         }/>
+
+                <Column  dataIndex="id" key="anprimage"
+                          render={id => (
+                                  <a title={"click here to download"}  href={"/public/anpr/vehicle/" + id + "/image.jpg"}
+                                  download={true}>
+                                  <img alt="event"
+                                  src={"/public/anpr/vehicle/" + id + "/image.jpg" }style={{width:200,height:"auto"}}/></a>)}/>
+           </Table>
+        </div>
+      )
   }
 
   renderHelmetMissingData(){
@@ -295,7 +433,7 @@ export default class IncidentRepeatedView extends Component {
          <Table dataSource={events} pagination={pagination}>
 
               <Column title="LPR" dataIndex="anprText" key="anprText"
-                      render={anprText => anprText}/>
+                      render={anprText => <Button onClick={()=> this.showModal(anprText)}>{anprText}</Button>}/>
                <Column title="Repeated Times" dataIndex="repeatedTimes" key="repeatedTimes"
                       render={repeatedTimes => repeatedTimes}/>
          </Table>
