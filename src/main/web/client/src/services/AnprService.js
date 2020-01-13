@@ -36,6 +36,9 @@ class AnprService {
     getReverseDirectionIncidentsRepeated(filter) {
             return axios.post('/api/incident/repeated/reverse', filter);
     }
+    getBriefIncidentsRepeated(filter) {
+                return axios.post('/api/incident/timeline', filter);
+     }
 
 }
 
