@@ -257,7 +257,11 @@ export default class TrafficIncidentView extends Component {
                                             onChange={this.updateZoomFactor}
                                             value={typeof zoomFactor === 'number' ? zoomFactor : 0}
                                         />
-                                        : null
+                                        : <div style={{height:"54px",textAlign: "center"}}>
+                                               <Button size="small" type="primary" onClick={() => this.magnifyEvent(event)} >
+                                                   <Icon type="zoom-in"/>Zoom Image
+                                               </Button>
+                                           </div>
                                     }
                                 </div>
                                 <div style={{textAlign: "center"}}>

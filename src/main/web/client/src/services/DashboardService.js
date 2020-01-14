@@ -72,12 +72,12 @@ class DashboardService {
     }
 
 
-    extractFromToDate(selectedCustomDateRange) {
+    extractFromToDate(selectedCustomDateRangeEnum, selectedCustomDateRangeMoment) {
 
         let baseDate;
         let from_date;
         let to_date;
-        switch (selectedCustomDateRange) {
+        switch (selectedCustomDateRangeEnum) {
             case  "Today":
                 baseDate = moment();
                 from_date = baseDate.startOf('day').toDate();
@@ -147,6 +147,10 @@ class DashboardService {
                 baseDate = moment().subtract(2, 'years');
                 from_date = baseDate.startOf('year').toDate();
                 to_date = baseDate.endOf('year').toDate();
+                break;
+            case  "Custom":
+                from_date = selectedCustomDateRangeMoment[0].toDate();
+                to_date = selectedCustomDateRangeMoment[1].toDate();
                 break;
         }
 
