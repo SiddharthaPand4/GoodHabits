@@ -29,6 +29,7 @@ export default class AnprView extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            visible:true,
             loading: true,
             layout: "list",
             events: {},
@@ -97,6 +98,12 @@ export default class AnprView extends Component {
     handleLayoutChange(data) {
         this.setState({layout: data})
     }
+    handleOnClick = e => {
+                console.log(e);
+                this.setState({
+                  visible: false,
+                });
+              };
 
     handleRefresh() {
         this.refresh();
@@ -198,7 +205,7 @@ export default class AnprView extends Component {
             4: {label: <span>4</span>},
             5: {label: <span><Icon style={{color: nextColor}} type="zoom-in"/></span>,}
         };
-        return <div style={{background: '#ECECEC', padding: '5px'}}>
+        return <div style={{background: '#ECECEC', padding: '5px'}} >
             <Row>
                 {
                     events.map((event, index) =>
@@ -258,12 +265,18 @@ export default class AnprView extends Component {
                                             onChange={this.updateZoomFactor}
                                             value={typeof zoomFactor === 'number' ? zoomFactor : 0}
                                         />
-                                        : null
+                                        :
+                                        <div style={{height:"54px",textAlign: "center"}}>
+                                            <Button size="small"  onClick={() => this.magnifyEvent(event)} >
+                                                <Icon type="zoom-in"/>Zoom Image
+                                            </Button>
+                                        </div>
+
                                     }
                                 </div>
                                 <div style={{textAlign: "center"}}>
                                     <img alt="event"
-                                         src={"/public/anpr/lpr/" + event.id + "/image.jpg"}/>
+                                         src={"/public/anpr/lpr/" + event.id + "/image.jpg"}   />
                                 </div>
                                 <div style={{marginTop: "5px", textAlign: "center"}}
                                      onClick={() => this.editEvent(event)}>

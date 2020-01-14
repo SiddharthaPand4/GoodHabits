@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Col, Row, Statistic, TimePicker, DatePicker, Button, Icon, message, Card, Menu, Dropdown, Select} from "antd";
+import {Col, Row, Statistic, TimePicker, DatePicker, Button, Icon, message, Card, Modal,Menu, Dropdown, Select} from "antd";
 import DashboardService from "../services/DashboardService";
 import CommonService from "../services/CommonService";
 import Moment from 'moment';
@@ -9,17 +9,20 @@ import * as name from "chartjs-plugin-colorschemes";
 import cloneDeep from 'lodash/cloneDeep';
 
 const {Option} = Select;
+const { RangePicker } = DatePicker;
 
 export default class HomeView extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-
+            isOpencustomDateRangeModal:"",
             atcc: {
                 filter: {
                     selectedCustomDateRange: "Today",
                     selectedXAxisOption: "Hourly",
+                    fromDate:{},
+                    toDate:{}
                 },
                 chartData: {
                     labels: [],
@@ -29,12 +32,14 @@ export default class HomeView extends Component {
                 filter: {
                     selectedCustomDateRange: "Today",
                     selectedXAxisOption: "Hourly",
+                    fromDate:{},
+                    toDate:{}
                 },
                 chartData: {
                     labels: [],
                     datasets: []
                 }
-            }
+            },
         };
 
         this.getIncidentVehicleCount = this.getIncidentVehicleCount.bind(this);
@@ -45,6 +50,7 @@ export default class HomeView extends Component {
         this.refresh = this.refresh.bind(this);
         this.getDateRangeOptions = this.getDateRangeOptions.bind(this);
         this.getXAxisOptions = this.getXAxisOptions.bind(this);
+        this.handleDateRangeChange = this.handleDateRangeChange.bind(this);
 
 
     }
@@ -52,12 +58,31 @@ export default class HomeView extends Component {
     componentDidMount() {
         this.refresh();
     }
+    showCustomDateRangeModal(graphName){
+        this.setState({
+          isOpencustomDateRangeModal: graphName,
+        });
+    };
 
+    handleCancel = e => {
+        this.setState({
+          isOpencustomDateRangeModal: "",
+        });
+      };
 
-    selectDateRange(graphName, selectedCustomDateRange) {
+    selectDateRange(graphName, selectedCustomDateRangeEnum, selectedCustomDateRangeMoment) {
+        let {isOpencustomDateRangeModal} = this.state;
         let graph = this.state[graphName];
-        graph.filter.selectedCustomDateRange = selectedCustomDateRange;
-        this.setState({[graphName]: graph}, () => {
+        graph.filter.selectedCustomDateRange = selectedCustomDateRangeEnum;
+        let fromToDate = DashboardService.extractFromToDate(graph.filter.selectedCustomDateRange, selectedCustomDateRangeMoment);
+        graph.filter.fromDate = fromToDate.from_date;
+        graph.filter.toDate = fromToDate.to_date;
+
+
+        if(selectedCustomDateRangeEnum=== "Custom"){
+            isOpencustomDateRangeModal = ""
+        }
+        this.setState({[graphName]: graph, isOpencustomDateRangeModal}, () => {
             this.refresh();
         });
 
@@ -72,11 +97,10 @@ export default class HomeView extends Component {
     }
 
     refresh() {
-        let fromToDate = DashboardService.extractFromToDate(this.state.atcc.filter.selectedCustomDateRange);
-        this.getAtccVehicleCount(fromToDate.from_date, fromToDate.to_date, this.state.atcc.filter.selectedXAxisOption);
 
-        fromToDate = DashboardService.extractFromToDate(this.state.incident.filter.selectedCustomDateRange);
-        this.getIncidentVehicleCount(fromToDate.from_date, fromToDate.to_date, this.state.incident.filter.selectedXAxisOption);
+        this.getAtccVehicleCount(this.state.atcc.filter.fromDate, this.state.atcc.filter.toDate, this.state.atcc.filter.selectedXAxisOption);
+
+        this.getIncidentVehicleCount(this.state.incident.filter.fromDate, this.state.incident.filter.toDate, this.state.incident.filter.selectedXAxisOption);
     }
 
 
@@ -217,6 +241,16 @@ export default class HomeView extends Component {
         });
     }
 
+    handleDateRangeChange(dates, dateString){
+
+        let startDate = dates[0].toDate();
+        let endDate = dates[1].toDate();
+        this.setState( () => {
+                    this.refresh();
+                });
+         console.log(dates, dateString);
+    }
+
     getXAxisOptions(graphName) {
         return (<Menu>
 
@@ -249,6 +283,16 @@ export default class HomeView extends Component {
                 <Menu.Item key="5" onClick={() => this.selectDateRange(graphName, "This month")}>
                     This month
                 </Menu.Item>
+                <Menu.Item key="6" onClick={() => this.selectDateRange(graphName, "This year")}>
+                    This year
+                </Menu.Item>
+                <Menu.Item key="7" onClick={() => this.selectDateRange(graphName, "Last year")}>
+                    Last year
+                </Menu.Item>
+                <Menu.Item  onClick={() =>this.showCustomDateRangeModal(graphName)}>
+                    Custom
+                </Menu.Item>
+
             </Menu>
         );
     }
@@ -306,6 +350,20 @@ export default class HomeView extends Component {
         const incidentChartOptions = this.getBarChartOptions("incident");
         return (
             <div>
+            <div>
+
+                    <Modal
+                     onCancel={this.handleCancel}
+                      title="Custom Date Range"
+                      visible={this.state.isOpencustomDateRangeModal ? true : false}
+                      footer={[
+                      ]}
+
+                    >
+                         <RangePicker
+                          onChange={(changedDateRange)=> this.selectDateRange(this.state.isOpencustomDateRangeModal, "Custom", changedDateRange)} />
+                    </Modal>
+                  </div>
                 <div>
                     <Card title={<div>ATCC
                         &nbsp;
