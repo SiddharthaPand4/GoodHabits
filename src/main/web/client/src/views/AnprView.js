@@ -288,7 +288,7 @@ export default class AnprView extends Component {
                                         type="secondary">{(workingEventLoading && workingEvent.id === event.id) ? "saving..." : ""}</Text>
                                     <div>
                                         <Text code><Icon type="schedule"/> <Moment
-                                            format="L">{event.eventDate}</Moment>{' '}|{' '}<Moment
+                                            format="lll">{event.eventDate}</Moment>{' '}|{' '}<Moment
                                             format="LTS">{event.eventDate}</Moment></Text>
                                     </div>
                                     <div>
