@@ -93,7 +93,7 @@ public class AnprService extends BaseService {
                 String toTime = request.getToTime() == null ? "00:00:00" : request.getToTime();
                 String ending = toDate + " " + toTime;
                 Date endingDate = dateFormat.parse(ending);
-                query = query.and(root.eventDate.after(endingDate));
+                query = query.and(root.eventDate.before(endingDate));
             }
             return query;
         } catch (Exception e) {
