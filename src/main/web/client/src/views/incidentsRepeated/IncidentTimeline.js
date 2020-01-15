@@ -60,14 +60,11 @@ export default class IncidentTimeline extends Component {
 
     }
 
-
-
     toggleVisible(){
         let visible = this.state.visible;
         this.setState({visible: !visible});
 
     }
-
 
     refreshBriefIncidentsNow() {
 
@@ -89,7 +86,6 @@ export default class IncidentTimeline extends Component {
 
     }
 
-
     render(){
          let events = this.state.anprresponse.events;
 
@@ -105,7 +101,7 @@ export default class IncidentTimeline extends Component {
 
         return <Modal
 
-                title={this.state.filter.incidentType}
+                title={<div>{this.state.filter.incidentType}&nbsp;&nbsp;|&nbsp;&nbsp;{this.state.filter.lpr}</div>}
                 visible={this.props.visible}
                 onCancel={this.props.toggleVisible}
                 onClose={this.props.toggleVisible}
@@ -115,43 +111,37 @@ export default class IncidentTimeline extends Component {
                          </Button>
                         ]}
                 >
-                 <div>
-                   <Row>
+                 <div >
+                   <Row >
 
                       {
                           (events || []).map((record, index)=>{
 
-                          return  <Timeline.Item><Row gutter={8}>
-                                <Col span={12}>
-                                  <div><p><Icon type="clock-circle" />  <Moment format="lll">{record.eventDate}</Moment></p>
-                                                                                          <p><Icon type="environment"/> {record.location}</p>
-                                                                                          <a title={"click here to download"}
-                                                                                            href={"/public/anpr/lpr/" + record.id + "/image.jpg"}
-                                                                                          download={true}>
-                                                                                          <img alt="event"
-                                                                                              src={"/public/anpr/lpr/" + record.id + "/image.jpg"}style={{width:160,height:"auto"}}/>
-                                                                                          </a></div>
+                          return  <Timeline.Item><Row gutter={8} >
+                                <Col span={12}  >
+                                  <div ><p><Icon type="clock-circle" />  <Moment format="lll">{record.eventDate}</Moment></p>
+                                             <p><Icon type="environment"/> {record.location}</p>
+                                             <a title={"click here to download"}
+                                               href={"/public/anpr/lpr/" + record.id + "/image.jpg"}
+                                             download={true}>
+                                             <img alt="event"
+                                                 src={"/public/anpr/lpr/" + record.id + "/image.jpg"}style={{width:160,height:"auto"}}/>
+                                             </a></div>
                                 </Col>
                                 <Col span={12}>
                                   <div> <a title={"click here to download"}
-                                                                                             href={"/public/anpr/vehicle/" + record.id + "/image.jpg"}
-                                                                                                       download={true}>
-                                                                                                       <img alt="event"
-
-                                                                                                       src={"/public/anpr/vehicle/" + record.id + "/image.jpg" } class="responsive" style={{maxWidth:"160px",height:"auto"}}/>
-                                                                                          </a></div>
+                                           href={"/public/anpr/vehicle/" + record.id + "/image.jpg"}
+                                                     download={true}>
+                                                         <img alt="event"
+                                                         src={"/public/anpr/vehicle/" + record.id + "/image.jpg" } class="responsive" style={{maxWidth:"160px",height:"auto"}}/>
+                                               </a></div>
                                 </Col>
-
-                              </Row>
-
+                            </Row><Divider /></Timeline.Item>
 
 
 
- </Timeline.Item>
-
-
-                        })
-                                               }
+                          })
+                      }
 
                    </Row>
                  </div>

@@ -300,7 +300,11 @@ export default class IncidentHotlistView extends Component {
                                             onChange={this.updateZoomFactor}
                                             value={typeof zoomFactor === 'number' ? zoomFactor : 0}
                                         />
-                                        : null
+                                        : <div style={{height:"54px",textAlign: "center"}}>
+                                               <Button size="small" type="primary" onClick={() => this.magnifyEvent(event)} >
+                                                   <Icon type="zoom-in"/>Zoom Image
+                                               </Button>
+                                           </div>
                                     }
                                 </div>
                                 <div style={{textAlign: "center"}}>
@@ -316,7 +320,7 @@ export default class IncidentHotlistView extends Component {
                                     <Text
                                         type="secondary">{(workingEventLoading && workingEvent.id === event.id) ? "saving..." : ""}</Text>
                                     <div>
-                                        <Text code> <Moment format="L">{event.eventDate}</Moment>{' '}|{' '}<Moment
+                                        <Text code> <Moment format="lll">{event.eventDate}</Moment>{' '}|{' '}<Moment
                                             format="LTS">{event.eventDate}</Moment></Text>
                                     </div>
                                     <div>
