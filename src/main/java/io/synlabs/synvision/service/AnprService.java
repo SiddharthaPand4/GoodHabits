@@ -102,9 +102,18 @@ public class AnprService extends BaseService {
         return null;
     }
 
-    public void archiveAnpr(AnprRequest request) {
+    public void archiveAnprEvent(AnprRequest request) {
         AnprEvent anprEvent = anprEventRepository.getOne(request.getId());
-        anprEventRepository.delete(anprEvent);
+        anprEvent.setArchived(true);
+        anprEventRepository.saveAndFlush(anprEvent);
+    }
+    public void archiveAnprEvents(AnprRequest request) {
+
+        List<AnprEvent> events = anprEventRepository.findAllByAnprTextAndArchived(request.anprText, false);
+        events.forEach(e->{
+            e.setArchived(true);
+        });
+        anprEventRepository.saveAll(events);
     }
 
     public void addAnprEvent(CreateAnprRequest request) {
@@ -345,5 +354,79 @@ public class AnprService extends BaseService {
             list.add(res);
         });
         return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
+    }
+    public PageResponse<AnprResponse> getAllIncidentsTimeline(AnprFilterRequest request) {
+
+        QAnprEvent event = QAnprEvent.anprEvent;
+        JPAQuery<AnprEvent> query = new JPAQuery<>(entityManager);
+
+        query = query.select(event).from(event);
+
+
+        query = query.where(event.anprText.eq(request.getLpr()));
+        if(StringUtils.isEmpty(request.getIncidentType())){
+            request.setIncidentType("all");
+        }
+
+
+        //pagination start
+        int count = (int) query.fetchCount();
+        int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
+        int offset = (request.getPage() - 1) * request.getPageSize();
+        query.offset(offset);
+        if (request.getPageSize() > 0) {
+            query.limit(request.getPageSize());
+        }
+        //pagination ends
+
+        query.orderBy(event.eventDate.desc());
+
+        List<AnprEvent> data = query.fetch();
+        List<AnprResponse> list = new ArrayList<>(request.getPageSize());
+        data.forEach(item -> {
+            AnprResponse res = new AnprResponse(item, location);
+            list.add(res);
+        });
+        return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
+    }
+
+    public PageResponse<AnprResponse> listAllIncidents(AnprFilterRequest request) {
+        QAnprEvent event = QAnprEvent.anprEvent;
+        JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
+
+        query = query.select(event.anprText,event.anprText.count() ).from(event);
+
+        query = query.where(event.archived.isFalse());
+
+        if(!StringUtils.isEmpty(request.getLpr()))
+        {
+            query = query.where(event.anprText.eq(request.getLpr()));
+        }
+
+        query = query.groupBy(event.anprText)
+
+                .orderBy(event.anprText.count().desc());
+
+        //pagination start
+        int count = (int) anprEventRepository.countAllIncidents();
+        int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
+        int offset = (request.getPage() - 1) * request.getPageSize();
+        query.offset(offset);
+        if (request.getPageSize() > 0) {
+            query.limit(request.getPageSize());
+        }
+        //pagination ends
+
+        List<Tuple> data = query.fetch();
+        List<IncidentRepeatCount> list = new ArrayList<>(request.getPageSize());
+        data.forEach(item -> {
+            String anprText = item.get(event.anprText);
+            Long repeatedTimes =  item.get(1, Long.class);
+
+            IncidentRepeatCount res = new IncidentRepeatCount(anprText, repeatedTimes);
+            list.add(res);
+        });
+        return (PageResponse<AnprResponse>) new IncidentRepeatPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
+
     }
 }
