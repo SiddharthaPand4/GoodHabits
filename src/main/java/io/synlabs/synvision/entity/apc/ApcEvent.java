@@ -21,9 +21,6 @@ public class ApcEvent extends BaseEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date eventDate;
 
-    @Column(length = 50)
-    private String eventImage;
-
     private boolean archived;
 
     @Column(length = 50)

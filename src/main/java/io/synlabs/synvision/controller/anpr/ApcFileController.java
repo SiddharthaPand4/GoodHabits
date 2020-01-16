@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
-@RequestMapping("/public/anpr")
+@RequestMapping("/public/apc")
 public class ApcFileController {
 
     private static final Logger logger = LoggerFactory.getLogger(ApcFileController.class);
