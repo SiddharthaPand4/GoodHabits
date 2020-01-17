@@ -42,13 +42,13 @@ class AnprService {
     }
     getBriefIncidentsRepeated(filter) {
                 return axios.post('/api/incident/timeline', filter);
+    }
+     getIncidentTimeline(filter) {
+                     return axios.post('/api/anpr/incident/masterData/timeline', filter);
      }
-     getBriefIncidentsAll(filter) {
-                     return axios.post('/api/anpr/timelineAll', filter);
-          }
-    getAllIncidents(filter) {
-                    return axios.post('/api/anpr/masterData', filter);
-         }
+     getIncidentsList(filter) {
+                    return axios.post('/api/anpr/incidents/list/masterData', filter);
+     }
 
 }
 

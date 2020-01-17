@@ -37,18 +37,12 @@ const {Column} = Table;
 const { TabPane } = Tabs;
 const { Search } = Input;
 const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin />;
-const tabList = [
-    {
-        key: 'All-Incidents',
-        tab: 'All-Incidents',
-    },
-
-];
 
 export default class MasterDataView extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      archiveEventsLoading: "",
       activeTab:"All-Incidents",
       visible:false,
       timelineLpr:"",
@@ -56,13 +50,9 @@ export default class MasterDataView extends Component {
         lpr: ""
       },
       archiveLpr:{
-
                  anprresponse: {},
                  lpr: "",
-                 archived:false,
-                 id: undefined
               },
-
 
       allData:{
         loading:false,
@@ -72,18 +62,16 @@ export default class MasterDataView extends Component {
           pageSizes: 24,
            lpr: "",
            incidentType:"",
-           archived:false,
-           id: undefined
         }
       }
     };
 
     this.refresh = this.refresh.bind(this);
     this.handleRefresh = this.handleRefresh.bind(this);
-    this.onReverseDirectionPageChange = this.onReverseDirectionPageChange.bind(this);
-    this.onReverseDirectionPageSizeChange = this.onReverseDirectionPageSizeChange.bind(this);
+    this.onMasterDataPageChange = this.onMasterDataPageChange.bind(this);
+    this.onMasterDataPageSizeChange = this.onMasterDataPageSizeChange.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this);
-    this.refreshReverseDirectionIncidentsNow = this.refreshReverseDirectionIncidentsNow.bind(this);
+    this.refreshIncidentsNow = this.refreshIncidentsNow.bind(this);
     this.onLprInputChange=this.onLprInputChange.bind(this);
     this.search=this.search.bind(this);
     this.onTabChange=this.onTabChange.bind(this);
@@ -105,41 +93,37 @@ export default class MasterDataView extends Component {
      }
 
   refresh() {
-
-     this.refreshReverseDirectionIncidentsNow();
-
+     this.refreshIncidentsNow();
   }
+
   showModal = (lpr) => {
         this.setState({
           visible: true,
           timelineLpr: lpr
         });
-    }
+  }
   toggleIncidentTimelineModal(){
       let visible = this.state.visible;
       this.setState({visible: !visible});
-    }
-
+  }
 
   //cant use refresh to read from state as state may not have been set
 
-  refreshReverseDirectionIncidentsNow() {
+  refreshIncidentsNow() {
       let allData = this.state.allData;
       allData.loading=true;
       this.setState({allData:allData});
-      AnprService.getAllIncidents(this.state.allData.filter).then(request =>
-          {
+      AnprService.getIncidentsList(this.state.allData.filter).then(request =>
+      {
            allData.loading = false;
            allData.anprresponse= request.data;
            this.setState({allData:allData});
-          }).catch(error=> {
+      }).catch(error=> {
              allData.loading = false;
              this.setState({ hasError: true });
              alert("Something went wrong");
-          });
+      });
   }
-
-
 
   handleRefresh(){
     this.refresh();
@@ -160,33 +144,33 @@ export default class MasterDataView extends Component {
     });
   }
 
-  onReverseDirectionPageChange(pages, pageSizes){
+  onMasterDataPageChange(pages, pageSizes){
      let filter = this.state.allData.filter;
      filter.pages = pages;
      filter.pageSizes = pageSizes;
-     this.refreshReverseDirectionIncidentsNow(filter);
+     this.refreshIncidentsNow(filter);
   }
 
-  onReverseDirectionPageSizeChange(current, pageSizes) {
+  onMasterDataPageSizeChange(current, pageSizes) {
      let filter = this.state.allData.filter;
      filter.pageSizes = pageSizes;
-     this.refreshReverseDirectionIncidentsNow(filter);
+     this.refreshIncidentsNow(filter);
   }
 
   onTabChange(key) {
       this.setState({activeTab: key})
   }
    archiveLprOnChange(lpr) {
-
+          this.setState({archiveEventsLoading : lpr});
           AnprService.archiveAllEvent(lpr).then(request => {
-                        this.refresh(this.state.archiveLpr);
-                        message.success('Vehicle archived!');
-                    }).catch(error => {
-                        message.error('Something went wrong!');
-                    })
-
-
-      }
+            this.setState({archiveEventsLoading : ""});
+            this.refresh(this.state.archiveLpr);
+            message.success('Vehicle archived!');
+          }).catch(error => {
+              this.setState({archiveEventsLoading : ""});
+              message.error('Something went wrong!');
+          })
+   }
 
   render() {
 
@@ -219,7 +203,7 @@ export default class MasterDataView extends Component {
                     this.onTabChange(key);
                 }}
                 >
-                  {this.renderReverseData()}
+                  {this.renderMasterData()}
                  <IncidentTimeline
                                     lpr={this.state.timelineLpr}
                                     incidentType={this.state.activeTab}
@@ -233,7 +217,7 @@ export default class MasterDataView extends Component {
     );
   }
 
-  renderReverseData(){
+  renderMasterData(){
 
 
    let events = this.state.allData.anprresponse.events;
@@ -244,8 +228,8 @@ export default class MasterDataView extends Component {
    const paginationOption = {
        showSizeChanger: true,
        showQuickJumper: true,
-       onShowSizeChange: this.onReverseDirectionPageSizeChange,
-       onChange: this.onReverseDirectionPageChange,
+       onShowSizeChange: this.onMasterDataPageSizeChange,
+       onChange: this.onMasterDataPageChange,
        total: count
    };
 
@@ -278,7 +262,7 @@ export default class MasterDataView extends Component {
 
          <Column
              render={(text,record,index)=><div>
-              <p><Button onClick={()=>this.archiveLprOnChange(record.anprText)}>Archive</Button></p>
+              <p><Button type={'danger'} loading={this.state.archiveEventsLoading === record.anprText} onClick={()=>this.archiveLprOnChange(record.anprText)}>Archive</Button></p>
 
              </div>
              }/>

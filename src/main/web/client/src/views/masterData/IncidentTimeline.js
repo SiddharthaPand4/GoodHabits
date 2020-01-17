@@ -77,7 +77,7 @@ export default class IncidentTimeline extends Component {
 
            if(filter.lpr && filter.incidentType){
               this.setState({loading : true});
-              AnprService.getBriefIncidentsAll(filter).then(request =>
+              AnprService.getIncidentTimeline(filter).then(request =>
               {
                 loading = false;
                 anprresponse= request.data;

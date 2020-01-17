@@ -40,11 +40,11 @@ public class AnprController {
         return anprService.list(request);
     }
 
-    @PostMapping("/masterData")
+    @PostMapping("/incidents/list/masterData")
     public PageResponse<AnprResponse> listAllIncidents(@RequestBody AnprFilterRequest request) {
         return anprService.listAllIncidents(request);
     }
-    @PostMapping("/timelineAll")
+    @PostMapping("/incident/masterData/timeline")
     public PageResponse<AnprResponse> getAllIncidentsTimeline(@RequestBody AnprFilterRequest request) {
         return anprService.getAllIncidentsTimeline(request);
     }
