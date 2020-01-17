@@ -40,13 +40,13 @@ public class AnprController {
         return anprService.list(request);
     }
 
-    @PostMapping("/incidents/list/masterData")
-    public PageResponse<AnprResponse> listAllIncidents(@RequestBody AnprFilterRequest request) {
-        return anprService.listAllIncidents(request);
+    @PostMapping("/events/list/lpr/count")
+    public PageResponse<AnprResponse> getEventsCountListByLpr(@RequestBody AnprFilterRequest request) {
+        return anprService.getEventsCountListByLpr(request);
     }
-    @PostMapping("/incident/masterData/timeline")
-    public PageResponse<AnprResponse> getAllIncidentsTimeline(@RequestBody AnprFilterRequest request) {
-        return anprService.getAllIncidentsTimeline(request);
+    @PostMapping("/events/list/bylpr")
+    public PageResponse<AnprResponse> getEventsListByLpr(@RequestBody AnprFilterRequest request) {
+        return anprService.getEventsListByLpr(request);
     }
 
     @PostMapping("/incidents")

@@ -373,7 +373,7 @@ public class AnprService extends BaseService {
         return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
     }
 
-    public PageResponse<AnprResponse> getAllIncidentsTimeline(AnprFilterRequest request) {
+    public PageResponse<AnprResponse> getEventsListByLpr(AnprFilterRequest request) {
 
         QAnprEvent event = QAnprEvent.anprEvent;
         JPAQuery<AnprEvent> query = new JPAQuery<>(entityManager);
@@ -408,7 +408,7 @@ public class AnprService extends BaseService {
         return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
     }
 
-    public PageResponse<AnprResponse> listAllIncidents(AnprFilterRequest request) {
+    public PageResponse<AnprResponse> getEventsCountListByLpr(AnprFilterRequest request) {
         QAnprEvent event = QAnprEvent.anprEvent;
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
 
@@ -425,7 +425,7 @@ public class AnprService extends BaseService {
                 .orderBy(event.anprText.count().desc());
 
         //pagination start
-        int count = (int) anprEventRepository.countAllIncidents();
+        int count = (int) anprEventRepository.findTotalEventsCountListOfEachLpr();
         int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
         int offset = (request.getPage() - 1) * request.getPageSize();
         query.offset(offset);
