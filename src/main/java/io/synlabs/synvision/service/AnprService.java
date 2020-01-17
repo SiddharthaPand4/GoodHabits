@@ -102,11 +102,39 @@ public class AnprService extends BaseService {
         return null;
     }
 
-    public void archiveAnpr(AnprRequest request) {
+    public void archiveAnprEvent(AnprRequest request) {
         AnprEvent anprEvent = anprEventRepository.getOne(request.getId());
-        anprEventRepository.delete(anprEvent);
+        anprEvent.setArchived(true);
+        anprEventRepository.saveAndFlush(anprEvent);
+    }
+    public void archiveAnprEvents(AnprRequest request) {
+
+        List<AnprEvent> events = anprEventRepository.findAllByAnprTextAndArchived(request.anprText, false);
+        int pageSize = 5;
+        int currentPage = 0;
+
+        QAnprEvent event = QAnprEvent.anprEvent;
+        JPAQuery<AnprEvent> query = createAnprQuery(event);
+        query.where(event.anprText.eq(request.anprText))
+                .where(event.archived.isFalse());
+
+        //pagination
+        int count = (int) query.fetchCount();
+        int pageCount = (int) Math.ceil(count * 1.0 / pageSize);
+
+        for (currentPage = 0; currentPage < pageCount; currentPage++) {
+            int offset = (currentPage) * pageSize;
+            query.offset(offset);
+            query.limit(pageSize);
+            events = query.fetch();
+
+        events.forEach(e->{
+            e.setArchived(true);
+        });
+        anprEventRepository.saveAll(events);
     }
 
+    }
     public void addAnprEvent(CreateAnprRequest request) {
         AnprEvent anprEvent = request.toEntity();
         anprEvent.setHotlisted(checkHotListed(anprEvent));
@@ -226,13 +254,12 @@ public class AnprService extends BaseService {
         QAnprEvent event = QAnprEvent.anprEvent;
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
 
-        query = query.select(event.anprText,event.anprText.count() ).from(event);
+        query = query.select(event.anprText, event.anprText.count()).from(event);
 
         // for repeated incidents
         query = query.where(event.direction.eq("rev"));
 
-        if(!StringUtils.isEmpty(request.getLpr()))
-        {
+        if (!StringUtils.isEmpty(request.getLpr())) {
             query = query.where(event.anprText.eq(request.getLpr()));
         }
 
@@ -254,7 +281,7 @@ public class AnprService extends BaseService {
         List<IncidentRepeatCount> list = new ArrayList<>(request.getPageSize());
         data.forEach(item -> {
             String anprText = item.get(event.anprText);
-            Long repeatedTimes =  item.get(1, Long.class);
+            Long repeatedTimes = item.get(1, Long.class);
 
             IncidentRepeatCount res = new IncidentRepeatCount(anprText, repeatedTimes);
             list.add(res);
@@ -267,19 +294,18 @@ public class AnprService extends BaseService {
         QAnprEvent event = QAnprEvent.anprEvent;
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
 
-        query = query.select(event.anprText,event.anprText.count() ).from(event);
+        query = query.select(event.anprText, event.anprText.count()).from(event);
 
         // for repeated incidents
         query = query.where(event.helmetMissing.isTrue());
 
-        if(!StringUtils.isEmpty(request.getLpr()))
-        {
+        if (!StringUtils.isEmpty(request.getLpr())) {
             query = query.where(event.anprText.eq(request.getLpr()));
         }
 
-         query=query.groupBy(event.anprText)
-                    .having(event.anprText.count().gt(1))
-                    .orderBy(event.anprText.count().desc());
+        query = query.groupBy(event.anprText)
+                .having(event.anprText.count().gt(1))
+                .orderBy(event.anprText.count().desc());
         //pagination start
         int count = (int) anprEventRepository.countHelmetMissingRepeatedIncidents();
         int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
@@ -295,9 +321,9 @@ public class AnprService extends BaseService {
         List<IncidentRepeatCount> list = new ArrayList<>(request.getPageSize());
         data.forEach(item -> {
             String anprText = item.get(event.anprText);
-            Long repeatedTimes =  item.get(1, Long.class);
+            Long repeatedTimes = item.get(1, Long.class);
 
-            IncidentRepeatCount res = new IncidentRepeatCount(anprText,repeatedTimes);
+            IncidentRepeatCount res = new IncidentRepeatCount(anprText, repeatedTimes);
             list.add(res);
         });
         return (PageResponse<IncidentRepeatCount>) new IncidentRepeatPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
@@ -312,18 +338,18 @@ public class AnprService extends BaseService {
         //query = query.where(event.helmetMissing.isTrue());
 
         query = query.where(event.anprText.eq(request.getLpr()));
-        if(StringUtils.isEmpty(request.getIncidentType())){
-           request.setIncidentType("all");
+        if (StringUtils.isEmpty(request.getIncidentType())) {
+            request.setIncidentType("all");
         }
-        switch (request.getIncidentType()){
+        switch (request.getIncidentType()) {
             case "Reverse":
-                query =query.where(event.direction.eq("rev"));
+                query = query.where(event.direction.eq("rev"));
                 break;
             case "Helmet-Missing":
-                query =query.where(event.helmetMissing.isTrue());
+                query = query.where(event.helmetMissing.isTrue());
                 break;
             default:
-                query =query.where((event.helmetMissing.isTrue()).or(event.direction.eq("rev")));
+                query = query.where((event.helmetMissing.isTrue()).or(event.direction.eq("rev")));
         }
 
         //pagination start
@@ -345,5 +371,79 @@ public class AnprService extends BaseService {
             list.add(res);
         });
         return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
+    }
+
+    public PageResponse<AnprResponse> getAllIncidentsTimeline(AnprFilterRequest request) {
+
+        QAnprEvent event = QAnprEvent.anprEvent;
+        JPAQuery<AnprEvent> query = new JPAQuery<>(entityManager);
+
+        query = query.select(event).from(event);
+
+
+        query = query.where(event.anprText.eq(request.getLpr()));
+        if (StringUtils.isEmpty(request.getIncidentType())) {
+            request.setIncidentType("all");
+        }
+
+
+        //pagination start
+        int count = (int) query.fetchCount();
+        int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
+        int offset = (request.getPage() - 1) * request.getPageSize();
+        query.offset(offset);
+        if (request.getPageSize() > 0) {
+            query.limit(request.getPageSize());
+        }
+        //pagination ends
+
+        query.orderBy(event.eventDate.desc());
+
+        List<AnprEvent> data = query.fetch();
+        List<AnprResponse> list = new ArrayList<>(request.getPageSize());
+        data.forEach(item -> {
+            AnprResponse res = new AnprResponse(item, location);
+            list.add(res);
+        });
+        return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
+    }
+
+    public PageResponse<AnprResponse> listAllIncidents(AnprFilterRequest request) {
+        QAnprEvent event = QAnprEvent.anprEvent;
+        JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
+
+        query = query.select(event.anprText, event.anprText.count()).from(event);
+
+        query = query.where(event.archived.isFalse());
+
+        if (!StringUtils.isEmpty(request.getLpr())) {
+            query = query.where(event.anprText.eq(request.getLpr()));
+        }
+
+        query = query.groupBy(event.anprText)
+
+                .orderBy(event.anprText.count().desc());
+
+        //pagination start
+        int count = (int) anprEventRepository.countAllIncidents();
+        int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
+        int offset = (request.getPage() - 1) * request.getPageSize();
+        query.offset(offset);
+        if (request.getPageSize() > 0) {
+            query.limit(request.getPageSize());
+        }
+        //pagination ends
+
+        List<Tuple> data = query.fetch();
+        List<IncidentRepeatCount> list = new ArrayList<>(request.getPageSize());
+        data.forEach(item -> {
+            String anprText = item.get(event.anprText);
+            Long repeatedTimes = item.get(1, Long.class);
+
+            IncidentRepeatCount res = new IncidentRepeatCount(anprText, repeatedTimes);
+            list.add(res);
+        });
+        return (PageResponse<AnprResponse>) new IncidentRepeatPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
+
     }
 }

@@ -22,6 +22,10 @@ class AnprService {
         return axios.delete('/api/anpr/' + event.id);
     }
 
+    archiveAllEvent(lpr) {
+            return axios.put('/api/anpr/events/archive/' + lpr);
+        }
+
     updateEvent(event) {
         return axios.put('/api/anpr/event', event);
     }
@@ -38,6 +42,12 @@ class AnprService {
     }
     getBriefIncidentsRepeated(filter) {
                 return axios.post('/api/incident/timeline', filter);
+    }
+     getIncidentTimeline(filter) {
+                     return axios.post('/api/anpr/incident/masterData/timeline', filter);
+     }
+     getIncidentsList(filter) {
+                    return axios.post('/api/anpr/incidents/list/masterData', filter);
      }
 
 }
