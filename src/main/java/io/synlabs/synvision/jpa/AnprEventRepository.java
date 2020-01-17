@@ -31,7 +31,7 @@ public interface AnprEventRepository extends JpaRepository<AnprEvent, Long>, Que
     long countHelmetMissingRepeatedIncidents();
 
     @Query(nativeQuery = true, value = "SELECT count(*) FROM (SELECT anpr_text, count(anpr_text) as count FROM anpr_event  group by anpr_text) as x  ")
-    long countAllIncidents();
+    long findTotalEventsCountListOfEachLpr();
 
     List<AnprEvent> findAllByAnprTextAndArchived(String anprText, boolean isArchived);
 }

@@ -44,10 +44,10 @@ class AnprService {
                 return axios.post('/api/incident/timeline', filter);
     }
      getIncidentTimeline(filter) {
-                     return axios.post('/api/anpr/incident/masterData/timeline', filter);
+                     return axios.post('/api/anpr/events/list/bylpr', filter);
      }
      getIncidentsList(filter) {
-                    return axios.post('/api/anpr/incidents/list/masterData', filter);
+                    return axios.post('/api/anpr/events/list/lpr/count', filter);
      }
 
 }
