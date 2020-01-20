@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Icon, Layout, Menu,} from "antd";
+import {Icon, Layout, Menu,Button} from "antd";
 import {Link} from "react-router-dom";
 import UserService from "../services/UserService";
 
@@ -7,6 +7,14 @@ const {Sider} = Layout;
 const {SubMenu} = Menu;
 
 export default class Sidebar extends Component {
+state = {
+    collapsed: false,
+  };
+  toggleCollapsed = () => {
+      this.setState({
+        collapsed: !this.state.collapsed,
+      });
+    };
     render() {
         return (
             <Sider
@@ -26,22 +34,41 @@ export default class Sidebar extends Component {
                     <Menu.Item key="0">
                         <Link to='/'><Icon type='home'/><span className='nav-text'>Home</span></Link>
                     </Menu.Item>
+                    <SubMenu
+                      key="sub1"
+                      title={
+                        <span>
+                          <Icon type='box-plot'/>
+                          <span>ANPR</span>
+                        </span>
+                      }
+                    >
                     <Menu.Item key="1" className="sidebar-nav-link">
-                        <Link to='/incidents'><Icon type='alert'/><span className='nav-text'>Incidents</span></Link>
+                        <Link to='/anpr'><span className='nav-text'>Events</span></Link>
                     </Menu.Item>
-                    <Menu.Item key="5" className="sidebar-nav-link">
-                        <Link to='/incidents/repeated'><Icon type='alert'/><span className='nav-text'>Repeated Incidents</span></Link>
-                    </Menu.Item>
-                    <Menu.Item key="7" className="sidebar-nav-link">
-                         <Link to='/anpr/masterdata'><Icon type='alert'/><span className='nav-text'>Master Data</span></Link>
-                    </Menu.Item>
-                    <Menu.Item key="2" className="sidebar-nav-link">
-                        <Link to="/incidents/hotlisted"><Icon type='alert'/><span className='nav-text'>Hotlist</span></Link>
-                    </Menu.Item>
+                     <Menu.Item key="2" className="sidebar-nav-link">
+                          <Link to='/anpr/masterdata'><span className='nav-text'>Repeated Events</span></Link>
+                     </Menu.Item></SubMenu>
+                     <SubMenu
+                       key="sub2"
+                       title={
+                         <span>
+                           <Icon type='box-plot'/>
+                           <span>Offends</span>
+                         </span>
+                       }
+                     >
                     <Menu.Item key="3" className="sidebar-nav-link">
-                        <Link to='/anpr'><Icon type='box-plot'/><span className='nav-text'>ANPR</span></Link>
+                        <Link to='/incidents'><span className='nav-text'>Events</span></Link>
                     </Menu.Item>
-                    <Menu.Item key="4">
+                    <Menu.Item key="4" className="sidebar-nav-link">
+                        <Link to='/incidents/repeated'><span className='nav-text'>Repeated Events</span></Link>
+                    </Menu.Item></SubMenu>
+
+                    <Menu.Item key="5" className="sidebar-nav-link">
+                        <Link to="/incidents/hotlisted"><Icon type='alert'/><span className='nav-text'>Hotlisted Vehicle Event</span></Link>
+                    </Menu.Item>
+                    <Menu.Item key="6">
                         <Link to='/feed'><Icon type='video-camera'/><span className='nav-text'>Feed</span></Link>
                     </Menu.Item>
                     {/*<SubMenu key="admin" title={<span><Icon type="deployment-unit"/>Admin</span>}>
@@ -56,7 +83,7 @@ export default class Sidebar extends Component {
                                 className='nav-text'>Triggers</span></Link>
                         </Menu.Item>
                     </SubMenu>*/}
-                    <Menu.Item key="6">
+                    <Menu.Item key="7">
                         <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span
                             className='nav-text'>Logout</span></Link>
                     </Menu.Item>
