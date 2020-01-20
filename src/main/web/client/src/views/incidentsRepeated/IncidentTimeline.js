@@ -27,7 +27,7 @@ import Moment from "react-moment";
 
 import AnprService from "../../services/AnprService";
 
-
+const {Paragraph, Text} = Typography;
 const {Column} = Table;
 export default class IncidentTimeline extends Component {
 
@@ -38,6 +38,8 @@ export default class IncidentTimeline extends Component {
           loading:false,
           anprresponse: {},
           filter:{
+            currentPage: 1,
+            pageSizes: 24,
             lpr: "",
             incidentType:""
           }
@@ -45,6 +47,8 @@ export default class IncidentTimeline extends Component {
 
        this.toggleVisible = this.toggleVisible.bind(this);
        this.refreshBriefIncidentsNow = this.refreshBriefIncidentsNow.bind(this);
+       this.onModalPageChange = this.onModalPageChange.bind(this);
+              this.onModalPageSizeChange = this.onModalPageSizeChange.bind(this);
     }
 
     componentWillReceiveProps(nextProps){
@@ -61,8 +65,10 @@ export default class IncidentTimeline extends Component {
     }
 
     toggleVisible(){
-        let visible = this.state.visible;
-        this.setState({visible: !visible});
+        let filter = this.state.filter;
+                filter.currentPage = 1;
+                this.setState({filter: filter});
+                this.props.toggleVisible();
 
     }
 
@@ -85,9 +91,39 @@ export default class IncidentTimeline extends Component {
            }
 
     }
+    onModalPageChange(currentPage, pageSizes){
+             let filter = this.state.filter;
+             filter.currentPage = currentPage;
+             filter.pageSizes = pageSizes;
+             this.refreshBriefIncidentsNow(filter);
+          }
+
+          onModalPageSizeChange(current, pageSizes) {
+               let filter = this.state.filter;
+               filter.pageSizes = pageSizes;
+               this.refreshBriefIncidentsNow(filter);
+            }
 
     render(){
          let events = this.state.anprresponse.events;
+         let count = this.state.anprresponse.totalPages * this.state.anprresponse.pageSizes;
+
+                  const paginationOption = {
+                         showSizeChanger: false,
+                         showQuickJumper: false,
+                         pageSize:5,
+                         showLessItems: true,
+                         onShowSizeChange: this.onModalPageSizeChange,
+                         onChange: this.onModalPageChange,
+                         total: count
+                     };
+
+                     const pagination = {
+                         ...paginationOption,
+                         total: count,
+                         current: this.state.filter.currentPage,
+                         pageSizes: this.state.filter.pageSizes
+                     };
 
          if (this.state.loading)
          {
@@ -101,50 +137,40 @@ export default class IncidentTimeline extends Component {
 
         return <Modal
 
-                title={<div>{this.state.filter.incidentType}&nbsp;&nbsp;|&nbsp;&nbsp;{this.state.filter.lpr}</div>}
+                title={<div>{this.state.filter.incidentType}<Paragraph copyable>{this.state.filter.lpr}</Paragraph></div> }
                 visible={this.props.visible}
-                onCancel={this.props.toggleVisible}
-                onClose={this.props.toggleVisible}
+                onCancel={this.toggleVisible}
+                onClose={this.toggleVisible}
                 footer={[
-                         <Button key="close"  type="primary" onClick={this.props.toggleVisible}>
+                         <Button key="close"  type="primary" onClick={this.toggleVisible}>
                            Close
                          </Button>
                         ]}
                 >
-                 <div >
-                   <Row >
-
-                      {
-                          (events || []).map((record, index)=>{
-
-                          return  <Timeline.Item><Row gutter={8} >
-                                <Col span={12}  >
-                                  <div ><p><Icon type="clock-circle" />  <Moment format="lll">{record.eventDate}</Moment></p>
-                                             <p><Icon type="environment"/> {record.location}</p>
-                                             <a title={"click here to download"}
-                                               href={"/public/anpr/lpr/" + record.id + "/image.jpg"}
-                                             download={true}>
-                                             <img alt="event"
-                                                 src={"/public/anpr/lpr/" + record.id + "/image.jpg"}style={{width:160,height:"auto"}}/>
-                                             </a></div>
-                                </Col>
-                                <Col span={12}>
-                                  <div> <a title={"click here to download"}
-                                           href={"/public/anpr/vehicle/" + record.id + "/image.jpg"}
-                                                     download={true}>
-                                                         <img alt="event"
-                                                         src={"/public/anpr/vehicle/" + record.id + "/image.jpg" } class="responsive" style={{maxWidth:"160px",height:"auto"}}/>
-                                               </a></div>
-                                </Col>
-                            </Row><Divider /></Timeline.Item>
-
-
-
-                          })
-                      }
-
-                   </Row>
-                 </div>
+                 <div>
+                                               <Table dataSource={events} pagination={pagination}>
+                                                    <Column title="When and Where"
+                                                             render={(text, record, index)=> <Timeline.Item>
+                                                           <div>
+                                                             <p><Icon type="clock-circle" />  <Moment format="lll">{record.eventDate}</Moment></p>
+                                                             <p><Icon type="environment"/> {record.location}</p>
+                                                             <a title={"click here to download"}
+                                                               href={"/public/anpr/lpr/" + record.id + "/image.jpg"}
+                                                             download={true}>
+                                                             <img alt="event"
+                                                                 src={"/public/anpr/lpr/" + record.id + "/image.jpg"}style={{width:160,height:"auto"}}/>
+                                                             </a>
+                                                           </div>
+                                                             </Timeline.Item>
+                                                             }/>
+                                                    <Column  title="Captured Image" dataIndex="id" key="anprimage"
+                                                              render={id => (
+                                                                      <a title={"click here to download"}  href={"/public/anpr/vehicle/" + id + "/image.jpg"}
+                                                                      download={true}>
+                                                                      <img alt="event"
+                                                                      src={"/public/anpr/vehicle/" + id + "/image.jpg" }style={{width:200,height:"auto"}}/></a>)}/>
+                                               </Table>
+                                            </div>
                </Modal>
     }
 }

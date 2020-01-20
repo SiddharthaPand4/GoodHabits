@@ -38,7 +38,7 @@ export default class IncidentTimeline extends Component {
           loading:false,
           anprresponse: {},
           filter:{
-            pages: 1,
+            currentPage: 1,
             pageSizes: 24,
             lpr: "",
             incidentType:""
@@ -66,8 +66,10 @@ export default class IncidentTimeline extends Component {
     }
 
     toggleVisible(){
-        let visible = this.state.visible;
-        this.setState({visible: !visible});
+        let filter = this.state.filter;
+        filter.currentPage = 1;
+        this.setState({filter: filter});
+        this.props.toggleVisible();
 
     }
 
@@ -90,9 +92,9 @@ export default class IncidentTimeline extends Component {
            }
 
     }
-      onModalPageChange(pages, pageSizes){
+      onModalPageChange(currentPage, pageSizes){
          let filter = this.state.filter;
-         filter.pages = pages;
+         filter.currentPage = currentPage;
          filter.pageSizes = pageSizes;
          this.refreshBriefIncidentsNow(filter);
       }
@@ -120,7 +122,7 @@ export default class IncidentTimeline extends Component {
             const pagination = {
                 ...paginationOption,
                 total: count,
-                current: this.state.filter.pages,
+                current: this.state.filter.currentPage,
                 pageSizes: this.state.filter.pageSizes
             };
 
@@ -136,22 +138,21 @@ export default class IncidentTimeline extends Component {
 
         return <Modal
 
-
+                title={<div><Paragraph copyable>{this.state.filter.lpr}</Paragraph></div> }
                 visible={this.props.visible}
-                onCancel={this.props.toggleVisible}
-                onClose={this.props.toggleVisible}
+                onCancel={this.toggleVisible}
+                onClose={this.toggleVisible}
                 footer={[
-                         <Button key="close"  type="primary" onClick={this.props.toggleVisible}>
+                         <Button key="close"  type="primary" onClick={this.toggleVisible}>
                            Close
                          </Button>
                         ]}
                 >
                    <div>
                               <Table dataSource={events} pagination={pagination}>
-                                   <Column title={
-                                      <Paragraph copyable>{this.state.filter.lpr}</Paragraph>
+                                   <Column title="When and Where"
 
-                                   }
+
                                             render={(text, record, index)=> <Timeline.Item>
                                           <div>
                                             <p><Icon type="clock-circle" />  <Moment format="lll">{record.eventDate}</Moment></p>
@@ -165,7 +166,7 @@ export default class IncidentTimeline extends Component {
                                           </div>
                                             </Timeline.Item>
                                             }/>
-                                   <Column  dataIndex="id" key="anprimage"
+                                   <Column  title="Captured Image" dataIndex="id" key="anprimage"
                                              render={id => (
                                                      <a title={"click here to download"}  href={"/public/anpr/vehicle/" + id + "/image.jpg"}
                                                      download={true}>

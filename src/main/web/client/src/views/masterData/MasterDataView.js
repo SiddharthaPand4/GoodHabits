@@ -47,7 +47,7 @@ export default class MasterDataView extends Component {
       visible:false,
       timelineLpr:"",
       filter: {
-        lpr: ""
+        lpr: "",
       },
       archiveLpr:{
                  anprresponse: {},
@@ -58,7 +58,7 @@ export default class MasterDataView extends Component {
         loading:false,
         anprresponse: {},
         filter: {
-          pagess: 1,
+          pages: 1,
           pageSizes: 24,
            lpr: "",
            incidentType:"",
