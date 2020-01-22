@@ -23,6 +23,7 @@ import TrafficIncidentView from "./views/TrafficIncidentView";
 import IncidentRepeatedView from "./views/incidentsRepeated/IncidentRepeatedView";
 import IncidentHotlistView from "./views/IncidentHotlistView";
 import MasterDataView from "./views/masterData/MasterDataView";
+import ParkingView from "./views/parking/ParkingView";
 
 const {Content} = Layout;
 
@@ -71,6 +72,7 @@ class App extends Component {
                                 <PrivateRoute path='/trigger' exact={true} component={TriggerView}/>
                                 <PrivateRoute path='/device' exact={true} component={DeviceView}/>
                                 <PrivateRoute path='/device/conf' exact={true} component={DeviceConfigView}/>
+                                <PrivateRoute path='/Parking' exact={true} component={ParkingView}/>
 
                             </div>
                         </Content>

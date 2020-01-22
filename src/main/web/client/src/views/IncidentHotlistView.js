@@ -301,7 +301,7 @@ export default class IncidentHotlistView extends Component {
                                             value={typeof zoomFactor === 'number' ? zoomFactor : 0}
                                         />
                                         : <div style={{height:"54px",textAlign: "center"}}>
-                                               <Button size="small" type="primary" onClick={() => this.magnifyEvent(event)} >
+                                               <Button size="small" type="dashed" onClick={() => this.magnifyEvent(event)} >
                                                    <Icon type="zoom-in"/>Zoom Image
                                                </Button>
                                            </div>
