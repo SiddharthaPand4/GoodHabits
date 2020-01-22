@@ -22,14 +22,10 @@ public class ParkingEvent extends BaseEntity {
     private String eventId;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date eventInDate;
-
-    private String eventInScreenshot;
+    private Date checkIn;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date eventOutDate;
-
-    private String eventOutScreenshot;
+    private Date checkOut;
 
     private boolean archived;
 
