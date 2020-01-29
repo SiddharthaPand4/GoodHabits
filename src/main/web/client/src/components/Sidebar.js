@@ -84,6 +84,9 @@ state = {
                         </Menu.Item>
                     </SubMenu>*/}
                     <Menu.Item key="7">
+                        <Link to='/ngofr'><Icon type='video-camera'/><span className='nav-text'>FRS</span></Link>
+                    </Menu.Item>
+                    <Menu.Item key="8">
                         <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span
                             className='nav-text'>Logout</span></Link>
                     </Menu.Item>

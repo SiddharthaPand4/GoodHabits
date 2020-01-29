@@ -15,7 +15,7 @@ export default class FeedView extends Component {
             feeds: {},
         };
 
-        EventBus.subscribe('feed-refresh', (event) => this.refresh())
+        EventBus.subscribe('feed-refresh', (event) => this.refresh());
         this.removeFeed = this.removeFeed.bind(this);
     }
 

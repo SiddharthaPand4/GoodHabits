@@ -23,6 +23,7 @@ import TrafficIncidentView from "./views/TrafficIncidentView";
 import IncidentRepeatedView from "./views/incidentsRepeated/IncidentRepeatedView";
 import IncidentHotlistView from "./views/IncidentHotlistView";
 import MasterDataView from "./views/masterData/MasterDataView";
+import FaceMatchView from "./components/facerec/FaceMatchView";
 
 const {Content} = Layout;
 
@@ -71,7 +72,7 @@ class App extends Component {
                                 <PrivateRoute path='/trigger' exact={true} component={TriggerView}/>
                                 <PrivateRoute path='/device' exact={true} component={DeviceView}/>
                                 <PrivateRoute path='/device/conf' exact={true} component={DeviceConfigView}/>
-
+                                <PrivateRoute path='/ngofr' exact={true} component={FaceMatchView}/>
                             </div>
                         </Content>
                         <Footerbar/>
