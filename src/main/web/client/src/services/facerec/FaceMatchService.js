@@ -1,18 +1,17 @@
 import axios from "../axios";
 
-const furl = "http://localhost:5000/";
 class FaceMatchService {
     static Instance() {
         return new FaceMatchService()
     }
 
     lookup(image) {
-        return axios.post(furl + 'lookup', {image:image});
+        return axios.post('/api/frs/lookup', {image:image});
     }
 
-    register(image, userdata) {
+    register(userdata, image) {
         userdata.image = image;
-        return axios.post(furl + 'register', userdata)
+        return axios.post('/api/frs/register', userdata)
     }
 }
 

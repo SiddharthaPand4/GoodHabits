@@ -1,9 +1,6 @@
 package io.synlabs.synvision.controller.frs;
 
-import io.synlabs.synvision.service.DashboardService;
 import io.synlabs.synvision.service.FaceRecService;
-import io.synlabs.synvision.views.DashboardRequest;
-import io.synlabs.synvision.views.DashboardResponse;
 import io.synlabs.synvision.views.frs.FRSLookupRequest;
 import io.synlabs.synvision.views.frs.FRSLookupResponse;
 import io.synlabs.synvision.views.frs.FRSRegisterRequest;
@@ -13,8 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/frs/")

@@ -1,7 +1,10 @@
 package io.synlabs.synvision.views.frs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.io.IOException;
 
 @Getter
 @NoArgsConstructor
@@ -19,4 +22,8 @@ public class FRSRegisterResponse {
         this.address = address;
     }
 
+    public static FRSRegisterResponse fromJson(String string) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(string, FRSRegisterResponse.class);
+    }
 }
