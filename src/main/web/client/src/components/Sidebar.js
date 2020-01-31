@@ -83,9 +83,18 @@ state = {
                                 className='nav-text'>Triggers</span></Link>
                         </Menu.Item>
                     </SubMenu>*/}
-                    <Menu.Item key="6" className="sidebar-nav-link">
-                                                                <Link to='/pplData'><Icon type='box-plot'/><span className='nav-text'>APC Data</span></Link>
-                                                            </Menu.Item>
+                   <SubMenu
+                     key="sub3"
+                     title={
+                       <span>
+                         <Icon type='box-plot'/>
+                         <span>People Counting</span>
+                       </span>
+                     }
+                     >
+                    <Menu.Item key="7" className="sidebar-nav-link">
+                                                                <Link to='/people-counting/events'><span className='nav-text'>Events</span></Link>
+                                                            </Menu.Item></SubMenu>
                     <Menu.Item key="logout">
                         <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span
                             className='nav-text'>Logout</span></Link>

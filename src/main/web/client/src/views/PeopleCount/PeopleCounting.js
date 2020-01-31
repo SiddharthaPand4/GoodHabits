@@ -85,8 +85,7 @@ export default class PeopleCounting extends Component{
              filter.pageSize   =   data.pageSize;
              filter.currentPage =   data.pageNumber;
              filter.totalPages =   data.totalPages;
-             filter.fromDate = data.fromDate;
-             filter.toDate = data.toDate;
+
             this.setState({filter, loading: false, events: data.list});
 
         }).catch(error => {
@@ -152,17 +151,17 @@ export default class PeopleCounting extends Component{
 
                  <Collapse bordered={true} defaultActiveKey={['1']}>
                                 <Panel header="Filter" key="1">
-                                ID: <Input value={pcId} style={{"width": "200px"}} onChange={this.onPcIdInputChange}/> <br/><br/>
+                                Event Id: <Input value={pcId} style={{"width": "200px"}} onChange={this.onPcIdInputChange}/> <br/><br/>
                                     <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
                                                    handleFilterChange={this.handleFilterChange}
                                                    handleLayoutChange={this.handleLayoutChange}
                                                    />
                                 </Panel>
-                <div>
-                    {layout === "table" ? (this.renderTable()) : (this.renderGrid())}
-                </div>
+                  </Collapse>
 
-                </Collapse>
+                  <div>
+                    {layout === "table" ? (this.renderTable()) : (this.renderGrid())}
+                    </div>
 
 
          </div>
@@ -195,7 +194,7 @@ export default class PeopleCounting extends Component{
            return (    <div>
                         <Table dataSource={events} pagination={pagination}>
                              <Column title="ID" dataIndex="eventId" key="eventId"
-                                     render={eventId => eventId}/>
+                                     render={eventId =><Paragraph strong copyable>{eventId}</Paragraph>}/>
                              <Column title="Date" dataIndex="eventDate" key="eventDate"
                                      render={eventDate => (<Moment format="L">{eventDate}</Moment>)}/>
                              <Column title="Archived" dataIndex="archived" key="archived"
