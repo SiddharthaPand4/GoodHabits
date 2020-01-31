@@ -53,7 +53,11 @@ export default class Sidebar extends Component {
                                 className='nav-text'>Triggers</span></Link>
                         </Menu.Item>
                     </SubMenu>*/}
+                    <Menu.Item key="7" className="sidebar-nav-link">
+                                            <Link to='/pplData'><Icon type='box-plot'/><span className='nav-text'>APC Data</span></Link>
+                                        </Menu.Item>
                     <Menu.Item key="6">
+
                         <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span
                             className='nav-text'>Logout</span></Link>
                     </Menu.Item>

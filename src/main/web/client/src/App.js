@@ -22,6 +22,7 @@ import AnprView from "./views/AnprView";
 import TrafficIncidentView from "./views/TrafficIncidentView";
 import IncidentRepeatedView from "./views/incidentsRepeated/IncidentRepeatedView";
 import IncidentHotlistView from "./views/IncidentHotlistView";
+import PeopleCounting from "./views/PeopleCount/PeopleCounting";
 
 const {Content} = Layout;
 
@@ -69,6 +70,7 @@ class App extends Component {
                                 <PrivateRoute path='/trigger' exact={true} component={TriggerView}/>
                                 <PrivateRoute path='/device' exact={true} component={DeviceView}/>
                                 <PrivateRoute path='/device/conf' exact={true} component={DeviceConfigView}/>
+                                <PrivateRoute path='/pplData' exact={true} component={PeopleCounting}/>
 
                             </div>
                         </Content>

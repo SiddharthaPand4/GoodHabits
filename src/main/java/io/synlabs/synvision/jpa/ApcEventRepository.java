@@ -6,5 +6,5 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 public interface ApcEventRepository extends JpaRepository<ApcEvent, Long>, QuerydslPredicateExecutor<ApcEvent> {
 
-
+    ApcEvent findByEventId(String eventId);
 }

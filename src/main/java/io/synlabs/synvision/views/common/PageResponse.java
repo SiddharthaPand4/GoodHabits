@@ -35,6 +35,9 @@ public class PageResponse<T extends Response>
         this.list=list;
     }
 
+    public PageResponse() {
+    }
+
     public List<T> getList()
     {
         return list;
