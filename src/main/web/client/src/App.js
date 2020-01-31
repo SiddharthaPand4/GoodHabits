@@ -22,6 +22,7 @@ import AnprView from "./views/AnprView";
 import TrafficIncidentView from "./views/TrafficIncidentView";
 import IncidentRepeatedView from "./views/incidentsRepeated/IncidentRepeatedView";
 import IncidentHotlistView from "./views/IncidentHotlistView";
+import MasterDataView from "./views/masterData/MasterDataView";
 import PeopleCounting from "./views/PeopleCount/PeopleCounting";
 
 const {Content} = Layout;
@@ -65,6 +66,7 @@ class App extends Component {
                                 <PrivateRoute path='/incidents/hotlisted' exact={true} component={IncidentHotlistView}/>
                                 <PrivateRoute path='/incidents/repeated' exact={true} component={IncidentRepeatedView}/>
                                 <PrivateRoute path='/anpr' exact={true} component={AnprView}/>
+                                <PrivateRoute path='/anpr/masterdata' exact={true} component={MasterDataView}/>
                                 <PrivateRoute path='/user' exact={true} component={UserListView}/>
                                 <PrivateRoute path='/feed' exact={true} component={FeedView}/>
                                 <PrivateRoute path='/trigger' exact={true} component={TriggerView}/>

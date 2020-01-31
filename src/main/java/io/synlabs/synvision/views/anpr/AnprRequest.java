@@ -18,6 +18,10 @@ public class AnprRequest implements Request {
         this.id=id;
     }
 
+    public AnprRequest(String anprText){
+        this.anprText=anprText;
+    }
+
     public AnprRequest(){
 
     }

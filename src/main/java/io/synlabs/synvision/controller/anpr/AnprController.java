@@ -40,6 +40,15 @@ public class AnprController {
         return anprService.list(request);
     }
 
+    @PostMapping("/events/list/lpr/count")
+    public PageResponse<AnprResponse> getEventsCountListByLpr(@RequestBody AnprFilterRequest request) {
+        return anprService.getEventsCountListByLpr(request);
+    }
+    @PostMapping("/events/list/bylpr")
+    public PageResponse<AnprResponse> getEventsListByLpr(@RequestBody AnprFilterRequest request) {
+        return anprService.getEventsListByLpr(request);
+    }
+
     @PostMapping("/incidents")
     public PageResponse<AnprResponse> listIncidents(@RequestBody AnprFilterRequest request) {
         return anprService.listIncidents(request);
@@ -52,7 +61,7 @@ public class AnprController {
 
     @DeleteMapping("/{id}")
     public void archiveAnpr(@PathVariable Long id) {
-        anprService.archiveAnpr(new AnprRequest(id));
+        anprService.archiveAnprEvent(new AnprRequest(id));
     }
 
     @PostMapping("/vehicle")
@@ -88,4 +97,8 @@ public class AnprController {
         return anprService.updateAnprEvent(request);
     }
 
+    @PutMapping("/events/archive/{lpr}")
+    public void archiveAnpr(@PathVariable String lpr) {
+        anprService.archiveAnprEvents(new AnprRequest(lpr));
+    }
 }
