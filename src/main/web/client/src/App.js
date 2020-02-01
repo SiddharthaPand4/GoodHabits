@@ -25,7 +25,6 @@ import IncidentHotlistView from "./views/IncidentHotlistView";
 import MasterDataView from "./views/masterData/MasterDataView";
 import PgsDashboardView from "./views/pgs/PgsDashboardView";
 import PgsConsoleView from "./views/pgs/PgsConsoleView";
-import PgsInOutView from "./views/pgs/PgsInOutView";
 import PgsReportView from "./views/pgs/PgsReportView";
 import ParkingInOutView from "./views/pgs/ParkingInOutView";
 
