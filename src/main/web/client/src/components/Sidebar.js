@@ -52,11 +52,11 @@ export default class Sidebar extends Component {
                         </Menu.Item>
                     </SubMenu>
                     <SubMenu key="sub2" title={
-                            <span>
+                        <span>
                            <Icon type='box-plot'/>
                            <span>Offences</span>
                          </span>
-                        }
+                    }
                     >
                         <Menu.Item key="3" className="sidebar-nav-link">
                             <Link to='/incidents'><span className='nav-text'>Events</span></Link>
@@ -85,12 +85,11 @@ export default class Sidebar extends Component {
                         </Menu.Item>
                     </SubMenu>*/}
                     <SubMenu key="pgs" title={
-                            <span>
+                        <span>
                            <Icon type='car'/>
-                           <span>PGS</span>
+                           <span>Parking</span>
                          </span>
-                        }
-                    >
+                    }>
                         <Menu.Item key="pgs-1" className="sidebar-nav-link">
                             <Link to='/pgs/dashboard'><span className='nav-text'>Dashboard</span></Link>
                         </Menu.Item>
@@ -105,12 +104,10 @@ export default class Sidebar extends Component {
                         </Menu.Item>
                     </SubMenu>
                     <Menu.Item key="7">
-                        <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span className='nav-text'>Logout</span></Link>
+                        <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span
+                            className='nav-text'>Logout</span></Link>
                     </Menu.Item>
-                    <Menu.Item key="8">
-                                            <Link to='/check/in' ><Icon type='home'/><span
-                                                className='nav-text'>Parking</span></Link>
-                                        </Menu.Item>
+
                 </Menu>
             </Sider>
         );
