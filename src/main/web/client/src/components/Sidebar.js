@@ -108,7 +108,7 @@ export default class Sidebar extends Component {
                         <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span className='nav-text'>Logout</span></Link>
                     </Menu.Item>
                     <Menu.Item key="8">
-                                            <Link to='/Parking' ><Icon type='home'/><span
+                                            <Link to='/check/in' ><Icon type='home'/><span
                                                 className='nav-text'>Parking</span></Link>
                                         </Menu.Item>
                 </Menu>

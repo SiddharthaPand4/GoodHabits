@@ -237,9 +237,8 @@ export default class AnprView extends Component {
                                             download={true}><Icon type="download"/>{' '} Cropped image</a>
                                     </Menu.Item>
                                     <Menu.Item key="3">
-                                        <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon
-                                            type="delete"/>{' '}
-                                            Delete
+                                        <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon type="warning"/>{' '}
+                                            Archive
                                         </Button>
                                     </Menu.Item>
 
@@ -288,7 +287,7 @@ export default class AnprView extends Component {
                                         type="secondary">{(workingEventLoading && workingEvent.id === event.id) ? "saving..." : ""}</Text>
                                     <div>
                                         <Text code><Icon type="schedule"/> <Moment
-                                            format="lll">{event.eventDate}</Moment>{' '}|{' '}<Moment
+                                            format="ll">{event.eventDate}</Moment>{' '}|{' '}<Moment
                                             format="LTS">{event.eventDate}</Moment></Text>
                                     </div>
                                     <div>
@@ -361,7 +360,7 @@ export default class AnprView extends Component {
                         key="action"
                         render={(text, event) => (
                             <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon type="warning"/>{' '}
-                                Delete</Button>
+                                Archive</Button>
                         )}
                 />
 

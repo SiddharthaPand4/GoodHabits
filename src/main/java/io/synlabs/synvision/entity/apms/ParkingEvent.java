@@ -16,7 +16,7 @@ import java.util.Date;
 public class ParkingEvent extends BaseEntity {
 
     @Column(length = 50)
-    private String vehiclNo;
+    private String vehicleNo;
 
     @Column(nullable = false, length = 50, unique = true)
     private String eventId;
@@ -31,6 +31,7 @@ public class ParkingEvent extends BaseEntity {
 
     @Column(length = 50)
     private String source;
+
 
 
 }
