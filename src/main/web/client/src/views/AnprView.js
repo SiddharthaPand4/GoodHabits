@@ -267,7 +267,7 @@ export default class AnprView extends Component {
                                         />
                                         :
                                         <div style={{height:"54px",textAlign: "center"}}>
-                                            <Button size="small"  onClick={() => this.magnifyEvent(event)} >
+                                            <Button size="small" type="dashed"onClick={() => this.magnifyEvent(event)} >
                                                 <Icon type="zoom-in"/>Zoom Image
                                             </Button>
                                         </div>
