@@ -25,7 +25,7 @@ const {Panel} = Collapse;
 const { Search } = Input;
 
 
-export default class ParkingView extends Component {
+export default class ParkingInOutView extends Component {
 
     constructor(props) {
         super(props);
