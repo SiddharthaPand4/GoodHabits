@@ -321,7 +321,7 @@ export default class IncidentListView extends Component {
                     <span>
                         <a onClick={() => this.showVideo(incident.videoId)}>Play</a>
                         <Divider type="vertical"/>
-                        <a onClick={this.showDeleteConfirm.bind(this, incident, this.refresh)}>Delete</a>
+                        <a onClick={this.showDeleteConfirm.bind(this, incident, this.refresh)}>Archive</a>
                     </span>
                 )}/>
             </Table>

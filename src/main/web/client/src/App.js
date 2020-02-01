@@ -72,7 +72,7 @@ class App extends Component {
                                 <PrivateRoute path='/trigger' exact={true} component={TriggerView}/>
                                 <PrivateRoute path='/device' exact={true} component={DeviceView}/>
                                 <PrivateRoute path='/device/conf' exact={true} component={DeviceConfigView}/>
-                                <PrivateRoute path='/Parking' exact={true} component={ParkingView}/>
+                                <PrivateRoute path='/check/in' exact={true} component={ParkingView}/>
 
                             </div>
                         </Content>
