@@ -1,15 +1,15 @@
-package io.synlabs.synvision.service;
+package io.synlabs.synvision.service.parking;
 
 import io.synlabs.synvision.config.FileStorageProperties;
-import io.synlabs.synvision.entity.apms.QParkingEvent;
+import io.synlabs.synvision.entity.parking.QParkingEvent;
 import io.synlabs.synvision.ex.ValidationException;
 import io.synlabs.synvision.jpa.ImportStatusRepository;
-import io.synlabs.synvision.views.apms.ApmsFilterRequest;
-import io.synlabs.synvision.views.apms.ApmsPageResponse;
-import io.synlabs.synvision.views.apms.ApmsResponse;
+import io.synlabs.synvision.views.parking.ApmsFilterRequest;
+import io.synlabs.synvision.views.parking.ApmsPageResponse;
+import io.synlabs.synvision.views.parking.ApmsResponse;
 import io.synlabs.synvision.views.common.PageResponse;
 import com.querydsl.jpa.impl.JPAQuery;
-import io.synlabs.synvision.entity.apms.ParkingEvent;
+import io.synlabs.synvision.entity.parking.ParkingEvent;
 import io.synlabs.synvision.jpa.ParkingEventRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

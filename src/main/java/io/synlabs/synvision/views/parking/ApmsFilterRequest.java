@@ -1,4 +1,4 @@
-package io.synlabs.synvision.views.apms;
+package io.synlabs.synvision.views.parking;
 
 import lombok.Getter;
 import lombok.Setter;

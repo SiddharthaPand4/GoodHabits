@@ -1,6 +1,6 @@
-package io.synlabs.synvision.views.apms;
+package io.synlabs.synvision.views.parking;
 
-import io.synlabs.synvision.entity.apms.ParkingEvent;
+import io.synlabs.synvision.entity.parking.ParkingEvent;
 import io.synlabs.synvision.views.common.Response;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

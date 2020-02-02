@@ -71,7 +71,7 @@ const flow_data = {
     }]
 };
 
-export default class PgsDashboardView extends Component {
+export default class ParkingDashboardView extends Component {
 
     render() {
         return (<div>

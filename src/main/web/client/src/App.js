@@ -23,10 +23,10 @@ import TrafficIncidentView from "./views/TrafficIncidentView";
 import IncidentRepeatedView from "./views/incidentsRepeated/IncidentRepeatedView";
 import IncidentHotlistView from "./views/IncidentHotlistView";
 import MasterDataView from "./views/masterData/MasterDataView";
-import PgsDashboardView from "./views/pgs/PgsDashboardView";
-import PgsConsoleView from "./views/pgs/PgsConsoleView";
-import PgsReportView from "./views/pgs/PgsReportView";
-import ParkingInOutView from "./views/pgs/ParkingInOutView";
+import ParkingDashboardView from "./views/parking/ParkingDashboardView";
+import ParkingConsoleView from "./views/parking/ParkingConsoleView";
+import PgsReportView from "./views/parking/ParkingReportView";
+import ParkingInOutView from "./views/parking/ParkingInOutView";
 
 const {Content} = Layout;
 
@@ -78,8 +78,8 @@ class App extends Component {
 
 
                                 {/* PGS is parking guideance and management system */}
-                                <PrivateRoute path='/pgs/dashboard' exact={true} component={PgsDashboardView}/>
-                                <PrivateRoute path='/pgs/console' exact={true} component={PgsConsoleView}/>
+                                <PrivateRoute path='/pgs/dashboard' exact={true} component={ParkingDashboardView}/>
+                                <PrivateRoute path='/pgs/console' exact={true} component={ParkingConsoleView}/>
                                 <PrivateRoute path='/pgs/inout' exact={true} component={ParkingInOutView}/>
                                 <PrivateRoute path='/pgs/reports' exact={true} component={PgsReportView}/>
                             </div>

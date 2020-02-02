@@ -1,13 +1,11 @@
-package io.synlabs.synvision.entity.apms;
+package io.synlabs.synvision.entity.parking;
 
 import io.synlabs.synvision.entity.BaseEntity;
+import io.synlabs.synvision.enums.VehicleType;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -32,6 +30,6 @@ public class ParkingEvent extends BaseEntity {
     @Column(length = 50)
     private String source;
 
-
-
+    @Enumerated(EnumType.STRING)
+    private VehicleType type;
 }

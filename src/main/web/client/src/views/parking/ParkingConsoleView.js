@@ -32,7 +32,7 @@ const data = {
     "P20" : {"free": false, x: 412, y : 226}
 };
 
-export default class PgsConsoleView extends Component {
+export default class ParkingConsoleView extends Component {
     render() {
 
         let params = queryString.parse(this.props.location.search);
