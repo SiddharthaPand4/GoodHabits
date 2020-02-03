@@ -34,6 +34,8 @@ public class CreateAnprRequest implements Request {
     @JsonProperty("helmet")
     private String helmetStatus;
 
+    private String source;
+
     public Long getId() {
         return unmask(id);
     }
@@ -51,6 +53,7 @@ public class CreateAnprRequest implements Request {
         if ("motorbike".equals(vehicleClass) && "without_helmet".equals(helmetStatus)) {
             event.setHelmetMissing(true);
         }
+        event.setSource(source);
 
         return event;
     }

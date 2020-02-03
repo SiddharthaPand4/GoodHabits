@@ -42,9 +42,6 @@ public class AnprService extends BaseService {
     @Autowired
     private HotListVehicleRepository hotListVehicleRepository;
 
-    @Value("${pilot.location}")
-    private String location;
-
     @Autowired
     private EntityManager entityManager;
 
@@ -62,7 +59,7 @@ public class AnprService extends BaseService {
 
         List<AnprResponse> list = new ArrayList<>(page.getSize());
         page.get().forEach(item -> {
-            list.add(new AnprResponse(item, location));
+            list.add(new AnprResponse(item));
         });
 
         return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
@@ -145,7 +142,7 @@ public class AnprService extends BaseService {
         AnprEvent anprEvent = anprEventRepository.getOne(request.getId());
         anprEvent.setAnprText(request.getAnprText());
         anprEvent = anprEventRepository.saveAndFlush(anprEvent);
-        return new AnprResponse(anprEvent, location);
+        return new AnprResponse(anprEvent);
     }
 
     private boolean checkHotListed(AnprEvent anprEvent) {
@@ -164,7 +161,7 @@ public class AnprService extends BaseService {
 
         List<AnprResponse> list = new ArrayList<>(page.getSize());
         page.get().forEach(item -> {
-            list.add(new AnprResponse(item, location));
+            list.add(new AnprResponse(item));
         });
         return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
     }
@@ -198,7 +195,7 @@ public class AnprService extends BaseService {
 
         List<AnprResponse> list = new ArrayList<>(request.getPageSize());
         data.forEach(item -> {
-            list.add(new AnprResponse(item, location));
+            list.add(new AnprResponse(item));
         });
         return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
     }
@@ -367,7 +364,7 @@ public class AnprService extends BaseService {
         List<AnprEvent> data = query.fetch();
         List<AnprResponse> list = new ArrayList<>(request.getPageSize());
         data.forEach(item -> {
-            AnprResponse res = new AnprResponse(item, location);
+            AnprResponse res = new AnprResponse(item);
             list.add(res);
         });
         return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
@@ -402,7 +399,7 @@ public class AnprService extends BaseService {
         List<AnprEvent> data = query.fetch();
         List<AnprResponse> list = new ArrayList<>(request.getPageSize());
         data.forEach(item -> {
-            AnprResponse res = new AnprResponse(item, location);
+            AnprResponse res = new AnprResponse(item);
             list.add(res);
         });
         return (PageResponse<AnprResponse>) new AnprPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
