@@ -29,8 +29,8 @@ public class PeopleCountingController {
 
 
     @DeleteMapping("/{id}")
-    public void archiveApc(@PathVariable Long id) {
-        apcFileService.archiveApc(new ApcRequest(id));
+    public void archiveEvent(@PathVariable Long id) {
+        apcFileService.archiveEvent(new ApcRequest(id));
     }
 
 

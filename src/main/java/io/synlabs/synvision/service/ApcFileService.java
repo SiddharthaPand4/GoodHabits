@@ -18,11 +18,9 @@ import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import java.io.IOException;
@@ -52,9 +50,6 @@ public class ApcFileService  {
     private  ApcEventRepository apcEventRepository;
     @Autowired
     private EntityManager entityManager;
-
-    @Value("${pilot.location}")
-    private String location;
 
 
 
@@ -208,11 +203,11 @@ public class ApcFileService  {
         return (PageResponse<ApcResponse>) new PageResponse(pageSize,currentPage, pageCount, list);
     }
 
-    public void archiveApc(ApcRequest request){
+    public void archiveEvent(ApcRequest request){
 
         ApcEvent apcEvent = apcEventRepository.getOne(request.getId());
         apcEvent.setArchived(true);
-        apcEventRepository.saveAndFlush(apcEvent);
+        apcEventRepository.save(apcEvent);
 
     }
 
