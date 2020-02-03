@@ -98,7 +98,7 @@ export default class TrafficIncidentView extends Component {
     }
 
     handleRefresh() {
-        this.refresh(this.state.refresh);
+        this.refresh();
     }
 
     onPageChange(page, pageSize) {
