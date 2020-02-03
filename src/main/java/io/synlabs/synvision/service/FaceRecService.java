@@ -32,6 +32,12 @@ public class FaceRecService {
 
     public RegisteredPerson register(FRSRegisterRequest request) {
 
+        RegisteredPerson re =  frsRepository.findOneByPidAndActiveTrue(request.getId());
+
+        if (re != null) {
+            throw new ValidationException("Duplicate RE");
+        }
+
         OkHttpClient client = new OkHttpClient();
         try {
             Request okrequest = new Request.Builder()
@@ -43,11 +49,21 @@ public class FaceRecService {
             logger.info("Outbound: {}", okrequest);
             Response okresponse = client.newCall(okrequest).execute();
             if (okresponse.isSuccessful()) {
+
+                ObjectMapper mapper = new ObjectMapper();
+                RegisterResponse resp = mapper.readValue(Objects.requireNonNull(okresponse.body()).string(), RegisterResponse.class);
+
+                if (resp.error) {
+                    throw new ValidationException(resp.message);
+                }
+
+
                 RegisteredPerson person = new RegisteredPerson();
                 person.setPid(request.getId());
                 person.setName(request.getName());
                 person.setAddress(request.getAddress());
                 person.setPersonType(PersonType.Subject);
+                person.setActive(true);
                 frsRepository.save(person);
                 return person;
             } else {
@@ -58,6 +74,11 @@ public class FaceRecService {
             throw new ValidationException("Error!");
         }
 
+    }
+
+    static class RegisterResponse {
+        public boolean error;
+        public String message;
     }
 
     static class OkResponse {

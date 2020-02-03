@@ -1,19 +1,20 @@
 import React, {Component} from "react";
 import Webcam from "react-webcam";
-import {Button, Col, Form, Input, Row, Typography} from "antd";
+import {Button, ButtonGroup, Col, Form, Input, Row, Typography} from "antd";
 import FaceMatchService from "../../services/facerec/FaceMatchService";
 import {EventBus} from "../event";
+
 const {Text} = Typography;
 
-export default class FaceMatchView extends Component  {
+export default class FaceMatchView extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            captured:false,
-            userdata:{},
-            image:"blank"
+            captured: false,
+            userdata: {},
+            image: "blank"
         };
         this.webcamRef = React.createRef();
         this.capture = this.capture.bind(this);
@@ -24,11 +25,12 @@ export default class FaceMatchView extends Component  {
         var image = this.webcamRef.current.getScreenshot();
         console.log('publishing image on bus', image);
         EventBus.publish('frs-screenshot', image);
-        this.setState({image:image, captured: true});
+        this.setState({image: image, captured: true});
     }
 
     resetcamera() {
-        this.setState({image:"blank", captured: false});
+        this.setState({image: "blank", captured: false, userdata: {}});
+        EventBus.publish('frs-refresh', {})
     }
 
     render() {
@@ -42,8 +44,7 @@ export default class FaceMatchView extends Component  {
         let elmnt;
         if (this.state.captured) {
             elmnt = <img src={this.state.image}/>
-        }
-        else {
+        } else {
             elmnt = <Webcam
                 width={400}
                 height={400}
@@ -56,8 +57,8 @@ export default class FaceMatchView extends Component  {
             <Row>
                 <Col md={6}>
                     {elmnt}
-                   <br/>
-                    <Button onClick={this.capture}>Capture photo</Button>
+                    <br/>
+                    <Button type="primary" onClick={this.capture}>Capture photo</Button>{' '}
                     <Button onClick={this.resetcamera}>Reset</Button>
                 </Col>
                 <Col md={6}>
@@ -79,11 +80,11 @@ class UserForm extends Component {
         this.state = {
             id: '',
             name: '',
-            address:'',
+            address: '',
             submitted: false,
             loading: false,
             loginError: '',
-            userdata:this.props.userdata
+            userdata: this.props.userdata
         };
 
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -101,7 +102,7 @@ class UserForm extends Component {
         console.log('component mounted');
 
         this.props.form.setFieldsInitialValue({
-            id : this.state.userdata.id,
+            id: this.state.userdata.id,
             name: this.state.userdata.name,
             address: this.state.userdata.address
         })
@@ -118,15 +119,19 @@ class UserForm extends Component {
 
     lookup() {
         FaceMatchService.lookup(this.state.image).then(response => {
-            this.setState({userdata : response.data});
+            this.setState({userdata: response.data});
             EventBus.publish('frs-refresh', response.data)
+        }).catch(function (error) {
+            if (error.response.data.message) {
+                self.setState({validationError: error.response.data.message});
+            }
         });
     }
 
     refresh(userdata) {
         console.log("got refresh with userdata:", userdata);
         this.props.form.setFieldsValue({
-            id : userdata.id,
+            id: userdata.id,
             name: userdata.name,
             address: userdata.address
         })
@@ -167,8 +172,14 @@ class UserForm extends Component {
 
         console.log('registering user', userdata);
         this.setState({submitted: true, loading: true});
-
-        FaceMatchService.register(userdata, this.state.image)
+        const self = this;
+        FaceMatchService.register(userdata, this.state.image).then(function (response) {
+            console.log(response)
+        }).catch(function (error) {
+            if (error.response.data.message) {
+                self.setState({validationError: error.response.data.message});
+            }
+        })
     }
 
     render() {
@@ -179,21 +190,23 @@ class UserForm extends Component {
             <Form onSubmit={this.handleSubmit}>
                 <Form.Item>
                     {getFieldDecorator('id', {rules: [{required: true, message: 'enter id!'}],})(
-                        <Input addonBefore="ID" placeholder="ID"/>,
+                        <Input addonBefore="ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>,
                     )}
                 </Form.Item>
                 <Form.Item>
                     {getFieldDecorator('name', {rules: [{required: true, message: 'enter name!'}],})(
-                        <Input addonBefore="name" placeholder="name"/>,
+                        <Input addonBefore="Name&nbsp;&nbsp;&nbsp;"/>,
                     )}
                 </Form.Item>
                 <Form.Item>
                     {getFieldDecorator('address', {rules: [{required: true, message: 'enter address!'}],})(
-                        <Input addonBefore="address" placeholder="address"/>,
+                        <Input addonBefore="Address"/>,
                     )}
                 </Form.Item>
-                <Button onClick={this.lookup}>Lookup</Button>
-                <Button htmlType="submit" type="primary" disabled={hasErrors(getFieldsError())}>Register</Button>
+                <div>
+                    <Button onClick={this.lookup}>Lookup</Button>{' '}
+                    <Button htmlType="submit" type="primary" disabled={hasErrors(getFieldsError())}>Register</Button>
+                </div>
                 {validationError && <Text type="danger">{validationError}</Text>}
             </Form>
         )
