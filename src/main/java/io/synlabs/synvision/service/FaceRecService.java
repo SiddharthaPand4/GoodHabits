@@ -1,6 +1,10 @@
 package io.synlabs.synvision.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.synlabs.synvision.entity.frs.RegisteredPerson;
+import io.synlabs.synvision.enums.PersonType;
 import io.synlabs.synvision.ex.ValidationException;
+import io.synlabs.synvision.jpa.RegisteredPersonRepository;
 import io.synlabs.synvision.views.frs.FRSLookupRequest;
 import io.synlabs.synvision.views.frs.FRSLookupResponse;
 import io.synlabs.synvision.views.frs.FRSRegisterRequest;
@@ -8,6 +12,7 @@ import io.synlabs.synvision.views.frs.FRSRegisterResponse;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -22,6 +27,9 @@ public class FaceRecService {
     public static final MediaType JSON
             = MediaType.get("application/json; charset=utf-8");
 
+    @Autowired
+    private RegisteredPersonRepository frsRepository;
+
     public FRSRegisterResponse register(FRSRegisterRequest request) {
 
         OkHttpClient client = new OkHttpClient();
@@ -34,7 +42,16 @@ public class FaceRecService {
 
             logger.info("Outbound: {}", okrequest);
             Response okresponse = client.newCall(okrequest).execute();
-            if (!okresponse.isSuccessful()) throw new IOException("Unexpected code " + okresponse);
+            if (okresponse.isSuccessful()) {
+                RegisteredPerson person = new RegisteredPerson();
+                person.setPid(request.getId());
+                person.setName(request.getName());
+                person.setAddress(request.getAddress());
+                person.setPersonType(PersonType.Subject);
+                frsRepository.save(person);
+            } else {
+                throw new IOException("Unexpected code " + okresponse);
+            }
             return FRSRegisterResponse.fromJson(Objects.requireNonNull(okresponse.body()).string());
 
         } catch (IOException e) {
@@ -43,7 +60,12 @@ public class FaceRecService {
 
     }
 
-    public FRSLookupResponse lookup(FRSLookupRequest request) {
+    public RegisteredPerson lookup(FRSLookupRequest request) {
+        class OkResponse {
+            public String id;
+            public String dist;
+        }
+
         OkHttpClient client = new OkHttpClient();
         try {
             Request okrequest = new Request.Builder()
@@ -53,8 +75,13 @@ public class FaceRecService {
                     .build();
 
             Response okresponse = client.newCall(okrequest).execute();
-            if (!okresponse.isSuccessful()) throw new IOException("Unexpected code " + okresponse);
-            return FRSLookupResponse.fromJson(Objects.requireNonNull(okresponse.body()).string());
+            if (okresponse.isSuccessful()) {
+                ObjectMapper mapper = new ObjectMapper();
+                OkResponse resp = mapper.readValue(Objects.requireNonNull(okresponse.body()).string(), OkResponse.class);
+                return frsRepository.findOneByPidAndActiveTrue(resp.id);
+            } else {
+                throw new IOException("Unexpected code " + okresponse);
+            }
 
         } catch (IOException e) {
             logger.error("Error calling api", e);

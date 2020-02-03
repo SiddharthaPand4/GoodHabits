@@ -25,6 +25,6 @@ public class FaceRecController {
 
     @PostMapping("lookup")
     public FRSLookupResponse register(@RequestBody FRSLookupRequest request){
-        return faceRecService.lookup(request);
+        return new FRSLookupResponse(faceRecService.lookup(request));
     }
 }

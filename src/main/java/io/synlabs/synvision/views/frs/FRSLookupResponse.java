@@ -1,6 +1,7 @@
 package io.synlabs.synvision.views.frs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.synlabs.synvision.entity.frs.RegisteredPerson;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,6 +20,12 @@ public class FRSLookupResponse {
         this.id = id;
         this.name = name;
         this.address = address;
+    }
+
+    public FRSLookupResponse(RegisteredPerson person) {
+        this.id = person.getPid();
+        this.name = person.getName();
+        this.address = person.getAddress();
     }
 
     public static FRSLookupResponse fromJson(String string) throws IOException {
