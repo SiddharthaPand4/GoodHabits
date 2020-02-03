@@ -1,68 +1,32 @@
 import React, {Component} from "react";
-import {Line, Pie} from 'react-chartjs-2';
-import {Col, Row} from "antd";
+import {Line, Pie, Doughnut} from 'react-chartjs-2';
+import {Card, Col, Row} from "antd";
+import ApmsService from "../../services/ApmsService";
+import {cloneDeep} from 'lodash';
 
-const fo_data = {
+let fo_data = {
     labels: [
         'Free',
         'Occupied',
     ],
     datasets: [{
-        data: [15, 5],
-        backgroundColor: [
-            '#FF6384',
-            '#36A2EB',
-            '#FFCE56'
-        ],
-        hoverBackgroundColor: [
-            '#FF6384',
-            '#36A2EB',
-            '#FFCE56'
-        ]
+        data: [0, 0],
     }]
 };
 
-const cb_data = {
-    labels: [
-        'Car',
-        'Bike',
-    ],
-    datasets: [{
-        data: [20, 0],
-        backgroundColor: [
-            '#FF6384',
-            '#36A2EB',
-            '#FFCE56'
-        ],
-        hoverBackgroundColor: [
-            '#FF6384',
-            '#36A2EB',
-            '#FFCE56'
-        ]
-    }]
-};
 
-const entryexit_data = {
+let entryexit_data = {
     labels: [
         'Car - In',
         'Bike - In',
     ],
     datasets: [{
-        data: [44, 0],
-        backgroundColor: [
-            '#FF6384',
-            '#36A2EB',
-            '#FFCE56'
-        ],
-        hoverBackgroundColor: [
-            '#FF6384',
-            '#36A2EB',
-            '#FFCE56'
-        ]
+        data: [44, 0]
     }]
 };
 
-const flow_data = {
+
+let flow_data = {
     labels: ['8AM', '9AM', '10AM', '11AM', '12PM', '1PM', '2PM'],
     datasets: [{
         label: 'Flow',
@@ -73,22 +37,112 @@ const flow_data = {
 
 export default class ParkingDashboardView extends Component {
 
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            loading: false,
+            fo_data: fo_data,
+            cb_data: {},
+            entryexit_data: entryexit_data
+
+        };
+
+        this.refresh = this.refresh.bind(this);
+        this.getParkingSlotStats = this.getParkingSlotStats.bind(this);
+
+    }
+
+    refresh() {
+        this.getParkingSlotStats();
+    }
+
+
+    getParkingSlotStats() {
+        let {fo_data} = this.state;
+        ApmsService.getParkingSlotStats().then(response => {
+            let statsData = response.data;
+            fo_data.datasets[0].data[0] = statsData.freeSlots;
+            fo_data.datasets[0].data[1] = statsData.totalSlots - statsData.freeSlots;
+
+            let cb_data = {
+                label: 'Car',
+                labels: ['Parked Slots', 'Free Slots'],
+                datasets: []
+            };
+
+            let dataset = {
+                data: [statsData.carsParked, statsData.carSlots - statsData.carsParked],
+                label: 'Car',
+                labels: ["Parked Slots", "Free Slots"]
+            };
+            cb_data.datasets.push(cloneDeep(dataset));
+
+            dataset = {
+                label: 'Bike',
+                data: [statsData.bikesParked, statsData.bikeSlots - statsData.bikesParked],
+                labels: ["Parked Slots", "Free Slots"]
+            };
+            cb_data.datasets.push(cloneDeep(dataset));
+
+            this.setState({fo_data, cb_data: cb_data});
+        }).catch(error => {
+            console.log(error);
+        })
+    }
+
+    componentDidMount() {
+        this.refresh();
+    }
+
+
     render() {
+        let {fo_data, cb_data} = this.state;
+
         return (<div>
-            <Row>
+            <Card><Row>
                 <Col md={8}>
-                    <Pie data={fo_data}/>
-                    <label>Free/Occupied</label>
+                    <Pie data={fo_data} options={{
+                        title: {
+                            display: true,
+                            text: 'Free/Occupied'
+                        }
+                    }}/>
                 </Col>
                 <Col md={8}>
-                    <Pie data={cb_data}/>
-                    <label>Car/Bike</label>
+                    {cb_data ? <Doughnut data={cb_data} options={{
+                        circumference: Math.PI,
+                        rotation: Math.PI,
+                        title: {
+                            display: true,
+                            text: ' Car/Bike'
+                        },
+                        tooltips: {
+                            callbacks: {
+                                title: function(item, data) {
+                                    return data.datasets[item[0].datasetIndex].label;
+                                },
+                                label: function (item, data) {
+                                    let label = data.datasets[item.datasetIndex].labels[item.index];
+                                    let value = data.datasets[item.datasetIndex].data[item.index];
+                                    return label + ': ' + value;
+                                }
+                            }
+                        }
+                    }}/> : null}
+
+
                 </Col>
                 <Col md={8}>
-                    <Pie data={entryexit_data}/>
-                    <label>In Car/Bike</label>
+                    <Pie data={entryexit_data} options={{
+                        title: {
+                            display: true,
+                            text: 'In Car/Bike'
+                        }
+                    }}/>
                 </Col>
-            </Row>
+            </Row></Card>
+
             <Row>
                 <Col md={24}>
                     <div style={{height: 100 + 'px'}}>

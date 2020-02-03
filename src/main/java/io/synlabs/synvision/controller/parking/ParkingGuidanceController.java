@@ -34,12 +34,12 @@ public class ParkingGuidanceController {
     @Autowired
     private ParkingGuidanceService guidanceService;
 
-    @GetMapping("stats")
+    @GetMapping("/stats")
     public ParkingDashboardResponse stats() {
         return guidanceService.stats("lucknow");
     }
 
-    @GetMapping("hourly")
+    @GetMapping("/hourly")
     public List<HourlyStatsResponse> hourly() {
         return guidanceService.hourly("lucknow");
     }
