@@ -29,7 +29,7 @@ export default class Sidebar extends Component {
                 }}
             >
                 <div className="logo">
-                    <img src={"synlabs-logo.png"}/>
+                    <img src={"orbitly-logo.png"}/>
                 </div>
                 <Menu theme="dark" mode="inline" defaultSelectedKeys={['0']}>
                     <Menu.Item key="0">

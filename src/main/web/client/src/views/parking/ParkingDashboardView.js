@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {Line, Pie, Doughnut} from 'react-chartjs-2';
-import {Card, Col, Row} from "antd";
+import {Card, Col, Row,Divider} from "antd";
 import ApmsService from "../../services/ApmsService";
 import {cloneDeep} from 'lodash';
 
@@ -100,7 +100,7 @@ export default class ParkingDashboardView extends Component {
         let {fo_data, cb_data} = this.state;
 
         return (<div>
-            <Card><Row>
+            <Row>
                 <Col md={8}>
                     <Pie data={fo_data} options={{
                         title: {
@@ -119,7 +119,7 @@ export default class ParkingDashboardView extends Component {
                         },
                         tooltips: {
                             callbacks: {
-                                title: function(item, data) {
+                                title: function (item, data) {
                                     return data.datasets[item[0].datasetIndex].label;
                                 },
                                 label: function (item, data) {
@@ -141,11 +141,11 @@ export default class ParkingDashboardView extends Component {
                         }
                     }}/>
                 </Col>
-            </Row></Card>
-
+            </Row>
+            <Divider />
             <Row>
                 <Col md={24}>
-                    <div style={{height: 100 + 'px'}}>
+                    <div>
                         <Line data={flow_data}/>
                     </div>
                 </Col>
