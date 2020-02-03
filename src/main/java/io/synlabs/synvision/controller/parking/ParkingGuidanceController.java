@@ -4,9 +4,12 @@ import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.controller.anpr.AnprController;
 import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.service.parking.ParkingGuidanceService;
+import io.synlabs.synvision.views.DashboardRequest;
 import io.synlabs.synvision.views.UploadFileResponse;
+import io.synlabs.synvision.views.incident.IncidentGroupCountResponse;
 import io.synlabs.synvision.views.parking.HourlyStatsResponse;
 import io.synlabs.synvision.views.parking.ParkingDashboardResponse;
+import io.synlabs.synvision.views.parking.ParkingEventCountResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +45,12 @@ public class ParkingGuidanceController {
     @GetMapping("/hourly")
     public List<HourlyStatsResponse> hourly() {
         return guidanceService.hourly("lucknow");
+    }
+
+
+    @PostMapping("parking/vehicle/count")
+    public ParkingEventCountResponse getParkingVehicleCount(@RequestBody DashboardRequest request){
+        return guidanceService.getParkingVehicleCount(request);
     }
 
     //TODO attach this with the lot and do slot calculation
