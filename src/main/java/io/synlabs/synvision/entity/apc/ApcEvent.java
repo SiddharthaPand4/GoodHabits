@@ -20,7 +20,7 @@ public class ApcEvent extends BaseEntity {
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date eventDate;
-    //@Column(columnDefinition="tinyint(1) default 1")
+
     private boolean archived;
 
     @Column(length = 50)

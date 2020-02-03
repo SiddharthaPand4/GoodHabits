@@ -165,11 +165,10 @@ public class ApcFileService  {
         QApcEvent apcEvent = QApcEvent.apcEvent;
         JPAQuery<ApcEvent> query= new JPAQuery<>(entityManager);
         query = query.select(apcEvent).from(apcEvent);
-        if(request.getPcId()!=null)
-            query= query.where(apcEvent.eventId.eq(request.getPcId()));
+        if(request.getEventId()!=null)
+         query= query.where(apcEvent.eventId.eq(request.getEventId()));
         query =  query.where(apcEvent.archived.eq(false));
         try {
-            //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String fromDate = request.getFromDate();
             String toDate = request.getToDate();
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -186,7 +185,7 @@ public class ApcFileService  {
                 Date endingDate = format.parse(ending);
                 query = query.where(apcEvent.eventDate.before(endingDate).or(apcEvent.eventDate.eq(endingDate)));
             }
-        } catch (Exception e) {
+        } catch (ParseException e) {
             logger.error("Error in parsing date", e);
         }
 
@@ -197,7 +196,7 @@ public class ApcFileService  {
 
         query.offset(offset);
         query.limit(pageSize);
-        //pagination ends
+
 
 
         List<ApcEvent> data = query.fetch();
@@ -212,7 +211,6 @@ public class ApcFileService  {
     public void archiveApc(ApcRequest request){
 
         ApcEvent apcEvent = apcEventRepository.getOne(request.getId());
-        System.out.println(apcEvent);
         apcEvent.setArchived(true);
         apcEventRepository.saveAndFlush(apcEvent);
 

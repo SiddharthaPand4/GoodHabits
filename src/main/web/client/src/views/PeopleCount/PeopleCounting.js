@@ -54,10 +54,8 @@ export default class PeopleCounting extends Component{
         this.onPageSizeChange = this.onPageSizeChange.bind(this);
         this.handleFilterChange=this.handleFilterChange.bind(this);
         this.handleLayoutChange=this.handleLayoutChange.bind(this);
-        this.editEvent = this.editEvent.bind(this);
-        this.magnifyEvent = this.magnifyEvent.bind(this);
-        this.updateZoomFactor = this.updateZoomFactor.bind(this);
-        this.onPcIdInputChange=this.onPcIdInputChange.bind(this);
+        this.onEventIdInputChange=this.onEventIdInputChange.bind(this);
+
     }
 
     componentDidMount(){
@@ -89,8 +87,7 @@ export default class PeopleCounting extends Component{
             this.setState({filter, loading: false, events: data.list});
 
         }).catch(error => {
-            alert("Error, something went wrong!!");
-
+         message.error("Error, something went wrong!!")
         })
     }
 
@@ -119,10 +116,10 @@ export default class PeopleCounting extends Component{
     })
 
      }
-      onPcIdInputChange(e) {
+      onEventIdInputChange(e) {
 
              let filter = this.state.filter;
-             filter.pcId = e.target.value;
+             filter.eventId = e.target.value;
              console.log(filter);
              this.setState({filter: filter})
          }
@@ -144,14 +141,14 @@ export default class PeopleCounting extends Component{
     render() {
 
              let layout = this.state.layout;
-             let pcId=this.state.filter.pcId;
+             let eventId=this.state.filter.eventId;
             return (
 
             <div>
 
                  <Collapse bordered={true} defaultActiveKey={['1']}>
                                 <Panel header="Filter" key="1">
-                                Event Id: <Input value={pcId} style={{"width": "200px"}} onChange={this.onPcIdInputChange}/> <br/><br/>
+                                Event Id: <Input value={eventId} style={{"width": "200px"}} onChange={this.onEventIdInputChange}/> <br/><br/>
                                     <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
                                                    handleFilterChange={this.handleFilterChange}
                                                    handleLayoutChange={this.handleLayoutChange}
@@ -160,7 +157,7 @@ export default class PeopleCounting extends Component{
                   </Collapse>
 
                   <div>
-                    {layout === "table" ? (this.renderTable()) : (this.renderGrid())}
+                    {this.renderTable()}
                     </div>
 
 
@@ -209,123 +206,6 @@ export default class PeopleCounting extends Component{
 
         }
 
-   renderGrid() {
-
-
-              if (this.state.loading || !this.state.events || this.state.events.length === 0) {
-                    return <Empty description={false}/>
-                }
-
-                let events = this.state.events;
-                let workingEventLoading = this.state.workingEventLoading;
-                let workingEvent = this.state.workingEvent;
-                let count = this.state.filter.totalPages * this.state.filter.pageSize;
-
-                let {magnifyEventId, zoomFactor, minZoomFactor, maxZoomFactor} = this.state.magnifyEvent;
-                const mid = ((maxZoomFactor - minZoomFactor) / 2).toFixed(5);
-                const preColor = zoomFactor >= mid ? '' : 'rgba(0, 0, 0, .45)';
-                const nextColor = zoomFactor >= mid ? 'rgba(0, 0, 0, .45)' : '';
-                const marks = {
-                    1: {label: <span><Icon style={{color: preColor}} type="zoom-out"/></span>},
-                    2: {label: <span>2</span>},
-                    3: {label: <span>3</span>},
-                    4: {label: <span>4</span>},
-                    5: {label: <span><Icon style={{color: nextColor}} type="zoom-in"/></span>,}
-                };
-                return <div style={{background: '#ECECEC', padding: '5px'}}>
-                    <Row>
-                        {
-                            events.map((event, index) =>
-                                <Col xl={{span: 8}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}} key={index}>
-                                    <Card
-                                        style={{margin: "5px"}}
-
-                                        extra={<Dropdown overlay={<Menu>
-                                            <Menu.Item key="0" onClick={() => this.magnifyEvent(event)}><Icon type="zoom-in"/>Zoom
-                                                image
-                                            </Menu.Item>
-                                            <Menu.Item key="1">
-                                                <a
-                                                    title={"click here to download"}
-                                                    href={"/public/apc/people/" + event.id + "/image.jpg"}
-                                                    download={true}><Icon type="download"/>{' '} Full
-                                                    image</a>
-                                            </Menu.Item>
-                                            <Menu.Item key="2">
-                                                <a
-                                                    title={"click here to download"}
-                                                    href={"/public/apc/people/" + event.id + "/image.jpg"}
-                                                    download={true}><Icon type="download"/>{' '} Cropped image</a>
-                                            </Menu.Item>
-                                            <Menu.Item key="3">
-                                                <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon
-                                                    type="delete"/>{' '}
-                                                    Archive
-                                                </Button>
-                                            </Menu.Item>
-
-                                        </Menu>}>
-                                            <Button>
-                                                More <Icon type="down"/>
-                                            </Button>
-                                        </Dropdown>}
-                                        bordered={true}
-                                        cover={(magnifyEventId === event.id) ?
-                                            <Magnifier src={"/public/apc/people/" + event.eventId + "/image.jpg"}
-                                                       zoomFactor={zoomFactor}/> : <img alt="event"
-                                                                            src={"/public/apc/people/" + event.eventId + "/image.jpg"}/>
-
-                                        }
-                                    >
-                                        <div>
-                                            {(magnifyEventId === event.id) ?
-                                                <Slider
-                                                    marks={marks}
-                                                    min={minZoomFactor}
-                                                    max={maxZoomFactor}
-                                                    onChange={this.updateZoomFactor}
-                                                    value={typeof zoomFactor === 'number' ? zoomFactor : 0}
-                                                />
-                                                : <div style={{height:"54px",textAlign: "center"}}>
-                                                       <Button size="small" type="primary" onClick={() => this.magnifyEvent(event)} >
-                                                           <Icon type="zoom-in"/>Zoom Image
-                                                       </Button>
-                                                   </div>
-                                            }
-                                        </div>
-
-                                        <div style={{marginTop: "5px", textAlign: "center"}}
-                                             onClick={() => this.editEvent(event)}>
-
-                                            <Text
-                                                type="secondary">{(workingEventLoading && workingEvent.id === event.eventId) ? "saving..." : ""}</Text>
-                                            <div>
-                                            <Paragraph
-                                              strong
-                                              copyable>{event.eventId}</Paragraph>
-                                            </div>
-                                            <div>
-                                                <Text code> <Moment format="ll">{event.eventDate}</Moment>{' '}|{' '}<Moment
-                                                    format="LTS">{event.eventDate}</Moment></Text>
-                                            </div>
-
-
-                                        </div>
-
-                                    </Card>
-                                </Col>
-                            )
-                        }
-                    </Row>
-                    <div style={{textAlign: "right"}}>
-                        <Pagination onChange={this.onPageChange} onShowSizeChange={this.onPageSizeChange} showSizeChanger
-                                    showQuickJumper
-                                    defaultCurrent={1} total={count} current={this.state.filter.page}
-                                    pageSize={this.state.filter.pageSize}/>
-                    </div>
-
-                </div>
-            }
 
 
 }
