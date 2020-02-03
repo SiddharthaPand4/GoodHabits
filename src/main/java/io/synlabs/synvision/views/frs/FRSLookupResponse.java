@@ -23,9 +23,15 @@ public class FRSLookupResponse {
     }
 
     public FRSLookupResponse(RegisteredPerson person) {
-        this.id = person.getPid();
-        this.name = person.getName();
-        this.address = person.getAddress();
+
+        if (person == null) {
+            this.name = "UNKNOWN";
+        }
+        else {
+            this.id = person.getPid();
+            this.name = person.getName();
+            this.address = person.getAddress();
+        }
     }
 
     public static FRSLookupResponse fromJson(String string) throws IOException {

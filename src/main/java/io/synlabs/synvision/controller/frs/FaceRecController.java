@@ -20,7 +20,7 @@ public class FaceRecController {
 
     @PostMapping("register")
     public FRSRegisterResponse register(@RequestBody FRSRegisterRequest request){
-        return faceRecService.register(request);
+        return new FRSRegisterResponse(faceRecService.register(request));
     }
 
     @PostMapping("lookup")

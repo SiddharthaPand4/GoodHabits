@@ -30,7 +30,7 @@ public class FaceRecService {
     @Autowired
     private RegisteredPersonRepository frsRepository;
 
-    public FRSRegisterResponse register(FRSRegisterRequest request) {
+    public RegisteredPerson register(FRSRegisterRequest request) {
 
         OkHttpClient client = new OkHttpClient();
         try {
@@ -49,10 +49,10 @@ public class FaceRecService {
                 person.setAddress(request.getAddress());
                 person.setPersonType(PersonType.Subject);
                 frsRepository.save(person);
+                return person;
             } else {
                 throw new IOException("Unexpected code " + okresponse);
             }
-            return FRSRegisterResponse.fromJson(Objects.requireNonNull(okresponse.body()).string());
 
         } catch (IOException e) {
             throw new ValidationException("Error!");
@@ -60,11 +60,13 @@ public class FaceRecService {
 
     }
 
+    static class OkResponse {
+        public String id;
+        public String dist;
+    }
+
     public RegisteredPerson lookup(FRSLookupRequest request) {
-        class OkResponse {
-            public String id;
-            public String dist;
-        }
+
 
         OkHttpClient client = new OkHttpClient();
         try {
@@ -78,7 +80,8 @@ public class FaceRecService {
             if (okresponse.isSuccessful()) {
                 ObjectMapper mapper = new ObjectMapper();
                 OkResponse resp = mapper.readValue(Objects.requireNonNull(okresponse.body()).string(), OkResponse.class);
-                return frsRepository.findOneByPidAndActiveTrue(resp.id);
+                RegisteredPerson re =  frsRepository.findOneByPidAndActiveTrue(resp.id);
+                return re;
             } else {
                 throw new IOException("Unexpected code " + okresponse);
             }
