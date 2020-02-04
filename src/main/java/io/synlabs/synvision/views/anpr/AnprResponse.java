@@ -28,6 +28,7 @@ public class AnprResponse implements Response {
     private String direction;
     private boolean helmet;
     private String location;
+    private Float speed;
 
     public AnprResponse(AnprEvent anprEvent, String location){
         this.id=mask(anprEvent.getId());
@@ -39,5 +40,6 @@ public class AnprResponse implements Response {
         this.direction = anprEvent.getDirection();
         this.helmet = anprEvent.isHelmetMissing();
         this.location = location;
+        this.speed = anprEvent.getSpeed();
     }
 }
