@@ -37,7 +37,7 @@ export default class ParkingInOutView extends Component {
             vehicleLastParkingEvent : {},
             filter: {
               page: 1,
-              pageSize: 12,
+              pageSize: 10,
               loading:false,
               apmsresponse: {},
               vehicleNo:"",
@@ -200,6 +200,19 @@ export default class ParkingInOutView extends Component {
          return true;
      }
 
+     getEventId(){
+        let filter={...this.state.filter}
+        if(!filter.loading){
+            if(filter.apmsresponse.events){
+                if(filter.apmsresponse.events.length>0)
+                {
+                    return parseInt(filter.apmsresponse.events[0].eventId);
+                }
+            }
+        }
+        return 0;
+     }
+
     render() {
 
         let filter = this.state.filter;
@@ -207,7 +220,7 @@ export default class ParkingInOutView extends Component {
         let vehicleNo = this.state.filter.vehicleNo;
         let vehicleLastParkingEvent = this.state.vehicleLastParkingEvent;
         let loading = this.state.loading;
-         let count = this.state.filter.apmsresponse.totalPages * this.state.filter.apmsresponse.pageSize;
+        let count = this.state.filter.apmsresponse.totalPages * this.state.filter.apmsresponse.pageSize;
 
          const paginationOption = {
                 showSizeChanger: false,
@@ -244,7 +257,7 @@ export default class ParkingInOutView extends Component {
                    <Row>
                      <Col  xl={{span: 12}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}}>
 
-                       <img  width="440" height="260" src="http://localhost:9090/stream"></img>
+                       <img  width="440" height="260" src={"/public/anpr/lpr/" + this.getEventId()+ "/image.jpg"} ></img>
 
                      </Col>
 

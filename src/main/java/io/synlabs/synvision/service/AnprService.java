@@ -7,8 +7,11 @@ import io.synlabs.synvision.entity.anpr.AnprEvent;
 import io.synlabs.synvision.entity.anpr.HotListVehicle;
 import io.synlabs.synvision.entity.anpr.QAnprEvent;
 import io.synlabs.synvision.entity.anpr.QHotListVehicle;
+import io.synlabs.synvision.entity.parking.ParkingEvent;
+import io.synlabs.synvision.enums.VehicleType;
 import io.synlabs.synvision.jpa.AnprEventRepository;
 import io.synlabs.synvision.jpa.HotListVehicleRepository;
+import io.synlabs.synvision.jpa.ParkingEventRepository;
 import io.synlabs.synvision.views.anpr.*;
 import io.synlabs.synvision.views.common.PageResponse;
 import org.slf4j.Logger;
@@ -41,6 +44,9 @@ public class AnprService extends BaseService {
 
     @Autowired
     private HotListVehicleRepository hotListVehicleRepository;
+
+    @Autowired
+    private ParkingEventRepository parkingEventRepository;
 
     @Value("${pilot.location}")
     private String location;
@@ -139,6 +145,25 @@ public class AnprService extends BaseService {
         AnprEvent anprEvent = request.toEntity();
         anprEvent.setHotlisted(checkHotListed(anprEvent));
         anprEventRepository.save(anprEvent);
+
+        //new parking event record
+        ParkingEvent parkingEvent= parkingEventRepository.findByEventIdAndCheckInIsNull(anprEvent.getId().toString());
+        if(parkingEvent==null){
+            parkingEvent= new ParkingEvent();
+        }
+        parkingEvent.setCheckIn(anprEvent.getEventDate());
+        parkingEvent.setEventId(anprEvent.getId().toString());
+        parkingEvent.setVehicleNo(anprEvent.getAnprText());
+        parkingEvent.setOrg(anprEvent.getOrg());
+
+        if(anprEvent.getVehicleClass().equals("car")){
+            parkingEvent.setType(VehicleType.Car);
+        }
+        else{
+            parkingEvent.setType(VehicleType.Bike);
+        }
+
+        parkingEventRepository.save(parkingEvent);
     }
 
     public AnprResponse updateAnprEvent(AnprRequest request) {

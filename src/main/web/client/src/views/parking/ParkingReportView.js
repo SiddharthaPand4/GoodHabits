@@ -1,8 +1,10 @@
 import React, {Component} from "react";
 import {Button, Card, DatePicker, Dropdown, Icon, Menu, Modal, Select} from "antd";
 import DashboardService from "../../services/DashboardService";
+import ReportService from "../../services/ReportService";
 import CommonService from "../../services/CommonService";
-import Moment from 'moment';
+import moment from 'moment';
+import { saveAs } from 'file-saver';
 
 const {Option} = Select;
 const {RangePicker} = DatePicker;
@@ -16,9 +18,11 @@ export default class HomeView extends Component {
             atcc: {
                 filter: {
                     selectedCustomDateRange: "Today",
-                    selectedXAxisOption: "Hourly",
-                    fromDate: {},
-                    toDate: {}
+                    selectedXAxisOption: "All",
+                    fromDate: moment().startOf('day').toDate(),
+                    toDate: moment().endOf('day').toDate(),
+                    reportType:"CSV",
+                    filterType:"inout"
                 },
                 chartData: {
                     labels: [],
@@ -44,10 +48,23 @@ export default class HomeView extends Component {
         this.getDateRangeOptions = this.getDateRangeOptions.bind(this);
         this.getXAxisOptions = this.getXAxisOptions.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.downloadReport = this.downloadReport.bind(this);
     }
 
-    handleChange() {
+    handleChange(value) {
 
+        let atcc= {...this.state.atcc}
+        let filter= atcc.filter;
+        filter.filterType= value;
+
+        this.setState({atcc:atcc})
+    }
+
+    handleChangeReportType(value) {
+        let atcc= {...this.state.atcc}
+        let filter= atcc.filter;
+        filter.reportType= value;
+        this.setState({atcc:atcc})
     }
 
     showCustomDateRangeModal(graphName) {
@@ -75,9 +92,27 @@ export default class HomeView extends Component {
             isOpencustomDateRangeModal = ""
         }
         this.setState({[graphName]: graph, isOpencustomDateRangeModal}, () => {
-            this.refresh();
+          //  this.refresh();
         });
 
+    }
+
+    downloadReport(){
+       let filter= this.state.atcc.filter;
+        var req={
+             fromDateString: moment(filter.fromDate).format('YYYY-MM-DD HH:mm:ss'),
+             toDateString: moment(filter.toDate).format('YYYY-MM-DD HH:mm:ss"'),
+             xAxis: filter.selectedXAxisOption,
+             reportType:filter.reportType,
+             filterType:filter.filterType
+        }
+
+        ReportService.getParkingEventsReport(req).then(response => {
+            this.setState({downloading: false});
+            saveAs(response.data, "parking-events.csv");
+        }).catch(error => {
+            this.setState({downloading: false});
+        });
     }
 
     selectXAxisOption(graphName, selectedXAxisOption) {
@@ -90,8 +125,8 @@ export default class HomeView extends Component {
         return (<Menu>
 
             <Menu.Item key="1"
-                       onClick={() => this.selectXAxisOption(graphName, "Hourly")}>
-                Hourly
+                       onClick={() => this.selectXAxisOption(graphName, "All")}>
+                All
             </Menu.Item>
             <Menu.Item key="5"
                        onClick={() => this.selectXAxisOption(graphName, "Daily")}>
@@ -166,14 +201,13 @@ export default class HomeView extends Component {
                         </Dropdown>
                         <Select defaultValue="inout" style={{ width: 200 }} onChange={this.handleChange}>
                             <Option value="inout">In/Out Report</Option>
-                            <Option value="occupancy">Occupancy Report</Option>
                         </Select>
-                        <Select defaultValue="csv" style={{ width: 120 }} onChange={this.handleChange}>
-                            <Option value="csv">CSV</Option>
+                        <Select defaultValue="csv" style={{ width: 120 }} onChange={this.handleChangeReportType}>
+                            <Option value="CSV">CSV</Option>
                             <Option value="xml">XML</Option>
                             <Option value="json">Json</Option>
                         </Select>
-                        <Button>Download</Button>
+                        <Button onClick={this.downloadReport}>Download</Button>
                     </div>}>
                     </Card>
                     <br/>
