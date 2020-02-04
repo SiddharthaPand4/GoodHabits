@@ -27,7 +27,7 @@ export default class ParkingConsoleView extends Component {
     }
 
     componentDidMount() {
-        this.intervalID = setInterval(this.refresh.bind(this), 5*1000);
+        this.intervalID = setInterval(this.refresh.bind(this), 30*1000);
         this.refresh();
     }
 
