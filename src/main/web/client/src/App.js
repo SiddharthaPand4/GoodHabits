@@ -24,7 +24,7 @@ import IncidentRepeatedView from "./views/incidentsRepeated/IncidentRepeatedView
 import IncidentHotlistView from "./views/IncidentHotlistView";
 import MasterDataView from "./views/masterData/MasterDataView";
 import PeopleCounting from "./views/PeopleCount/PeopleCounting";
-
+import ApcDashboard from "./views/PeopleCount/ApcDashboard";
 const {Content} = Layout;
 
 class App extends Component {
@@ -73,7 +73,7 @@ class App extends Component {
                                 <PrivateRoute path='/device' exact={true} component={DeviceView}/>
                                 <PrivateRoute path='/device/conf' exact={true} component={DeviceConfigView}/>
                                 <PrivateRoute path='/people-counting/events' exact={true} component={PeopleCounting}/>
-
+                                <PrivateRoute path='/people-counting/Dashboard' exact={true} component={ApcDashboard}/>
                             </div>
                         </Content>
                         <Footerbar/>
