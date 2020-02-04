@@ -30,7 +30,7 @@ class ApmsService {
         return axios.get('/api/apms/guidance/checked-in/current/count');
     }
 
-    getLots() {
+    getSlots() {
         return axios.get('/api/apms/guidance/slots?lot=lucknow')
     }
 }

@@ -17,6 +17,8 @@ public class ParkingSlotResponse {
 
     private String slotGroup;
 
+    private String vehicleType;
+
     private int x;
     private int y;
 
@@ -36,6 +38,7 @@ public class ParkingSlotResponse {
         this.name = slot.getName();
         this.free = slot.isFree();
         this.slotGroup = slot.getSlotGroup();
+        this.vehicleType = slot.getVehicleType().name();
         this.x = slot.getX();
         this.y = slot.getY();
         this.p1x = slot.getP1x();

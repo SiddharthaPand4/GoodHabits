@@ -2,12 +2,11 @@ package io.synlabs.synvision.entity.parking;
 
 
 import io.synlabs.synvision.entity.BaseEntity;
+import io.synlabs.synvision.enums.VehicleType;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -26,6 +25,9 @@ public class ParkingSlot extends BaseEntity {
     //grouping based on camera or lane etc
     @Column(length = 50)
     private String slotGroup;
+
+    @Enumerated(EnumType.STRING)
+    private VehicleType vehicleType;
 
     private int x;
     private int y;
