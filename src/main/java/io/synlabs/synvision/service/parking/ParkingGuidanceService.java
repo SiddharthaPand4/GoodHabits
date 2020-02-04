@@ -291,6 +291,7 @@ public class ParkingGuidanceService {
     public void updateParkingLotImage(String lotName, String imageName) {
         ParkingLot parkingLot = parkingLotRepository.findOneByName(lotName);
         parkingLot.setLastestImage(imageName);
+        parkingLotRepository.saveAndFlush(parkingLot);
     }
 
     public Resource downloadLotImage(String lotName) {
