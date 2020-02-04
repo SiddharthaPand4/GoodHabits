@@ -215,4 +215,14 @@ public class ParkingGuidanceService {
 
         return parkingSlotRepository.findAllByLotName(lot);
     }
+
+    public void updateSlot(UpdateSlotRequest request) {
+        ParkingSlot slot = parkingSlotRepository.findOneByNameAndLotName(request.getSlot(), request.getLot());
+        if (slot == null) {
+            throw new NotFoundException("Cannot found slot:" + request.getSlot());
+        }
+
+        slot.setFree(request.isStatus());
+        parkingSlotRepository.save(slot);
+    }
 }
