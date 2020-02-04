@@ -29,7 +29,7 @@ let fo_data = {
         'Free'
     ],
     datasets: [{
-        data: [0, 0],
+        data: [],
         backgroundColor: [DashboardService.getColor(0), DashboardService.getColor(2)]
     }]
 };
@@ -41,7 +41,8 @@ let entryexit_data = {
         'Bike - In',
     ],
     datasets: [{
-        data: [44, 0]
+        data: [],
+        backgroundColor: [DashboardService.getColor(0), DashboardService.getColor(2)]
     }]
 };
 
@@ -55,7 +56,8 @@ export default class ParkingDashboardView extends Component {
         this.state = {
             loading: {
                 parkingEventData: false,
-                stats: false
+                stats: false,
+                checkInEventsData: false
             },
             isOpencustomDateRangeModal: "",
             fo_data: fo_data,
@@ -87,9 +89,8 @@ export default class ParkingDashboardView extends Component {
         this.refresh = this.refresh.bind(this);
         this.getDateRangeOptions = this.getDateRangeOptions.bind(this);
         this.getXAxisOptions = this.getXAxisOptions.bind(this);
-
-
         this.handleDateRangeChange = this.handleDateRangeChange.bind(this);
+        this.getCheckedInVehiclesCount = this.getCheckedInVehiclesCount.bind(this);
 
 
     }
@@ -99,24 +100,9 @@ export default class ParkingDashboardView extends Component {
         this.refresh();
     }
 
-    handleCancel = e => {
-        this.setState({
-            isOpencustomDateRangeModal: "",
-        });
-    };
-
-    handleDateRangeChange(dates, dateString) {
-
-        let startDate = dates[0].toDate();
-        let endDate = dates[1].toDate();
-        this.setState(() => {
-            this.refresh();
-        });
-        console.log(dates, dateString);
-    }
-
     refresh() {
         this.getParkingSlotStats();
+        this.getCheckedInVehiclesCount();
         this.getParkingVehicleCount(this.state.parkingEventData.filter.fromDate, this.state.parkingEventData.filter.toDate, this.state.parkingEventData.filter.selectedXAxisOption);
     }
 
@@ -141,6 +127,12 @@ export default class ParkingDashboardView extends Component {
         </Menu>)
     }
 
+    showCustomDateRangeModal() {
+        this.setState({
+            isOpencustomDateRangeModal: true,
+        });
+    };
+
     selectDateRange(selectedCustomDateRangeEnum, selectedCustomDateRangeMoment) {
         let {isOpencustomDateRangeModal} = this.state;
         let parkingEventData = this.state.parkingEventData;
@@ -158,6 +150,22 @@ export default class ParkingDashboardView extends Component {
         });
 
     }
+
+    handleDateRangeChange(dates, dateString) {
+
+        let startDate = dates[0].toDate();
+        let endDate = dates[1].toDate();
+        this.setState(() => {
+            this.refresh();
+        });
+        console.log(dates, dateString);
+    }
+
+    handleCancel = e => {
+        this.setState({
+            isOpencustomDateRangeModal: "",
+        });
+    };
 
     getParkingVehicleCount(from_date, to_date, xAxis) {
         let {parkingEventData, loading} = this.state;
@@ -204,12 +212,12 @@ export default class ParkingDashboardView extends Component {
             let checkInDataset = {
                 label: "Check In",
                 data: [],
-                backgroundColor: DashboardService.getColor(0)
+                borderColor: DashboardService.getColor(0)
             };
             let checkOutDataset = {
                 label: "Check Out",
                 data: [],
-                backgroundColor: DashboardService.getColor(2)
+                borderColor: DashboardService.getColor(2)
             };
 
             //fill the value of dataset for each label
@@ -310,7 +318,7 @@ export default class ParkingDashboardView extends Component {
             },
             scales: {
                 xAxes: [{
-                    stacked: true,
+                    stacked: false,
                     ticks: {
                         beginAtZero: true
                     }, scaleLabel: {
@@ -319,7 +327,7 @@ export default class ParkingDashboardView extends Component {
                     }
                 }],
                 yAxes: [{
-                    stacked: true,
+                    stacked: false,
                     ticks: {
                         beginAtZero: true
                     }, scaleLabel: {
@@ -332,11 +340,24 @@ export default class ParkingDashboardView extends Component {
 
     }
 
-    showCustomDateRangeModal() {
-        this.setState({
-            isOpencustomDateRangeModal: true,
+
+    getCheckedInVehiclesCount() {
+        let {entryexit_data, loading} = this.state;
+        loading.checkInEventsData = true;
+        this.setState({loading};
+        ApmsService.getCheckedInVehiclesCount().then(response => {
+            let data = response.data;
+            entryexit_data.datasets[0].data[0] = data.checkedInCars;
+            entryexit_data.datasets[0].data[1] = data.checkedInBikes;
+
+            loading.checkInEventsData = false;
+            this.setState({entryexit_data, loading});
+        }).catch(error => {
+            loading.checkInEventsData = false;
+            this.setState({loading});
+            console.log(error);
         });
-    };
+    }
 
     getDateRangeOptions() {
         return (
@@ -375,56 +396,69 @@ export default class ParkingDashboardView extends Component {
         const parkingEventsChartOptions = this.getBarChartOptions("parkingEventData");
         return (<div>
 
-            {loading.stats ? <Skeleton active/> :
-                <Row>
-                    <Col md={8}>
-                        <Card>
-                            <Pie data={fo_data} options={{
-                                title: {
-                                    display: true,
-                                    text: 'Free/Occupied'
-                                }
-                            }}/>
-                        </Card>
-                    </Col>
-                    <Col md={8}>
-                        <Card><Doughnut data={cb_data} options={{
-                            circumference: Math.PI,
-                            rotation: Math.PI,
-                            title: {
-                                display: true,
-                                text: ' Car/Bike'
-                            },
-                            tooltips: {
-                                callbacks: {
-                                    title: function (item, data) {
-                                        return data.datasets[item[0].datasetIndex].label;
-                                    },
-                                    label: function (item, data) {
-                                        let label = data.datasets[item.datasetIndex].labels[item.index];
-                                        let value = data.datasets[item.datasetIndex].data[item.index];
-                                        return label + ': ' + value;
+
+            <Row>
+                <Col md={8}>
+                    <Card>
+                        {
+                            loading.stats
+                                ? <Skeleton active/>
+                                : <Pie data={fo_data} options={{
+                                    title: {
+                                        display: true,
+                                        text: 'Free/Occupied'
                                     }
-                                }
-                            }
-                        }}/>
-                        </Card>
+                                }}/>
+                        }
+                    </Card>
+                </Col>
+                <Col md={8}>
+                    <Card>
+                        {
+                            loading.stats
+                                ? <Skeleton active/>
+                                : <Doughnut data={cb_data} options={{
+                                    circumference: Math.PI,
+                                    rotation: Math.PI,
+                                    title: {
+                                        display: true,
+                                        text: ' Car/Bike'
+                                    },
+                                    tooltips: {
+                                        callbacks: {
+                                            title: function (item, data) {
+                                                return data.datasets[item[0].datasetIndex].label;
+                                            },
+                                            label: function (item, data) {
+                                                let label = data.datasets[item.datasetIndex].labels[item.index];
+                                                let value = data.datasets[item.datasetIndex].data[item.index];
+                                                return label + ': ' + value;
+                                            }
+                                        }
+                                    }
+                                }}/>
+                        }
+                    </Card>
 
 
-                    </Col>
-                    <Col md={8}>
-                        <Card>
-                            <Pie data={entryexit_data} options={{
-                                title: {
-                                    display: true,
-                                    text: 'In Car/Bike'
-                                }
-                            }}/>
-                        </Card>
-                    </Col>
-                </Row>
+                </Col>
+                <Col md={8}>
+                    <Card>
+                        {
+                            loading.checkInEventsData
+                                ? <Skeleton active/>
+                                : <Pie data={entryexit_data} options={{
+                                    title: {
+                                        display: true,
+                                        text: 'In Car/Bike'
+                                    }
+                                }}/>
+                        }
 
-            }
+                    </Card>
+                </Col>
+            </Row>
+
 
             <br/>
 

@@ -22,9 +22,15 @@ class ApmsService {
         return axios.post('/api/apms/event/status?vehicleNo=' + vehicleNo);
     }
 
-    getParkingSlotStats(){
+    getParkingSlotStats() {
         return axios.get('/api/apms/guidance/stats');
     }
+
+    getCheckedInVehiclesCount() {
+        return axios.get('/api/apms/guidance/checked-in/current/count');
+    }
+
+
 }
 
 export default ApmsService.Instance()

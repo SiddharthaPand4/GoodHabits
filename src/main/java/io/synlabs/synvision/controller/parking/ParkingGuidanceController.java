@@ -10,6 +10,7 @@ import io.synlabs.synvision.views.incident.IncidentGroupCountResponse;
 import io.synlabs.synvision.views.parking.HourlyStatsResponse;
 import io.synlabs.synvision.views.parking.ParkingDashboardResponse;
 import io.synlabs.synvision.views.parking.ParkingEventCountResponse;
+import io.synlabs.synvision.views.parking.ParkingEventDashboardResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,12 @@ public class ParkingGuidanceController {
         return guidanceService.stats("lucknow");
     }
 
+    @GetMapping("/checked-in/current/count")
+    public ParkingEventDashboardResponse getCheckedInVehicleCount() {
+        return guidanceService.getCheckedInVehicleCount();
+    }
+
+
     @GetMapping("/hourly")
     public List<HourlyStatsResponse> hourly() {
         return guidanceService.hourly("lucknow");
@@ -49,7 +56,7 @@ public class ParkingGuidanceController {
 
 
     @PostMapping("parking/vehicle/count")
-    public ParkingEventCountResponse getParkingVehicleCount(@RequestBody DashboardRequest request){
+    public ParkingEventCountResponse getParkingVehicleCount(@RequestBody DashboardRequest request) {
         return guidanceService.getParkingVehicleCount(request);
     }
 

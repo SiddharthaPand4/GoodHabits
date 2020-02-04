@@ -5,15 +5,13 @@ import com.querydsl.jpa.impl.JPAQuery;
 import io.synlabs.synvision.entity.parking.ParkingEvent;
 import io.synlabs.synvision.entity.parking.ParkingLot;
 import io.synlabs.synvision.entity.parking.QParkingEvent;
+import io.synlabs.synvision.enums.VehicleType;
 import io.synlabs.synvision.jpa.ParkingEventRepository;
 import io.synlabs.synvision.jpa.ParkingLotRepository;
 import io.synlabs.synvision.jpa.ParkingSlotRepository;
 import io.synlabs.synvision.views.DashboardRequest;
-import io.synlabs.synvision.views.parking.VehicleCountResponse;
+import io.synlabs.synvision.views.parking.*;
 import io.synlabs.synvision.views.incident.IncidentGroupCountResponse;
-import io.synlabs.synvision.views.parking.HourlyStatsResponse;
-import io.synlabs.synvision.views.parking.ParkingDashboardResponse;
-import io.synlabs.synvision.views.parking.ParkingEventCountResponse;
 import io.synlabs.synvision.views.parking.VehicleCountResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -52,6 +50,16 @@ public class ParkingGuidanceService {
         response.setBikesParked(parkingLot.getCarsParked());
         response.setBikeSlots(parkingLot.getBikeSlots());
         response.setCarSlots(parkingLot.getCarSlots());
+        return response;
+    }
+
+    public ParkingEventDashboardResponse getCheckedInVehicleCount() {
+        long checkedInBikeCount = parkingEventRepository.countAllByCheckOutIsNullAndAndType(VehicleType.Bike);
+        long checkedInCarCount = parkingEventRepository.countAllByCheckOutIsNullAndAndType(VehicleType.Car);
+
+        ParkingEventDashboardResponse response = new ParkingEventDashboardResponse();
+        response.setCheckedInBikes(checkedInBikeCount);
+        response.setCheckedInCars(checkedInCarCount);
 
         return response;
     }
