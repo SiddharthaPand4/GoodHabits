@@ -27,4 +27,19 @@ public class ParkingSlot extends BaseEntity {
     @Column(length = 50)
     private String slotGroup;
 
+    private int x;
+    private int y;
+
+    private int p1x;
+    private int p1y;
+
+    private int p2x;
+    private int p2y;
+
+    private int p3x;
+    private int p3y;
+
+    private int p4x;
+    private int p4y;
+
 }

@@ -30,7 +30,8 @@ class ApmsService {
         return axios.get('/api/apms/guidance/checked-in/current/count');
     }
 
-
+    getLots() {
+        return axios.get('/api/apms/guidance/slots?lot=lucknow')
+    }
 }
-
 export default ApmsService.Instance()

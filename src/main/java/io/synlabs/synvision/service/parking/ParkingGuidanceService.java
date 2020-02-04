@@ -4,8 +4,12 @@ import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import io.synlabs.synvision.entity.parking.ParkingEvent;
 import io.synlabs.synvision.entity.parking.ParkingLot;
+import io.synlabs.synvision.entity.parking.ParkingSlot;
+import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.entity.parking.QParkingEvent;
 import io.synlabs.synvision.enums.VehicleType;
+import io.synlabs.synvision.entity.parking.ParkingSlot;
+import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.jpa.ParkingEventRepository;
 import io.synlabs.synvision.jpa.ParkingLotRepository;
 import io.synlabs.synvision.jpa.ParkingSlotRepository;
@@ -200,5 +204,15 @@ public class ParkingGuidanceService {
                 break;
         }
         return checkInEvents;
+    }
+
+    public List<ParkingSlot> slots(String lot) {
+        ParkingLot parkingLot = parkingLotRepository.findOneByName(lot);
+
+        if (parkingLot == null) {
+            throw new NotFoundException("Cannot locate lot" + lot);
+        }
+
+        return parkingSlotRepository.findAllByLotName(lot);
     }
 }

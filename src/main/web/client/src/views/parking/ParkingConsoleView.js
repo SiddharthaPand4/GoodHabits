@@ -33,6 +33,17 @@ const data = {
 };
 
 export default class ParkingConsoleView extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+
+        }
+    }
+
+    componentDidMount() {
+
+    }
+
     render() {
 
         let params = queryString.parse(this.props.location.search);
