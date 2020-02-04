@@ -212,7 +212,6 @@ export default class HomeView extends Component {
                         </Select>
                         <Select defaultValue="csv" style={{ width: 120 }} onChange={this.handleChangeReportType}>
                             <Option value="CSV">CSV</Option>
-                            <Option value="XML">XML</Option>
                             <Option value="JSON">Json</Option>
                         </Select>
                         <Button onClick={this.downloadReport}>Download</Button>
