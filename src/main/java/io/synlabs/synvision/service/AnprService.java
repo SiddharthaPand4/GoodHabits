@@ -152,7 +152,7 @@ public class AnprService extends BaseService {
             parkingEvent= new ParkingEvent();
         }
         parkingEvent.setCheckIn(anprEvent.getEventDate());
-        parkingEvent.setEventId(anprEvent.getId().toString());
+        parkingEvent.setEventId(anprEvent.getEventId().toString());
         parkingEvent.setVehicleNo(anprEvent.getAnprText());
         parkingEvent.setOrg(anprEvent.getOrg());
 
