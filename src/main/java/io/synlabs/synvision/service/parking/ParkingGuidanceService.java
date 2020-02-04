@@ -247,12 +247,51 @@ public class ParkingGuidanceService {
         }
 
         slot.setFree(request.isStatus());
-        parkingSlotRepository.save(slot);
+        parkingSlotRepository.saveAndFlush(slot);
+
+        ParkingLot lot = slot.getLot();
+        int freeSlots = lot.getFreeSlots();
+        int carsParked = lot.getCarsParked();
+        int bikesParked = lot.getBikesParked();
+
+
+        if (request.isStatus()) {
+            freeSlots = freeSlots + 1;
+            if (slot.getVehicleType() != null) {
+
+                if (slot.getVehicleType().equals(VehicleType.Car)) {
+                    carsParked = carsParked - 1;
+                }
+                if (slot.getVehicleType().equals(VehicleType.Bike)) {
+                    bikesParked = bikesParked - 1;
+                }
+            }
+
+
+        } else {
+            freeSlots = freeSlots - 1;
+            if (slot.getVehicleType() != null) {
+
+                if (slot.getVehicleType().equals(VehicleType.Car)) {
+                    carsParked = carsParked + 1;
+                }
+                if (slot.getVehicleType().equals(VehicleType.Bike)) {
+                    bikesParked = bikesParked + 1;
+                }
+            }
+
+        }
+
+        lot.setFreeSlots(freeSlots);
+        lot.setCarsParked(carsParked);
+        lot.setBikesParked(bikesParked);
+        parkingLotRepository.saveAndFlush(lot);
     }
 
     public void updateParkingLotImage(String lotName, String imageName) {
         ParkingLot parkingLot = parkingLotRepository.findOneByName(lotName);
         parkingLot.setLastestImage(imageName);
+        parkingLotRepository.saveAndFlush(parkingLot);
     }
 
     public Resource downloadLotImage(String lotName) {
