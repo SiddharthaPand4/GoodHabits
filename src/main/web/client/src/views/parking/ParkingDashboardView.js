@@ -344,7 +344,7 @@ export default class ParkingDashboardView extends Component {
     getCheckedInVehiclesCount() {
         let {entryexit_data, loading} = this.state;
         loading.checkInEventsData = true;
-        this.setState({loading};
+        this.setState({loading});
         ApmsService.getCheckedInVehiclesCount().then(response => {
             let data = response.data;
             entryexit_data.datasets[0].data[0] = data.checkedInCars;
