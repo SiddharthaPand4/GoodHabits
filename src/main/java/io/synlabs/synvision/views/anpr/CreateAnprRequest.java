@@ -34,7 +34,7 @@ public class CreateAnprRequest implements Request {
     @JsonProperty("helmet")
     private String helmetStatus;
 
-    @JsonProperty("speed")
+    private String source;
     private Float speed;
 
     public Long getId() {
@@ -51,6 +51,7 @@ public class CreateAnprRequest implements Request {
         event.setDirection(direction);
         event.setVehicleClass(vehicleClass);
         event.setEventId(UUID.randomUUID().toString());
+        event.setSource(source);
         if ("motorbike".equals(vehicleClass) && "without_helmet".equals(helmetStatus)) {
             event.setHelmetMissing(true);
         }

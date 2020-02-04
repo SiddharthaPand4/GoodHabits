@@ -50,4 +50,5 @@ public class AnprEvent extends BaseEntity {
 
     private Float speed;
 
+    private String source;
 }

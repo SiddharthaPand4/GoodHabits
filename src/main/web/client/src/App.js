@@ -27,6 +27,7 @@ import ParkingDashboardView from "./views/parking/ParkingDashboardView";
 import ParkingConsoleView from "./views/parking/ParkingConsoleView";
 import PgsReportView from "./views/parking/ParkingReportView";
 import ParkingInOutView from "./views/parking/ParkingInOutView";
+import PeopleCounting from "./views/PeopleCount/PeopleCounting";
 
 const {Content} = Layout;
 
@@ -75,6 +76,7 @@ class App extends Component {
                                 <PrivateRoute path='/trigger' exact={true} component={TriggerView}/>
                                 <PrivateRoute path='/device' exact={true} component={DeviceView}/>
                                 <PrivateRoute path='/device/conf' exact={true} component={DeviceConfigView}/>
+                                <PrivateRoute path='/people-counting/events' exact={true} component={PeopleCounting}/>
 
 
                                 {/* PGS is parking guideance and management system */}
