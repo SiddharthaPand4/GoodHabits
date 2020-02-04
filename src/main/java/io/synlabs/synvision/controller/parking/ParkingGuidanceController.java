@@ -83,7 +83,7 @@ public class ParkingGuidanceController {
         if (file == null) throw new FileStorageException("Missing file in multipart");
         logger.info("File uploaded, now importing..{} with tag {}", file.getOriginalFilename(), lotName);
         try {
-            Path fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir(), lotName).toAbsolutePath().normalize();
+            Path fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir(), "pgs").toAbsolutePath().normalize();
 
             if (!Files.exists(fileStorageLocation)) {
                 File dir = new File(fileStorageLocation.toString());
