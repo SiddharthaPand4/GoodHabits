@@ -1,17 +1,14 @@
 package io.synlabs.synvision.controller.parking;
 
 import io.synlabs.synvision.config.FileStorageProperties;
-import io.synlabs.synvision.controller.anpr.AnprController;
 import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.service.parking.ParkingGuidanceService;
 import io.synlabs.synvision.views.DashboardRequest;
 import io.synlabs.synvision.views.UploadFileResponse;
-import io.synlabs.synvision.views.incident.IncidentGroupCountResponse;
 import io.synlabs.synvision.views.parking.HourlyStatsResponse;
 import io.synlabs.synvision.views.parking.ParkingDashboardResponse;
 import io.synlabs.synvision.views.parking.ParkingEventCountResponse;
 import io.synlabs.synvision.views.parking.ParkingEventDashboardResponse;
-import io.synlabs.synvision.views.parking.ParkingSlotResponse;
 import io.synlabs.synvision.views.parking.ParkingSlotResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +31,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/apms/guidance")
 public class ParkingGuidanceController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AnprController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ParkingGuidanceController.class);
 
     @Autowired
     private FileStorageProperties fileStorageProperties;
@@ -47,6 +44,7 @@ public class ParkingGuidanceController {
         //return userService.getRoles().stream().map(RoleResponse::new).collect(Collectors.toList());
         return guidanceService.slots("lucknow").stream().map(ParkingSlotResponse::new).collect(Collectors.toList());
     }
+
     @GetMapping("/stats")
     public ParkingDashboardResponse stats() {
         return guidanceService.stats("lucknow");
@@ -56,7 +54,6 @@ public class ParkingGuidanceController {
     public ParkingEventDashboardResponse getCheckedInVehicleCount() {
         return guidanceService.getCheckedInVehicleCount();
     }
-
 
     @GetMapping("/hourly")
     public List<HourlyStatsResponse> hourly() {
@@ -72,12 +69,12 @@ public class ParkingGuidanceController {
     //TODO attach this with the lot and do slot calculation
     //TODO upload to S3
     @PostMapping("/image")
-    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("tag") String tag) {
+    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("lot") String lotName) {
 
         if (file == null) throw new FileStorageException("Missing file in multipart");
-        logger.info("File uploaded, now importing..{} with tag {}", file.getOriginalFilename(), tag);
+        logger.info("File uploaded, now importing..{} with tag {}", file.getOriginalFilename(), lotName);
         try {
-            Path fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir(), tag).toAbsolutePath().normalize();
+            Path fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir(), lotName).toAbsolutePath().normalize();
 
             if (!Files.exists(fileStorageLocation)) {
                 File dir = new File(fileStorageLocation.toString());
@@ -88,7 +85,8 @@ public class ParkingGuidanceController {
 
             Path targetLocation = fileStorageLocation.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-            return new UploadFileResponse(fileName, file.getContentType(), file.getSize(), tag);
+            guidanceService.updateParkingLotImage(lotName, fileName);
+            return new UploadFileResponse(fileName, file.getContentType(), file.getSize(), lotName);
         } catch (IOException e) {
             throw new FileStorageException("Error copying file to storage");
         }

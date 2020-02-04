@@ -6,7 +6,7 @@ import useImage from 'use-image';
 import ApmsService from "../../services/ApmsService";
 
 const ParkingImage = () => {
-    const [image] = useImage('/pgs/p-001.png');
+    const [image] = useImage('/public/apms/lot/lucknow/image.jpg');
     return <Image image={image}/>;
 };
 

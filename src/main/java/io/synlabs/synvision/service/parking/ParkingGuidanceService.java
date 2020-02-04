@@ -2,28 +2,34 @@ package io.synlabs.synvision.service.parking;
 
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
-import io.synlabs.synvision.entity.parking.ParkingEvent;
+import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.entity.parking.ParkingLot;
 import io.synlabs.synvision.entity.parking.ParkingSlot;
+import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.entity.parking.QParkingEvent;
 import io.synlabs.synvision.enums.VehicleType;
-import io.synlabs.synvision.entity.parking.ParkingSlot;
-import io.synlabs.synvision.ex.NotFoundException;
+
 import io.synlabs.synvision.jpa.ParkingEventRepository;
 import io.synlabs.synvision.jpa.ParkingLotRepository;
 import io.synlabs.synvision.jpa.ParkingSlotRepository;
 import io.synlabs.synvision.views.DashboardRequest;
 import io.synlabs.synvision.views.parking.*;
-import io.synlabs.synvision.views.incident.IncidentGroupCountResponse;
 import io.synlabs.synvision.views.parking.VehicleCountResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -42,7 +48,25 @@ public class ParkingGuidanceService {
     @Autowired
     private EntityManager entityManager;
 
+
+    @Autowired
+    private FileStorageProperties fileStorageProperties;
+    private Path fileStorageLocation;
+
     private static final Logger logger = LoggerFactory.getLogger(ParkingGuidanceService.class);
+
+
+    @PostConstruct
+    public void init() {
+        this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
+                .toAbsolutePath().normalize();
+
+        try {
+            Files.createDirectories(this.fileStorageLocation);
+        } catch (Exception ex) {
+            throw new FileStorageException("Could not create the directory where the uploaded files will be stored.", ex);
+        }
+    }
 
     public ParkingDashboardResponse stats(String lot) {
 
@@ -214,5 +238,33 @@ public class ParkingGuidanceService {
         }
 
         return parkingSlotRepository.findAllByLotName(lot);
+    }
+
+    public void updateParkingLotImage(String lotName, String imageName) {
+        ParkingLot parkingLot = parkingLotRepository.findOneByName(lotName);
+        parkingLot.setLastestImage(imageName);
+    }
+
+    public Resource downloadLotImage(String lotName) {
+        String filename = null;
+        Resource resource = null;
+        try {
+            ParkingLot parkingLot = parkingLotRepository.findOneByName(lotName);
+            if (parkingLot != null) {
+                filename = parkingLot.getLastestImage();
+
+                if (!StringUtils.isEmpty(filename)) {
+                    Path filePath = Paths.get(this.fileStorageLocation.toString(), "pgs", filename).toAbsolutePath().normalize();
+                    resource = new UrlResource(filePath.toUri());
+                }
+            }
+            if (resource != null && resource.exists()) {
+                return resource;
+            } else {
+                throw new NotFoundException("File not found " + filename);
+            }
+        } catch (MalformedURLException ex) {
+            throw new NotFoundException("File not found " + filename, ex);
+        }
     }
 }
