@@ -23,6 +23,10 @@ import TrafficIncidentView from "./views/TrafficIncidentView";
 import IncidentRepeatedView from "./views/incidentsRepeated/IncidentRepeatedView";
 import IncidentHotlistView from "./views/IncidentHotlistView";
 import MasterDataView from "./views/masterData/MasterDataView";
+import ParkingDashboardView from "./views/parking/ParkingDashboardView";
+import ParkingConsoleView from "./views/parking/ParkingConsoleView";
+import PgsReportView from "./views/parking/ParkingReportView";
+import ParkingInOutView from "./views/parking/ParkingInOutView";
 import PeopleCounting from "./views/PeopleCount/PeopleCounting";
 import ApcDashboard from "./views/PeopleCount/ApcDashboard";
 const {Content} = Layout;
@@ -73,6 +77,13 @@ class App extends Component {
                                 <PrivateRoute path='/device' exact={true} component={DeviceView}/>
                                 <PrivateRoute path='/device/conf' exact={true} component={DeviceConfigView}/>
                                 <PrivateRoute path='/people-counting/events' exact={true} component={PeopleCounting}/>
+
+
+                                {/* PGS is parking guideance and management system */}
+                                <PrivateRoute path='/pgs/dashboard' exact={true} component={ParkingDashboardView}/>
+                                <PrivateRoute path='/pgs/console' exact={true} component={ParkingConsoleView}/>
+                                <PrivateRoute path='/pgs/inout' exact={true} component={ParkingInOutView}/>
+                                <PrivateRoute path='/pgs/reports' exact={true} component={PgsReportView}/>
                                 <PrivateRoute path='/people-counting/Dashboard' exact={true} component={ApcDashboard}/>
                             </div>
                         </Content>

@@ -37,6 +37,15 @@ class DashboardService {
         return axios.post('/api/dashboard/incident/vehicle/count', filter);
     }
 
+    getParkingVehicleCount(fromDate, toDate, xAxis) {
+        let filter = {
+            fromDateString: moment(fromDate).format('YYYY-MM-DD HH:mm:ss'),
+            toDateString: moment(toDate).format('YYYY-MM-DD HH:mm:ss'),
+            xAxis: xAxis
+        };
+        return axios.post('/api/apms/guidance/parking/vehicle/count', filter);
+    }
+
     getColor(index) {
         let color = "";
         let colors = [
