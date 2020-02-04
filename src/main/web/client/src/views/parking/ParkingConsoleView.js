@@ -1,9 +1,10 @@
 import React, {Component} from "react";
-import {Button, Col, Row, Slider} from "antd";
+import {Button, Col, Row, Select, Slider} from "antd";
 import queryString from 'query-string';
 import {Image, Layer, Line, Stage, Star} from 'react-konva';
 import useImage from 'use-image';
 import ApmsService from "../../services/ApmsService";
+const { Option } = Select;
 
 const ParkingImage = () => {
     const [image] = useImage('/public/apms/lot/lucknow/image.jpg');
@@ -21,11 +22,12 @@ export default class ParkingConsoleView extends Component {
             cartotal: 0,
             bikefull: 0,
             carfull: 0
-        }
+        };
+        this.togglerRef = React.createRef();
     }
 
     componentDidMount() {
-        this.intervalID = setInterval(this.refresh.bind(this), 5000);
+        this.intervalID = setInterval(this.refresh.bind(this), 30*1000);
         this.refresh();
     }
 
@@ -53,7 +55,7 @@ export default class ParkingConsoleView extends Component {
                 }
             });
 
-            console.log(carfull,cartotal, bikefull, biketotal);
+
             this.setState({
                 slots: response.data,
                 loading: false,
@@ -61,7 +63,11 @@ export default class ParkingConsoleView extends Component {
                 cartotal: cartotal,
                 bikefull: bikefull,
                 biketotal: biketotal
-            })
+            });
+            let params = queryString.parse(this.props.location.search);
+            if (params.edit) {
+                this.togglerRef.current.refresh(response.data)
+            }
         })
     }
 
@@ -74,12 +80,11 @@ export default class ParkingConsoleView extends Component {
         const bikefull = this.state.bikefull;
         const carfull = this.state.carfull;
 
-
+        console.log("R", carfull, cartotal, bikefull, biketotal);
         if (loading || !data) {
             return (<div>Loading...</div>)
         }
 
-        console.log(this.state);
         let params = queryString.parse(this.props.location.search);
 
         return (
@@ -113,13 +118,63 @@ export default class ParkingConsoleView extends Component {
                         </Stage>
                     </Col>
                     <Col md={8}>
-                        Car: <Slider defaultValue={carfull} tooltipVisible max={cartotal}/>
-                        Bike: <Slider defaultValue={bikefull} tooltipVisible max={biketotal} />
+                        Car: <Slider value={carfull} tooltipVisible max={cartotal}/>
+                        Bike: <Slider value={bikefull} tooltipVisible max={biketotal} />
 
-                        {params.edit && <div><label>Toggle:</label><input/><Button>GO</Button></div>}
+                        {params.edit && <SlotToggler ref={this.togglerRef} slots={data}/>}
                     </Col>
                 </Row>
             </div>
         )
+    }
+}
+
+class SlotToggler extends Component {
+    constructor(props) {
+        super(props);
+
+        let slotmap = {};
+        props.slots.forEach(v => {
+            slotmap[v.name] = v;
+        });
+
+        this.state = {
+            slots:slotmap,
+            selectedSlot:"C1"
+        };
+        this.handleChange = this.handleChange.bind(this);
+        this.updateSlot = this.updateSlot.bind(this);
+    }
+
+    refresh(data) {
+        let slotmap = {};
+        data.forEach(v => {
+            slotmap[v.name] = v;
+        });
+
+        this.setState({
+            slots:slotmap,
+        });
+    }
+    handleChange(value) {
+        this.setState({selectedSlot:value});
+    }
+
+    updateSlot() {
+        ApmsService.updateSlot(this.state.selectedSlot, !this.state.slots[this.state.selectedSlot].free)
+    }
+
+    render() {
+        const ss = this.state.selectedSlot;
+        return (
+            <div>
+                <label>Toggle:</label>
+                <Select onChange={this.handleChange} defaultValue={ss}>
+                    <Option value="C1">C1</Option>
+                    <Option value="C2">C2</Option>
+                    <Option value="B1">B1</Option>
+                    <Option value="B2">B2</Option>
+                </Select>
+                <Button onClick={this.updateSlot}>GO</Button></div>)
     }
 }

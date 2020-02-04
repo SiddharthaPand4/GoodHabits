@@ -10,6 +10,9 @@ import io.synlabs.synvision.views.parking.ParkingDashboardResponse;
 import io.synlabs.synvision.views.parking.ParkingEventCountResponse;
 import io.synlabs.synvision.views.parking.ParkingEventDashboardResponse;
 import io.synlabs.synvision.views.parking.ParkingSlotResponse;
+import io.synlabs.synvision.views.incident.IncidentGroupCountResponse;
+import io.synlabs.synvision.views.parking.*;
+import io.synlabs.synvision.views.parking.ParkingSlotResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +47,12 @@ public class ParkingGuidanceController {
         //return userService.getRoles().stream().map(RoleResponse::new).collect(Collectors.toList());
         return guidanceService.slots("lucknow").stream().map(ParkingSlotResponse::new).collect(Collectors.toList());
     }
+
+    @PostMapping("slots")
+    public void updateSlot(@RequestBody UpdateSlotRequest request) {
+        guidanceService.updateSlot(request);
+    }
+
 
     @GetMapping("/stats")
     public ParkingDashboardResponse stats() {
