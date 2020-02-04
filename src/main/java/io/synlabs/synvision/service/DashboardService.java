@@ -4,6 +4,7 @@ import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import io.synlabs.synvision.entity.anpr.QAnprEvent;
 import io.synlabs.synvision.entity.atcc.QAtccRawData;
+import io.synlabs.synvision.entity.parking.QParkingEvent;
 import io.synlabs.synvision.jpa.AnprEventRepository;
 import io.synlabs.synvision.views.DashboardRequest;
 import io.synlabs.synvision.views.DashboardResponse;
@@ -126,6 +127,8 @@ public class DashboardService extends BaseService {
         return response;
     }
 
+
+
     public List<IncidentCountResponse> getHelmetMissingIncidents(DashboardRequest request) {
 
         List<IncidentCountResponse> helmetMissingIncidents = new ArrayList<>();
@@ -183,6 +186,8 @@ public class DashboardService extends BaseService {
         }
         return helmetMissingIncidents;
     }
+
+
 
     public List<IncidentCountResponse> getReverseDirectionIncidents(DashboardRequest request) {
 

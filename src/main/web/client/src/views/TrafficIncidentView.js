@@ -33,7 +33,7 @@ export default class TrafficIncidentView extends Component {
             events: {},
             filter: {
                 page: 1,
-                pageSize: 24
+                pageSize: 12
             },
             workingEvent: {},
             workingEventLoading: false,
@@ -230,8 +230,8 @@ export default class TrafficIncidentView extends Component {
                                     </Menu.Item>
                                     <Menu.Item key="3">
                                         <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon
-                                            type="delete"/>{' '}
-                                            Delete
+                                            type="warning"/>{' '}
+                                            Archive
                                         </Button>
                                     </Menu.Item>
 
@@ -258,7 +258,7 @@ export default class TrafficIncidentView extends Component {
                                             value={typeof zoomFactor === 'number' ? zoomFactor : 0}
                                         />
                                         : <div style={{height:"54px",textAlign: "center"}}>
-                                               <Button size="small" type="primary" onClick={() => this.magnifyEvent(event)} >
+                                               <Button size="small" type="dashed" onClick={() => this.magnifyEvent(event)} >
                                                    <Icon type="zoom-in"/>Zoom Image
                                                </Button>
                                            </div>
@@ -277,7 +277,7 @@ export default class TrafficIncidentView extends Component {
                                     <Text
                                         type="secondary">{(workingEventLoading && workingEvent.id === event.id) ? "saving..." : ""}</Text>
                                     <div>
-                                        <Text code> <Moment format="lll">{event.eventDate}</Moment>{' '}|{' '}<Moment
+                                        <Text code> <Moment format="ll">{event.eventDate}</Moment>{' '}|{' '}<Moment
                                             format="LTS">{event.eventDate}</Moment></Text>
                                     </div>
                                     <div>
@@ -348,8 +348,8 @@ export default class TrafficIncidentView extends Component {
                 <Column title="Action"
                         key="action"
                         render={(text, event) => (
-                            <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon type="delete"/>{' '}
-                                Delete</Button>
+                            <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon type="warning"/>{' '}
+                                Archive</Button>
                         )}
                 />
             </Table>

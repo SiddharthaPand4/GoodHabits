@@ -48,6 +48,7 @@ public class AnprEvent extends BaseEntity {
 
     private boolean hotlisted;
 
-    private String source;
+    private Float speed;
 
+    private String source;
 }

@@ -29,7 +29,7 @@ export default class AnprView extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            visible:true,
+            visible: true,
             loading: true,
             layout: "list",
             events: {},
@@ -98,12 +98,13 @@ export default class AnprView extends Component {
     handleLayoutChange(data) {
         this.setState({layout: data})
     }
+
     handleOnClick = e => {
-                console.log(e);
-                this.setState({
-                  visible: false,
-                });
-              };
+        console.log(e);
+        this.setState({
+            visible: false,
+        });
+    };
 
     handleRefresh() {
         this.refresh();
@@ -205,7 +206,7 @@ export default class AnprView extends Component {
             4: {label: <span>4</span>},
             5: {label: <span><Icon style={{color: nextColor}} type="zoom-in"/></span>,}
         };
-        return <div style={{background: '#ECECEC', padding: '5px'}} >
+        return <div style={{background: '#ECECEC', padding: '5px'}}>
             <Row>
                 {
                     events.map((event, index) =>
@@ -238,8 +239,8 @@ export default class AnprView extends Component {
                                     </Menu.Item>
                                     <Menu.Item key="3">
                                         <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon
-                                            type="delete"/>{' '}
-                                            Delete
+                                            type="warning"/>{' '}
+                                            Archive
                                         </Button>
                                     </Menu.Item>
 
@@ -252,7 +253,7 @@ export default class AnprView extends Component {
                                 cover={(magnifyEventId === event.id) ?
                                     <Magnifier src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}
                                                zoomFactor={zoomFactor}/> : <img alt="event"
-                                                                    src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}/>
+                                                                                src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}/>
 
                                 }
                             >
@@ -266,8 +267,8 @@ export default class AnprView extends Component {
                                             value={typeof zoomFactor === 'number' ? zoomFactor : 0}
                                         />
                                         :
-                                        <div style={{height:"54px",textAlign: "center"}}>
-                                            <Button size="small"  onClick={() => this.magnifyEvent(event)} >
+                                        <div style={{height: "54px", textAlign: "center"}}>
+                                            <Button size="small" type="dashed" onClick={() => this.magnifyEvent(event)}>
                                                 <Icon type="zoom-in"/>Zoom Image
                                             </Button>
                                         </div>
@@ -276,7 +277,7 @@ export default class AnprView extends Component {
                                 </div>
                                 <div style={{textAlign: "center"}}>
                                     <img alt="event"
-                                         src={"/public/anpr/lpr/" + event.id + "/image.jpg"}   />
+                                         src={"/public/anpr/lpr/" + event.id + "/image.jpg"}/>
                                 </div>
                                 <div style={{marginTop: "5px", textAlign: "center"}}
                                      onClick={() => this.editEvent(event)}>
@@ -286,9 +287,11 @@ export default class AnprView extends Component {
                                         copyable>{event.anprText}</Paragraph>
                                     <Text
                                         type="secondary">{(workingEventLoading && workingEvent.id === event.id) ? "saving..." : ""}</Text>
+                                    <Text
+                                        type="secondary">{(event.speed) ? "Speed: "+event.speed : ""}</Text>
                                     <div>
                                         <Text code><Icon type="schedule"/> <Moment
-                                            format="lll">{event.eventDate}</Moment>{' '}|{' '}<Moment
+                                            format="ll">{event.eventDate}</Moment>{' '}|{' '}<Moment
                                             format="LTS">{event.eventDate}</Moment></Text>
                                     </div>
                                     <div>
@@ -357,11 +360,13 @@ export default class AnprView extends Component {
                         render={direction => direction}/>
                 <Column title="Helmet?" dataIndex="helmet" key="helmet"
                         render={helmet => helmet ? <span>No</span> : <span>N/A</span>}/>
+                <Column title="Speed" dataIndex="speed" key="speed"
+                        render={speed => <span>{speed}</span>}/>
                 <Column title="Action"
                         key="action"
                         render={(text, event) => (
                             <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon type="warning"/>{' '}
-                                Delete</Button>
+                                Archive</Button>
                         )}
                 />
 
