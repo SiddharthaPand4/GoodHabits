@@ -4,9 +4,15 @@ import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.controller.anpr.AnprController;
 import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.service.parking.ParkingGuidanceService;
+import io.synlabs.synvision.views.DashboardRequest;
 import io.synlabs.synvision.views.UploadFileResponse;
+import io.synlabs.synvision.views.incident.IncidentGroupCountResponse;
 import io.synlabs.synvision.views.parking.HourlyStatsResponse;
 import io.synlabs.synvision.views.parking.ParkingDashboardResponse;
+import io.synlabs.synvision.views.parking.ParkingEventCountResponse;
+import io.synlabs.synvision.views.parking.ParkingEventDashboardResponse;
+import io.synlabs.synvision.views.parking.ParkingSlotResponse;
+import io.synlabs.synvision.views.parking.ParkingSlotResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +27,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/apms/guidance")
@@ -34,14 +42,31 @@ public class ParkingGuidanceController {
     @Autowired
     private ParkingGuidanceService guidanceService;
 
-    @GetMapping("stats")
+    @GetMapping("/slots")
+    public List<ParkingSlotResponse> getLots() {
+        //return userService.getRoles().stream().map(RoleResponse::new).collect(Collectors.toList());
+        return guidanceService.slots("lucknow").stream().map(ParkingSlotResponse::new).collect(Collectors.toList());
+    }
+    @GetMapping("/stats")
     public ParkingDashboardResponse stats() {
         return guidanceService.stats("lucknow");
     }
 
-    @GetMapping("hourly")
+    @GetMapping("/checked-in/current/count")
+    public ParkingEventDashboardResponse getCheckedInVehicleCount() {
+        return guidanceService.getCheckedInVehicleCount();
+    }
+
+
+    @GetMapping("/hourly")
     public List<HourlyStatsResponse> hourly() {
         return guidanceService.hourly("lucknow");
+    }
+
+
+    @PostMapping("parking/vehicle/count")
+    public ParkingEventCountResponse getParkingVehicleCount(@RequestBody DashboardRequest request) {
+        return guidanceService.getParkingVehicleCount(request);
     }
 
     //TODO attach this with the lot and do slot calculation

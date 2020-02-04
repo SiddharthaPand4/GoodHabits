@@ -29,7 +29,7 @@ export default class Sidebar extends Component {
                 }}
             >
                 <div className="logo">
-                    <img src={"synlabs-logo.png"}/>
+                    <img src={"orbitly-logo.png"}/>
                 </div>
                 <Menu theme="dark" mode="inline" defaultSelectedKeys={['0']}>
                     <Menu.Item key="0">
@@ -67,7 +67,7 @@ export default class Sidebar extends Component {
                     </SubMenu>
 
                     <Menu.Item key="5" className="sidebar-nav-link">
-                        <Link to="/incidents/hotlisted"><Icon type='alert'/><span className='nav-text'>Hotlisted Vehicle Event</span></Link>
+                        <Link to="/incidents/hotlisted"><Icon type='alert'/><span className='nav-text'>Hotlist</span></Link>
                     </Menu.Item>
                     <Menu.Item key="6">
                         <Link to='/feed'><Icon type='video-camera'/><span className='nav-text'>Feed</span></Link>
