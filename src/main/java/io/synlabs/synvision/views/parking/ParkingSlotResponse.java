@@ -12,6 +12,7 @@ public class ParkingSlotResponse {
 
     private String name;
 
+    private boolean misaligned;
 
     private boolean free;
 
@@ -39,6 +40,7 @@ public class ParkingSlotResponse {
         this.free = slot.isFree();
         this.slotGroup = slot.getSlotGroup();
         this.vehicleType = slot.getVehicleType().name();
+        this.misaligned = slot.isMisaligned();
         this.x = slot.getX();
         this.y = slot.getY();
         this.p1x = slot.getP1x();

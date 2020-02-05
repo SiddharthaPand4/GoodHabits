@@ -262,6 +262,7 @@ public class ParkingGuidanceService {
         }
 
         slot.setFree(request.isStatus());
+        slot.setMisaligned(request.isMisaligned());
         parkingSlotRepository.saveAndFlush(slot);
 
         ParkingLot lot =  parkingLotRepository.findOneByName(slot.getLot().getName());

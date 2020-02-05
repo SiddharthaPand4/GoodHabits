@@ -29,6 +29,8 @@ public class ParkingSlot extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private VehicleType vehicleType;
 
+    private boolean misaligned;
+
     private int x;
     private int y;
 

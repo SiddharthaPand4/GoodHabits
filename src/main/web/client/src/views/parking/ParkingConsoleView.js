@@ -1,7 +1,7 @@
 import React, {Component} from "react";
-import {Button, Col, Row, Select, Slider, Card} from "antd";
+import {Button, Col, Row, Select, Switch} from "antd";
 import queryString from 'query-string';
-import {Image, Layer, Line, Stage, Star, Group, Label, Tag, Text} from 'react-konva';
+import {Group, Image, Label, Layer, Line, Stage, Star, Tag, Text} from 'react-konva';
 import useImage from 'use-image';
 import ApmsService from "../../services/ApmsService";
 
@@ -142,15 +142,22 @@ export default class ParkingConsoleView extends Component {
                             </Layer>
                         </Stage>
                     </Col>
+                    {/*
                     <Col xl={{span: 12}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}}>
                         <Card>
 
                             Car: <Slider value={carfull} tooltipVisible max={cartotal}/>
                             Bike: <Slider value={bikefull} tooltipVisible max={biketotal}/>
 
-                            {params.edit && <SlotToggler ref={this.togglerRef} slots={data}/>}
+
                         </Card>
 
+                    </Col>
+                    */}
+                </Row>
+                <Row>
+                    <Col>
+                        {params.edit && <SlotToggler ref={this.togglerRef} slots={data}/>}
                     </Col>
                 </Row>
             </div>
@@ -169,44 +176,81 @@ class SlotToggler extends Component {
 
         this.state = {
             slots: slotmap,
-            selectedSlot: "C1"
+            selectedSlot: "C1",
+            ss: slotmap["C1"]
         };
         this.handleChange = this.handleChange.bind(this);
         this.updateSlot = this.updateSlot.bind(this);
+        this.onAlignmentChange = this.onAlignmentChange.bind(this);
+        this.onFreeChange = this.onFreeChange.bind(this);
     }
 
     refresh(data) {
         let slotmap = {};
+
         data.forEach(v => {
             slotmap[v.name] = v;
         });
-
+        let ss = slotmap[this.state.selectedSlot];
         this.setState({
             slots: slotmap,
+            ss:ss
         });
     }
 
     handleChange(value) {
-        this.setState({selectedSlot: value});
+        let slot = this.state.slots[this.state.selectedSlot];
+        this.setState({selectedSlot: value, ss:slot});
+    }
+
+    onAlignmentChange(value) {
+        let slot = this.state.ss;
+        slot.misaligned = value;
+        this.setState({ss: slot});
+    }
+
+    onFreeChange(value) {
+        let slot = this.state.ss;
+        slot.free = value;
+        this.setState({ss: slot});
     }
 
     updateSlot() {
-        ApmsService.updateSlot(this.state.selectedSlot, !this.state.slots[this.state.selectedSlot].free)
+        ApmsService.updateSlot(this.state.ss)
     }
 
     render() {
-        const ss = this.state.selectedSlot;
+        const ss = this.state.ss;
         const slots = this.props.slots;
         return (
             <div>
-                <label>Toggle:</label>
-                <Select onChange={this.handleChange} defaultValue={ss}>
+                <table>
+                    <tr>
+                        <th>Slot</th>
+                        <th>Free</th>
+                        <th>MisAligned</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <Select onChange={this.handleChange} value={ss.name}>
 
-                    {(slots || []).map((slot, index) => {
-                        return <Option value={slot.name}>{slot.name}</Option>
-                    })}
+                                {(slots || []).map((slot, index) => {
+                                    return <Option value={slot.name}>{slot.name}</Option>
+                                })}
 
-                </Select>
-                <Button onClick={this.updateSlot}>GO</Button></div>)
+                            </Select>
+                        </td>
+                        <td>
+                            <Switch checked={ss.free} onChange={this.onFreeChange}/>
+                        </td>
+                        <td>
+                            <Switch checked={ss.misaligned} onChange={this.onAlignmentChange}/>
+                        </td>
+                        <td><Button onClick={this.updateSlot}>GO</Button></td>
+                    </tr>
+                </table>
+            </div>
+        )
     }
 }
