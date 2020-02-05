@@ -36,19 +36,20 @@ public class ReportController {
     private static Logger logger = LoggerFactory.getLogger(ReportController.class);
 
     @PostMapping("/parkingevents")
-    public void parkingEventReport(@RequestBody ParkingReportRequest request, HttpServletResponse response) {
+    public void parkingEventReport(@RequestBody ParkingReportRequest request, HttpServletResponse response) throws IOException {
         File file=null;
-        if(request.getXAxis().equals("All")) {
-            List<ParkingEvent> parkingEventList = apmsService.listAllParkingEvents(request);
+        String fileName=null;
 
-            file = apmsService.export(parkingEventList, request.getReportType());
-        }
-        else{
-            Map<Date, ParkingReportResponse> totalCheckinAndCheckoutsByDate = apmsService.listParkingEventsOnDailyBasis(request);
+        if (request.getXAxis().equals("All")) {
+            fileName = apmsService.downloadParkingEvents(request);
 
-            file = apmsService.export1(totalCheckinAndCheckoutsByDate, request.getReportType());
+        } else {
+            fileName = apmsService.downloadParkingEventsOnDailyBasis(request);
+
         }
-        String fileName = "Parking Event Report";
+
+
+        file = new File(fileName);
 
         if (file != null && file.exists()) {
             String extension = FilenameUtils.getExtension(file.getName());

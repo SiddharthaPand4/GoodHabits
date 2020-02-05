@@ -49,6 +49,7 @@ export default class HomeView extends Component {
         this.getXAxisOptions = this.getXAxisOptions.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.downloadReport = this.downloadReport.bind(this);
+        this.handleChangeReportType = this.handleChangeReportType.bind(this);
     }
 
     handleChange(value) {
@@ -109,7 +110,14 @@ export default class HomeView extends Component {
 
         ReportService.getParkingEventsReport(req).then(response => {
             this.setState({downloading: false});
-            saveAs(response.data, "parking-events.csv");
+
+            if(filter.reportType=="CSV"){
+                 saveAs(response.data, "parking-events.csv");
+            }
+            else if(filter.reportType=="JSON"){
+                 saveAs(response.data, "parking-events.json");
+            }
+
         }).catch(error => {
             this.setState({downloading: false});
         });
@@ -204,8 +212,7 @@ export default class HomeView extends Component {
                         </Select>
                         <Select defaultValue="csv" style={{ width: 120 }} onChange={this.handleChangeReportType}>
                             <Option value="CSV">CSV</Option>
-                            <Option value="xml">XML</Option>
-                            <Option value="json">Json</Option>
+                            <Option value="JSON">Json</Option>
                         </Select>
                         <Button onClick={this.downloadReport}>Download</Button>
                     </div>}>

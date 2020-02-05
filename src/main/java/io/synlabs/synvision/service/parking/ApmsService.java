@@ -1,5 +1,6 @@
 package io.synlabs.synvision.service.parking;
 
+import com.google.gson.Gson;
 import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.entity.parking.QParkingEvent;
 import io.synlabs.synvision.ex.ValidationException;
@@ -20,8 +21,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.Tuple;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -127,7 +130,11 @@ public class ApmsService extends BaseService {
 
     }
 
-    public List<ParkingEvent> listAllParkingEvents(ParkingReportRequest request) {
+    public String downloadParkingEvents(ParkingReportRequest request) throws IOException {
+        int page = 1;
+        int offset = 0;
+        int limit = 1000;
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             request.setFrom(sdf.parse(request.getFromDateString()));
@@ -144,19 +151,99 @@ public class ApmsService extends BaseService {
 
         switch (xAxis) {
             case "All":
-                result = query
+                      query
                         .select(parkingEvent)
                         .from(parkingEvent)
-                        .where(parkingEvent.checkIn.between(request.getFrom(), request.getTo()))
-                        .fetch();
+                        .where(parkingEvent.checkIn.between(request.getFrom(), request.getTo()));
                 break;
 
         }
+        long totalRecordsCount = query.fetchCount();
+        Path path = Paths.get(uploadDirPath);
+        String filename = null;
+        FileWriter fileWriter = null;
 
-        return  result;
+        switch(request.getReportType()) {
+            case "CSV":
+            filename = path.resolve(UUID.randomUUID().toString() + ".csv").toString();
+            fileWriter = new FileWriter(filename);
+
+            fileWriter.append("Sr. No");
+            fileWriter.append(',');
+            fileWriter.append("EventId");
+            fileWriter.append(',');
+            fileWriter.append("Vehicle No");
+            fileWriter.append(',');
+            fileWriter.append("CheckIn Date");
+            fileWriter.append(',');
+            fileWriter.append("CheckIn Time");
+            fileWriter.append(',');
+            fileWriter.append("CheckOut");
+            fileWriter.append(',');
+            fileWriter.append("CheckOut Time");
+            fileWriter.append('\n');
+            while (totalRecordsCount > offset) {
+                offset = (page - 1) * limit;
+                if (offset > 0) {
+                    query.offset(offset);
+                }
+                query.limit(limit);
+                result = query.fetch();
+
+                int i = 0;
+                for (ParkingEvent event : result) {
+                    fileWriter.append(String.valueOf('"')).append(String.valueOf(i + 1)).append(String.valueOf('"'));
+                    fileWriter.append(',');
+                    fileWriter.append(String.valueOf('"')).append(event.getEventId()).append(String.valueOf('"'));
+                    fileWriter.append(',');
+                    fileWriter.append(String.valueOf('"')).append(event.getVehicleNo()).append(String.valueOf('"'));
+                    fileWriter.append(',');
+                    fileWriter.append(String.valueOf('"')).append(toFormattedDate(event.getCheckIn(), "dd-MM-yyyy")).append(String.valueOf('"'));
+                    fileWriter.append(',');
+                    fileWriter.append(String.valueOf('"')).append(toFormattedDate(event.getCheckIn(), "HH:mm:ss")).append(String.valueOf('"'));
+                    fileWriter.append(',');
+                    fileWriter.append(String.valueOf('"')).append(toFormattedDate(event.getCheckOut(), "dd-MM-yyyy")).append(String.valueOf('"'));
+                    fileWriter.append(',');
+                    fileWriter.append(String.valueOf('"')).append(toFormattedDate(event.getCheckOut(), "HH:mm:ss")).append(String.valueOf('"'));
+
+                    fileWriter.append('\n');
+                }
+                page++;
+            }
+            break;
+
+            case "JSON":
+                filename = path.resolve(UUID.randomUUID().toString() + ".json").toString();
+                fileWriter = new FileWriter(filename);
+                while (totalRecordsCount > offset) {
+                    offset = (page - 1) * limit;
+                    if (offset > 0) {
+                        query.offset(offset);
+                    }
+                    query.limit(limit);
+
+                    result = query.fetch();
+
+
+                    Gson gson = new Gson();
+
+                    for (ParkingEvent event : result) {
+                        ParkingEventResponse response = new ParkingEventResponse(event);
+                        gson.toJson(response, fileWriter);
+                    }
+                    page++;
+                }
+
+                break;
+        }
+
+
+        fileWriter.flush();
+        fileWriter.close();
+        return filename;
     }
 
-    public Map<Date, ParkingReportResponse> listParkingEventsOnDailyBasis(ParkingReportRequest request) {
+    public String downloadParkingEventsOnDailyBasis(ParkingReportRequest request) throws IOException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SimpleDateFormat sdf1 = new SimpleDateFormat("dd/MM/yyyy");
         try {
@@ -175,7 +262,6 @@ public class ApmsService extends BaseService {
         Long checkinCount = null;
         List<com.querydsl.core.Tuple> result = null;
         List<com.querydsl.core.Tuple> result1 = null;
-        List<ParkingReportResponse> response= new ArrayList<>();
         String xAxis = StringUtils.isEmpty(request.getXAxis()) ? "" : request.getXAxis();
         Map<Date, ParkingReportResponse> totalCheckinAndCheckoutsByDate = new TreeMap<Date, ParkingReportResponse>();
 
@@ -232,7 +318,7 @@ public class ApmsService extends BaseService {
 
                     if(totalCheckinAndCheckoutsByDate.containsKey(checkout)){
                         ParkingReportResponse parkingReportResponse = totalCheckinAndCheckoutsByDate.get(checkout);
-                        parkingReportResponse.setCheckOut(checkoutCount);
+                        parkingReportResponse.setTotalCheckOut(checkoutCount);
                         totalCheckinAndCheckoutsByDate.put(checkout,parkingReportResponse);
                     }
 
@@ -245,141 +331,61 @@ public class ApmsService extends BaseService {
                 }
                 break;
         }
-
-        return  totalCheckinAndCheckoutsByDate;
-    }
-
-    public File export(List<ParkingEvent> parkingEvents, String reportType) {
-
-        String reportName = "Parking  Event Report";
-        List<String> header = getHeader();
-        String[][] data = getExportData(parkingEvents);
-        return createReport(reportType, reportName, header, data);
-    }
-
-    private String[][] getExportData(List<ParkingEvent> parkingEvents) {
-        String data[][] = new String[parkingEvents.size()][5];
-        for (int i = 0; i < parkingEvents.size(); i++) {
-            ParkingEvent parkingEvent = parkingEvents.get(i);
-            data[i][0] = "" + ++i; // for S.No index starts from zero
-            --i;                   // back to original
-            data[i][1] = parkingEvent.getEventId();
-            data[i][2] = parkingEvent.getVehicleNo();
-            data[i][3] = toFormattedDate(parkingEvent.getCheckIn(),"dd-MM-yyyy hh:mm:ss");
-            data[i][4] = toFormattedDate(parkingEvent.getCheckOut(),"dd-MM-yyyy hh:mm:ss");
+        List<ParkingReportResponse> responses = new ArrayList<>();
+        for(Date date: totalCheckinAndCheckoutsByDate.keySet()){
+            responses.add(new ParkingReportResponse( totalCheckinAndCheckoutsByDate.get(date).getTotalCheckIn(),totalCheckinAndCheckoutsByDate.get(date).getTotalCheckOut(),toFormattedDate(date,"dd/MM/yyyy")));
         }
-        return data;
-    }
 
-
-
-    public List<String> getHeader() {
-        List<String> header = new ArrayList<>();
-        header.add("S. No");
-        header.add("Event Id");
-        header.add("Vehicle No");
-        header.add("CheckIn");
-        header.add("CheckOut");
-
-        return header;
-    }
-
-    private String[][] getExportData1(Map<Date, ParkingReportResponse>totalCheckinAndCheckoutsByDate) {
-        String data[][] = new String[totalCheckinAndCheckoutsByDate.size()][4];
-        int i=0;
-        for (Date key: totalCheckinAndCheckoutsByDate.keySet()) {
-            data[i][0] = "" + ++i; // for S.No index starts from zero
-            --i;                   // back to original
-            data[i][1] = toFormattedDate(key,"dd/MM/yyyy");
-            data[i][2] = String.valueOf(totalCheckinAndCheckoutsByDate.get(key).getCheckIn());
-            data[i][3] = String.valueOf(totalCheckinAndCheckoutsByDate.get(key).getCheckOut());
-            i++;
-        }
-        return data;
-    }
-
-    public File export1(Map<Date, ParkingReportResponse> totalCheckinAndCheckoutsByDate, String reportType) {
-
-        String reportName = "Parking  Event Report";
-        List<String> header = getHeader1();
-        String[][] data = getExportData1(totalCheckinAndCheckoutsByDate);
-        return createReport(reportType, reportName, header, data);
-    }
-
-
-
-    public List<String> getHeader1() {
-        List<String> header = new ArrayList<>();
-        header.add("S. No");
-        header.add("Date");
-        header.add("Total Check-Ins");
-        header.add("Total Check-Outs");
-
-        return header;
-    }
-
-
-    public File createReport(String reportType, String reportName, List<String> header, String[][] data) {
-        File file = null;
-        switch (reportType) {
+        Path path = Paths.get(uploadDirPath);
+        String filename=null;
+        FileWriter fileWriter= null;
+        switch (request.getReportType()){
             case "CSV":
-                file = createCSV(header, data, new StringBuffer());
+                filename = path.resolve(UUID.randomUUID().toString() + ".csv").toString();
+                fileWriter = new FileWriter(filename);
+                fileWriter.append("Sr. No");
+                fileWriter.append(',');
+                fileWriter.append("Date");
+                fileWriter.append(',');
+                fileWriter.append("Total Check-Ins");
+                fileWriter.append(',');
+                fileWriter.append("Total Check-Outs");
+                fileWriter.append('\n');
+
+                int i=0;
+                for (ParkingReportResponse response1: responses) {
+
+                    fileWriter.append(String.valueOf('"')).append(String.valueOf(i+1)).append(String.valueOf('"'));
+                    fileWriter.append(',');
+                    fileWriter.append(String.valueOf('"')).append(response1.getDate()).append(String.valueOf('"'));
+                    fileWriter.append(',');
+                    fileWriter.append(String.valueOf('"')).append(String.valueOf(response1.getTotalCheckIn())).append(String.valueOf('"'));
+                    fileWriter.append(',');
+                    fileWriter.append(String.valueOf('"')).append(String.valueOf(response1.getTotalCheckOut())).append(String.valueOf('"'));
+
+                    fileWriter.append('\n');
+
+                }
                 break;
+
+            case "JSON":
+                filename = path.resolve(UUID.randomUUID().toString() + ".json").toString();
+                fileWriter = new FileWriter(filename);
+
+                Gson gson = new Gson();
+
+                for (ParkingReportResponse response1 : responses) {
+                     gson.toJson(response1, fileWriter);
+                }
+
+                break;
+
         }
-        return file;
+
+
+        fileWriter.flush();
+        fileWriter.close();
+        return  filename;
     }
 
-    public StringBuffer writeCSVRow(List<String> list, StringBuffer data) {
-        data = data == null ? new StringBuffer() : data;
-        if (!list.isEmpty()) {
-            for (String item : list) {
-                data.append(String.valueOf('"')).append(item).append(String.valueOf('"')).append(",");
-            }
-            data.append("\n");
-        }
-        return data;
-    }
-
-    public StringBuffer writeCSVRows(String[][] rawData, StringBuffer data) {
-        data = data == null ? new StringBuffer() : data;
-        for (int i = 0; i < rawData.length; i++) {
-            for (int j = 0; j < rawData[i].length; j++) {
-                data.append(String.valueOf('"')).append(rawData[i][j]).append(String.valueOf('"')).append(",");
-            }
-            data.append("\n");
-        }
-        return data;
-    }
-
-    protected File writeCSV(StringBuffer data, String fileName) throws IOException {
-        if (StringUtils.isEmpty(fileName)) {
-            fileName = uploadDirPath + "/" + UUID.randomUUID().toString();
-        }
-        fileName = fileName.concat(".csv");
-        File file = new File(fileName);
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(file);
-            fos.write(data.toString().getBytes());
-        } finally {
-            if (fos != null) {
-                fos.close();
-            }
-        }
-        return file;
-    }
-
-    public File createCSV(List<String> list,String[][] rawData,  StringBuffer data){
-        //list contains header ,rawdata is actual row data
-//        header
-        data = writeCSVRow(list, data);
-//        body
-        data = writeCSVRows(rawData, data);
-        try {
-            return writeCSV(data, "");
-        } catch (IOException e) {
-            logger.error("ERROR IN WRITING CSV",e);
-            return null;
-        }
-    }
 }
