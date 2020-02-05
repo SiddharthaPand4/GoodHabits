@@ -34,4 +34,6 @@ public interface AnprEventRepository extends JpaRepository<AnprEvent, Long>, Que
     long findTotalEventsCountListOfEachLpr();
 
     List<AnprEvent> findAllByAnprTextAndArchived(String anprText, boolean isArchived);
+
+    AnprEvent findByEventId(String eventId);
 }

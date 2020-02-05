@@ -1,5 +1,6 @@
 package io.synlabs.synvision.controller.parking;
 
+import io.synlabs.synvision.service.AtccDataService;
 import io.synlabs.synvision.service.parking.ParkingGuidanceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +27,19 @@ public class ParkingFileController {
     private ParkingGuidanceService guidanceService;
 
 
+
+
     @GetMapping("/lot/{name}/image.jpg")
     public ResponseEntity<Resource> downloadVehicleImage(@PathVariable String name, HttpServletRequest request) throws IOException {
 
         Resource resource = guidanceService.downloadLotImage(name);
+        return send(resource, request);
+    }
+
+    @GetMapping("/parking/event/{id}/image.jpg")
+    public ResponseEntity<Resource> downloadVehicleImage(@PathVariable Long id, HttpServletRequest request) throws IOException {
+
+        Resource resource = guidanceService.downloadParkingEventImage(id);
         return send(resource, request);
     }
 
