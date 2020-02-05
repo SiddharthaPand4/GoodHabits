@@ -425,7 +425,7 @@ export default class ParkingDashboardView extends Component {
                                                 size: '10'
                                             },
                                             formatter: (item, context) => {
-                                                return "Slots " + item;
+                                                return  item + " Slots";
                                             }
                                         }
                                     }
