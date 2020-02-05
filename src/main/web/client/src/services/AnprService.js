@@ -19,7 +19,7 @@ class AnprService {
     }
 
     archiveEvent(event) {
-        return axios.delete('/api/anpr/' + event.eventId);
+        return axios.delete('/api/anpr/' + event.id);
     }
 
     archiveAllEvent(lpr) {

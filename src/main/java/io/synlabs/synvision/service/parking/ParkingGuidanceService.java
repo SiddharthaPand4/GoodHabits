@@ -3,6 +3,8 @@ package io.synlabs.synvision.service.parking;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import io.synlabs.synvision.config.FileStorageProperties;
+import io.synlabs.synvision.entity.anpr.AnprEvent;
+import io.synlabs.synvision.entity.parking.ParkingEvent;
 import io.synlabs.synvision.entity.parking.ParkingLot;
 import io.synlabs.synvision.entity.parking.ParkingSlot;
 import io.synlabs.synvision.ex.FileStorageException;
@@ -10,10 +12,14 @@ import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.entity.parking.QParkingEvent;
 import io.synlabs.synvision.enums.VehicleType;
 
+import io.synlabs.synvision.jpa.AnprEventRepository;
 import io.synlabs.synvision.jpa.ParkingEventRepository;
 import io.synlabs.synvision.jpa.ParkingLotRepository;
 import io.synlabs.synvision.jpa.ParkingSlotRepository;
+import io.synlabs.synvision.service.AtccDataService;
 import io.synlabs.synvision.views.DashboardRequest;
+import io.synlabs.synvision.views.common.DummyRequest;
+import io.synlabs.synvision.views.common.DummyResponse;
 import io.synlabs.synvision.views.parking.*;
 import io.synlabs.synvision.views.parking.VehicleCountResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +40,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static io.synlabs.synvision.entity.parking.QParkingLot.parkingLot;
+
 @Service
 public class ParkingGuidanceService {
 
@@ -45,8 +53,15 @@ public class ParkingGuidanceService {
 
     @Autowired
     private ParkingEventRepository parkingEventRepository;
+
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private AtccDataService atccDataService;
+
+    @Autowired
+    private AnprEventRepository anprEventRepository;
 
 
     @Autowired
@@ -315,5 +330,25 @@ public class ParkingGuidanceService {
         } catch (MalformedURLException ex) {
             throw new NotFoundException("File not found " + filename, ex);
         }
+    }
+
+    public Resource downloadParkingEventImage(Long mid) {
+        Resource resource = null;
+        long id = new DummyRequest().unmask(mid);
+        Optional<ParkingEvent> parkingEventOptional = parkingEventRepository.findById(id);
+        if (parkingEventOptional.isPresent()) {
+            ParkingEvent parkingEvent = parkingEventOptional.get();
+            if (!StringUtils.isEmpty(parkingEvent.getEventId())) {
+                AnprEvent anprEvent = anprEventRepository.findByEventId(parkingEvent.getEventId());
+                if (anprEvent != null) {
+                    Long maskedAnprEventId = new DummyResponse().mask(anprEvent.getId());
+                    resource = atccDataService.downloadVehicleImage(maskedAnprEventId);
+                }
+            }
+        }
+        if(resource == null){
+            throw new NotFoundException("File not found " + id);
+        }
+        return resource;
     }
 }
