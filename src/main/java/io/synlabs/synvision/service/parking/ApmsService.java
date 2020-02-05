@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ApmsService extends BaseService {
@@ -150,11 +151,12 @@ public class ApmsService extends BaseService {
         String xAxis = StringUtils.isEmpty(request.getXAxis()) ? "" : request.getXAxis();
 
         switch (xAxis) {
-            case "All":
+            case "All Entry-Exit":
                       query
                         .select(parkingEvent)
                         .from(parkingEvent)
-                        .where(parkingEvent.checkIn.between(request.getFrom(), request.getTo()));
+                        .where(parkingEvent.checkIn.between(request.getFrom(), request.getTo()))
+                        .orderBy(parkingEvent.checkIn.asc());
                 break;
 
         }
@@ -207,6 +209,7 @@ public class ApmsService extends BaseService {
                     fileWriter.append(String.valueOf('"')).append(toFormattedDate(event.getCheckOut(), "HH:mm:ss")).append(String.valueOf('"'));
 
                     fileWriter.append('\n');
+                    i++;
                 }
                 page++;
             }
@@ -224,12 +227,11 @@ public class ApmsService extends BaseService {
 
                     result = query.fetch();
 
+                    List<ParkingEventResponse> responses=result.stream().map(ParkingEventResponse::new).collect(Collectors.toList());
 
-                    Gson gson = new Gson();
-
-                    for (ParkingEvent event : result) {
-                        ParkingEventResponse response = new ParkingEventResponse(event);
-                        gson.toJson(response, fileWriter);
+                    if(responses.size()>0) {
+                        Gson gson = new Gson();
+                        gson.toJson(responses, fileWriter);
                     }
                     page++;
                 }
@@ -267,7 +269,7 @@ public class ApmsService extends BaseService {
 
         switch (xAxis) {
 
-            case "Daily":
+            case "DayWise Summary":
                 result = checkinquery
                         .select(parkingEvent.checkIn,
                                 parkingEvent.count())
@@ -365,6 +367,8 @@ public class ApmsService extends BaseService {
 
                     fileWriter.append('\n');
 
+                    i++;
+
                 }
                 break;
 
@@ -373,10 +377,7 @@ public class ApmsService extends BaseService {
                 fileWriter = new FileWriter(filename);
 
                 Gson gson = new Gson();
-
-                for (ParkingReportResponse response1 : responses) {
-                     gson.toJson(response1, fileWriter);
-                }
+                gson.toJson(responses, fileWriter);
 
                 break;
 
