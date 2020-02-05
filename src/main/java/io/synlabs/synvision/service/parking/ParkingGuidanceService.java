@@ -264,7 +264,7 @@ public class ParkingGuidanceService {
         slot.setFree(request.isStatus());
         parkingSlotRepository.saveAndFlush(slot);
 
-        ParkingLot lot = slot.getLot();
+        ParkingLot lot =  parkingLotRepository.findOneByName(slot.getLot().getName());
         int freeSlots = lot.getFreeSlots();
         int carsParked = lot.getCarsParked();
         int bikesParked = lot.getBikesParked();
@@ -281,8 +281,6 @@ public class ParkingGuidanceService {
                     bikesParked = bikesParked - 1;
                 }
             }
-
-
         } else {
             freeSlots = freeSlots - 1;
             if (slot.getVehicleType() != null) {
@@ -294,7 +292,6 @@ public class ParkingGuidanceService {
                     bikesParked = bikesParked + 1;
                 }
             }
-
         }
 
         lot.setFreeSlots(freeSlots);

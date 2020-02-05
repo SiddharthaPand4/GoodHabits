@@ -16,9 +16,8 @@ import ApmsService from "../../services/ApmsService";
 import {cloneDeep} from 'lodash';
 import DashboardService from "../../services/DashboardService";
 import CommonService from "../../services/CommonService";
-import * as name from "chartjs-plugin-colorschemes";
 import Moment from 'moment';
-import classnames from 'classnames';
+import 'chartjs-plugin-datalabels';
 
 const {Option} = Select;
 const {RangePicker} = DatePicker;
@@ -407,6 +406,28 @@ export default class ParkingDashboardView extends Component {
                                     title: {
                                         display: true,
                                         text: 'Free/Occupied'
+                                    },
+                                    plugins: {
+                                        datalabels: {
+                                            display: true,
+                                            color: '#fff',
+                                            anchor: 'end',
+                                            align: 'start',
+                                            offset: -10,
+                                            borderWidth: 2,
+                                            borderColor: '#fff',
+                                            borderRadius: 25,
+                                            backgroundColor: (context) => {
+                                                return context.dataset.backgroundColor;
+                                            },
+                                            font: {
+                                                weight: 'bold',
+                                                size: '10'
+                                            },
+                                            formatter: (item, context) => {
+                                                return "Slots " + item;
+                                            }
+                                        }
                                     }
                                 }}/>
                         }
@@ -417,26 +438,51 @@ export default class ParkingDashboardView extends Component {
                         {
                             loading.stats
                                 ? <Skeleton active/>
-                                : <Doughnut data={cb_data} options={{
-                                    circumference: Math.PI,
-                                    rotation: Math.PI,
-                                    title: {
-                                        display: true,
-                                        text: ' Car/Bike'
-                                    },
-                                    tooltips: {
-                                        callbacks: {
-                                            title: function (item, data) {
-                                                return data.datasets[item[0].datasetIndex].label;
-                                            },
-                                            label: function (item, data) {
-                                                let label = data.datasets[item.datasetIndex].labels[item.index];
-                                                let value = data.datasets[item.datasetIndex].data[item.index];
-                                                return label + ': ' + value;
+                                : <Doughnut data={cb_data} options={
+                                    {
+                                        circumference: Math.PI,
+                                        rotation: Math.PI,
+                                        title: {
+                                            display: true,
+                                            text: ' Car/Bike'
+                                        },
+                                        tooltips: {
+                                            callbacks: {
+                                                title: function (item, data) {
+                                                    return data.datasets[item[0].datasetIndex].label;
+                                                },
+                                                label: function (item, data) {
+                                                    let label = data.datasets[item.datasetIndex].labels[item.index];
+                                                    let value = data.datasets[item.datasetIndex].data[item.index];
+                                                    return label + ': ' + value;
+                                                }
+                                            }
+                                        },
+                                        plugins: {
+                                            datalabels: {
+                                                display: true,
+                                                color: '#fff',
+                                                anchor: 'end',
+                                                align: 'start',
+                                                offset: -10,
+                                                borderWidth: 2,
+                                                borderColor: '#fff',
+                                                borderRadius: 25,
+                                                backgroundColor: (context) => {
+                                                    return context.dataset.backgroundColor;
+                                                },
+                                                font: {
+                                                    weight: 'bold',
+                                                    size: '10'
+                                                },
+                                                formatter: (item, context) => {
+                                                    return context.dataset.label + ": " + item;
+                                                }
                                             }
                                         }
                                     }
-                                }}/>
+                                }
+                                />
                         }
                     </Card>
 
@@ -460,7 +506,7 @@ export default class ParkingDashboardView extends Component {
             </Row>
 
 
-           {/* <br/>
+            {/* <br/>
 
             <Card title={<div>Parkings
                 &nbsp;
