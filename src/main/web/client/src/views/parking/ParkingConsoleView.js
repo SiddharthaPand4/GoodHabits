@@ -1,10 +1,11 @@
 import React, {Component} from "react";
-import {Button, Col, Row, Select, Slider} from "antd";
+import {Button, Col, Row, Select, Slider, Card} from "antd";
 import queryString from 'query-string';
-import {Image, Layer, Line, Stage, Star} from 'react-konva';
+import {Image, Layer, Line, Stage, Star, Group, Label, Tag, Text} from 'react-konva';
 import useImage from 'use-image';
 import ApmsService from "../../services/ApmsService";
-const { Option } = Select;
+
+const {Option} = Select;
 
 const ParkingImage = () => {
     const [image] = useImage('/public/apms/lot/lucknow/image.jpg');
@@ -27,7 +28,7 @@ export default class ParkingConsoleView extends Component {
     }
 
     componentDidMount() {
-        this.intervalID = setInterval(this.refresh.bind(this), 30*1000);
+        this.intervalID = setInterval(this.refresh.bind(this), 30 * 1000);
         this.refresh();
     }
 
@@ -91,7 +92,7 @@ export default class ParkingConsoleView extends Component {
 
             <div>
                 <Row>
-                    <Col md={8}>
+                    <Col xl={{span: 12}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}}>
                         <Stage width={500} height={500}>
                             <Layer>
                                 <ParkingImage/>
@@ -102,26 +103,54 @@ export default class ParkingConsoleView extends Component {
                                         stroke="red" closed={true}/>
                                 ))}
                                 {Object.keys(data).map((k) => (
-                                    <Star
-                                        key={k}
-                                        x={data[k].x}
-                                        y={data[k].y}
-                                        numPoints={20}
-                                        innerRadius={10}
-                                        outerRadius={10}
-                                        fill={data[k].free ? "green" : "red"}
-                                        opacity={1.0}
-                                        rotation={30}
-                                    />
+                                    <Group>
+                                        <Label x={data[k].x}
+                                               y={data[k].y}
+
+                                        >
+                                            <Tag
+
+                                                fill='black'
+                                                pointerDirection='down'
+                                                pointerWidth={10}
+                                                pointerHeight={10}
+                                                lineJoin='round'
+                                                shadowColor='black'
+                                            />
+                                            <Text
+
+                                                text={data[k].name}
+                                                fontFamily='Calibri'
+                                                fontSize={12}
+                                                padding={3}
+                                                fill='white'
+                                            />
+                                        </Label>
+                                        <Star
+                                            key={k}
+                                            x={data[k].x}
+                                            y={data[k].y}
+                                            numPoints={20}
+                                            innerRadius={10}
+                                            outerRadius={10}
+                                            fill={data[k].free ? "green" : "red"}
+                                            opacity={1.0}
+                                            rotation={30}
+                                        />
+                                    </Group>
                                 ))}
                             </Layer>
                         </Stage>
                     </Col>
-                    <Col md={8}>
-                        Car: <Slider value={carfull} tooltipVisible max={cartotal}/>
-                        Bike: <Slider value={bikefull} tooltipVisible max={biketotal} />
+                    <Col xl={{span: 12}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}}>
+                        <Card>
 
-                        {params.edit && <SlotToggler ref={this.togglerRef} slots={data}/>}
+                            Car: <Slider value={carfull} tooltipVisible max={cartotal}/>
+                            Bike: <Slider value={bikefull} tooltipVisible max={biketotal}/>
+
+                            {params.edit && <SlotToggler ref={this.togglerRef} slots={data}/>}
+                        </Card>
+
                     </Col>
                 </Row>
             </div>
@@ -139,8 +168,8 @@ class SlotToggler extends Component {
         });
 
         this.state = {
-            slots:slotmap,
-            selectedSlot:"C1"
+            slots: slotmap,
+            selectedSlot: "C1"
         };
         this.handleChange = this.handleChange.bind(this);
         this.updateSlot = this.updateSlot.bind(this);
@@ -153,11 +182,12 @@ class SlotToggler extends Component {
         });
 
         this.setState({
-            slots:slotmap,
+            slots: slotmap,
         });
     }
+
     handleChange(value) {
-        this.setState({selectedSlot:value});
+        this.setState({selectedSlot: value});
     }
 
     updateSlot() {
@@ -166,14 +196,16 @@ class SlotToggler extends Component {
 
     render() {
         const ss = this.state.selectedSlot;
+        const slots = this.props.slots;
         return (
             <div>
                 <label>Toggle:</label>
                 <Select onChange={this.handleChange} defaultValue={ss}>
-                    <Option value="C1">C1</Option>
-                    <Option value="C2">C2</Option>
-                    <Option value="B1">B1</Option>
-                    <Option value="B2">B2</Option>
+
+                    {(slots || []).map((slot, index) => {
+                        return <Option value={slot.name}>{slot.name}</Option>
+                    })}
+
                 </Select>
                 <Button onClick={this.updateSlot}>GO</Button></div>)
     }

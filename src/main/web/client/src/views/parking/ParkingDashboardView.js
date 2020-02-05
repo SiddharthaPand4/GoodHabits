@@ -16,9 +16,8 @@ import ApmsService from "../../services/ApmsService";
 import {cloneDeep} from 'lodash';
 import DashboardService from "../../services/DashboardService";
 import CommonService from "../../services/CommonService";
-import * as name from "chartjs-plugin-colorschemes";
 import Moment from 'moment';
-import classnames from 'classnames';
+import 'chartjs-plugin-datalabels';
 
 const {Option} = Select;
 const {RangePicker} = DatePicker;
@@ -398,7 +397,7 @@ export default class ParkingDashboardView extends Component {
 
 
             <Row>
-                <Col md={8}>
+                <Col xl={{span: 12}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}}>
                     <Card>
                         {
                             loading.stats
@@ -407,42 +406,89 @@ export default class ParkingDashboardView extends Component {
                                     title: {
                                         display: true,
                                         text: 'Free/Occupied'
-                                    }
-                                }}/>
-                        }
-                    </Card>
-                </Col>
-                <Col md={8}>
-                    <Card>
-                        {
-                            loading.stats
-                                ? <Skeleton active/>
-                                : <Doughnut data={cb_data} options={{
-                                    circumference: Math.PI,
-                                    rotation: Math.PI,
-                                    title: {
-                                        display: true,
-                                        text: ' Car/Bike'
                                     },
-                                    tooltips: {
-                                        callbacks: {
-                                            title: function (item, data) {
-                                                return data.datasets[item[0].datasetIndex].label;
+                                    plugins: {
+                                        datalabels: {
+                                            display: true,
+                                            color: '#fff',
+                                            anchor: 'end',
+                                            align: 'start',
+                                            offset: -10,
+                                            borderWidth: 2,
+                                            borderColor: '#fff',
+                                            borderRadius: 25,
+                                            backgroundColor: (context) => {
+                                                return context.dataset.backgroundColor;
                                             },
-                                            label: function (item, data) {
-                                                let label = data.datasets[item.datasetIndex].labels[item.index];
-                                                let value = data.datasets[item.datasetIndex].data[item.index];
-                                                return label + ': ' + value;
+                                            font: {
+                                                weight: 'bold',
+                                                size: '10'
+                                            },
+                                            formatter: (item, context) => {
+                                                return "Slots " + item;
                                             }
                                         }
                                     }
                                 }}/>
                         }
                     </Card>
+                </Col>
+                <Col xl={{span: 12}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}}>
+                    <Card>
+                        {
+                            loading.stats
+                                ? <Skeleton active/>
+                                : <Doughnut data={cb_data} options={
+                                    {
+                                        circumference: Math.PI,
+                                        rotation: Math.PI,
+                                        title: {
+                                            display: true,
+                                            text: ' Car/Bike'
+                                        },
+                                        tooltips: {
+                                            callbacks: {
+                                                title: function (item, data) {
+                                                    return data.datasets[item[0].datasetIndex].label;
+                                                },
+                                                label: function (item, data) {
+                                                    let label = data.datasets[item.datasetIndex].labels[item.index];
+                                                    let value = data.datasets[item.datasetIndex].data[item.index];
+                                                    return label + ': ' + value;
+                                                }
+                                            }
+                                        },
+                                        plugins: {
+                                            datalabels: {
+                                                display: true,
+                                                color: '#fff',
+                                                anchor: 'end',
+                                                align: 'start',
+                                                offset: -10,
+                                                borderWidth: 2,
+                                                borderColor: '#fff',
+                                                borderRadius: 25,
+                                                backgroundColor: (context) => {
+                                                    return context.dataset.backgroundColor;
+                                                },
+                                                font: {
+                                                    weight: 'bold',
+                                                    size: '10'
+                                                },
+                                                formatter: (item, context) => {
+                                                    return context.dataset.label + ": " + item;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                />
+                        }
+                    </Card>
 
 
                 </Col>
-                <Col md={8}>
+                {/*<Col md={8}>
                     <Card>
                         {
                             loading.checkInEventsData
@@ -456,11 +502,11 @@ export default class ParkingDashboardView extends Component {
                         }
 
                     </Card>
-                </Col>
+                </Col>*/}
             </Row>
 
 
-            <br/>
+            {/* <br/>
 
             <Card title={<div>Parkings
                 &nbsp;
@@ -482,7 +528,7 @@ export default class ParkingDashboardView extends Component {
                 {loading.parkingEventData ? <Skeleton active/> :
                     <Line data={parkingEventData.chartData} options={parkingEventsChartOptions}/>}
 
-            </Card>
+            </Card>*/}
 
             <Modal
                 onCancel={this.handleCancel}
