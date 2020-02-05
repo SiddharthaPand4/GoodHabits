@@ -135,11 +135,11 @@ export default class HomeView extends Component {
         return (<Menu>
 
             <Menu.Item key="1"
-                       onClick={() => this.selectXAxisOption(graphName, "All")}>
+                       onClick={() => this.selectXAxisOption(graphName, "All Entry-Exit")}>
                 All Entry-Exit
             </Menu.Item>
             <Menu.Item key="5"
-                       onClick={() => this.selectXAxisOption(graphName, "Daily")}>
+                       onClick={() => this.selectXAxisOption(graphName, "DayWise Summary")}>
                 DayWise Summary
             </Menu.Item>
         </Menu>)

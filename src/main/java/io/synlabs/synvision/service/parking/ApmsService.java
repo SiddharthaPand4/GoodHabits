@@ -151,7 +151,7 @@ public class ApmsService extends BaseService {
         String xAxis = StringUtils.isEmpty(request.getXAxis()) ? "" : request.getXAxis();
 
         switch (xAxis) {
-            case "All":
+            case "All Entry-Exit":
                       query
                         .select(parkingEvent)
                         .from(parkingEvent)
@@ -269,7 +269,7 @@ public class ApmsService extends BaseService {
 
         switch (xAxis) {
 
-            case "Daily":
+            case "DayWise Summary":
                 result = checkinquery
                         .select(parkingEvent.checkIn,
                                 parkingEvent.count())

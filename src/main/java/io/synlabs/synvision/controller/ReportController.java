@@ -40,7 +40,7 @@ public class ReportController {
         File file=null;
         String fileName=null;
 
-        if (request.getXAxis().equals("All")) {
+        if (request.getXAxis().equals("All Entry-Exit")) {
             fileName = apmsService.downloadParkingEvents(request);
 
         } else {
