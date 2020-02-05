@@ -144,12 +144,12 @@ public class AnprService extends BaseService {
         anprEventRepository.save(anprEvent);
 
         //new parking event record
-        ParkingEvent parkingEvent= parkingEventRepository.findByEventIdAndCheckInIsNull(anprEvent.getId().toString());
+        ParkingEvent parkingEvent= parkingEventRepository.findByEventIdAndCheckInIsNull(anprEvent.getEventId());
         if(parkingEvent==null){
             parkingEvent= new ParkingEvent();
         }
         parkingEvent.setCheckIn(anprEvent.getEventDate());
-        parkingEvent.setEventId(anprEvent.getId().toString());
+        parkingEvent.setEventId(anprEvent.getEventId());
         parkingEvent.setVehicleNo(anprEvent.getAnprText());
         parkingEvent.setOrg(anprEvent.getOrg());
 
