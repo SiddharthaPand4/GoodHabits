@@ -19,6 +19,7 @@ export default class Sidebar extends Component {
     render() {
         return (
             <Sider
+                collapsible
                 breakpoint="lg"
                 collapsedWidth="0"
                 onBreakpoint={broken => {
