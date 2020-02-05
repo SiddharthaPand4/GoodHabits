@@ -11,6 +11,8 @@ public interface ParkingEventRepository extends JpaRepository<ParkingEvent, Long
     ParkingEvent findFirstByVehicleNoAndCheckOutOrderByIdDesc(String vehicleNo, Date checkOut);
 
     ParkingEvent findByEventIdAndCheckInIsNull(String eventId);
+
     long countAllByCheckOutIsNullAndAndType(VehicleType type);
+
 
 }
