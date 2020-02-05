@@ -398,7 +398,7 @@ export default class ParkingDashboardView extends Component {
 
 
             <Row>
-                <Col md={8}>
+                <Col xl={{span: 12}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}}>
                     <Card>
                         {
                             loading.stats
@@ -412,7 +412,7 @@ export default class ParkingDashboardView extends Component {
                         }
                     </Card>
                 </Col>
-                <Col md={8}>
+                <Col xl={{span: 12}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}}>
                     <Card>
                         {
                             loading.stats
@@ -442,7 +442,7 @@ export default class ParkingDashboardView extends Component {
 
 
                 </Col>
-                <Col md={8}>
+                {/*<Col md={8}>
                     <Card>
                         {
                             loading.checkInEventsData
@@ -456,11 +456,11 @@ export default class ParkingDashboardView extends Component {
                         }
 
                     </Card>
-                </Col>
+                </Col>*/}
             </Row>
 
 
-            <br/>
+           {/* <br/>
 
             <Card title={<div>Parkings
                 &nbsp;
@@ -482,7 +482,7 @@ export default class ParkingDashboardView extends Component {
                 {loading.parkingEventData ? <Skeleton active/> :
                     <Line data={parkingEventData.chartData} options={parkingEventsChartOptions}/>}
 
-            </Card>
+            </Card>*/}
 
             <Modal
                 onCancel={this.handleCancel}

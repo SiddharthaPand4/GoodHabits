@@ -90,9 +90,9 @@ export default class Sidebar extends Component {
                            <span>Parking</span>
                          </span>
                     }>
-                        <Menu.Item key="pgs-1" className="sidebar-nav-link">
+                        {/*<Menu.Item key="pgs-1" className="sidebar-nav-link">
                             <Link to='/pgs/dashboard'><span className='nav-text'>Dashboard</span></Link>
-                        </Menu.Item>
+                        </Menu.Item>*/}
                         <Menu.Item key="pgs-2" className="sidebar-nav-link">
                             <Link to='/pgs/console'><span className='nav-text'>Operator Console</span></Link>
                         </Menu.Item>
