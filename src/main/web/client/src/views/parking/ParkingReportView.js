@@ -18,7 +18,7 @@ export default class HomeView extends Component {
             atcc: {
                 filter: {
                     selectedCustomDateRange: "Today",
-                    selectedXAxisOption: "All",
+                    selectedXAxisOption: "All Entry-Exit",
                     fromDate: moment().startOf('day').toDate(),
                     toDate: moment().endOf('day').toDate(),
                     reportType:"CSV",
@@ -197,7 +197,7 @@ export default class HomeView extends Component {
                 <Row>
                      <Col xl={{span: 8}} lg={{span: 6}} md={{span: 4}} sm={{span: 2}} xs={{span: 2}}/>
                      <Col xl={{span: 8}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}}>
-                         <Card title={<div>Parking Guidance Report</div>} style={{top: 50}}>
+                         <Card title={<div>Parking Guidance Report</div>}>
                              <Form>
                                  <Form.Item>
                                     Select Date Range
@@ -236,11 +236,9 @@ export default class HomeView extends Component {
 
                                    </Form.Item>
                                  <Form.Item>
-                                 {this.state.downloading ?
-                                    <Spin indicator={antIcon}/> :null}
-                                    <Button type="primary" htmlType="submit" onClick={this.downloadReport} block disabled={this.state.downloading}>
+                                  <Button type="primary" htmlType="submit" onClick={this.downloadReport} block loading={this.state.downloading}>
                                          Download
-                                    </Button>
+                                  </Button>
                                  </Form.Item>
                              </Form>
 
