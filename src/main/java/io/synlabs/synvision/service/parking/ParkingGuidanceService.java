@@ -89,8 +89,8 @@ public class ParkingGuidanceService {
         ParkingDashboardResponse response = new ParkingDashboardResponse();
         response.setFreeSlots(parkingLot.getFreeSlots());
         response.setTotalSlots(parkingLot.getTotalSlots());
-        response.setCarsParked(parkingLot.getBikesParked());
-        response.setBikesParked(parkingLot.getCarsParked());
+        response.setCarsParked(parkingLot.getCarsParked());
+        response.setBikesParked(parkingLot.getBikesParked());
         response.setBikeSlots(parkingLot.getBikeSlots());
         response.setCarSlots(parkingLot.getCarSlots());
         return response;
@@ -252,7 +252,7 @@ public class ParkingGuidanceService {
             throw new NotFoundException("Cannot locate lot" + lot);
         }
 
-        return parkingSlotRepository.findAllByLotName(lot);
+        return parkingSlotRepository.findAllByLotNameOrderByName(lot);
     }
 
     public void updateSlot(UpdateSlotRequest request) {
@@ -264,7 +264,7 @@ public class ParkingGuidanceService {
         slot.setFree(request.isStatus());
         parkingSlotRepository.saveAndFlush(slot);
 
-        ParkingLot lot = slot.getLot();
+        ParkingLot lot =  parkingLotRepository.findOneByName(slot.getLot().getName());
         int freeSlots = lot.getFreeSlots();
         int carsParked = lot.getCarsParked();
         int bikesParked = lot.getBikesParked();
@@ -281,8 +281,6 @@ public class ParkingGuidanceService {
                     bikesParked = bikesParked - 1;
                 }
             }
-
-
         } else {
             freeSlots = freeSlots - 1;
             if (slot.getVehicleType() != null) {
@@ -294,7 +292,6 @@ public class ParkingGuidanceService {
                     bikesParked = bikesParked + 1;
                 }
             }
-
         }
 
         lot.setFreeSlots(freeSlots);
