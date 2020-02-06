@@ -29,11 +29,23 @@ export default class ParkingConsoleView extends Component {
 
     componentDidMount() {
         this.intervalID = setInterval(this.refresh.bind(this), 30 * 1000);
+        this.ptTimer = setInterval(this.setOccupied.bind(this), 1000);
         this.refresh();
+    }
+
+    setOccupied() {
+        let slots = this.state.slots;
+        slots.forEach(v => {
+            if (!v.free) {
+                v.lastOccupiedSeconds++
+            }
+        });
+        this.setState({slots:slots});
     }
 
     componentWillUnmount() {
         clearInterval(this.intervalID);
+        clearInterval(this.ptTimer);
     }
 
     refresh() {
@@ -72,7 +84,20 @@ export default class ParkingConsoleView extends Component {
         })
     }
 
+    getText(slot) {
 
+        if (slot.free)
+            return slot.misaligned ? (slot.name + " (Misaligned)") : slot.name;
+
+        return slot.misaligned ? (slot.name + " (" + this.fancyTime(slot.lastOccupiedSeconds) + ") " + " (Misaligned)") : slot.name + " (" + this.fancyTime(slot.lastOccupiedSeconds) + ") ";
+    }
+
+    fancyTime(secs) {
+        if (secs <= 60)
+            return secs + "s";
+        if (secs <= 3600)
+            return Math.floor(secs / 60) +"m" + (secs % 60) + "s";
+    }
     render() {
         const loading = this.state.loading;
         const data = this.state.slots;
@@ -119,7 +144,7 @@ export default class ParkingConsoleView extends Component {
                                             />
                                             <Text
 
-                                                text={data[k].misaligned ? (data[k].name + " (Misaligned)") : data[k].name}
+                                                text={this.getText(data[k])}
                                                 fontFamily='Calibri'
                                                 fontSize={12}
                                                 padding={3}

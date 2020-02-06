@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Duration;
+import java.util.Date;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -35,6 +38,8 @@ public class ParkingSlotResponse {
     private int p4x;
     private int p4y;
 
+    private long lastOccupiedSeconds;
+
     public ParkingSlotResponse(ParkingSlot slot) {
         this.name = slot.getName();
         this.free = slot.isFree();
@@ -51,5 +56,15 @@ public class ParkingSlotResponse {
         this.p3y = slot.getP3y();
         this.p4x = slot.getP4x();
         this.p4y = slot.getP4y();
+
+        if (!slot.isFree()) {
+            Date now = new Date();
+            Date lastOccupied = slot.getLastOccupied();
+
+            if (lastOccupied != null) {
+                Duration dur = Duration.between(lastOccupied.toInstant(), now.toInstant());
+                lastOccupiedSeconds = dur.getSeconds();
+            }
+        }
     }
 }
