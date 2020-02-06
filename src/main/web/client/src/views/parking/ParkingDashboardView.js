@@ -272,11 +272,8 @@ export default class ParkingDashboardView extends Component {
             fo_data.datasets[0].data[0] = statsData.parkedSlots;
             fo_data.datasets[0].data[1] = statsData.freeSlots;
 
-            misAlignedData.datasets[0].data[0] = statsData.parkedSlots;
+            misAlignedData.datasets[0].data[0] = statsData.parkedSlots- statsData.parkedMisalignedSlots;
             misAlignedData.datasets[0].data[1] = statsData.parkedMisalignedSlots;
-
-
-
 
             let cb_data = {
                 label: 'Car',
