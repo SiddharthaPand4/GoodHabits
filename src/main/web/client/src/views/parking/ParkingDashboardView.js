@@ -40,7 +40,7 @@ let misAlignedData = {
     ],
     datasets: [{
         data: [],
-        backgroundColor: [DashboardService.getColor(0), DashboardService.getColor(2)]
+        backgroundColor: [DashboardService.getColor(6), DashboardService.getColor(1)]
     }]
 };
 
@@ -419,7 +419,7 @@ export default class ParkingDashboardView extends Component {
                                 : <Pie data={fo_data} options={{
                                     title: {
                                         display: true,
-                                        text: 'Free/Occupied'
+                                        text: 'Free/Occupied Slots'
                                     },
                                     plugins: {
                                         datalabels: {
@@ -510,7 +510,7 @@ export default class ParkingDashboardView extends Component {
                                 : <Pie data={misAlignedData} options={{
                                     title: {
                                         display: true,
-                                        text: 'Aligned/Mis-Aligned'
+                                        text: 'Aligned/Mis-Aligned Occupied Slots'
                                     },
                                     plugins: {
                                         datalabels: {
