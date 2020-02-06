@@ -7,8 +7,11 @@ import lombok.Setter;
 @Setter
 public class ParkingDashboardResponse {
 
-    private int freeSlots;
     private int totalSlots;
+    private int freeSlots;
+    private int parkedSlots;
+    private int parkedMisalignedSlots;
+
     private int carSlots;
     private int bikeSlots;
     private int carsParked;

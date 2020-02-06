@@ -83,16 +83,32 @@ public class ParkingGuidanceService {
         }
     }
 
-    public ParkingDashboardResponse stats(String lot) {
+    public ParkingDashboardResponse stats(String lotName) {
 
-        ParkingLot parkingLot = parkingLotRepository.findOneByName(lot);
+        ParkingLot lot = parkingLotRepository.findOneByName(lotName);
+
+
+        long totalSlots = parkingSlotRepository.countByLot(lot);
+        long totalFreeSlots = parkingSlotRepository.countByLotAndFree(lot, true);
+        long totalParkedSlots = parkingSlotRepository.countByLotAndFree(lot, false);
+        long totalParkedMisalignedSlots = parkingSlotRepository.countByLotAndFreeAndMisaligned(lot, false, true);
+        long carTotalSlots = parkingSlotRepository.countByLotAndVehicleType(lot, VehicleType.Car);
+        long bikeTotalSlots = parkingSlotRepository.countByLotAndVehicleType(lot, VehicleType.Bike);
+        long carsParked = parkingSlotRepository.countByLotAndFreeAndVehicleType(lot, false, VehicleType.Car);
+        long bikesParked = parkingSlotRepository.countByLotAndFreeAndVehicleType(lot, false, VehicleType.Bike);
+
         ParkingDashboardResponse response = new ParkingDashboardResponse();
-        response.setFreeSlots(parkingLot.getFreeSlots());
-        response.setTotalSlots(parkingLot.getTotalSlots());
-        response.setCarsParked(parkingLot.getCarsParked());
-        response.setBikesParked(parkingLot.getBikesParked());
-        response.setBikeSlots(parkingLot.getBikeSlots());
-        response.setCarSlots(parkingLot.getCarSlots());
+        response.setTotalSlots((int) totalSlots);
+        response.setFreeSlots((int) totalFreeSlots);
+        response.setParkedSlots((int) totalParkedSlots);
+        response.setParkedMisalignedSlots((int) totalParkedMisalignedSlots);
+
+        response.setCarsParked((int) carsParked);
+        response.setBikesParked((int) bikesParked);
+
+        response.setCarSlots((int) carTotalSlots);
+        response.setBikeSlots((int) bikeTotalSlots);
+
         return response;
     }
 
@@ -265,7 +281,7 @@ public class ParkingGuidanceService {
         slot.setMisaligned(request.isMisaligned());
         parkingSlotRepository.saveAndFlush(slot);
 
-        ParkingLot lot =  parkingLotRepository.findOneByName(slot.getLot().getName());
+        ParkingLot lot = parkingLotRepository.findOneByName(slot.getLot().getName());
         int freeSlots = lot.getFreeSlots();
         int carsParked = lot.getCarsParked();
         int bikesParked = lot.getBikesParked();
@@ -344,7 +360,7 @@ public class ParkingGuidanceService {
                 }
             }
         }
-        if(resource == null){
+        if (resource == null) {
             throw new NotFoundException("File not found " + id);
         }
         return resource;
