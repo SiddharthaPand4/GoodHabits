@@ -93,7 +93,7 @@ export default class ParkingConsoleView extends Component {
             <div>
                 <Row>
                     <Col xl={{span: 12}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}}>
-                        <Stage width={500} height={500}>
+                        <Stage width={1280} height={724}>
                             <Layer>
                                 <ParkingImage/>
                                 {Object.keys(data).map((k) => (
@@ -110,21 +110,23 @@ export default class ParkingConsoleView extends Component {
                                         >
                                             <Tag
 
-                                                fill='black'
+                                                fill={'black'}
                                                 pointerDirection='down'
                                                 pointerWidth={10}
                                                 pointerHeight={10}
                                                 lineJoin='round'
-                                                shadowColor='black'
+                                                shadowColor={'black'}
                                             />
                                             <Text
 
-                                                text={data[k].name}
+                                                text={data[k].misaligned ? (data[k].name + " (Misaligned)") : data[k].name}
                                                 fontFamily='Calibri'
                                                 fontSize={12}
                                                 padding={3}
                                                 fill='white'
                                             />
+
+
                                         </Label>
                                         <Star
                                             key={k}
@@ -133,7 +135,7 @@ export default class ParkingConsoleView extends Component {
                                             numPoints={20}
                                             innerRadius={10}
                                             outerRadius={10}
-                                            fill={data[k].free ? "green" : "red"}
+                                            fill={data[k].free ? "green" : (data[k].misaligned ? 'blue' : 'red')}
                                             opacity={1.0}
                                             rotation={30}
                                         />
@@ -194,13 +196,13 @@ class SlotToggler extends Component {
         let ss = slotmap[this.state.selectedSlot];
         this.setState({
             slots: slotmap,
-            ss:ss
+            ss: ss
         });
     }
 
     handleChange(value) {
         let slot = this.state.slots[this.state.selectedSlot];
-        this.setState({selectedSlot: value, ss:slot});
+        this.setState({selectedSlot: value, ss: slot});
     }
 
     onAlignmentChange(value) {
