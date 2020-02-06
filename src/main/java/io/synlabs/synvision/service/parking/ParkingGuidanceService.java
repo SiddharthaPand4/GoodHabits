@@ -261,8 +261,19 @@ public class ParkingGuidanceService {
             throw new NotFoundException("Cannot found slot:" + request.getSlot());
         }
 
+        //slot is free -> occupied
+        if (slot.isFree() && !request.isStatus()) {
+            slot.setLastOccupied(new Date());
+        }
+
+        //slot is occupied -> free
+        if (!slot.isFree() && request.isStatus()) {
+            slot.setLastOccupied(null);
+        }
+
         slot.setFree(request.isStatus());
         slot.setMisaligned(request.isMisaligned());
+
         parkingSlotRepository.saveAndFlush(slot);
 
         ParkingLot lot =  parkingLotRepository.findOneByName(slot.getLot().getName());
