@@ -7,10 +7,62 @@ import ApmsService from "../../services/ApmsService";
 
 const {Option} = Select;
 
-const ParkingImage = () => {
-    const [image] = useImage('/public/apms/lot/lucknow/image.jpg');
-    return <Image image={image}/>;
-};
+class ParkingImage extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            image: null
+        };
+    }
+
+    componentDidMount() {
+        this.loadImage();
+    }
+
+    componentDidUpdate(oldProps) {
+
+        if (oldProps.src !== this.props.src) {
+            this.loadImage();
+        }
+    }
+    componentWillUnmount() {
+        this.image.removeEventListener('load', this.handleLoad);
+    }
+
+    handleLoad = () => {
+        // after setState react-konva will update canvas and redraw the layer
+        // because "image" property is changed
+        this.setState({
+            image: this.image
+        });
+        // if you keep same image object during source updates
+        // you will have to update layer manually:
+        // this.imageNode.getLayer().batchDraw();
+    };
+
+    loadImage() {
+
+        // save to "this" to remove "load" handler on unmount
+        this.image = new window.Image();
+        this.image.src = this.props.src;
+        this.image.addEventListener('load', this.handleLoad);
+    }
+
+    render() {
+
+        return (
+            <Image
+                x={this.props.x}
+                y={this.props.y}
+                image={this.state.image}
+                ref={node => {
+                    this.imageNode = node;
+                }}
+            />
+        );
+    }
+}
 
 export default class ParkingConsoleView extends Component {
     constructor(props) {
@@ -22,7 +74,9 @@ export default class ParkingConsoleView extends Component {
             biketotal: 0,
             cartotal: 0,
             bikefull: 0,
-            carfull: 0
+            carfull: 0,
+            img: '/public/apms/lot/lucknow/image.jpg',
+            baseimg: '/public/apms/lot/lucknow/image.jpg'
         };
         this.togglerRef = React.createRef();
     }
@@ -75,7 +129,8 @@ export default class ParkingConsoleView extends Component {
                 carfull: carfull,
                 cartotal: cartotal,
                 bikefull: bikefull,
-                biketotal: biketotal
+                biketotal: biketotal,
+                img: this.state.baseimg + "?rng=" + Math.random()
             });
             let params = queryString.parse(this.props.location.search);
             if (params.edit) {
@@ -105,6 +160,7 @@ export default class ParkingConsoleView extends Component {
         const cartotal = this.state.cartotal;
         const bikefull = this.state.bikefull;
         const carfull = this.state.carfull;
+        const img = this.state.img;
 
         console.log("R", carfull, cartotal, bikefull, biketotal);
         if (loading || !data) {
@@ -120,7 +176,7 @@ export default class ParkingConsoleView extends Component {
                     <Col xl={{span: 12}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}}>
                         <Stage width={1280} height={724}>
                             <Layer>
-                                <ParkingImage/>
+                                <ParkingImage src={img}/>
                                 {Object.keys(data).map((k) => (
                                     <Line
                                         key={k}
