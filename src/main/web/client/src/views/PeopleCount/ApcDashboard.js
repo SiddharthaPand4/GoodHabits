@@ -7,8 +7,6 @@ import classnames from 'classnames';
 import {Bar, Pie, Line} from 'react-chartjs-2';
 import * as name from "chartjs-plugin-colorschemes";
 import cloneDeep from 'lodash/cloneDeep';
-
-
 const {Option} = Select;
 const { RangePicker } = DatePicker;
 
@@ -43,18 +41,16 @@ export default class ApcDashboard extends Component {
                 },
             };
 
-           // this.getIncidentVehicleCount = this.getIncidentVehicleCount.bind(this);
-            this.getApcPeopleCount = this.getApcPeopleCount.bind(this);
-            this.getBarChartOptions = this.getBarChartOptions.bind(this);
-            this.selectDateRange = this.selectDateRange.bind(this);
-            this.selectXAxisOption = this.selectXAxisOption.bind(this);
-            this.refresh = this.refresh.bind(this);
-            this.getDateRangeOptions = this.getDateRangeOptions.bind(this);
-            this.getXAxisOptions = this.getXAxisOptions.bind(this);
-            this.handleDateRangeChange = this.handleDateRangeChange.bind(this);
+        this.getApcPeopleCount = this.getApcPeopleCount.bind(this);
+        this.getBarChartOptions = this.getBarChartOptions.bind(this);
+        this.selectDateRange = this.selectDateRange.bind(this);
+        this.selectXAxisOption = this.selectXAxisOption.bind(this);
+        this.refresh = this.refresh.bind(this);
+        this.getDateRangeOptions = this.getDateRangeOptions.bind(this);
+        this.getXAxisOptions = this.getXAxisOptions.bind(this);
+        this.handleDateRangeChange = this.handleDateRangeChange.bind(this);
 
-
-        }
+    }
     componentDidMount() {
         this.refresh();
     }
@@ -95,58 +91,48 @@ export default class ApcDashboard extends Component {
     }
 
     refresh(){
-        this.getApcPeopleCount(this.state.atcc.filter.fromDate, this.state.atcc.filter.toDate, this.state.atcc.filter.selectedXAxisOption);
+        this.getApcPeopleCount(this.state.apc.filter.fromDate, this.state.apc.filter.toDate, this.state.apc.filter.selectedXAxisOption);
     }
 
     getApcPeopleCount(from_date, to_date, xAxis) {
-            let {atcc} = this.state;
-            atcc.chartData = {
+            let {apc} = this.state;
+            apc.chartData = {
                 labels: [],
                 datasets: []
             };
-            ApcDashboardService.getApcPeopleCount(from_date, to_date, xAxis).then(resposne => {
+            ApcDashboardService.getApcPeopleCount(from_date, to_date, xAxis).then(response => {
 
-                let rawData = resposne.data;
+                let rawData = response.data;
                 if (rawData && rawData.length > 0) {
                     let labelDates = [];
-
-                    let rawDataByVehicleData = [];
+                    let peopleCount = [];
                     for (let i in rawData) {
 
                         if (!labelDates.includes(rawData[i].date)) {
                             labelDates.push(rawData[i].date)
                         }
-
-                        if (!rawDataByVehicleData[rawData[i].vehicleType]) {
-                            rawDataByVehicleData[rawData[i].vehicleType] = {};
-                        }
-                        if (!rawDataByVehicleData[rawData[i].vehicleType][rawData[i].date]) {
-                            rawDataByVehicleData[rawData[i].vehicleType][rawData[i].date] = rawData[i];
-                        }
+                        if(!peopleCount[rawData[i].date]) peopleCount[rawData[i].date]=rawData[i];
                     }
-                    atcc.chartData.labels = labelDates;
-                    let vehicleTypeIndex = 0;
-                    for (let vehicleType in rawDataByVehicleData) {
-
-                        let color = ApcDashboardService.getColor(vehicleTypeIndex);
-                        let dataSet = {
-                            label: vehicleType,
-                            data: [],
-                            backgroundColor: color
-                        };
+                    apc.chartData.labels = labelDates;
+                    let dataSet = {
+                                     label : "No Of People",
+                                     data: [],
+                                     backgroundColor: '#e83e8c'
+                                            };
+                    for (let j in peopleCount) {
 
                         for (let i in labelDates) {
-                            if (rawDataByVehicleData[vehicleType][labelDates[i]]) {
-                                dataSet.data.push(rawDataByVehicleData[vehicleType][labelDates[i]].vehicleCount);
+                            if (peopleCount[labelDates[i]]) {
+                                dataSet.data.push(peopleCount[labelDates[i]].peopleCount);
                             } else {
                                 dataSet.data.push(0);
                             }
                         }
-                        atcc.chartData.datasets.push(dataSet);
-                        vehicleTypeIndex++;
                     }
+                    apc.chartData.datasets.push(dataSet);
                 }
-                this.setState({atcc});
+
+                this.setState({apc});
             }).catch(error => {
                 console.log(error);
             });
@@ -216,10 +202,6 @@ export default class ApcDashboard extends Component {
             yAxisScaleLabel = "Hours(24-hour)"
         }
         let yAxisLabel = "No Of People";
-        if (chartName === "incident") {
-            yAxisLabel = "Challans"
-        }
-
         let options = {
             responsive: true,
             maintainAspectRatio: false,
@@ -258,46 +240,52 @@ export default class ApcDashboard extends Component {
     }
 
     render() {
-        let {atcc, incident} = this.state;
-        const atccChartOptions = this.getBarChartOptions("atcc");
-        const incidentChartOptions = this.getBarChartOptions("incident");
+        let {apc} = this.state;
+        const atccChartOptions = this.getBarChartOptions("apc");
         return (
             <div>
             <div>
-
-                    <Modal
+                  <Modal
                      onCancel={this.handleCancel}
                       title="Custom Date Range"
                       visible={this.state.isOpencustomDateRangeModal ? true : false}
                       footer={[
                       ]}
-
                     >
                          <RangePicker
                           onChange={(changedDateRange)=> this.selectDateRange(this.state.isOpencustomDateRangeModal, "Custom", changedDateRange)} />
                     </Modal>
                   </div>
                 <div>
-                    <Card title={<div>APC
+                    <Card title={<div>People Counting
                         &nbsp;
-                        <Dropdown overlay={() => this.getDateRangeOptions("atcc")}>
+                        <Dropdown overlay={() => this.getDateRangeOptions("apc")}>
                             <Button>
-                                {atcc.filter.selectedCustomDateRange ? atcc.filter.selectedCustomDateRange : "Select"}
+                                {apc.filter.selectedCustomDateRange ? apc.filter.selectedCustomDateRange : "Select"}
                                 <Icon
                                     type="down"/>
                             </Button>
                         </Dropdown>
-                        &nbsp;<Dropdown overlay={() => this.getXAxisOptions("atcc")}>
+                        &nbsp;<Dropdown overlay={() => this.getXAxisOptions("apc")}>
                             <Button>
-                                {atcc.filter.selectedXAxisOption ? atcc.filter.selectedXAxisOption : "Select"} <Icon
+                                {apc.filter.selectedXAxisOption ? apc.filter.selectedXAxisOption : "Select"} <Icon
                                 type="down"/>
                             </Button>
                         </Dropdown>
                     </div>}>
-                        <Line data={atcc.chartData} options={atccChartOptions}/>
+                        <Line data={apc.chartData} options={atccChartOptions}/>
 
                     </Card>
                     </div>
+                    <Card>
+                    <div>
+                    <Doughnut data={apc.chartData} />
+                    </div>
+
+                    </Card>
+
+
+
                     </div>
                 )
             }

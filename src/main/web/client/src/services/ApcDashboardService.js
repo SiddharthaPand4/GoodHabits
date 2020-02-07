@@ -13,7 +13,7 @@ class ApcDashboardService {
             toDateString: moment(toDate).format('YYYY-MM-DD HH:mm:ss"'),
             xAxis: xAxis
         };
-        return axios.post('/api/dashboard/atcc/vehicle/count', filter);
+        return axios.post('/api/apc/dashboard/peoplecount', filter);
     }
     getColor(index) {
         let color = "";
