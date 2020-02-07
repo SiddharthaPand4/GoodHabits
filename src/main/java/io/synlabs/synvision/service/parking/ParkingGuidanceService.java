@@ -3,6 +3,8 @@ package io.synlabs.synvision.service.parking;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import io.synlabs.synvision.config.FileStorageProperties;
+import io.synlabs.synvision.entity.anpr.AnprEvent;
+import io.synlabs.synvision.entity.parking.ParkingEvent;
 import io.synlabs.synvision.entity.parking.ParkingLot;
 import io.synlabs.synvision.entity.parking.ParkingSlot;
 import io.synlabs.synvision.ex.FileStorageException;
@@ -10,10 +12,14 @@ import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.entity.parking.QParkingEvent;
 import io.synlabs.synvision.enums.VehicleType;
 
+import io.synlabs.synvision.jpa.AnprEventRepository;
 import io.synlabs.synvision.jpa.ParkingEventRepository;
 import io.synlabs.synvision.jpa.ParkingLotRepository;
 import io.synlabs.synvision.jpa.ParkingSlotRepository;
+import io.synlabs.synvision.service.AtccDataService;
 import io.synlabs.synvision.views.DashboardRequest;
+import io.synlabs.synvision.views.common.DummyRequest;
+import io.synlabs.synvision.views.common.DummyResponse;
 import io.synlabs.synvision.views.parking.*;
 import io.synlabs.synvision.views.parking.VehicleCountResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +40,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static io.synlabs.synvision.entity.parking.QParkingLot.parkingLot;
+
 @Service
 public class ParkingGuidanceService {
 
@@ -45,8 +53,15 @@ public class ParkingGuidanceService {
 
     @Autowired
     private ParkingEventRepository parkingEventRepository;
+
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private AtccDataService atccDataService;
+
+    @Autowired
+    private AnprEventRepository anprEventRepository;
 
 
     @Autowired
@@ -68,16 +83,32 @@ public class ParkingGuidanceService {
         }
     }
 
-    public ParkingDashboardResponse stats(String lot) {
+    public ParkingDashboardResponse stats(String lotName) {
 
-        ParkingLot parkingLot = parkingLotRepository.findOneByName(lot);
+        ParkingLot lot = parkingLotRepository.findOneByName(lotName);
+
+
+        long totalSlots = parkingSlotRepository.countByLot(lot);
+        long totalFreeSlots = parkingSlotRepository.countByLotAndFree(lot, true);
+        long totalParkedSlots = parkingSlotRepository.countByLotAndFree(lot, false);
+        long totalParkedMisalignedSlots = parkingSlotRepository.countByLotAndFreeAndMisaligned(lot, false, true);
+        long carTotalSlots = parkingSlotRepository.countByLotAndVehicleType(lot, VehicleType.Car);
+        long bikeTotalSlots = parkingSlotRepository.countByLotAndVehicleType(lot, VehicleType.Bike);
+        long carsParked = parkingSlotRepository.countByLotAndFreeAndVehicleType(lot, false, VehicleType.Car);
+        long bikesParked = parkingSlotRepository.countByLotAndFreeAndVehicleType(lot, false, VehicleType.Bike);
+
         ParkingDashboardResponse response = new ParkingDashboardResponse();
-        response.setFreeSlots(parkingLot.getFreeSlots());
-        response.setTotalSlots(parkingLot.getTotalSlots());
-        response.setCarsParked(parkingLot.getBikesParked());
-        response.setBikesParked(parkingLot.getCarsParked());
-        response.setBikeSlots(parkingLot.getBikeSlots());
-        response.setCarSlots(parkingLot.getCarSlots());
+        response.setTotalSlots((int) totalSlots);
+        response.setFreeSlots((int) totalFreeSlots);
+        response.setParkedSlots((int) totalParkedSlots);
+        response.setParkedMisalignedSlots((int) totalParkedMisalignedSlots);
+
+        response.setCarsParked((int) carsParked);
+        response.setBikesParked((int) bikesParked);
+
+        response.setCarSlots((int) carTotalSlots);
+        response.setBikeSlots((int) bikeTotalSlots);
+
         return response;
     }
 
@@ -237,7 +268,7 @@ public class ParkingGuidanceService {
             throw new NotFoundException("Cannot locate lot" + lot);
         }
 
-        return parkingSlotRepository.findAllByLotName(lot);
+        return parkingSlotRepository.findAllByLotNameOrderByName(lot);
     }
 
     public void updateSlot(UpdateSlotRequest request) {
@@ -246,13 +277,61 @@ public class ParkingGuidanceService {
             throw new NotFoundException("Cannot found slot:" + request.getSlot());
         }
 
+        //slot is free -> occupied
+        if (slot.isFree() && !request.isStatus()) {
+            slot.setLastOccupied(new Date());
+        }
+
+        //slot is occupied -> free
+        if (!slot.isFree() && request.isStatus()) {
+            slot.setLastOccupied(null);
+        }
+
         slot.setFree(request.isStatus());
-        parkingSlotRepository.save(slot);
+        slot.setMisaligned(request.isMisaligned());
+
+        parkingSlotRepository.saveAndFlush(slot);
+
+        ParkingLot lot = parkingLotRepository.findOneByName(slot.getLot().getName());
+        int freeSlots = lot.getFreeSlots();
+        int carsParked = lot.getCarsParked();
+        int bikesParked = lot.getBikesParked();
+
+
+        if (request.isStatus()) {
+            freeSlots = freeSlots + 1;
+            if (slot.getVehicleType() != null) {
+
+                if (slot.getVehicleType().equals(VehicleType.Car)) {
+                    carsParked = carsParked - 1;
+                }
+                if (slot.getVehicleType().equals(VehicleType.Bike)) {
+                    bikesParked = bikesParked - 1;
+                }
+            }
+        } else {
+            freeSlots = freeSlots - 1;
+            if (slot.getVehicleType() != null) {
+
+                if (slot.getVehicleType().equals(VehicleType.Car)) {
+                    carsParked = carsParked + 1;
+                }
+                if (slot.getVehicleType().equals(VehicleType.Bike)) {
+                    bikesParked = bikesParked + 1;
+                }
+            }
+        }
+
+        lot.setFreeSlots(freeSlots);
+        lot.setCarsParked(carsParked);
+        lot.setBikesParked(bikesParked);
+        parkingLotRepository.saveAndFlush(lot);
     }
 
     public void updateParkingLotImage(String lotName, String imageName) {
         ParkingLot parkingLot = parkingLotRepository.findOneByName(lotName);
         parkingLot.setLastestImage(imageName);
+        parkingLotRepository.saveAndFlush(parkingLot);
     }
 
     public Resource downloadLotImage(String lotName) {
@@ -276,5 +355,25 @@ public class ParkingGuidanceService {
         } catch (MalformedURLException ex) {
             throw new NotFoundException("File not found " + filename, ex);
         }
+    }
+
+    public Resource downloadParkingEventImage(Long mid) {
+        Resource resource = null;
+        long id = new DummyRequest().unmask(mid);
+        Optional<ParkingEvent> parkingEventOptional = parkingEventRepository.findById(id);
+        if (parkingEventOptional.isPresent()) {
+            ParkingEvent parkingEvent = parkingEventOptional.get();
+            if (!StringUtils.isEmpty(parkingEvent.getEventId())) {
+                AnprEvent anprEvent = anprEventRepository.findByEventId(parkingEvent.getEventId());
+                if (anprEvent != null) {
+                    Long maskedAnprEventId = new DummyResponse().mask(anprEvent.getId());
+                    resource = atccDataService.downloadVehicleImage(maskedAnprEventId);
+                }
+            }
+        }
+        if (resource == null) {
+            throw new NotFoundException("File not found " + id);
+        }
+        return resource;
     }
 }

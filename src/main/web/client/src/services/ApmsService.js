@@ -34,8 +34,8 @@ class ApmsService {
         return axios.get('/api/apms/guidance/slots?lot=lucknow')
     }
 
-    updateSlot(slot, status) {
-        return axios.post('/api/apms/guidance/slots', {lot:'lucknow', slot:slot, status:status})
+    updateSlot(slot) {
+        return axios.post('/api/apms/guidance/slots', {lot:'lucknow', slot:slot.name, status:slot.free, misaligned:slot.misaligned})
     }
 }
 export default ApmsService.Instance()

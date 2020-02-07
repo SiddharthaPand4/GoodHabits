@@ -9,4 +9,5 @@ public class UpdateSlotRequest {
     private String lot;
     private String slot;
     private boolean status;
+    private boolean misaligned;
 }

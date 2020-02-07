@@ -11,11 +11,18 @@ import java.util.Date;
 @Getter
 @Setter
 public class ParkingReportResponse {
-    public Long checkOut;
-    public Long checkIn;
+    public Long totalCheckOut;
+    public Long totalCheckIn;
+    public String date;
 
     public ParkingReportResponse(Long checkIn, Long checkOut) {
-        this.checkOut = checkOut == null ? 0 : checkOut;
-        this.checkIn = checkIn == null ? 0 : checkIn;
+        this.totalCheckOut = checkOut == null ? 0 : checkOut;
+        this.totalCheckIn = checkIn == null ? 0 : checkIn;
+    }
+
+    public ParkingReportResponse(Long checkIn, Long checkOut,String date) {
+        this.totalCheckOut = checkOut == null ? 0 : checkOut;
+        this.totalCheckIn = checkIn == null ? 0 : checkIn;
+        this.date=date;
     }
 }

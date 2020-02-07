@@ -5,8 +5,10 @@ import io.synlabs.synvision.entity.BaseEntity;
 import io.synlabs.synvision.enums.VehicleType;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Getter
@@ -29,6 +31,8 @@ public class ParkingSlot extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private VehicleType vehicleType;
 
+    private boolean misaligned;
+
     private int x;
     private int y;
 
@@ -43,5 +47,8 @@ public class ParkingSlot extends BaseEntity {
 
     private int p4x;
     private int p4y;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastOccupied;
 
 }
