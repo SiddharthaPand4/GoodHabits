@@ -12,34 +12,23 @@ const { RangePicker } = DatePicker;
 
 export default class ApcDashboard extends Component {
 
-        constructor(props) {
-            super(props);
-            this.state = {
-                isOpencustomDateRangeModal:"",
-                atcc: {
-                    filter: {
-                        selectedCustomDateRange: "Today",
-                        selectedXAxisOption: "Hourly",
-                        fromDate:{},
-                        toDate:{}
-                    },
-                    chartData: {
-                        labels: [],
-                        datasets: []
-                    }
-                },incident: {
-                    filter: {
-                        selectedCustomDateRange: "Today",
-                        selectedXAxisOption: "Hourly",
-                        fromDate:{},
-                        toDate:{}
-                    },
-                    chartData: {
-                        labels: [],
-                        datasets: []
-                    }
+    constructor(props) {
+        super(props);
+        this.state = {
+            isOpencustomDateRangeModal:"",
+            apc: {
+                filter: {
+                    selectedCustomDateRange: "Today",
+                    selectedXAxisOption: "Hourly",
+                    fromDate:{},
+                    toDate:{}
                 },
-            };
+                chartData: {
+                    labels: [],
+                    datasets: []
+                }
+            }
+            }
 
         this.getApcPeopleCount = this.getApcPeopleCount.bind(this);
         this.getBarChartOptions = this.getBarChartOptions.bind(this);
@@ -199,7 +188,7 @@ export default class ApcDashboard extends Component {
     getBarChartOptions(chartName) {
         let yAxisScaleLabel = "Day";
         if (this.state[chartName].filter.selectedXAxisOption === "Hourly") {
-            yAxisScaleLabel = "Hours(24-hour)"
+            yAxisScaleLabel = "Hours(24-hour)";
         }
         let yAxisLabel = "No Of People";
         let options = {
@@ -241,7 +230,7 @@ export default class ApcDashboard extends Component {
 
     render() {
         let {apc} = this.state;
-        const atccChartOptions = this.getBarChartOptions("apc");
+        const apcChartOptions = this.getBarChartOptions("apc");
         return (
             <div>
             <div>
@@ -273,19 +262,10 @@ export default class ApcDashboard extends Component {
                             </Button>
                         </Dropdown>
                     </div>}>
-                        <Line data={apc.chartData} options={atccChartOptions}/>
+                        <Line data={apc.chartData} options={apcChartOptions}/>
 
                     </Card>
                     </div>
-                    <Card>
-                    <div>
-                    <Doughnut data={apc.chartData} />
-                    </div>
-
-                    </Card>
-
-
-
                     </div>
                 )
             }
