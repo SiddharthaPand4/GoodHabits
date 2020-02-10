@@ -3,21 +3,16 @@ package io.synlabs.synvision.service;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
-import io.synlabs.synvision.entity.anpr.AnprEvent;
-import io.synlabs.synvision.entity.anpr.HotListVehicle;
-import io.synlabs.synvision.entity.anpr.QAnprEvent;
-import io.synlabs.synvision.entity.anpr.QHotListVehicle;
+import io.synlabs.synvision.entity.anpr.*;
+import io.synlabs.synvision.entity.core.Feed;
 import io.synlabs.synvision.entity.parking.ParkingEvent;
 import io.synlabs.synvision.enums.VehicleType;
-import io.synlabs.synvision.jpa.AnprEventRepository;
-import io.synlabs.synvision.jpa.HotListVehicleRepository;
-import io.synlabs.synvision.jpa.ParkingEventRepository;
+import io.synlabs.synvision.jpa.*;
 import io.synlabs.synvision.views.anpr.*;
 import io.synlabs.synvision.views.common.PageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +22,7 @@ import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,6 +43,12 @@ public class AnprService extends BaseService {
 
     @Autowired
     private ParkingEventRepository parkingEventRepository;
+
+    @Autowired
+    private SpeedSectionRepository speedSectionRepository;
+
+    @Autowired
+    private FeedRepository feedRepository;
 
     @Autowired
     private EntityManager entityManager;
@@ -110,6 +112,7 @@ public class AnprService extends BaseService {
         anprEvent.setArchived(true);
         anprEventRepository.saveAndFlush(anprEvent);
     }
+
     public void archiveAnprEvents(AnprRequest request) {
 
         List<AnprEvent> events = anprEventRepository.findAllByAnprTextAndArchived(request.anprText, false);
@@ -131,32 +134,64 @@ public class AnprService extends BaseService {
             query.limit(pageSize);
             events = query.fetch();
 
-        events.forEach(e->{
-            e.setArchived(true);
-        });
-        anprEventRepository.saveAll(events);
-    }
+            events.forEach(e -> {
+                e.setArchived(true);
+            });
+            anprEventRepository.saveAll(events);
+        }
 
     }
+
     public void addAnprEvent(CreateAnprRequest request) {
+
         AnprEvent anprEvent = request.toEntity();
         anprEvent.setHotlisted(checkHotListed(anprEvent));
-        anprEventRepository.save(anprEvent);
+        anprEvent.setSectionSpeedViolated(checkSectionSpeed(anprEvent));
+        Feed feed = feedRepository.findOneByName(anprEvent.getSource());
+        anprEvent.setFeed(feed);
 
+        anprEventRepository.save(anprEvent);
+    }
+
+    private boolean checkSectionSpeed(AnprEvent anprEvent) {
+
+        //find the feed configured for this source as there can be multple entry and exit cameras in a section
+        Feed feed = anprEvent.getFeed();
+
+        if (feed != null && feed.isCheckSectionSpeed()) {
+
+            //now find the section and all entry sites for this exit site
+            SpeedSection section = speedSectionRepository.findOneByExitSite(feed.getSite());
+
+            //now locate the first anpr event
+            AnprEvent first = anprEventRepository.findOneByAnprTextAndFeedSite(anprEvent.getAnprText(), section.getEntrySite());
+            if (first != null) {
+                long seconds = Duration.between(anprEvent.getEventDate().toInstant(), first.getEventDate().toInstant()).getSeconds();
+
+                //1 mps = 3.6 kmph
+                double avgspeed = 3.6 * (section.getSectionDistance() * 1.0 ) / seconds;
+                anprEvent.setSpeed((float)avgspeed);
+                return avgspeed > section.getMaxSpeed();
+            }
+        }
+        return false;
+    }
+
+
+    private void parkingEvent(AnprEvent anprEvent) {
         //new parking event record
-        ParkingEvent parkingEvent= parkingEventRepository.findByEventIdAndCheckInIsNull(anprEvent.getEventId());
-        if(parkingEvent==null){
-            parkingEvent= new ParkingEvent();
+        ParkingEvent parkingEvent = parkingEventRepository.findByEventIdAndCheckInIsNull(anprEvent.getEventId());
+        if (parkingEvent == null) {
+            parkingEvent = new ParkingEvent();
         }
         parkingEvent.setCheckIn(anprEvent.getEventDate());
         parkingEvent.setEventId(anprEvent.getEventId());
         parkingEvent.setVehicleNo(anprEvent.getAnprText());
         parkingEvent.setOrg(anprEvent.getOrg());
 
-        if(anprEvent.getVehicleClass().equals("car")){
+        if (anprEvent.getVehicleClass().equals("car")) {
             parkingEvent.setType(VehicleType.Car);
-        }
-        else{
+        } else {
             parkingEvent.setType(VehicleType.Bike);
         }
 

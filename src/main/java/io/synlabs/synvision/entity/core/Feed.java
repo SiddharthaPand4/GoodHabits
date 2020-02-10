@@ -4,8 +4,7 @@ import io.synlabs.synvision.entity.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -23,4 +22,12 @@ public class Feed extends BaseEntity {
 
     @Column(nullable = false, length = 50)
     private String url;
+
+    private boolean checkSectionSpeed;
+
 }
+/*
+ name -> site -> location
+ e.g.
+ CAM 1 -> Maloya 1 -> Lucknow
+ */
