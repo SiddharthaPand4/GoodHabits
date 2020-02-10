@@ -115,7 +115,7 @@ public class AnprService extends BaseService {
 
     public void archiveAnprEvents(AnprRequest request) {
 
-        List<AnprEvent> events = anprEventRepository.findAllByAnprTextAndArchived(request.anprText, false);
+        List<AnprEvent> events;
         int pageSize = 5;
         int currentPage = 0;
 
@@ -145,11 +145,10 @@ public class AnprService extends BaseService {
     public void addAnprEvent(CreateAnprRequest request) {
 
         AnprEvent anprEvent = request.toEntity();
-        anprEvent.setHotlisted(checkHotListed(anprEvent));
-        anprEvent.setSectionSpeedViolated(checkSectionSpeed(anprEvent));
         Feed feed = feedRepository.findOneByName(anprEvent.getSource());
         anprEvent.setFeed(feed);
-
+        anprEvent.setHotlisted(checkHotListed(anprEvent));
+        anprEvent.setSectionSpeedViolated(checkSectionSpeed(anprEvent));
         anprEventRepository.save(anprEvent);
     }
 
@@ -166,7 +165,7 @@ public class AnprService extends BaseService {
             //now locate the first anpr event
             AnprEvent first = anprEventRepository.findOneByAnprTextAndFeedSite(anprEvent.getAnprText(), section.getEntrySite());
             if (first != null) {
-                long seconds = Duration.between(anprEvent.getEventDate().toInstant(), first.getEventDate().toInstant()).getSeconds();
+                long seconds = Duration.between(first.getEventDate().toInstant(), anprEvent.getEventDate().toInstant()).getSeconds();
 
                 //1 mps = 3.6 kmph
                 double avgspeed = 3.6 * (section.getSectionDistance() * 1.0 ) / seconds;
