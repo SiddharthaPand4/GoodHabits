@@ -22,7 +22,5 @@ public class ApcDashboardController {
     public List<ApcDashboardResponse> getApcPeopleCount(@RequestBody ApcDashboardRequest request){
         return apcDashboardService.getApcPeopleCount(request);
 
-
-
     }
 }
