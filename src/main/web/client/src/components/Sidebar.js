@@ -68,7 +68,8 @@ export default class Sidebar extends Component {
                     </SubMenu>*/}
 
                     <Menu.Item key="5" className="sidebar-nav-link">
-                        <Link to="/incidents/hotlisted"><Icon type='alert'/><span className='nav-text'>Hotlist</span></Link>
+                        <Link to="/incidents/hotlisted"><Icon type='alert'/><span
+                            className='nav-text'>Hotlist</span></Link>
                     </Menu.Item>
                     {/*<Menu.Item key="6">
                         <Link to='/feed'><Icon type='video-camera'/><span className='nav-text'>Feed</span></Link>
@@ -119,21 +120,22 @@ export default class Sidebar extends Component {
                         </Menu.Item>
                     </SubMenu>*/}
 
-                     <SubMenu
-                                            key="sub3"
-                                            title={
-                                                <span>
+                    <SubMenu
+                        key="sub3"
+                        title={
+                            <span>
                                              <Icon type='box-plot'/>
                                              <span>People Counting</span>
                                            </span>
-                                            }
-                                        >
-                                            <Menu.Item key="7" className="sidebar-nav-link">
-                                                <Link to='/people-counting/events'><span className='nav-text'>Events</span></Link>
-                                            </Menu.Item>
-                                            <Menu.Item key="8" className="sidebar-nav-link"> <Link to='/people-counting/dashboard'><span className='nav-text'>Dashboard</span></Link>
-                                                                                                                                                 </Menu.Item>
-                                        </SubMenu>
+                        }
+                    >
+                        <Menu.Item key="7" className="sidebar-nav-link">
+                            <Link to='/people-counting/events'><span className='nav-text'>Events</span></Link>
+                        </Menu.Item>
+                        <Menu.Item key="8" className="sidebar-nav-link"> <Link to='/people-counting/dashboard'><span
+                            className='nav-text'>Dashboard</span></Link>
+                        </Menu.Item>
+                    </SubMenu>
 
                     <Menu.Item key="7">
                         <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span

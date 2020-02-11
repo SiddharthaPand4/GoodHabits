@@ -1,34 +1,49 @@
 import React, {Component} from "react";
-import {Col, Row, Statistic, TimePicker, DatePicker, Button, Icon, message, Card, Modal,Menu, Dropdown, Select} from "antd";
+import {
+    Col,
+    Row,
+    Statistic,
+    TimePicker,
+    DatePicker,
+    Button,
+    Icon,
+    message,
+    Card,
+    Modal,
+    Menu,
+    Dropdown,
+    Select
+} from "antd";
 import ApcDashboardService from "../../services/ApcDashboardService";
 import CommonService from "../../services/CommonService";
 import Moment from 'moment';
 import classnames from 'classnames';
-import {Bar, Pie, Line} from 'react-chartjs-2';
+import {Bar, Pie, Line, Doughnut} from 'react-chartjs-2';
 import * as name from "chartjs-plugin-colorschemes";
 import cloneDeep from 'lodash/cloneDeep';
+
 const {Option} = Select;
-const { RangePicker } = DatePicker;
+const {RangePicker} = DatePicker;
 
 export default class ApcDashboard extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            isOpencustomDateRangeModal:"",
+            isOpencustomDateRangeModal: "",
             apc: {
                 filter: {
                     selectedCustomDateRange: "Today",
                     selectedXAxisOption: "Hourly",
-                    fromDate:{},
-                    toDate:{}
+                    fromDate: {},
+                    toDate: {}
                 },
                 chartData: {
                     labels: [],
                     datasets: []
                 }
             }
-            }
+        }
 
         this.getApcPeopleCount = this.getApcPeopleCount.bind(this);
         this.getBarChartOptions = this.getBarChartOptions.bind(this);
@@ -40,20 +55,23 @@ export default class ApcDashboard extends Component {
         this.handleDateRangeChange = this.handleDateRangeChange.bind(this);
 
     }
+
     componentDidMount() {
         this.refresh();
     }
-    showCustomDateRangeModal(graphName){
+
+    showCustomDateRangeModal(graphName) {
         this.setState({
-          isOpencustomDateRangeModal: graphName,
+            isOpencustomDateRangeModal: graphName,
         });
     };
 
     handleCancel = e => {
         this.setState({
-          isOpencustomDateRangeModal: "",
+            isOpencustomDateRangeModal: "",
         });
-      };
+    };
+
     selectDateRange(graphName, selectedCustomDateRangeEnum, selectedCustomDateRangeMoment) {
         let {isOpencustomDateRangeModal} = this.state;
         let graph = this.state[graphName];
@@ -63,7 +81,7 @@ export default class ApcDashboard extends Component {
         graph.filter.toDate = fromToDate.to_date;
 
 
-        if(selectedCustomDateRangeEnum=== "Custom"){
+        if (selectedCustomDateRangeEnum === "Custom") {
             isOpencustomDateRangeModal = ""
         }
         this.setState({[graphName]: graph, isOpencustomDateRangeModal}, () => {
@@ -71,6 +89,7 @@ export default class ApcDashboard extends Component {
         });
 
     }
+
     selectXAxisOption(graphName, selectedXAxisOption) {
         let graph = this.state[graphName];
         graph.filter.selectedXAxisOption = selectedXAxisOption;
@@ -79,64 +98,69 @@ export default class ApcDashboard extends Component {
         });
     }
 
-    refresh(){
+    refresh() {
         this.getApcPeopleCount(this.state.apc.filter.fromDate, this.state.apc.filter.toDate, this.state.apc.filter.selectedXAxisOption);
+        ApcDashboardService.getApcPeakHour(this.state.apc.filter.fromDate, this.state.apc.filter.toDate, this.state.apc.filter.selectedXAxisOption).then(response=>{
+            let rawData = response.data;
+        }).catch(error => {
+            console.log(error);
+        });
     }
 
     getApcPeopleCount(from_date, to_date, xAxis) {
-            let {apc} = this.state;
-            apc.chartData = {
-                labels: [],
-                datasets: []
-            };
-            ApcDashboardService.getApcPeopleCount(from_date, to_date, xAxis).then(response => {
+        let {apc} = this.state;
+        apc.chartData = {
+            labels: [],
+            datasets: []
+        };
+        ApcDashboardService.getApcPeopleCount(from_date, to_date, xAxis).then(response => {
 
-                let rawData = response.data;
-                if (rawData && rawData.length > 0) {
-                    let labelDates = [];
-                    let peopleCount = [];
-                    for (let i in rawData) {
+            let rawData = response.data;
+            if (rawData && rawData.length > 0) {
+                let labelDates = [];
+                let peopleCount = [];
+                for (let i in rawData) {
 
-                        if (!labelDates.includes(rawData[i].date)) {
-                            labelDates.push(rawData[i].date)
-                        }
-                        if(!peopleCount[rawData[i].date]) peopleCount[rawData[i].date]=rawData[i];
+                    if (!labelDates.includes(rawData[i].date)) {
+                        labelDates.push(rawData[i].date)
                     }
-                    apc.chartData.labels = labelDates;
-                    let dataSet = {
-                                     label : "No Of People",
-                                     data: [],
-                                     backgroundColor: '#e83e8c'
-                                            };
-                    for (let j in peopleCount) {
-
-                        for (let i in labelDates) {
-                            if (peopleCount[labelDates[i]]) {
-                                dataSet.data.push(peopleCount[labelDates[i]].peopleCount);
-                            } else {
-                                dataSet.data.push(0);
-                            }
-                        }
-                    }
-                    apc.chartData.datasets.push(dataSet);
+                    if (!peopleCount[rawData[i].date]) peopleCount[rawData[i].date] = rawData[i];
                 }
+                apc.chartData.labels = labelDates;
+                let dataSet = {
+                    label: "No Of People",
+                    data: [],
+                    backgroundColor: '#e8003c'
+                };
+                for (let j in peopleCount) {
 
-                this.setState({apc});
-            }).catch(error => {
-                console.log(error);
-            });
+                    for (let i in labelDates) {
+                        if (peopleCount[labelDates[i]]) {
+                            dataSet.data.push(peopleCount[labelDates[i]].peopleCount);
+                        } else {
+                            dataSet.data.push(0);
+                        }
+                    }
+                }
+                apc.chartData.datasets.push(dataSet);
+            }
+
+            this.setState({apc});
+        }).catch(error => {
+            console.log(error);
+        });
+
     }
 
 
-
-    handleDateRangeChange(dates, dateString){
+    handleDateRangeChange(dates, dateString) {
 
         let startDate = dates[0].toDate();
         let endDate = dates[1].toDate();
-        this.setState( () => {
-                    this.refresh();
-                });
-         console.log(dates, dateString);
+        this.setState(() => {
+            this.refresh();
+        });
+        console.log(dates, dateString);
     }
 
     getXAxisOptions(graphName) {
@@ -177,7 +201,7 @@ export default class ApcDashboard extends Component {
                 <Menu.Item key="7" onClick={() => this.selectDateRange(graphName, "Last year")}>
                     Last year
                 </Menu.Item>
-                <Menu.Item  onClick={() =>this.showCustomDateRangeModal(graphName)}>
+                <Menu.Item onClick={() => this.showCustomDateRangeModal(graphName)}>
                     Custom
                 </Menu.Item>
 
@@ -231,20 +255,39 @@ export default class ApcDashboard extends Component {
     render() {
         let {apc} = this.state;
         const apcChartOptions = this.getBarChartOptions("apc");
+        const data = {
+            labels: [
+                'Red',
+                'Green',
+                'Yellow'
+            ],
+            datasets: [{
+                data: [300, 50, 100],
+                backgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56'
+                ],
+                hoverBackgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56'
+                ]
+            }]
+        };
         return (
             <div>
-            <div>
-                  <Modal
-                     onCancel={this.handleCancel}
-                      title="Custom Date Range"
-                      visible={this.state.isOpencustomDateRangeModal ? true : false}
-                      footer={[
-                      ]}
+                <div>
+                    <Modal
+                        onCancel={this.handleCancel}
+                        title="Custom Date Range"
+                        visible={this.state.isOpencustomDateRangeModal ? true : false}
+                        footer={[]}
                     >
-                         <RangePicker
-                          onChange={(changedDateRange)=> this.selectDateRange(this.state.isOpencustomDateRangeModal, "Custom", changedDateRange)} />
+                        <RangePicker
+                            onChange={(changedDateRange) => this.selectDateRange(this.state.isOpencustomDateRangeModal, "Custom", changedDateRange)}/>
                     </Modal>
-                  </div>
+                </div>
                 <div>
                     <Card title={<div>People Counting
                         &nbsp;
@@ -265,9 +308,12 @@ export default class ApcDashboard extends Component {
                         <Line data={apc.chartData} options={apcChartOptions}/>
 
                     </Card>
-                    </div>
-                    </div>
-                )
-            }
+                </div>
+                <div>
+                        <Doughnut data={data} />
+                </div>
+            </div>
+        )
+    }
 
 }
