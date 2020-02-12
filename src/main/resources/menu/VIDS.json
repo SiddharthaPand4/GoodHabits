@@ -1,0 +1,13 @@
+{
+  "key": "highways",
+  "title": "Highways",
+  "icon": "box-plot",
+  "submenu": [
+    {
+      "key": "VIDS",
+      "title": "VIDS",
+      "icon": "box-plot",
+      "link": "/vids"
+    }
+  ]
+}

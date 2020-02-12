@@ -9,25 +9,35 @@ const {SubMenu} = Menu;
 export default class Sidebar extends Component {
     state = {
         collapsed: false,
+        loaded: false,
+        menu: {}
     };
-    toggleCollapsed = () => {
+
+    constructor(props) {
+        super(props);
+    }
+
+    componentDidMount() {
+        UserService.getMenu().then(response => {
+            this.setState({menu: response.data, loaded: true});
+        });
+    }
+
+    toggleCollapsed() {
         this.setState({
             collapsed: !this.state.collapsed,
         });
     };
 
     render() {
+
+        let menu = this.state.menu;
+
         return (
             <Sider
                 collapsible
                 breakpoint="lg"
                 collapsedWidth="0"
-                onBreakpoint={broken => {
-                    console.log(broken);
-                }}
-                onCollapse={(collapsed, type) => {
-                    console.log(collapsed, type);
-                }}
             >
                 <div className="logo">
                     <img src={"synlabs-logo.png"}/>
@@ -37,6 +47,19 @@ export default class Sidebar extends Component {
                         <Link to='/'><Icon type='home'/><span className='nav-text'>Home</span></Link>
                     </Menu.Item>
 
+                    {(menu.items || []).map((item, index) =>
+
+                        <SubMenu key={item.key} title={
+                            <span><Icon type='box-plot'/><span>{item.title}</span></span>
+                        }
+                        >
+                            {(item.submenu || []).map((subitem, index) =>
+                                <Menu.Item key={subitem.key} className="sidebar-nav-link">
+                                <Link to={subitem.link}><span className='nav-text'>{subitem.title}</span></Link>
+                                </Menu.Item>
+                            )}
+                        </SubMenu>
+                    )}
 
                     <SubMenu key="sub1" title={
                         <span>

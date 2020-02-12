@@ -1,10 +1,12 @@
 package io.synlabs.synvision.controller;
 
 import io.synlabs.synvision.service.UserService;
+import io.synlabs.synvision.views.core.Menu;
 import io.synlabs.synvision.views.core.RoleResponse;
 import io.synlabs.synvision.views.core.UserRequest;
 import io.synlabs.synvision.views.core.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +22,12 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @GetMapping("/menu")
+    //@Secured(SELF_READ)
+    public Menu getMenu()
+    {
+        return userService.getCurrentUserMenu();
+    }
 
     @GetMapping
     public List<UserResponse> listUsers(){

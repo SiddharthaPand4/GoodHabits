@@ -1,0 +1,13 @@
+{
+  "key": "highways",
+  "title": "Highways",
+  "icon": "box-plot",
+  "submenu": [
+    {
+      "key": "ATCC",
+      "title": "ATCC",
+      "icon": "box-plot",
+      "link": "/atcc"
+    }
+  ]
+}
