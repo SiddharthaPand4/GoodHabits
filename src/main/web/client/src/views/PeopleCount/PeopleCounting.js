@@ -17,15 +17,16 @@ import {
 import ApcGenericFilter from "./ApcGenericFilter";
 import Moment from "react-moment";
 import ApcFileService from "../../services/ApcFileService";
+
 const {Paragraph, Text} = Typography;
 const {Column} = Table;
 const {Panel} = Collapse;
 
-export default class PeopleCounting extends Component{
+export default class PeopleCounting extends Component {
 
     constructor(props) {
         super(props);
-        this.state ={
+        this.state = {
             loading: true,
             events: {},
             filter: {
@@ -39,36 +40,35 @@ export default class PeopleCounting extends Component{
         this.handleRefresh = this.handleRefresh.bind(this);
         this.onPageChange = this.onPageChange.bind(this);
         this.onPageSizeChange = this.onPageSizeChange.bind(this);
-        this.handleFilterChange=this.handleFilterChange.bind(this);
-        this.onEventIdInputChange=this.onEventIdInputChange.bind(this);
+        this.handleFilterChange = this.handleFilterChange.bind(this);
+        this.onEventIdInputChange = this.onEventIdInputChange.bind(this);
 
     }
 
-    componentDidMount(){
+    componentDidMount() {
         this.refresh();
     }
 
-
     onPageSizeChange(current, pageSize) {
         let filter = this.state.filter;
-        filter.page=current;// Here i made change
+        filter.page = current;// Here i made change
         filter.pageSize = pageSize;
         this.refresh(filter);
     }
 
     refresh(filter) {
-        if(!filter){
+        if (!filter) {
             filter = this.state.filter;
         }
         this.setState({loading: true});
         ApcFileService.getPeopleData(filter).then(response => {
-            let data = response.data ;
-            filter.pageSize   =   data.pageSize;
-            filter.currentPage =   data.pageNumber;
-            filter.totalPages =   data.totalPages;
+            let data = response.data;
+            filter.pageSize = data.pageSize;
+            filter.currentPage = data.pageNumber;
+            filter.totalPages = data.totalPages;
             this.setState({filter, loading: false, events: data.list});
         }).catch(error => {
-         message.error("Error, something went wrong!!")
+            message.error("Error, something went wrong!!")
         })
     }
 
@@ -86,40 +86,42 @@ export default class PeopleCounting extends Component{
         filter.pageSize = pageSize;
         this.refresh(filter)
     }
-     archiveEvent(event){
-        ApcFileService.archiveEvent(event).then(request => {
-        this.refresh();
-     })
 
-     }
-      onEventIdInputChange(e) {
+    archiveEvent(event) {
+        ApcFileService.archiveEvent(event).then(request => {
+            this.refresh();
+        })
+
+    }
+
+    onEventIdInputChange(e) {
         let filter = this.state.filter;
         filter.eventId = e.target.value;
         console.log(filter);
         this.setState({filter: filter})
-      }
-
-    render() {
-        let eventId=this.state.filter.eventId;
-        return (
-            <div>
-                 <Collapse bordered={true} defaultActiveKey={['1']}>
-                    <Panel header="Filter" key="1">
-                    Event Id: <Input value={eventId} style={{"width": "200px"}} onChange={this.onEventIdInputChange}/> <br/><br/>
-                        <ApcGenericFilter handleRefresh={this.refresh} filter={this.state.filter}
-                                       handleFilterChange={this.handleFilterChange}
-                        />
-                    </Panel>
-                  </Collapse>
-                  <div>
-                  {this.renderTable()}
-                  </div>
-            </div>
-            );
     }
 
+    render() {
+        let eventId = this.state.filter.eventId;
+        return (
+            <div>
+                <Collapse bordered={true} defaultActiveKey={['1']}>
+                    <Panel header="Filter" key="1">
+                        Event Id: <Input value={eventId} style={{"width": "200px"}}
+                                         onChange={this.onEventIdInputChange}/> <br/><br/>
+                        <ApcGenericFilter handleRefresh={this.refresh} filter={this.state.filter}
+                                          handleFilterChange={this.handleFilterChange}
+                        />
+                    </Panel>
+                </Collapse>
+                <div>
+                    {this.renderTable()}
+                </div>
+            </div>
+        );
+    }
 
-    renderTable(){
+    renderTable() {
 
         if (this.state.loading || !this.state.events || this.state.events.length === 0) {
             return <Empty description={false}/>
@@ -140,17 +142,17 @@ export default class PeopleCounting extends Component{
             pageSize: this.state.filter.pageSize
         };
         return (<div>
-                     <Table dataSource={events} pagination={pagination}>
-                          <Column title="ID" dataIndex="eventId" key="eventId"
-                                  render={eventId =><Paragraph strong copyable>{eventId}</Paragraph>}/>
-                          <Column title="Date" dataIndex="eventDate" key="eventDate"
-                                  render={eventDate => (<Moment format="L">{eventDate}</Moment>)}/>
-                          <Column title="Archived" dataIndex="archived" key="archived"
-                                  render={ archived=>(<p>{archived ? "Archived": "Active"}</p>)}/>
-                            <Column title="Direction" dataIndex="direction" key="direction"
-                                    render={direction => direction }/>
-                     </Table>
-                 </div>
+                <Table dataSource={events} pagination={pagination}>
+                    <Column title="ID" dataIndex="eventId" key="eventId"
+                            render={eventId => <Paragraph strong copyable>{eventId}</Paragraph>}/>
+                    <Column title="Date" dataIndex="eventDate" key="eventDate"
+                            render={eventDate => (<Moment format="L">{eventDate}</Moment>)}/>
+                    <Column title="Archived" dataIndex="archived" key="archived"
+                            render={archived => (<p>{archived ? "Archived" : "Active"}</p>)}/>
+                    <Column title="Direction" dataIndex="direction" key="direction"
+                            render={direction => direction}/>
+                </Table>
+            </div>
         );
 
     }

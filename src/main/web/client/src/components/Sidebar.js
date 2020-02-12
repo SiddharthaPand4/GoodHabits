@@ -123,6 +123,23 @@ export default class Sidebar extends Component {
                         </Menu.Item>
                     </SubMenu>*/}
 
+                    <SubMenu
+                        key="sub3"
+                        title={
+                            <span>
+                                             <Icon type='box-plot'/>
+                                             <span>People Counting</span>
+                                           </span>
+                        }
+                    >
+                        <Menu.Item key="9" className="sidebar-nav-link">
+                            <Link to='/people-counting/events'><span className='nav-text'>Events</span></Link>
+                        </Menu.Item>
+                        <Menu.Item key="8" className="sidebar-nav-link"> <Link to='/people-counting/dashboard'><span
+                            className='nav-text'>Dashboard</span></Link>
+                        </Menu.Item>
+                    </SubMenu>
+
                     <Menu.Item key="7">
                         <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span
                             className='nav-text'>Logout</span></Link>

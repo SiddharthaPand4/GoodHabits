@@ -28,7 +28,7 @@ import ParkingConsoleView from "./views/parking/ParkingConsoleView";
 import PgsReportView from "./views/parking/ParkingReportView";
 import ParkingInOutView from "./views/parking/ParkingInOutView";
 import PeopleCounting from "./views/PeopleCount/PeopleCounting";
-
+import ApcDashboard from "./views/PeopleCount/ApcDashboard";
 const {Content} = Layout;
 
 class App extends Component {
@@ -83,6 +83,7 @@ class App extends Component {
                                 <PrivateRoute path='/pgs/console' exact={true} component={ParkingConsoleView}/>
                                 <PrivateRoute path='/pgs/inout' exact={true} component={ParkingInOutView}/>
                                 <PrivateRoute path='/pgs/reports' exact={true} component={PgsReportView}/>
+                                <PrivateRoute path='/people-counting/Dashboard' exact={true} component={ApcDashboard}/>
                             </div>
                         </Content>
                         <Footerbar/>

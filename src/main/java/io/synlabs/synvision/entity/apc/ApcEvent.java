@@ -4,10 +4,7 @@ import io.synlabs.synvision.entity.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -24,7 +21,7 @@ public class ApcEvent extends BaseEntity {
     private boolean archived;
 
     @Column(length = 50)
-    private String direction; //=> fwd or rev
+    private String direction;
 
     @Column(length = 50)
     private String source;
