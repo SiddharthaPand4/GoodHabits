@@ -107,7 +107,6 @@ public class ApcDashboardService extends BaseService {
                 .where(apcEvent.eventDate.between(request.getFrom(), request.getTo()))
                 .groupBy(apcEvent.eventDate.hour()).orderBy(apcEvent.eventDate.hour().asc())
                 .fetch();
-        System.out.println(result);
 
         Calendar calendar = Calendar.getInstance();
         for (int i = 0; i < result.size(); i++) {
