@@ -29,6 +29,9 @@ import PgsReportView from "./views/parking/ParkingReportView";
 import ParkingInOutView from "./views/parking/ParkingInOutView";
 import PeopleCounting from "./views/PeopleCount/PeopleCounting";
 import ApcDashboard from "./views/PeopleCount/ApcDashboard";
+import AtccView from "./views/atcc/AtccView";
+import AtccSummaryView from "./views/atcc/AtccSummaryView";
+
 const {Content} = Layout;
 
 class App extends Component {
@@ -84,6 +87,11 @@ class App extends Component {
                                 <PrivateRoute path='/pgs/inout' exact={true} component={ParkingInOutView}/>
                                 <PrivateRoute path='/pgs/reports' exact={true} component={PgsReportView}/>
                                 <PrivateRoute path='/people-counting/Dashboard' exact={true} component={ApcDashboard}/>
+
+                                {/* atcc */}
+                                <PrivateRoute path='/atcc' exact={true} component={AtccView}/>
+                                <PrivateRoute path='/atcc/summary' exact={true} component={AtccSummaryView}/>
+
                             </div>
                         </Content>
                         <Footerbar/>

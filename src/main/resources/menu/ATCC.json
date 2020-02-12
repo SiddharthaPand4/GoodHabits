@@ -4,7 +4,13 @@
   "icon": "box-plot",
   "submenu": [
     {
-      "key": "ATCC",
+      "key": "atcc-summary",
+      "title": "ATCC Dashboard",
+      "icon": "box-plot",
+      "link": "/atcc/summary"
+    },
+    {
+      "key": "atcc",
       "title": "ATCC",
       "icon": "box-plot",
       "link": "/atcc"
