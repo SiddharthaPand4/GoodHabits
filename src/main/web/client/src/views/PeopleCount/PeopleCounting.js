@@ -49,7 +49,6 @@ export default class PeopleCounting extends Component {
         this.refresh();
     }
 
-
     onPageSizeChange(current, pageSize) {
         let filter = this.state.filter;
         filter.page = current;// Here i made change
@@ -121,7 +120,6 @@ export default class PeopleCounting extends Component {
             </div>
         );
     }
-
 
     renderTable() {
 

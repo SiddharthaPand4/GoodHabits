@@ -85,10 +85,8 @@ public class ApcDashboardService extends BaseService {
                 break;
         }
 
-
         return response;
     }
-
 
     public List<ApcDashboardPeakHourResponse> getApcPeakHour(ApcDashboardRequest request) {
         List<ApcDashboardResponse> response = new ArrayList<>();
@@ -110,7 +108,6 @@ public class ApcDashboardService extends BaseService {
                 .groupBy(apcEvent.eventDate.hour()).orderBy(apcEvent.eventDate.hour().asc())
                 .fetch();
         System.out.println(result);
-
 
         Calendar calendar = Calendar.getInstance();
         for (int i = 0; i < result.size(); i++) {
@@ -150,13 +147,13 @@ public class ApcDashboardService extends BaseService {
         }
         if (total != 0) {
             DecimalFormat df = new DecimalFormat("####0.00");
-            output.add(new ApcDashboardPeakHourResponse("5-8 AM", Double.parseDouble(df.format(fiveToEightAM / total * 100)),(long)fiveToEightAM));
-            output.add(new ApcDashboardPeakHourResponse("8-11 AM", Double.parseDouble(df.format(eightToElevenAM / total * 100)),(long)eightToElevenAM));
-            output.add(new ApcDashboardPeakHourResponse("11-1 PM", Double.parseDouble(df.format(elevenAMToOnePM / total * 100)),(long)elevenAMToOnePM));
-            output.add(new ApcDashboardPeakHourResponse("1-3 PM", Double.parseDouble(df.format(oneToThreePM / total * 100)),(long)oneToThreePM));
-            output.add(new ApcDashboardPeakHourResponse("3-5 PM", Double.parseDouble(df.format(threeToFivePM / total * 100)),(long)threeToFivePM));
-            output.add(new ApcDashboardPeakHourResponse("5-7 PM", Double.parseDouble(df.format(fiveToSevenPM / total * 100)), (long)fiveToSevenPM));
-            output.add(new ApcDashboardPeakHourResponse("7-5 AM", Double.parseDouble(df.format(sevenPMToFiveAM / total * 100)),(long)sevenPMToFiveAM));
+            output.add(new ApcDashboardPeakHourResponse("5-8 AM", Double.parseDouble(df.format(fiveToEightAM / total * 100)), (long) fiveToEightAM));
+            output.add(new ApcDashboardPeakHourResponse("8-11 AM", Double.parseDouble(df.format(eightToElevenAM / total * 100)), (long) eightToElevenAM));
+            output.add(new ApcDashboardPeakHourResponse("11-1 PM", Double.parseDouble(df.format(elevenAMToOnePM / total * 100)), (long) elevenAMToOnePM));
+            output.add(new ApcDashboardPeakHourResponse("1-3 PM", Double.parseDouble(df.format(oneToThreePM / total * 100)), (long) oneToThreePM));
+            output.add(new ApcDashboardPeakHourResponse("3-5 PM", Double.parseDouble(df.format(threeToFivePM / total * 100)), (long) threeToFivePM));
+            output.add(new ApcDashboardPeakHourResponse("5-7 PM", Double.parseDouble(df.format(fiveToSevenPM / total * 100)), (long) fiveToSevenPM));
+            output.add(new ApcDashboardPeakHourResponse("7-5 AM", Double.parseDouble(df.format(sevenPMToFiveAM / total * 100)), (long) sevenPMToFiveAM));
         }
         return output;
 
