@@ -7,10 +7,12 @@ import lombok.Setter;
 @Setter
 public class ApcDashboardPeakHourResponse {
     private String duration;
-    private Double peopleCount;
+    private double peopleCountPercentage;
+    private long peopleCount;
 
-    public ApcDashboardPeakHourResponse(String duration, Double peopleCount) {
+    public ApcDashboardPeakHourResponse(String duration, double peopleCountPercentage, long peopleCount) {
         this.duration = duration;
+        this.peopleCountPercentage = peopleCountPercentage;
         this.peopleCount = peopleCount;
     }
 

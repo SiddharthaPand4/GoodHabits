@@ -244,7 +244,7 @@ export default class TrafficIncidentView extends Component {
                                 cover={(magnifyEventId === event.id) ?
                                     <Magnifier src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}
                                                zoomFactor={zoomFactor}/> : <img alt="event"
-                                                                    src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}/>
+                                                                                src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}/>
 
                                 }
                             >
@@ -257,11 +257,11 @@ export default class TrafficIncidentView extends Component {
                                             onChange={this.updateZoomFactor}
                                             value={typeof zoomFactor === 'number' ? zoomFactor : 0}
                                         />
-                                        : <div style={{height:"54px",textAlign: "center"}}>
-                                               <Button size="small" type="dashed" onClick={() => this.magnifyEvent(event)} >
-                                                   <Icon type="zoom-in"/>Zoom Image
-                                               </Button>
-                                           </div>
+                                        : <div style={{height: "54px", textAlign: "center"}}>
+                                            <Button size="small" type="dashed" onClick={() => this.magnifyEvent(event)}>
+                                                <Icon type="zoom-in"/>Zoom Image
+                                            </Button>
+                                        </div>
                                     }
                                 </div>
                                 <div style={{textAlign: "center"}}>

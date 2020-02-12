@@ -129,7 +129,7 @@ export default class Sidebar extends Component {
                                            </span>
                         }
                     >
-                        <Menu.Item key="7" className="sidebar-nav-link">
+                        <Menu.Item key="9" className="sidebar-nav-link">
                             <Link to='/people-counting/events'><span className='nav-text'>Events</span></Link>
                         </Menu.Item>
                         <Menu.Item key="8" className="sidebar-nav-link"> <Link to='/people-counting/dashboard'><span

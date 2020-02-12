@@ -3,8 +3,8 @@ import moment from 'moment';
 
 class ApcDashboardService {
 
-    static Instance(){
-    return new ApcDashboardService()
+    static Instance() {
+        return new ApcDashboardService()
     }
 
     getApcPeopleCount(fromDate, toDate, xAxis) {
@@ -16,11 +16,10 @@ class ApcDashboardService {
         return axios.post('/api/apc/dashboard/peoplecount', filter);
     }
 
-    getApcPeakHour(fromDate, toDate, xAxis) {
+    getApcPeakHour(fromDate, toDate) {
         let filter = {
             fromDateString: moment(fromDate).format('YYYY-MM-DD HH:mm:ss'),
-            toDateString: moment(toDate).format('YYYY-MM-DD HH:mm:ss"'),
-            xAxis: xAxis
+            toDateString: moment(toDate).format('YYYY-MM-DD HH:mm:ss"')
         };
         return axios.post('/api/apc/dashboard/peakhour', filter);
     }

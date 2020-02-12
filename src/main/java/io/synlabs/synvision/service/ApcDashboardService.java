@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class ApcDashboardService extends BaseService {
 
         switch (xAxis) {
             case "Hourly":
-                result = query.select(apcEvent.eventDate,apcEvent.count())
+                result = query.select(apcEvent.eventDate, apcEvent.count())
                         .from(apcEvent)
                         .where(apcEvent.eventDate.between(request.getFrom(), request.getTo()))
                         .groupBy(apcEvent.eventDate.hour()).orderBy(apcEvent.eventDate.hour().asc())
@@ -108,6 +109,7 @@ public class ApcDashboardService extends BaseService {
                 .where(apcEvent.eventDate.between(request.getFrom(), request.getTo()))
                 .groupBy(apcEvent.eventDate.hour()).orderBy(apcEvent.eventDate.hour().asc())
                 .fetch();
+        System.out.println(result);
 
 
         Calendar calendar = Calendar.getInstance();
@@ -119,43 +121,43 @@ public class ApcDashboardService extends BaseService {
             response.add(apcDashboardResponse);
             result.set(i, null);
         }
-        long total = 0;
-        long fiveToEightAM = 0;
-        long eightToElevenAM = 0;
-        long elevenAMToOnePM = 0;
-        long oneToThreePM = 0;
-        long threeToFivePM = 0;
-        long fiveToSevenPM = 0;
-        long sevenPMToFiveAM = 0;
-        for (int i = 0; i < response.size(); i++) {
-            if (Integer.valueOf(response.get(i).getDate()) >= 5 && Integer.valueOf(response.get(i).getDate()) <= 8) {
-                fiveToEightAM += response.get(i).getPeopleCount();
-            } else if (Integer.valueOf(response.get(i).getDate()) > 8 && Integer.valueOf(response.get(i).getDate()) <= 11) {
-                eightToElevenAM += response.get(i).getPeopleCount();
-            } else if (Integer.valueOf(response.get(i).getDate()) > 11 && Integer.valueOf(response.get(i).getDate()) <= 13) {
-                elevenAMToOnePM += response.get(i).getPeopleCount();
-            } else if (Integer.valueOf(response.get(i).getDate()) > 13 && Integer.valueOf(response.get(i).getDate()) <= 15) {
-                oneToThreePM += response.get(i).getPeopleCount();
-            } else if (Integer.valueOf(response.get(i).getDate()) > 15 && Integer.valueOf(response.get(i).getDate()) <= 17) {
-                threeToFivePM += response.get(i).getPeopleCount();
-            } else if (Integer.valueOf(response.get(i).getDate()) > 17 && Integer.valueOf(response.get(i).getDate()) <= 19) {
-                fiveToSevenPM += response.get(i).getPeopleCount();
+        double total = 0;
+        double fiveToEightAM = 0;
+        double eightToElevenAM = 0;
+        double elevenAMToOnePM = 0;
+        double oneToThreePM = 0;
+        double threeToFivePM = 0;
+        double fiveToSevenPM = 0;
+        double sevenPMToFiveAM = 0;
+        for (ApcDashboardResponse apcDashboardResponse : response) {
+            if (Integer.parseInt(apcDashboardResponse.getDate()) >= 5 && Integer.parseInt(apcDashboardResponse.getDate()) <= 8) {
+                fiveToEightAM += apcDashboardResponse.getPeopleCount();
+            } else if (Integer.parseInt(apcDashboardResponse.getDate()) > 8 && Integer.parseInt(apcDashboardResponse.getDate()) <= 11) {
+                eightToElevenAM += apcDashboardResponse.getPeopleCount();
+            } else if (Integer.parseInt(apcDashboardResponse.getDate()) > 11 && Integer.parseInt(apcDashboardResponse.getDate()) <= 13) {
+                elevenAMToOnePM += apcDashboardResponse.getPeopleCount();
+            } else if (Integer.parseInt(apcDashboardResponse.getDate()) > 13 && Integer.parseInt(apcDashboardResponse.getDate()) <= 15) {
+                oneToThreePM += apcDashboardResponse.getPeopleCount();
+            } else if (Integer.parseInt(apcDashboardResponse.getDate()) > 15 && Integer.parseInt(apcDashboardResponse.getDate()) <= 17) {
+                threeToFivePM += apcDashboardResponse.getPeopleCount();
+            } else if (Integer.parseInt(apcDashboardResponse.getDate()) > 17 && Integer.parseInt(apcDashboardResponse.getDate()) <= 19) {
+                fiveToSevenPM += apcDashboardResponse.getPeopleCount();
             } else {
-                sevenPMToFiveAM += response.get(i).getPeopleCount();
+                sevenPMToFiveAM += apcDashboardResponse.getPeopleCount();
             }
-            total += response.get(i).getPeopleCount();
+            total += apcDashboardResponse.getPeopleCount();
 
         }
-        System.out.println(total+" "+fiveToEightAM+" "+eightToElevenAM+" "+elevenAMToOnePM+" "+oneToThreePM+" "+threeToFivePM+" "+fiveToSevenPM+" "+sevenPMToFiveAM);
-
-        output.add(new ApcDashboardPeakHourResponse("5-8 AM", ((fiveToEightAM * 1.0) / total) * 100));
-        output.add(new ApcDashboardPeakHourResponse("8-11 AM", ((eightToElevenAM * 1.0) / total) * 100));
-        output.add(new ApcDashboardPeakHourResponse("11-1 PM", ((elevenAMToOnePM * 1.0) / total) * 100));
-        output.add(new ApcDashboardPeakHourResponse("1-3 PM", ((oneToThreePM * 1.0 )/ total) * 100));
-        output.add(new ApcDashboardPeakHourResponse("3-5 PM", ((threeToFivePM * 1.0) / total) * 100));
-        output.add(new ApcDashboardPeakHourResponse("5-7 PM", ((fiveToSevenPM * 1.0) / total) * 100));
-        output.add(new ApcDashboardPeakHourResponse("7-5 AM", ((sevenPMToFiveAM * 1.0) / total) * 100));
-
+        if (total != 0) {
+            DecimalFormat df = new DecimalFormat("####0.00");
+            output.add(new ApcDashboardPeakHourResponse("5-8 AM", Double.parseDouble(df.format(fiveToEightAM / total * 100)),(long)fiveToEightAM));
+            output.add(new ApcDashboardPeakHourResponse("8-11 AM", Double.parseDouble(df.format(eightToElevenAM / total * 100)),(long)eightToElevenAM));
+            output.add(new ApcDashboardPeakHourResponse("11-1 PM", Double.parseDouble(df.format(elevenAMToOnePM / total * 100)),(long)elevenAMToOnePM));
+            output.add(new ApcDashboardPeakHourResponse("1-3 PM", Double.parseDouble(df.format(oneToThreePM / total * 100)),(long)oneToThreePM));
+            output.add(new ApcDashboardPeakHourResponse("3-5 PM", Double.parseDouble(df.format(threeToFivePM / total * 100)),(long)threeToFivePM));
+            output.add(new ApcDashboardPeakHourResponse("5-7 PM", Double.parseDouble(df.format(fiveToSevenPM / total * 100)), (long)fiveToSevenPM));
+            output.add(new ApcDashboardPeakHourResponse("7-5 AM", Double.parseDouble(df.format(sevenPMToFiveAM / total * 100)),(long)sevenPMToFiveAM));
+        }
         return output;
 
     }

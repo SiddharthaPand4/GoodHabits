@@ -12,18 +12,13 @@ import {
     Modal,
     Menu,
     Dropdown,
-    Select
+    Select, Table
 } from "antd";
 import ApcDashboardService from "../../services/ApcDashboardService";
-import CommonService from "../../services/CommonService";
-import Moment from 'moment';
-import classnames from 'classnames';
-import {Bar, Pie, Line, Doughnut} from 'react-chartjs-2';
-import * as name from "chartjs-plugin-colorschemes";
-import cloneDeep from 'lodash/cloneDeep';
+import { Line, Doughnut} from 'react-chartjs-2';
 
-const {Option} = Select;
 const {RangePicker} = DatePicker;
+const {Column} = Table;
 
 export default class ApcDashboard extends Component {
 
@@ -42,10 +37,24 @@ export default class ApcDashboard extends Component {
                     labels: [],
                     datasets: []
                 }
-            }
+            },
+            peakhour: {
+                filter: {
+                    selectedCustomDateRange: "Today",
+
+                    fromDate: {},
+                    toDate: {}
+                },
+                chartData: {
+                    labels: [],
+                    datasets: []
+                }
+            },
+            peakHourEvents: []
         }
 
         this.getApcPeopleCount = this.getApcPeopleCount.bind(this);
+        this.getApcPeakHour = this.getApcPeakHour.bind(this);
         this.getBarChartOptions = this.getBarChartOptions.bind(this);
         this.selectDateRange = this.selectDateRange.bind(this);
         this.selectXAxisOption = this.selectXAxisOption.bind(this);
@@ -53,7 +62,8 @@ export default class ApcDashboard extends Component {
         this.getDateRangeOptions = this.getDateRangeOptions.bind(this);
         this.getXAxisOptions = this.getXAxisOptions.bind(this);
         this.handleDateRangeChange = this.handleDateRangeChange.bind(this);
-
+        this.refreshPeakHour = this.refreshPeakHour.bind(this);
+        this.refreshApcChart = this.refreshApcChart.bind(this);
     }
 
     componentDidMount() {
@@ -84,24 +94,84 @@ export default class ApcDashboard extends Component {
         if (selectedCustomDateRangeEnum === "Custom") {
             isOpencustomDateRangeModal = ""
         }
-        this.setState({[graphName]: graph, isOpencustomDateRangeModal}, () => {
-            this.refresh();
-        });
+        if (graphName === "peakhour") {
+            this.setState({[graphName]: graph, isOpencustomDateRangeModal}, () => {
+                this.refreshPeakHour();
+            });
+        } else if (graphName === "apc") {
+            this.setState({[graphName]: graph, isOpencustomDateRangeModal}, () => {
+                this.refreshApcChart();
+            });
+        }
 
     }
 
     selectXAxisOption(graphName, selectedXAxisOption) {
         let graph = this.state[graphName];
         graph.filter.selectedXAxisOption = selectedXAxisOption;
-        this.setState({[graphName]: graph}, () => {
-            this.refresh();
-        });
+        if (graphName === "peakhour") {
+            this.setState({[graphName]: graph}, () => {
+                this.refreshPeakHour();
+            });
+        } else if (graphName === "apc") {
+            this.setState({[graphName]: graph}, () => {
+                this.refreshApcChart();
+            });
+        }
     }
 
     refresh() {
+        this.refreshPeakHour();
+        this.refreshApcChart();
+    }
+
+    refreshApcChart() {
         this.getApcPeopleCount(this.state.apc.filter.fromDate, this.state.apc.filter.toDate, this.state.apc.filter.selectedXAxisOption);
-        ApcDashboardService.getApcPeakHour(this.state.apc.filter.fromDate, this.state.apc.filter.toDate, this.state.apc.filter.selectedXAxisOption).then(response=>{
+
+    }
+
+    refreshPeakHour() {
+        this.getApcPeakHour(this.state.peakhour.filter.fromDate, this.state.peakhour.filter.toDate);
+
+    }
+
+    getApcPeakHour(from_date, to_date) {
+        let {peakhour} = this.state;
+        peakhour.chartData = {
+            labels: [],
+            datasets: []
+        }
+        ApcDashboardService.getApcPeakHour(from_date, to_date).then(response => {
             let rawData = response.data;
+            if (rawData && rawData.length > 0) {
+                let labelDuration = [];
+                let percentageOfPeopleCount = [];
+                for (let i in rawData) {
+                    labelDuration.push(rawData[i].duration);
+                    percentageOfPeopleCount.push(rawData[i].peopleCountPercentage);
+                }
+                peakhour.chartData.labels = labelDuration;
+                let durationIndex = 0;
+                let dataSet = {
+                    data: [],
+                    backgroundColor: [],
+                    hoverBackgroundColor: []
+                };
+                for (let j in percentageOfPeopleCount) {
+
+                    let color = ApcDashboardService.getColor(durationIndex);
+
+                    dataSet.backgroundColor.push(color);
+                    dataSet.hoverBackgroundColor.push("black");
+                    dataSet.data.push(percentageOfPeopleCount[j]);
+
+                    durationIndex++;
+                }
+                peakhour.chartData.datasets.push(dataSet);
+
+
+            }
+            this.setState({peakhour, peakHourEvents: rawData});
         }).catch(error => {
             console.log(error);
         });
@@ -121,29 +191,24 @@ export default class ApcDashboard extends Component {
                 let peopleCount = [];
                 for (let i in rawData) {
 
-                    if (!labelDates.includes(rawData[i].date)) {
-                        labelDates.push(rawData[i].date)
-                    }
-                    if (!peopleCount[rawData[i].date]) peopleCount[rawData[i].date] = rawData[i];
+                    labelDates.push(rawData[i].date)
+                    peopleCount.push(rawData[i].peopleCount);
                 }
                 apc.chartData.labels = labelDates;
                 let dataSet = {
                     label: "No Of People",
                     data: [],
-                    backgroundColor: '#e8003c'
+                    backgroundColor: '#e83e65'
                 };
                 for (let j in peopleCount) {
 
-                    for (let i in labelDates) {
-                        if (peopleCount[labelDates[i]]) {
-                            dataSet.data.push(peopleCount[labelDates[i]].peopleCount);
-                        } else {
-                            dataSet.data.push(0);
-                        }
-                    }
+                    dataSet.data.push(peopleCount[j]);
+
+
                 }
                 apc.chartData.datasets.push(dataSet);
             }
+
 
             this.setState({apc});
         }).catch(error => {
@@ -247,36 +312,92 @@ export default class ApcDashboard extends Component {
                         labelString: yAxisLabel
                     }
                 }]
+            },
+            plugins: {
+                datalabels: {
+                    display: true,
+
+                }
             }
         };
         return options;
     }
 
     render() {
-        let {apc} = this.state;
+        let {apc, peakhour} = this.state;
+        let peakHourEvents = this.state.peakHourEvents;
         const apcChartOptions = this.getBarChartOptions("apc");
-        const data = {
-            labels: [
-                'Red',
-                'Green',
-                'Yellow'
-            ],
-            datasets: [{
-                data: [300, 50, 100],
-                backgroundColor: [
-                    '#FF6384',
-                    '#36A2EB',
-                    '#FFCE56'
-                ],
-                hoverBackgroundColor: [
-                    '#FF6384',
-                    '#36A2EB',
-                    '#FFCE56'
-                ]
-            }]
-        };
         return (
-            <div>
+            <div style={{background: '#ECECEC', padding: '5px'}}>
+                <Row>
+
+
+                    <Card title={<div>Peak Hour
+                        &nbsp;
+                        <Dropdown overlay={() => this.getDateRangeOptions("peakhour")}>
+                            <Button>
+                                {peakhour.filter.selectedCustomDateRange ? peakhour.filter.selectedCustomDateRange : "Select"}
+                                <Icon
+                                    type="down"/>
+                            </Button>
+                        </Dropdown>
+                    </div>
+                    }>
+                        <Col xl={{span: 12}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}}>
+
+                            <Doughnut data={peakhour.chartData} options={{
+                                title: {
+                                    display: true,
+                                    text: 'Peak Hour'
+                                },
+                                maintainAspectRatio: true,
+
+                                plugins: {
+                                    datalabels: {
+                                        display: true,
+                                        color: '#fff',
+                                        anchor: 'end',
+                                        align: 'start',
+                                        offset: -10,
+                                        borderWidth: 2,
+                                        borderColor: '#fff',
+                                        borderRadius: 5,
+                                        backgroundColor: (context) => {
+                                            return context.dataset.backgroundColor;
+                                        },
+                                        font: {
+                                            weight: 'bold',
+                                            size: '10'
+                                        },
+                                        formatter: (item, context) => {
+                                            return item + " % ";
+                                        }
+                                    }
+                                },
+                                rotation: 1 * Math.PI,
+                                circumference: 1 * Math.PI,
+
+
+                            }}/>
+
+                        </Col>
+                        <Col xl={{span: 12}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}}>
+
+                            <div>
+                                <Table dataSource={peakHourEvents} bordered={true} size={"small"} pagination={false}>
+                                    <Column title="Duration" dataIndex="duration" key="duration"
+                                            render={duration => duration} />
+                                    <Column title="No Of People" dataIndex="peopleCount" key="peopleCount"
+                                            render={peopleCount => peopleCount}/>
+                                </Table>
+                            </div>
+
+
+                        </Col>
+                    </Card>
+
+
+                </Row>
                 <div>
                     <Modal
                         onCancel={this.handleCancel}
@@ -305,13 +426,12 @@ export default class ApcDashboard extends Component {
                             </Button>
                         </Dropdown>
                     </div>}>
-                        <Line data={apc.chartData} options={apcChartOptions}/>
+                        < Line data={apc.chartData} options={apcChartOptions}/>
 
                     </Card>
                 </div>
-                <div>
-                        <Doughnut data={data} />
-                </div>
+
+
             </div>
         )
     }
