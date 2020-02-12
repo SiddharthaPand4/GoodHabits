@@ -18,11 +18,11 @@ import {EventBus} from "./components/event"
 import LoginView from "./views/LoginView";
 import IncidentListView from "./views/IncidentListView";
 import TriggerView from "./views/TriggerView";
-import AnprView from "./views/AnprView";
+import AnprView from "./views/anpr/AnprView";
 import TrafficIncidentView from "./views/TrafficIncidentView";
-import IncidentRepeatedView from "./views/incidentsRepeated/IncidentRepeatedView";
+import IncidentRepeatedView from "./views/incidents/IncidentRepeatedView";
 import IncidentHotlistView from "./views/IncidentHotlistView";
-import MasterDataView from "./views/masterData/MasterDataView";
+import MasterDataView from "./views/anpr/MasterDataView";
 import ParkingDashboardView from "./views/parking/ParkingDashboardView";
 import ParkingConsoleView from "./views/parking/ParkingConsoleView";
 import PgsReportView from "./views/parking/ParkingReportView";
@@ -31,6 +31,7 @@ import PeopleCounting from "./views/PeopleCount/PeopleCounting";
 import ApcDashboard from "./views/PeopleCount/ApcDashboard";
 import AtccView from "./views/atcc/AtccView";
 import AtccSummaryView from "./views/atcc/AtccSummaryView";
+import HighwayIncidentView from "./views/vids/HighwayIncidentView";
 
 const {Content} = Layout;
 
@@ -92,6 +93,8 @@ class App extends Component {
                                 <PrivateRoute path='/atcc' exact={true} component={AtccView}/>
                                 <PrivateRoute path='/atcc/summary' exact={true} component={AtccSummaryView}/>
 
+                                {/* vids */}
+                                <PrivateRoute path='/vids' exact={true} component={HighwayIncidentView}/>
                             </div>
                         </Content>
                         <Footerbar/>

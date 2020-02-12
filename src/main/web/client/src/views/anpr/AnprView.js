@@ -3,19 +3,17 @@ import {
     Card,
     Col,
     Collapse,
-    Divider,
     Empty,
     Icon,
     Pagination,
     Row,
     Table,
     Tag,
-    Modal,
-    message, Input, Button, Menu, Dropdown, Typography, Slider
+    Input, Button, Menu, Dropdown, Typography, Slider
 } from 'antd';
-import GenericFilter from "../components/GenericFilter";
+import GenericFilter from "../../components/GenericFilter";
 import Moment from "react-moment";
-import AnprService from "../services/AnprService";
+import AnprService from "../../services/AnprService";
 import Magnifier from "react-magnifier";
 
 const {Paragraph, Text} = Typography;

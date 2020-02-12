@@ -1,6 +1,4 @@
 import axios from './axios';
-import { authHeader } from '../helpers/auth-header';
-import { config } from '../helpers/config'
 
 class DeviceService {
 

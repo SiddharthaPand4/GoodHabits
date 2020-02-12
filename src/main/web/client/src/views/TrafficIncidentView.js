@@ -3,15 +3,13 @@ import {
     Card,
     Col,
     Collapse,
-    Divider,
     Empty,
     Icon,
     Pagination,
     Row,
     Table,
     Tag,
-    Modal,
-    message, Input, Button, Menu, Dropdown, Typography, Slider
+    Input, Button, Menu, Dropdown, Typography, Slider
 } from 'antd';
 import GenericFilter from "../components/GenericFilter";
 import Moment from "react-moment";

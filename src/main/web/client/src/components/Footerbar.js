@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Layout, Divider} from "antd";
+import {Layout} from "antd";
 
 const {Footer} = Layout;
 

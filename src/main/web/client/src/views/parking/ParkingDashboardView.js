@@ -1,15 +1,11 @@
 import React, {Component} from "react";
-import {Line, Pie, Doughnut} from 'react-chartjs-2';
+import {Pie, Doughnut} from 'react-chartjs-2';
 import {
     Col,
     Row,
-    Button,
-    Icon,
     Card,
     Modal,
     Menu,
-    Dropdown,
-    Select,
     DatePicker, Skeleton
 } from "antd";
 import ApmsService from "../../services/ApmsService";
@@ -19,7 +15,6 @@ import CommonService from "../../services/CommonService";
 import Moment from 'moment';
 import 'chartjs-plugin-datalabels';
 
-const {Option} = Select;
 const {RangePicker} = DatePicker;
 
 let fo_data = {
@@ -163,13 +158,10 @@ export default class ParkingDashboardView extends Component {
     }
 
     handleDateRangeChange(dates, dateString) {
-
-        let startDate = dates[0].toDate();
-        let endDate = dates[1].toDate();
         this.setState(() => {
             this.refresh();
         });
-        console.log(dates, dateString);
+
     }
 
     handleCancel = e => {

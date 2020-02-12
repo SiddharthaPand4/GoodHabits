@@ -1,13 +1,11 @@
 import React, {Component} from "react";
 import {Table, Divider,Row,Col,Card,Form,Button,Input,Icon,Typography,Select,Modal,message} from 'antd';
 import UserService from "../services/UserService";
-import {EventBus} from "../components/event";
+
 import '../form.css';
 const { Column} = Table;
 const {Text} = Typography;
 const { confirm } = Modal;
-const { Option } = Select;
-const ButtonGroup = Button.Group;
 export default class UserListView extends Component {
 
     constructor(props) {
@@ -20,14 +18,12 @@ export default class UserListView extends Component {
             user:{userName:"", lastName:"",firstName:"",email:"",password:"",roles:[],id:""},
             roles:[],
             visible: false ,
-        }
-
+        };
 
         this.addUser=this.addUser.bind(this);
         this.refresh=this.refresh.bind(this);
         this.refreshUsers=this.refreshUsers.bind(this);
         this.close=this.close.bind(this);
-
 
     }
 
@@ -67,7 +63,7 @@ export default class UserListView extends Component {
     }
 
     showUser(userId){
-        this.setState({showUserDetails:true,mode:"Edit"})
+        this.setState({showUserDetails:true,mode:"Edit"});
         UserService.getUser(userId).then(response =>{
             this.setState({user : response.data})
         },
@@ -108,8 +104,6 @@ export default class UserListView extends Component {
 
      const WrappedUserForm = Form.create({name: 'user_form'})(UserForm);
      const showUserDetails=this.state.showUserDetails;
-     const mode=this.state.mode;
-     const user=this.state.user;
 
         return (
          <div>
@@ -178,7 +172,7 @@ class UserForm extends Component {
     handleSubmit(e) {
         e.preventDefault();
         const form = this.props.form;
-        var user = {};
+        let user = {};
         user.firstName = form.getFieldValue("firstname");
         user.userName = form.getFieldValue("username");
         user.lastName = form.getFieldValue("lastname");
@@ -200,7 +194,7 @@ class UserForm extends Component {
             validationError = "Missing email"
         }
 
-        if(user.roles.length==0){
+        if(user.roles.length===0){
             validationError="Missing role"
         }
         if (validationError) {
@@ -233,7 +227,7 @@ class UserForm extends Component {
         const validationError = this.state.validationError;
 
          return (
-            <Card title={this.props.mode=="Add"? "Add User" : "Edit User"}>
+            <Card title={this.props.mode ==="Add"? "Add User" : "Edit User"}>
 
                <Form onSubmit={this.handleSubmit} className="user-form" >
                     <Form.Item label="Username" className="formitem">
@@ -300,7 +294,7 @@ class UserForm extends Component {
                               )}
                     </Form.Item>
                     <br/>
-                    <div align="right">
+                    <div>
                         <Button type="primary" htmlType="submit" className="user-form-button"  size="small" loading={this.state.loading}>
                             Save
                         </Button>

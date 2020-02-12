@@ -11,34 +11,23 @@ import {
     Tag,
     Input, Button, Menu, Dropdown, Typography, Slider
 } from 'antd';
-import GenericFilter from "../components/GenericFilter";
+import GenericFilter from "../../components/GenericFilter";
 import Moment from "react-moment";
-import AnprService from "../services/AnprService";
+import AnprService from "../../services/AnprService";
 import Magnifier from "react-magnifier";
-import HotListedVehiclesList from "../components/HotListedVehicles/HotListedVehiclesList";
 
+const {Paragraph, Text} = Typography;
 
 const {Column} = Table;
 const {Panel} = Collapse;
-const {Paragraph, Text} = Typography;
-const tabList = [
-    {
-        key: 'incidents',
-        tab: 'Incidents',
-    },
-    {
-        key: 'vehicles',
-        tab: 'Vehicles',
-    },
-];
 
 
-export default class IncidentHotlistView extends Component {
+export default class HighwayIncidentView extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            activeTab: "incidents",
+            visible: true,
             loading: true,
             layout: "list",
             events: {},
@@ -54,7 +43,6 @@ export default class IncidentHotlistView extends Component {
                 minZoomFactor: 1,
                 maxZoomFactor: 5
             },
-
         };
 
         this.refresh = this.refresh.bind(this);
@@ -68,7 +56,6 @@ export default class IncidentHotlistView extends Component {
         this.updateEvent = this.updateEvent.bind(this);
         this.magnifyEvent = this.magnifyEvent.bind(this);
         this.updateZoomFactor = this.updateZoomFactor.bind(this);
-
     }
 
     componentDidMount() {
@@ -76,14 +63,14 @@ export default class IncidentHotlistView extends Component {
     }
 
     refresh() {
-        AnprService.getIncidentsHotlisted(this.state.filter).then(request => {
+        AnprService.getEvents(this.state.filter).then(request => {
             this.setState({"anprresponse": request.data, loading: false})
         })
     }
 
     //cant use refresh to read from state as state may not have been set
     refreshNow(filter) {
-        AnprService.getIncidentsHotlisted(this.state.filter).then(request => {
+        AnprService.getEvents(this.state.filter).then(request => {
             this.setState({"anprresponse": request.data, loading: false})
         })
     }
@@ -109,6 +96,13 @@ export default class IncidentHotlistView extends Component {
     handleLayoutChange(data) {
         this.setState({layout: data})
     }
+
+    handleOnClick = e => {
+        console.log(e);
+        this.setState({
+            visible: false,
+        });
+    };
 
     handleRefresh() {
         this.refresh();
@@ -145,7 +139,6 @@ export default class IncidentHotlistView extends Component {
         this.setState({magnifyEvent});
     }
 
-
     updateEvent(anprText) {
 
         let {workingEvent, workingEventLoading} = this.state;
@@ -165,53 +158,27 @@ export default class IncidentHotlistView extends Component {
         })
     }
 
-    onTabChange(key) {
-        if (key === "incidents") {
-            this.refresh();
-        }
-        this.setState({activeTab: key})
-    }
-
 
     render() {
 
-
-        return (<div>
-            <Card
-                style={{width: '100%'}}
-                title="Hotlist"
-                tabList={tabList}
-                activeTabKey={this.state.activeTab}
-                onTabChange={key => {
-                    this.onTabChange(key);
-                }}
-            >
-                {this.state.activeTab === "incidents" ? (this.renderIncidents()) : <HotListedVehiclesList/>}
-            </Card>
-
-
-        </div>)
-    }
-
-
-    renderIncidents() {
         let layout = this.state.layout;
         let lpr = this.state.filter.lpr;
 
-        return <div>
-            <Collapse bordered={false} defaultActiveKey={['1']}>
-                <Panel header="Filter" key="1">
-                    LPR: <Input value={lpr} style={{"width": "200px"}} onChange={this.onLprInputChange}/> <br/><br/>
-                    <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
-                                   handleFilterChange={this.handleFilterChange}
-                                   handleLayoutChange={this.handleLayoutChange}/>
-                </Panel>
+        return (
+            <div>
+                <h3>Highway Incidents</h3>
+                <Collapse bordered={false} defaultActiveKey={['1']}>
+                    <Panel header="Filter" key="1">
+                        LPR: <Input value={lpr} style={{"width": "200px"}} onChange={this.onLprInputChange}/> <br/><br/>
+                        <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
+                                       handleFilterChange={this.handleFilterChange}
+                                       handleLayoutChange={this.handleLayoutChange}/>
+                    </Panel>
+                </Collapse>
                 <div>
                     {layout === "table" ? (this.renderTable()) : (this.renderGrid())}
                 </div>
-            </Collapse>
-
-        </div>;
+            </div>)
     }
 
     renderGrid() {
@@ -249,6 +216,8 @@ export default class IncidentHotlistView extends Component {
                                         {(event.direction && event.direction === "rev") ?
                                             <Tag color="#f50">Reverse</Tag> : null}
                                         {(event.helmet) ? <Tag color="#f50">Without helmet</Tag> : null}
+
+                                        {(event.sectionSpeed) ? <Tag color="#f50">Overspeeding</Tag> : null}
                                     </div>
                                 }
                                 extra={<Dropdown overlay={<Menu>
@@ -297,11 +266,13 @@ export default class IncidentHotlistView extends Component {
                                             onChange={this.updateZoomFactor}
                                             value={typeof zoomFactor === 'number' ? zoomFactor : 0}
                                         />
-                                        : <div style={{height:"54px",textAlign: "center"}}>
-                                               <Button size="small" type="dashed" onClick={() => this.magnifyEvent(event)} >
-                                                   <Icon type="zoom-in"/>Zoom Image
-                                               </Button>
-                                           </div>
+                                        :
+                                        <div style={{height: "54px", textAlign: "center"}}>
+                                            <Button size="small" type="dashed" onClick={() => this.magnifyEvent(event)}>
+                                                <Icon type="zoom-in"/>Zoom Image
+                                            </Button>
+                                        </div>
+
                                     }
                                 </div>
                                 <div style={{textAlign: "center"}}>
@@ -316,13 +287,17 @@ export default class IncidentHotlistView extends Component {
                                         copyable>{event.anprText}</Paragraph>
                                     <Text
                                         type="secondary">{(workingEventLoading && workingEvent.id === event.id) ? "saving..." : ""}</Text>
+                                    <Text
+                                        type="secondary">{(event.speed) ? "Speed: "+event.speed : ""}</Text>
                                     <div>
-                                        <Text code> <Moment format="ll">{event.eventDate}</Moment>{' '}|{' '}<Moment
+                                        <Text code><Icon type="schedule"/> <Moment
+                                            format="ll">{event.eventDate}</Moment>{' '}|{' '}<Moment
                                             format="LTS">{event.eventDate}</Moment></Text>
                                     </div>
                                     <div>
                                         <Text code><Icon type="environment"/> {event.location}</Text>
                                     </div>
+
 
                                 </div>
 
@@ -375,23 +350,26 @@ export default class IncidentHotlistView extends Component {
                         render={eventDate => (<Moment format="LTS">{eventDate}</Moment>)}/>
                 <Column title="LPR" dataIndex="anprText" key="anprText"
                         render={anprText => anprText}/>
-                <Column title="image" dataIndex="id" key="anprimage"
+                <Column title="LP Image" dataIndex="id" key="anprimage"
                         render={id => (
                             <a title={"click here to download"} href={"/public/anpr/lpr/" + id + "/image.jpg"}
                                download={true}>
                                 <img alt="event"
-                                     src={"/public/anpr/lpr/" + id + "/image.jpg"}/></a>)}/>
+                                     src={"/public/anpr/lpr/" + id + "/image.jpg"}/></a> )}/>
                 <Column title="direction" dataIndex="direction" key="direction"
                         render={direction => direction}/>
-                <Column title="Helmet" dataIndex="helmet" key="helmet"
-                        render={helmet => helmet ? <span>No</span> : <span>Yes</span>}/>
+                <Column title="Helmet?" dataIndex="helmet" key="helmet"
+                        render={helmet => helmet ? <span>No</span> : <span>N/A</span>}/>
+                <Column title="Speed" dataIndex="speed" key="speed"
+                        render={speed => <span>{speed}</span>}/>
                 <Column title="Action"
                         key="action"
                         render={(text, event) => (
                             <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon type="warning"/>{' '}
-                               Archive</Button>
+                                Archive</Button>
                         )}
                 />
+
             </Table>
         )
     }

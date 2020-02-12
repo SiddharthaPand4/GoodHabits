@@ -2,25 +2,17 @@ import React, {Component} from "react";
 import {
     Card,
     Col,
-    Collapse,
-    Divider,
-    Empty,
     Icon,
-    Pagination,
     Row,
     Table,
-    Tag,
-    Modal,
-    message, Input, Button, Menu, Dropdown, Typography, Slider, Spin
+    Input, Button, Spin
 } from 'antd';
-import GenericFilter from "../../components/GenericFilter";
+
 import Moment from "react-moment";
 import moment from "moment";
 import ApmsService from "../../services/ApmsService";
 
-const {Paragraph, Text} = Typography;
 const {Column} = Table;
-const {Panel} = Collapse;
 const {Search} = Input;
 const antIcon = <Icon type="loading" style={{fontSize: 24}} spin/>;
 
@@ -71,7 +63,7 @@ export default class ParkingInOutView extends Component {
     onLprInputChange(e) {
         let filter = this.state.filter;
         filter.vehicleNo = e.target.value;
-        this.setState({filter: filter})
+        this.setState({filter: filter});
         if (filter.vehicleNo && filter.vehicleNo.length > 2) {
             this.getEventsStatus(filter.vehicleNo);
         }
@@ -94,7 +86,7 @@ export default class ParkingInOutView extends Component {
     copyVehicleNo(vehicleNo) {
         let filter = this.state.filter;
         filter.vehicleNo = vehicleNo;
-        this.setState({filter: filter})
+        this.setState({filter: filter});
         if (filter.vehicleNo && filter.vehicleNo.length > 2) {
             this.getEventsStatus(filter.vehicleNo);
         }
@@ -154,7 +146,6 @@ export default class ParkingInOutView extends Component {
             filter.loading = false;
             filter.apmsresponse = response.data;
             for (var i in filter.apmsresponse.events) {
-
                 filter.apmsresponse.events[i].timeDiff = this.getTimeDifference(filter.apmsresponse.events[i]);
             }
             this.setState({filter: filter});
@@ -192,14 +183,14 @@ export default class ParkingInOutView extends Component {
         // Otherwise, does it have any properties of its own?
         // Note that this doesn't handle
         // toString and valueOf enumeration bugs in IE < 9
-        for (var key in obj) {
+        for (let key in obj) {
             if (hasOwnProperty.call(obj, key)) return false;
         }
         return true;
     }
 
     getEventId() {
-        let filter = {...this.state.filter}
+        let filter = {...this.state.filter};
         if (!filter.loading) {
             if (filter.apmsresponse.events) {
                 if (filter.apmsresponse.events.length > 0) {
@@ -255,7 +246,7 @@ export default class ParkingInOutView extends Component {
                         <Col xl={{span: 12}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}}>
 
                             <img width="440" height="260"
-                                 src={"/public/apms/parking/event/" + vehicleLastParkingEvent.id + "/image.jpg"}></img>
+                                 src={"/public/apms/parking/event/" + vehicleLastParkingEvent.id + "/image.jpg"}/>
 
                         </Col>
 
@@ -270,14 +261,14 @@ export default class ParkingInOutView extends Component {
 
                                     onSearch={() => this.onPageChange(1, filter.pageSize)}
 
-                            /><br></br><br></br><br></br>
+                            /><br/><br/><br/>
 
 
                             <Button type="primary" size="large" block="false" icon={"arrow-down"}
                                     loading={loading.checkIn} disabled={disableCheckIn}
                                     onClick={() => this.addCheckIn()}>
                                 Entry
-                            </Button><br></br><br></br><br></br>
+                            </Button><br/><br/><br/>
 
 
                             <Button type="primary" size="large" block="false" icon={"arrow-up"}
@@ -287,7 +278,7 @@ export default class ParkingInOutView extends Component {
                             </Button>
                         </Col>
                     </Row>
-                    <br></br>
+                    <br/>
                 </Card>
 
 
@@ -316,7 +307,7 @@ export default class ParkingInOutView extends Component {
                                                 </div> : ""
                                             )}
                                     />
-                                    <Column title="Time-diff(HH:mm)" render={(text, record, index) => (record.timeDiff)}/>
+                                    <Column title="Time-diff(HH:mm)" render={(text, record) => (record.timeDiff)}/>
                                 </Table>
                             </div>
                         </div>
