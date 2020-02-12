@@ -1,8 +1,6 @@
 
 import React, {Component} from "react";
-import {Button,  Card, DatePicker, Icon, TimePicker} from 'antd';
-import DeviceService from "../services/DeviceService";
-import {Link} from "react-router-dom";
+import {Button, DatePicker, Icon, TimePicker} from 'antd';
 const ButtonGroup = Button.Group;
 
 export default class DeviceView extends Component {

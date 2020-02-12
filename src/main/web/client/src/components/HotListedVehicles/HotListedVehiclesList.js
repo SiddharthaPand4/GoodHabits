@@ -2,7 +2,6 @@ import React, {Component} from "react";
 import {
     Card,
     Col,
-    Empty,
     Icon,
     Pagination,
     Row,
@@ -162,21 +161,12 @@ export default class HotListedVehiclesList extends Component {
         });
     };
 
-    onLprInputChange(e) {
-
-        let filter = this.state.filter;
-        filter.lpr = e.target.value;
-        console.log(filter);
-        this.setState({filter: filter})
-    }
-
     search(searchText) {
         let {filter} = this.state;
         filter.lpr = searchText;
         this.setState({filter: filter});
         this.refresh(filter)
     }
-
 
     onLprInputChange(e) {
 

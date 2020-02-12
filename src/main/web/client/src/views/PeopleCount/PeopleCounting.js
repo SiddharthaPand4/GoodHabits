@@ -1,24 +1,16 @@
 import React, {Component} from "react";
 import {
-    Card,
-    Col,
     Collapse,
-    Divider,
     Empty,
-    Icon,
-    Pagination,
-    Row,
     Table,
-    Tag,
-    Modal,
-    message, Input, Button, Menu, Dropdown, Typography, Slider
+    message, Input, Typography
 } from 'antd';
 
 import ApcGenericFilter from "./ApcGenericFilter";
 import Moment from "react-moment";
 import ApcFileService from "../../services/ApcFileService";
 
-const {Paragraph, Text} = Typography;
+const {Paragraph} = Typography;
 const {Column} = Table;
 const {Panel} = Collapse;
 
@@ -88,7 +80,7 @@ export default class PeopleCounting extends Component {
     }
 
     archiveEvent(event) {
-        ApcFileService.archiveEvent(event).then(request => {
+        ApcFileService.archiveEvent(event).then(() => {
             this.refresh();
         })
 

@@ -1,33 +1,19 @@
 import React, { Component } from "react"
 import {
-  Anchor,
-  Card,
-  Col,
-  Collapse,
-  Divider,
   Empty,
   Icon,
   Spin,
-  Pagination,
-  Row,
   Table,
-  Tag,
   Timeline,
   Modal,
-  Tabs,
-  message,
-  Input,
   Button,
-  Menu,
-  Dropdown,
   Typography,
-  Slider
 } from "antd";
 import Moment from "react-moment";
 
 import AnprService from "../../services/AnprService";
 
-const {Paragraph, Text} = Typography;
+const {Paragraph} = Typography;
 const {Column} = Table;
 export default class IncidentTimeline extends Component {
 

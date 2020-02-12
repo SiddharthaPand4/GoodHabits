@@ -1,27 +1,13 @@
 import React, { Component } from "react"
 import {
-  Anchor,
-  Card,
-  Col,
-  Collapse,
-  Divider,
   Empty,
   Icon,
   Spin,
-  Pagination,
-  Row,
   Table,
-  Tag,
   Timeline,
   Modal,
-  Tabs,
-  message,
-  Input,
   Button,
-  Menu,
-  Dropdown,
   Typography,
-  Slider
 } from "antd";
 import Moment from "react-moment";
 
@@ -53,7 +39,7 @@ export default class IncidentTimeline extends Component {
 
     componentWillReceiveProps(nextProps){
         let filter = this.state.filter;
-        if((filter.lpr != nextProps.lpr) || (filter.incidentType != nextProps.incidentType)) {
+        if((filter.lpr !== nextProps.lpr) || (filter.incidentType !== nextProps.incidentType)) {
             filter.lpr = nextProps.lpr;
             filter.incidentType = nextProps.incidentType;
             this.setState({filter},()=>{
@@ -168,7 +154,7 @@ export default class IncidentTimeline extends Component {
                                                                       <a title={"click here to download"}  href={"/public/anpr/vehicle/" + id + "/image.jpg"}
                                                                       download={true}>
                                                                       <img alt="event"
-                                                                      src={"/public/anpr/vehicle/" + id + "/image.jpg" }style={{width:200,height:"auto"}}/></a>)}/>
+                                                                      src={"/public/anpr/vehicle/" + id + "/image.jpg" } style={{width:200,height:"auto"}}/></a>)}/>
                                                </Table>
                                             </div>
                </Modal>

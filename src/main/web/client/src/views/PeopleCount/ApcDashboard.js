@@ -2,17 +2,14 @@ import React, {Component} from "react";
 import {
     Col,
     Row,
-    Statistic,
-    TimePicker,
     DatePicker,
     Button,
     Icon,
-    message,
     Card,
     Modal,
     Menu,
     Dropdown,
-    Select, Table
+    Table
 } from "antd";
 import ApcDashboardService from "../../services/ApcDashboardService";
 import { Line, Doughnut} from 'react-chartjs-2';
@@ -51,7 +48,7 @@ export default class ApcDashboard extends Component {
                 }
             },
             peakHourEvents: []
-        }
+        };
 
         this.getApcPeopleCount = this.getApcPeopleCount.bind(this);
         this.getApcPeakHour = this.getApcPeakHour.bind(this);
@@ -140,7 +137,7 @@ export default class ApcDashboard extends Component {
         peakhour.chartData = {
             labels: [],
             datasets: []
-        }
+        };
         ApcDashboardService.getApcPeakHour(from_date, to_date).then(response => {
             let rawData = response.data;
             if (rawData && rawData.length > 0) {
@@ -376,8 +373,6 @@ export default class ApcDashboard extends Component {
                                 },
                                 rotation: 1 * Math.PI,
                                 circumference: 1 * Math.PI,
-
-
                             }}/>
 
                         </Col>
@@ -402,7 +397,7 @@ export default class ApcDashboard extends Component {
                     <Modal
                         onCancel={this.handleCancel}
                         title="Custom Date Range"
-                        visible={this.state.isOpencustomDateRangeModal ? true : false}
+                        visible={!!this.state.isOpencustomDateRangeModal}
                         footer={[]}
                     >
                         <RangePicker

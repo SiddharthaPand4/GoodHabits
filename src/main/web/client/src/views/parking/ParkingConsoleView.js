@@ -2,7 +2,6 @@ import React, {Component} from "react";
 import {Button, Col, Row, Select, Switch} from "antd";
 import queryString from 'query-string';
 import {Group, Image, Label, Layer, Line, Stage, Star, Tag, Text} from 'react-konva';
-import useImage from 'use-image';
 import ApmsService from "../../services/ApmsService";
 
 const {Option} = Select;
