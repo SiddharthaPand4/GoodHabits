@@ -30,7 +30,7 @@ export default class Sidebar extends Component {
                 }}
             >
                 <div className="logo">
-                    <img src={"orbitly-logo.png"}/>
+                    <img src={"synlabs-logo.png"}/>
                 </div>
                 <Menu theme="dark" mode="inline" defaultSelectedKeys={['0']}>
                     <Menu.Item key="0">
@@ -52,7 +52,7 @@ export default class Sidebar extends Component {
                             <Link to='/anpr/masterdata'><span className='nav-text'>Repeated Events</span></Link>
                         </Menu.Item>
                     </SubMenu>
-                    {/*<SubMenu key="sub2" title={
+                    <SubMenu key="sub2" title={
                         <span>
                            <Icon type='box-plot'/>
                            <span>Offences</span>
@@ -65,36 +65,22 @@ export default class Sidebar extends Component {
                         <Menu.Item key="4" className="sidebar-nav-link">
                             <Link to='/incidents/repeated'><span className='nav-text'>Repeated Events</span></Link>
                         </Menu.Item>
-                    </SubMenu>*/}
+                    </SubMenu>
 
                     <Menu.Item key="5" className="sidebar-nav-link">
                         <Link to="/incidents/hotlisted"><Icon type='alert'/><span
                             className='nav-text'>Hotlist</span></Link>
                     </Menu.Item>
-                    {/*<Menu.Item key="6">
-                        <Link to='/feed'><Icon type='video-camera'/><span className='nav-text'>Feed</span></Link>
-                    </Menu.Item>*/}
-                    {/*<SubMenu key="admin" title={<span><Icon type="deployment-unit"/>Admin</span>}>
-                        <Menu.Item key="51">
-                            <Link to='/user'><Icon type='user'/><span className='nav-text'>Users</span></Link>
-                        </Menu.Item>
-                        <Menu.Item key="52">
-                            <Link to='/device'><Icon type='laptop'/><span className='nav-text'>Device</span></Link>
-                        </Menu.Item>
-                        <Menu.Item key="53">
-                            <Link to='/trigger'><Icon type="clock-circle"/><span
-                                className='nav-text'>Triggers</span></Link>
-                        </Menu.Item>
-                    </SubMenu>*/}
+
                     <SubMenu key="pgs" title={
                         <span>
                            <Icon type='car'/>
                            <span>Parking</span>
                          </span>
                     }>
-                        {/*<Menu.Item key="pgs-1" className="sidebar-nav-link">
+                        <Menu.Item key="pgs-1" className="sidebar-nav-link">
                             <Link to='/pgs/dashboard'><span className='nav-text'>Dashboard</span></Link>
-                        </Menu.Item>*/}
+                        </Menu.Item>
                         <Menu.Item key="pgs-2" className="sidebar-nav-link">
                             <Link to='/pgs/console'><span className='nav-text'>Operator Console</span></Link>
                         </Menu.Item>
@@ -105,6 +91,23 @@ export default class Sidebar extends Component {
                             <Link to='/pgs/reports'><span className='nav-text'>Reports</span></Link>
                         </Menu.Item>
                     </SubMenu>
+
+                    <Menu.Item key="6">
+                        <Link to='/feed'><Icon type='video-camera'/><span className='nav-text'>Feed</span></Link>
+                    </Menu.Item>
+                    <SubMenu key="admin" title={<span><Icon type="deployment-unit"/>Admin</span>}>
+                        <Menu.Item key="51">
+                            <Link to='/user'><Icon type='user'/><span className='nav-text'>Users</span></Link>
+                        </Menu.Item>
+                        <Menu.Item key="52">
+                            <Link to='/device'><Icon type='laptop'/><span className='nav-text'>Device</span></Link>
+                        </Menu.Item>
+                        <Menu.Item key="53">
+                            <Link to='/trigger'><Icon type="clock-circle"/><span
+                                className='nav-text'>Triggers</span></Link>
+                        </Menu.Item>
+                    </SubMenu>
+
 
                     {/*<SubMenu
                         key="sub3"
@@ -141,7 +144,6 @@ export default class Sidebar extends Component {
                         <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span
                             className='nav-text'>Logout</span></Link>
                     </Menu.Item>
-
                 </Menu>
             </Sider>
         );

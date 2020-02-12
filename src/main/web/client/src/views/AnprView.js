@@ -218,6 +218,8 @@ export default class AnprView extends Component {
                                         {(event.direction && event.direction === "rev") ?
                                             <Tag color="#f50">Reverse</Tag> : null}
                                         {(event.helmet) ? <Tag color="#f50">Without helmet</Tag> : null}
+
+                                        {(event.sectionSpeed) ? <Tag color="#f50">Overspeeding</Tag> : null}
                                     </div>
                                 }
                                 extra={<Dropdown overlay={<Menu>
