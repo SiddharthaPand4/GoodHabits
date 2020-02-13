@@ -10,9 +10,9 @@ import {
     Row,
     Table,
     Tag,
-    Input, Button, Menu, Dropdown, Typography, Slider
+    Input, Button, Menu, Dropdown, Typography, Slider,
     Modal,
-    message, Input, Button, Menu, Dropdown, Typography, Slider, Form
+    message,  Form
 } from 'antd';
 import GenericFilter from "../../components/GenericFilter";
 import Moment from "react-moment";
@@ -20,7 +20,7 @@ import AnprService from "../../services/AnprService";
 import Magnifier from "react-magnifier";
 import moment from "moment";
 import {saveAs} from "file-saver";
-import AnprReportService from "../services/AnprReportService";
+import AnprReportService from "../../services/AnprReportService";
 
 const {Paragraph, Text} = Typography;
 
