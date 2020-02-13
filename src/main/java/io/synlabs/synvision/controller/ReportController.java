@@ -4,6 +4,7 @@ import ch.qos.logback.core.util.FileUtil;
 import io.synlabs.synvision.entity.parking.ParkingEvent;
 import io.synlabs.synvision.jpa.ParkingEventRepository;
 import io.synlabs.synvision.service.parking.ApmsService;
+import io.synlabs.synvision.views.anpr.AnprFilterRequest;
 import io.synlabs.synvision.views.parking.ParkingReportRequest;
 import io.synlabs.synvision.views.parking.ParkingReportResponse;
 import org.apache.commons.io.FilenameUtils;
@@ -77,4 +78,5 @@ public class ReportController {
         }
 
     }
+
 }
