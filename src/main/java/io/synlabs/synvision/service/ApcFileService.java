@@ -160,7 +160,7 @@ public class ApcFileService  {
         QApcEvent apcEvent = QApcEvent.apcEvent;
         JPAQuery<ApcEvent> query= new JPAQuery<>(entityManager);
         query = query.select(apcEvent).from(apcEvent);
-        if(request.getEventId()!=null)
+        if(request.getEventId()!=null&&!request.getEventId().equals(""))
          query= query.where(apcEvent.eventId.eq(request.getEventId()));
         query =  query.where(apcEvent.archived.eq(false));
         try {

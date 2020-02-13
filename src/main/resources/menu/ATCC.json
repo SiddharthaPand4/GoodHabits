@@ -1,0 +1,19 @@
+{
+  "key": "highways",
+  "title": "Highways",
+  "icon": "box-plot",
+  "submenu": [
+    {
+      "key": "atcc-summary",
+      "title": "ATCC Dashboard",
+      "icon": "box-plot",
+      "link": "/atcc/summary"
+    },
+    {
+      "key": "atcc",
+      "title": "ATCC",
+      "icon": "box-plot",
+      "link": "/atcc"
+    }
+  ]
+}

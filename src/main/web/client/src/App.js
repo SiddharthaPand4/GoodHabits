@@ -18,16 +18,20 @@ import {EventBus} from "./components/event"
 import LoginView from "./views/LoginView";
 import IncidentListView from "./views/IncidentListView";
 import TriggerView from "./views/TriggerView";
-import AnprView from "./views/AnprView";
+import AnprView from "./views/anpr/AnprView";
 import TrafficIncidentView from "./views/TrafficIncidentView";
-import IncidentRepeatedView from "./views/incidentsRepeated/IncidentRepeatedView";
+import IncidentRepeatedView from "./views/incidents/IncidentRepeatedView";
 import IncidentHotlistView from "./views/IncidentHotlistView";
-import MasterDataView from "./views/masterData/MasterDataView";
+import MasterDataView from "./views/anpr/MasterDataView";
 import ParkingDashboardView from "./views/parking/ParkingDashboardView";
 import ParkingConsoleView from "./views/parking/ParkingConsoleView";
 import PgsReportView from "./views/parking/ParkingReportView";
 import ParkingInOutView from "./views/parking/ParkingInOutView";
 import PeopleCounting from "./views/PeopleCount/PeopleCounting";
+import ApcDashboard from "./views/PeopleCount/ApcDashboard";
+import AtccView from "./views/atcc/AtccView";
+import AtccSummaryView from "./views/atcc/AtccSummaryView";
+import HighwayIncidentView from "./views/vids/HighwayIncidentView";
 
 const {Content} = Layout;
 
@@ -64,7 +68,7 @@ class App extends Component {
                         <Content style={{margin: '16px'}}>
                             <div style={{padding: 4}}>
                                 <Route path='/login' exact={true} component={LoginView}/>
-                                <PrivateRoute path='/' exact={true} component={ParkingDashboardView}/>
+                                <PrivateRoute path='/' exact={true} component={HomeView}/>
                                 <PrivateRoute path='/incidents' exact={true} component={TrafficIncidentView}/>
                                 <PrivateRoute path='/incidents/hotlisted' exact={true} component={IncidentHotlistView}/>
                                 <PrivateRoute path='/incidents/repeated' exact={true} component={IncidentRepeatedView}/>
@@ -83,6 +87,14 @@ class App extends Component {
                                 <PrivateRoute path='/pgs/console' exact={true} component={ParkingConsoleView}/>
                                 <PrivateRoute path='/pgs/inout' exact={true} component={ParkingInOutView}/>
                                 <PrivateRoute path='/pgs/reports' exact={true} component={PgsReportView}/>
+                                <PrivateRoute path='/people-counting/Dashboard' exact={true} component={ApcDashboard}/>
+
+                                {/* atcc */}
+                                <PrivateRoute path='/atcc' exact={true} component={AtccView}/>
+                                <PrivateRoute path='/atcc/summary' exact={true} component={AtccSummaryView}/>
+
+                                {/* vids */}
+                                <PrivateRoute path='/vids' exact={true} component={HighwayIncidentView}/>
                             </div>
                         </Content>
                         <Footerbar/>

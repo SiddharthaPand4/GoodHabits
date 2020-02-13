@@ -3,15 +3,13 @@ import {
     Card,
     Col,
     Collapse,
-    Divider,
     Empty,
     Icon,
     Pagination,
     Row,
     Table,
     Tag,
-    Modal,
-    message, Input, Button, Menu, Dropdown, Typography, Slider
+    Input, Button, Menu, Dropdown, Typography, Slider
 } from 'antd';
 import GenericFilter from "../components/GenericFilter";
 import Moment from "react-moment";
@@ -244,7 +242,7 @@ export default class TrafficIncidentView extends Component {
                                 cover={(magnifyEventId === event.id) ?
                                     <Magnifier src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}
                                                zoomFactor={zoomFactor}/> : <img alt="event"
-                                                                    src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}/>
+                                                                                src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}/>
 
                                 }
                             >
@@ -257,11 +255,11 @@ export default class TrafficIncidentView extends Component {
                                             onChange={this.updateZoomFactor}
                                             value={typeof zoomFactor === 'number' ? zoomFactor : 0}
                                         />
-                                        : <div style={{height:"54px",textAlign: "center"}}>
-                                               <Button size="small" type="dashed" onClick={() => this.magnifyEvent(event)} >
-                                                   <Icon type="zoom-in"/>Zoom Image
-                                               </Button>
-                                           </div>
+                                        : <div style={{height: "54px", textAlign: "center"}}>
+                                            <Button size="small" type="dashed" onClick={() => this.magnifyEvent(event)}>
+                                                <Icon type="zoom-in"/>Zoom Image
+                                            </Button>
+                                        </div>
                                     }
                                 </div>
                                 <div style={{textAlign: "center"}}>

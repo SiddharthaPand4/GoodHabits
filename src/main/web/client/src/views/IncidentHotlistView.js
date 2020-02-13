@@ -3,20 +3,17 @@ import {
     Card,
     Col,
     Collapse,
-    Divider,
     Empty,
     Icon,
     Pagination,
     Row,
     Table,
     Tag,
-    Modal,
-    message, Input, Button, Menu, Dropdown, Typography, Slider, Popconfirm,
+    Input, Button, Menu, Dropdown, Typography, Slider
 } from 'antd';
 import GenericFilter from "../components/GenericFilter";
 import Moment from "react-moment";
 import AnprService from "../services/AnprService";
-import HotListVehicleService from "../services/HotListVehicleService";
 import Magnifier from "react-magnifier";
 import HotListedVehiclesList from "../components/HotListedVehicles/HotListedVehiclesList";
 

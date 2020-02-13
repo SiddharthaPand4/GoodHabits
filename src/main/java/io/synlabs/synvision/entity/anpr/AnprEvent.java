@@ -1,13 +1,11 @@
 package io.synlabs.synvision.entity.anpr;
 
 import io.synlabs.synvision.entity.BaseEntity;
+import io.synlabs.synvision.entity.core.Feed;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -51,4 +49,10 @@ public class AnprEvent extends BaseEntity {
     private Float speed;
 
     private String source;
+
+    @ManyToOne
+    private Feed feed;
+
+    private boolean sectionSpeedViolated;
+
 }

@@ -8,6 +8,7 @@ import io.synlabs.synvision.ex.ValidationException;
 import io.synlabs.synvision.jpa.SynVisionUserRepository;
 import io.synlabs.synvision.jpa.RoleRepository;
 import io.synlabs.synvision.views.core.LoginRequest;
+import io.synlabs.synvision.views.core.Menu;
 import io.synlabs.synvision.views.core.UserRequest;
 import io.synlabs.synvision.views.core.UserResponse;
 import org.joda.time.DateTime;
@@ -37,6 +38,7 @@ public class UserService extends BaseService implements UserDetailsService {
     @Autowired
     private SynVisionUserRepository userRepository;
 
+    @Autowired UserMenuBuilder menuBuilder;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -198,5 +200,9 @@ public class UserService extends BaseService implements UserDetailsService {
 
     public List<Role> getRoles(){
         return roleRepository.findAllByOrg(getAtccUser().getOrg());
+    }
+
+    public Menu getCurrentUserMenu() {
+        return menuBuilder.getMenu();
     }
 }

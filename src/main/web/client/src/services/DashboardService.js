@@ -157,7 +157,8 @@ class DashboardService {
                 from_date = baseDate.startOf('year').toDate();
                 to_date = baseDate.endOf('year').toDate();
                 break;
-            case  "Custom":
+            case "Custom":
+            default:
                 from_date = selectedCustomDateRangeMoment[0].toDate();
                 to_date = selectedCustomDateRangeMoment[1].toDate();
                 break;

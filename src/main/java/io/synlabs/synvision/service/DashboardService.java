@@ -4,7 +4,6 @@ import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import io.synlabs.synvision.entity.anpr.QAnprEvent;
 import io.synlabs.synvision.entity.atcc.QAtccRawData;
-import io.synlabs.synvision.entity.parking.QParkingEvent;
 import io.synlabs.synvision.jpa.AnprEventRepository;
 import io.synlabs.synvision.views.DashboardRequest;
 import io.synlabs.synvision.views.DashboardResponse;
@@ -89,7 +88,7 @@ public class DashboardService extends BaseService {
                                 rawData.type,
                                 rawData.count())
                         .from(rawData)
-                        .where(rawData.date.between(request.getFrom(),request.getTo()))
+                        .where(rawData.date.between(request.getFrom(), request.getTo()))
                         .groupBy(rawData.date, rawData.type)
                         .fetch();
                 for (int i = 0; i < result.size(); i++) {
@@ -107,7 +106,7 @@ public class DashboardService extends BaseService {
         return response;
     }
 
-    public IncidentGroupCountResponse getIncidentsCount(DashboardRequest request){
+    public IncidentGroupCountResponse getIncidentsCount(DashboardRequest request) {
         //request.setFrom(BaseService.setMinTime(request.getFrom()));
         //request.setTo(BaseService.setMaxTime(request.getTo()));
 
@@ -126,7 +125,6 @@ public class DashboardService extends BaseService {
         response.setReverseDirectionIncidents(getReverseDirectionIncidents(request));
         return response;
     }
-
 
 
     public List<IncidentCountResponse> getHelmetMissingIncidents(DashboardRequest request) {
@@ -186,7 +184,6 @@ public class DashboardService extends BaseService {
         }
         return helmetMissingIncidents;
     }
-
 
 
     public List<IncidentCountResponse> getReverseDirectionIncidents(DashboardRequest request) {

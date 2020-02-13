@@ -13,9 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/public/atcc/data")
+@RequestMapping("/api/atcc/")
 public class AtccDataController {
 
     private static final Logger logger = LoggerFactory.getLogger(AtccDataController.class);
