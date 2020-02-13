@@ -139,8 +139,7 @@ export default class HighwayIncidentView extends Component {
                                 style={{margin: "5px"}}
                                 title={
                                     <div>
-                                        {(event.direction && event.direction === "rev") ?
-                                            <Tag color="#f50">Reverse</Tag> : null}
+                                        <Tag color="#f50">{event.incidentType}</Tag>
                                         <div>
                                             <Text code><Icon type="schedule"/> <Moment
                                                 format="ll">{event.eventDate}</Moment>{' '}|{' '}<Moment
@@ -151,6 +150,7 @@ export default class HighwayIncidentView extends Component {
                                                 <Text code><Icon type="environment"/> {event.location || "Location:NA"}</Text>
                                             </div>
                                         </div>
+
                                     </div>
 
                                 }

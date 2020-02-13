@@ -15,21 +15,10 @@ import java.text.SimpleDateFormat;
 public class VidsResponse implements Response {
 
     private Long id;
-
     private String incidentDate;
-
     private long timeStamp;
-
-    private int lane;
-
-    private BigDecimal speed;
-
-    private int direction;
-
-    private String type;
-
-    private String feed;
-
+    private String location;
+    private String incidentType;
     private String incidentImage;
     private String incidentVideo;
 
@@ -37,11 +26,8 @@ public class VidsResponse implements Response {
         this.id = incident.getId();
         this.incidentDate = new SimpleDateFormat("dd/MM/YYYY hh:mm:ss").format(incident.getIncidentDate());
         this.timeStamp = incident.getTimeStamp();
-        this.lane = incident.getLane();
-        this.speed = incident.getSpeed();
-        this.direction = incident.getDirection();
-        this.type = incident.getType();
-        this.feed = incident.getFeed();
+        this.incidentType = incident.getIncidentType().name();
+        this.location = incident.getFeed().getLocation();
         this.incidentImage = incident.getIncidentImage();
         this.incidentVideo = incident.getIncidentVideo();
     }

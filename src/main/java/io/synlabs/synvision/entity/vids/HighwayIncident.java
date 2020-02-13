@@ -1,13 +1,12 @@
 package io.synlabs.synvision.entity.vids;
 
+import io.synlabs.synvision.entity.core.Feed;
+import io.synlabs.synvision.enums.HighwayIncidentType;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -16,20 +15,21 @@ import java.util.Date;
 @Entity
 public class HighwayIncident extends AbstractPersistable<Long> {
 
+    @Column(nullable = false, length = 50, unique = true)
+    private String eventId;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date incidentDate;
+
+    @Enumerated(EnumType.STRING)
+    private HighwayIncidentType incidentType;
 
     private long timeStamp;
 
     private int lane;
 
-    private BigDecimal speed;
-
-    private int direction;
-
-    private String type;
-
-    private String feed;
+    @ManyToOne
+    private Feed feed;
 
     @Column(length = 50)
     private String incidentImage;

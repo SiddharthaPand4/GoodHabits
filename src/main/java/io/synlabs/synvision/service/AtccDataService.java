@@ -668,7 +668,7 @@ public class AtccDataService extends BaseService {
         try {
             Optional<HighwayIncident> incident = incidentRepository.findById(id);
             if (incident.isPresent()) {
-                filename = incident.get().getIncidentImage() + ".jpg";
+                filename = incident.get().getIncidentImage();
 
                 Path filePath = Paths.get(this.fileStorageLocation.toString(), tag, filename).toAbsolutePath().normalize();
                 Resource resource = new UrlResource(filePath.toUri());
