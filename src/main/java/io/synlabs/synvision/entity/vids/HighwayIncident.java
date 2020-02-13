@@ -26,8 +26,6 @@ public class HighwayIncident extends AbstractPersistable<Long> {
 
     private long timeStamp;
 
-    private int lane;
-
     @ManyToOne
     private Feed feed;
 

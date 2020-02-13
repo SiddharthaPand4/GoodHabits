@@ -2,27 +2,38 @@ package io.synlabs.synvision.service;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 
+import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.entity.anpr.AnprEvent;
+import io.synlabs.synvision.entity.core.Feed;
 import io.synlabs.synvision.entity.vids.HighwayIncident;
 import io.synlabs.synvision.entity.vids.QHighwayIncident;
+import io.synlabs.synvision.ex.NotFoundException;
+import io.synlabs.synvision.jpa.FeedRepository;
 import io.synlabs.synvision.jpa.HighwayIncidentRepository;
 import io.synlabs.synvision.views.common.PageResponse;
+import io.synlabs.synvision.views.vids.CreateIncidentRequest;
 import io.synlabs.synvision.views.vids.VidsFilterRequest;
 import io.synlabs.synvision.views.vids.VidsPageResponse;
 import io.synlabs.synvision.views.vids.VidsResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -33,6 +44,12 @@ public class VidsService {
 
     @Autowired
     private HighwayIncidentRepository incidentRepository;
+
+    @Autowired
+    private FeedRepository feedRepository;
+
+    @Autowired
+    private FileStorageProperties fileStorageProperties;
 
     public PageResponse<VidsResponse> listIncidents(VidsFilterRequest request) {
         BooleanExpression query = getQuery(request);
@@ -88,4 +105,70 @@ public class VidsService {
         incident.setArchived(true);
         incidentRepository.saveAndFlush(incident);
     }
+
+    public void addIncident(CreateIncidentRequest request) {
+        HighwayIncident incident = request.toEntity();
+        Feed feed = feedRepository.findOneByName(request.getSource());
+        incident.setFeed(feed);
+        incidentRepository.save(incident);
+    }
+
+
+    public Resource downloadIncidentImage(Long id) {
+
+
+        Path fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
+                .toAbsolutePath().normalize();
+
+        String filename = null;
+        String tag = "vids-image";
+        try {
+            Optional<HighwayIncident> incident = incidentRepository.findById(id);
+            if (incident.isPresent()) {
+                filename = incident.get().getIncidentImage();
+
+                Path filePath = Paths.get(fileStorageLocation.toString(), tag, filename).toAbsolutePath().normalize();
+                Resource resource = new UrlResource(filePath.toUri());
+                if (resource.exists()) {
+                    return resource;
+                } else {
+                    throw new NotFoundException("File not found " + filename);
+                }
+            } else {
+                throw new NotFoundException("File not found " + filename);
+            }
+
+        } catch (MalformedURLException ex) {
+            throw new NotFoundException("File not found " + filename, ex);
+        }
+    }
+
+    public Resource downloadIncidentVideo(Long id) {
+
+        Path fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
+                .toAbsolutePath().normalize();
+
+        String filename = null;
+        String tag = "vids-video";
+        try {
+            Optional<HighwayIncident> incident = incidentRepository.findById(id);
+            if (incident.isPresent()) {
+                filename = incident.get().getIncidentVideo();
+
+                Path filePath = Paths.get(fileStorageLocation.toString(), tag, filename).toAbsolutePath().normalize();
+                Resource resource = new UrlResource(filePath.toUri());
+                if (resource.exists()) {
+                    return resource;
+                } else {
+                    throw new NotFoundException("File not found " + filename);
+                }
+            } else {
+                throw new NotFoundException("File not found " + filename);
+            }
+
+        } catch (MalformedURLException ex) {
+            throw new NotFoundException("File not found " + filename, ex);
+        }
+    }
+
 }

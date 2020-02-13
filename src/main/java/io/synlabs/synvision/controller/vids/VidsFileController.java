@@ -1,7 +1,6 @@
 package io.synlabs.synvision.controller.vids;
 
-import io.synlabs.synvision.controller.anpr.AnprFileController;
-import io.synlabs.synvision.service.AtccDataService;
+import io.synlabs.synvision.service.VidsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,19 +23,19 @@ public class VidsFileController {
     private static final Logger logger = LoggerFactory.getLogger(VidsFileController.class);
 
     @Autowired
-    private AtccDataService dataService;
+    private VidsService vidsService;
 
     @GetMapping("/image/{id}/image.jpg")
     public ResponseEntity<Resource> downloadVehicleImage(@PathVariable Long id, HttpServletRequest request) throws IOException {
 
-        Resource resource = dataService.downloadIncidentImage(id);
+        Resource resource = vidsService.downloadIncidentImage(id);
         return send(resource, request);
     }
 
     @GetMapping("/video/{id}/video.mp4")
     public ResponseEntity<Resource> downloadVehicleVideo(@PathVariable Long id, HttpServletRequest request) throws IOException {
 
-        Resource resource = dataService.downloadIncidentVideo(id);
+        Resource resource = vidsService.downloadIncidentVideo(id);
         return send(resource, request);
     }
 
