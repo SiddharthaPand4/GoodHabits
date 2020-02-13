@@ -78,7 +78,6 @@ public class AnprReportService extends BaseService {
         CSVWriter writer=new CSVWriter(fileWriter);
         String record []="Sr.No,Date,Time,Lpr,Direction,Helmet?,Speed,Location".split(",");
         writer.writeNext(record);
-        fileWriter.append('\n');
         while (totalRecordsCount > offset) {
             offset = (page - 1) * limit;
             if (offset > 0) {
@@ -89,34 +88,34 @@ public class AnprReportService extends BaseService {
 
             int i = 1;
             for (AnprEvent event : result) {
-                String temp[]=new String[10];
-                temp[0]=String.valueOf(i);
-                temp[1]=String.valueOf(toFormattedDate(event.getEventDate(), "dd/MM/yyyy"));
-                temp[2]=String.valueOf(toFormattedDate(event.getEventDate(), "HH:mm:ss"));
-                temp[3]=String.valueOf(event.getAnprText());
-                temp[4]=String.valueOf(event.getDirection());
+                String report[]=new String[10];
+                report[0]=String.valueOf(i);
+                report[1]=String.valueOf(toFormattedDate(event.getEventDate(), "dd/MM/yyyy"));
+                report[2]=String.valueOf(toFormattedDate(event.getEventDate(), "HH:mm:ss"));
+                report[3]=String.valueOf(event.getAnprText());
+                report[4]=String.valueOf(event.getDirection());
                 String helmet;
                 if (event.isHelmetMissing()) {
                     helmet = "Yes";
                 } else {
                     helmet = "N/A";
                 }
-                temp[5]=helmet;
+                report[5]=helmet;
                 String speed;
                 if (event.getSpeed() == null) {
                     speed = "";
                 } else {
                     speed = String.valueOf(event.getSpeed());
                 }
-                temp[6]=speed;
+                report[6]=speed;
                 String source = "";
                 if (event.getSource() == null) {
                     source = "";
                 } else {
                     source= String.valueOf(event.getSource());
                 }
-                temp[7]=source;
-                writer.writeNext(temp);
+                report[7]=source;
+                writer.writeNext(report);
                 i++;
             }
             page++;
