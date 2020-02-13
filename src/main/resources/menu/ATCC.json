@@ -6,13 +6,13 @@
     {
       "key": "atcc-summary",
       "title": "ATCC Dashboard",
-      "icon": "box-plot",
+      "icon": "area-chart",
       "link": "/atcc/summary"
     },
     {
       "key": "atcc",
       "title": "ATCC",
-      "icon": "box-plot",
+      "icon": "fund",
       "link": "/atcc"
     }
   ]

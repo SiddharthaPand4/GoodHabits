@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -15,7 +16,7 @@ import java.text.SimpleDateFormat;
 public class VidsResponse implements Response {
 
     private Long id;
-    private String incidentDate;
+    private Date incidentDate;
     private long timeStamp;
     private String location;
     private String incidentType;
@@ -24,7 +25,7 @@ public class VidsResponse implements Response {
 
     public VidsResponse(HighwayIncident incident) {
         this.id = incident.getId();
-        this.incidentDate = new SimpleDateFormat("dd/MM/YYYY hh:mm:ss").format(incident.getIncidentDate());
+        this.incidentDate = incident.getIncidentDate();
         this.timeStamp = incident.getTimeStamp();
         this.incidentType = incident.getIncidentType().name();
         this.location = incident.getFeed().getLocation();

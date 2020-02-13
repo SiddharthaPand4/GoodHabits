@@ -149,11 +149,6 @@ export default class AtccView extends Component {
     showVideo(e) {
 
         const seek = e.original.timeStamp - e.original.vts - e.original.offset - 5;
-        console.log("et", e.original.timeStamp);
-        console.log("vts", e.original.vts);
-        console.log("offset", e.original.offset);
-        console.log("seek to", seek);
-        console.log(e);
         //seek(time)
         this.setState({
             seek : seek,

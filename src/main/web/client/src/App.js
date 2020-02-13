@@ -16,7 +16,6 @@ import DeviceConfigView from "./views/DeviceConfigView";
 import UserService from "./services/UserService";
 import {EventBus} from "./components/event"
 import LoginView from "./views/LoginView";
-import IncidentListView from "./views/IncidentListView";
 import TriggerView from "./views/TriggerView";
 import AnprView from "./views/anpr/AnprView";
 import TrafficIncidentView from "./views/TrafficIncidentView";
@@ -32,6 +31,7 @@ import ApcDashboard from "./views/PeopleCount/ApcDashboard";
 import AtccView from "./views/atcc/AtccView";
 import AtccSummaryView from "./views/atcc/AtccSummaryView";
 import HighwayIncidentView from "./views/vids/HighwayIncidentView";
+import HighwayIncidentDashboardView from "./views/vids/HighwayIncidentDashboardView";
 
 const {Content} = Layout;
 
@@ -95,6 +95,7 @@ class App extends Component {
 
                                 {/* vids */}
                                 <PrivateRoute path='/vids' exact={true} component={HighwayIncidentView}/>
+                                <PrivateRoute path='/vids/dashboard' exact={true} component={HighwayIncidentDashboardView}/>
                             </div>
                         </Content>
                         <Footerbar/>

@@ -33,6 +33,13 @@ public class VidsFileController {
         return send(resource, request);
     }
 
+    @GetMapping("/video/{id}/video.mp4")
+    public ResponseEntity<Resource> downloadVehicleVideo(@PathVariable Long id, HttpServletRequest request) throws IOException {
+
+        Resource resource = dataService.downloadIncidentVideo(id);
+        return send(resource, request);
+    }
+
     public ResponseEntity<Resource> send(Resource resource, HttpServletRequest request) {
         // Try to determine file's content type
         String contentType = null;

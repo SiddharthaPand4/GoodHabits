@@ -1,13 +1,19 @@
 {
   "key": "highways",
   "title": "Highways",
-  "icon": "box-plot",
+  "icon": "rocket",
   "submenu": [
     {
-      "key": "VIDS",
+      "key": "vids",
       "title": "VIDS",
-      "icon": "box-plot",
+      "icon": "alert",
       "link": "/vids"
+    },
+    {
+      "key": "vids-dashboard",
+      "title": "VIDS Dashboard",
+      "icon": "alert",
+      "link": "/vids/dashboard"
     }
   ]
 }

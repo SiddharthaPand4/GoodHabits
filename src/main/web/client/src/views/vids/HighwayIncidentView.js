@@ -9,12 +9,13 @@ import {
     Row,
     Table,
     Tag,
-    Input, Button, Menu, Dropdown, Typography
+    Button, Menu, Dropdown, Typography
 } from 'antd';
 import GenericFilter from "../../components/GenericFilter";
 import Moment from "react-moment";
 import VidsService from "../../services/VidsService";
-
+import { Player } from 'video-react';
+import "video-react/dist/video-react.css";
 const {Text} = Typography;
 
 const {Column} = Table;
@@ -30,6 +31,7 @@ export default class HighwayIncidentView extends Component {
             loading: true,
             layout: "list",
             incidents: {},
+            playVideo: false,
             filter: {
                 page: 1,
                 pageSize: 12
@@ -142,8 +144,8 @@ export default class HighwayIncidentView extends Component {
                                         <Tag color="#f50">{event.incidentType}</Tag>
                                         <div>
                                             <Text code><Icon type="schedule"/> <Moment
-                                                format="ll">{event.eventDate}</Moment>{' '}|{' '}<Moment
-                                                format="LTS">{event.eventDate}</Moment></Text>
+                                                format="ll">{event.incidentDate}</Moment>{' '}|{' '}<Moment
+                                                format="LTS">{event.incidentDate}</Moment></Text>
                                         </div>
                                         <div style={{marginTop: "5px", textAlign: "left"}}>
                                             <div>
@@ -180,10 +182,14 @@ export default class HighwayIncidentView extends Component {
                                     </Button>
                                 </Dropdown>}
                                 bordered={true}
-                                cover={<img alt="event" src={"/public/vids/image/" + event.id + "/image.jpg"}/>}
+
                             >
 
-
+                                <Player
+                                    playsInline
+                                    poster={"/public/vids/image/" + event.id + "/image.jpg"}
+                                    src={"/public/vids/video/" + event.id + "/video.mp4"}
+                                />
                             </Card>
                         </Col>
                     )

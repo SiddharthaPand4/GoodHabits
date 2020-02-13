@@ -685,4 +685,29 @@ public class AtccDataService extends BaseService {
             throw new NotFoundException("File not found " + filename, ex);
         }
     }
+
+    public Resource downloadIncidentVideo(Long id) {
+
+        String filename = null;
+        String tag = "vids-video";
+        try {
+            Optional<HighwayIncident> incident = incidentRepository.findById(id);
+            if (incident.isPresent()) {
+                filename = incident.get().getIncidentVideo();
+
+                Path filePath = Paths.get(this.fileStorageLocation.toString(), tag, filename).toAbsolutePath().normalize();
+                Resource resource = new UrlResource(filePath.toUri());
+                if (resource.exists()) {
+                    return resource;
+                } else {
+                    throw new NotFoundException("File not found " + filename);
+                }
+            } else {
+                throw new NotFoundException("File not found " + filename);
+            }
+
+        } catch (MalformedURLException ex) {
+            throw new NotFoundException("File not found " + filename, ex);
+        }
+    }
 }

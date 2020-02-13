@@ -2,6 +2,7 @@ package io.synlabs.synvision.service;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 
+import io.synlabs.synvision.entity.anpr.AnprEvent;
 import io.synlabs.synvision.entity.vids.HighwayIncident;
 import io.synlabs.synvision.entity.vids.QHighwayIncident;
 import io.synlabs.synvision.jpa.HighwayIncidentRepository;
@@ -47,7 +48,7 @@ public class VidsService {
             list.add(new VidsResponse(item));
         });
 
-        return (PageResponse<VidsResponse>) new VidsPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
+        return new VidsPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
     }
 
     public BooleanExpression getQuery(VidsFilterRequest request) {
@@ -82,4 +83,9 @@ public class VidsService {
     }
 
 
+    public void archiveIncident(Long id) {
+        HighwayIncident incident = incidentRepository.getOne(id);
+        incident.setArchived(true);
+        incidentRepository.saveAndFlush(incident);
+    }
 }
