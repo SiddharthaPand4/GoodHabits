@@ -9,14 +9,13 @@ import {
     Row,
     Table,
     Tag,
-    Input, Button, Menu, Dropdown, Typography, Slider
+    Input, Button, Menu, Dropdown, Typography
 } from 'antd';
 import GenericFilter from "../../components/GenericFilter";
 import Moment from "react-moment";
-import AnprService from "../../services/AnprService";
-import Magnifier from "react-magnifier";
+import VidsService from "../../services/VidsService";
 
-const {Paragraph, Text} = Typography;
+const {Text} = Typography;
 
 const {Column} = Table;
 const {Panel} = Collapse;
@@ -30,18 +29,10 @@ export default class HighwayIncidentView extends Component {
             visible: true,
             loading: true,
             layout: "list",
-            events: {},
+            incidents: {},
             filter: {
                 page: 1,
                 pageSize: 12
-            },
-            workingEvent: {},
-            workingEventLoading: false,
-            magnifyEvent: {
-                magnifyEventId: "",
-                zoomFactor: 2,
-                minZoomFactor: 1,
-                maxZoomFactor: 5
             },
         };
 
@@ -51,11 +42,6 @@ export default class HighwayIncidentView extends Component {
         this.handleRefresh = this.handleRefresh.bind(this);
         this.onPageChange = this.onPageChange.bind(this);
         this.onPageSizeChange = this.onPageSizeChange.bind(this);
-        this.onLprInputChange = this.onLprInputChange.bind(this);
-        this.editEvent = this.editEvent.bind(this);
-        this.updateEvent = this.updateEvent.bind(this);
-        this.magnifyEvent = this.magnifyEvent.bind(this);
-        this.updateZoomFactor = this.updateZoomFactor.bind(this);
     }
 
     componentDidMount() {
@@ -63,30 +49,22 @@ export default class HighwayIncidentView extends Component {
     }
 
     refresh() {
-        AnprService.getEvents(this.state.filter).then(request => {
-            this.setState({"anprresponse": request.data, loading: false})
+        VidsService.getIncidents(this.state.filter).then(request => {
+            this.setState({"incidents": request.data, loading: false})
         })
     }
 
     //cant use refresh to read from state as state may not have been set
-    refreshNow(filter) {
-        AnprService.getEvents(this.state.filter).then(request => {
-            this.setState({"anprresponse": request.data, loading: false})
+    refreshNow() {
+        VidsService.getIncidents(this.state.filter).then(request => {
+            this.setState({"incidents": request.data, loading: false})
         })
     }
 
     archiveEvent(event) {
-        AnprService.archiveEvent(event).then(request => {
+        VidsService.archiveIncident(event).then(request => {
             this.refresh();
         })
-    }
-
-    onLprInputChange(e) {
-
-        let filter = this.state.filter;
-        filter.lpr = e.target.value;
-        console.log(filter);
-        this.setState({filter: filter})
     }
 
     handleFilterChange(data) {
@@ -97,8 +75,7 @@ export default class HighwayIncidentView extends Component {
         this.setState({layout: data})
     }
 
-    handleOnClick = e => {
-        console.log(e);
+    handleOnClick() {
         this.setState({
             visible: false,
         });
@@ -121,55 +98,16 @@ export default class HighwayIncidentView extends Component {
         this.refreshNow(filter);
     }
 
-    editEvent(event) {
-        this.setState({workingEvent: event});
-    }
-
-    magnifyEvent(event) {
-        let magnifyEvent = this.state.magnifyEvent;
-        magnifyEvent.magnifyEventId = event.id;
-
-        this.setState({magnifyEvent});
-    }
-
-    updateZoomFactor(zoomFactor) {
-        let magnifyEvent = this.state.magnifyEvent;
-        magnifyEvent.zoomFactor = zoomFactor;
-
-        this.setState({magnifyEvent});
-    }
-
-    updateEvent(anprText) {
-
-        let {workingEvent, workingEventLoading} = this.state;
-        workingEvent.anprText = anprText;
-        workingEventLoading = true;
-        this.setState({workingEvent, workingEventLoading});
-        AnprService.updateEvent(workingEvent).then(request => {
-            let {workingEvent, workingEventLoading} = this.state;
-            workingEvent.anprText = anprText;
-            workingEventLoading = false;
-            this.setState({workingEventLoading});
-        }).catch(error => {
-            alert("error in saving");
-            let {workingEventLoading} = this.state;
-            workingEventLoading = false;
-            this.setState({workingEventLoading});
-        })
-    }
-
-
     render() {
 
         let layout = this.state.layout;
-        let lpr = this.state.filter.lpr;
 
         return (
             <div>
                 <h3>Highway Incidents</h3>
                 <Collapse bordered={false} defaultActiveKey={['1']}>
                     <Panel header="Filter" key="1">
-                        LPR: <Input value={lpr} style={{"width": "200px"}} onChange={this.onLprInputChange}/> <br/><br/>
+
                         <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
                                        handleFilterChange={this.handleFilterChange}
                                        handleLayoutChange={this.handleLayoutChange}/>
@@ -184,26 +122,14 @@ export default class HighwayIncidentView extends Component {
     renderGrid() {
 
 
-        if (this.state.loading || !this.state.anprresponse || this.state.anprresponse.totalPage === 0) {
+        if (this.state.loading || !this.state.incidents || this.state.incidents.totalPage === 0) {
             return <Empty description={false}/>
         }
 
-        let events = this.state.anprresponse.events;
-        let workingEventLoading = this.state.workingEventLoading;
-        let workingEvent = this.state.workingEvent;
-        let count = this.state.anprresponse.totalPages * this.state.anprresponse.pageSize;
+        let events = this.state.incidents.events;
+        let count = this.state.incidents.totalPages * this.state.incidents.pageSize;
 
-        let {magnifyEventId, zoomFactor, minZoomFactor, maxZoomFactor} = this.state.magnifyEvent;
-        const mid = ((maxZoomFactor - minZoomFactor) / 2).toFixed(5);
-        const preColor = zoomFactor >= mid ? '' : 'rgba(0, 0, 0, .45)';
-        const nextColor = zoomFactor >= mid ? 'rgba(0, 0, 0, .45)' : '';
-        const marks = {
-            1: {label: <span><Icon style={{color: preColor}} type="zoom-out"/></span>},
-            2: {label: <span>2</span>},
-            3: {label: <span>3</span>},
-            4: {label: <span>4</span>},
-            5: {label: <span><Icon style={{color: nextColor}} type="zoom-in"/></span>,}
-        };
+
         return <div style={{background: '#ECECEC', padding: '5px'}}>
             <Row>
                 {
@@ -215,27 +141,31 @@ export default class HighwayIncidentView extends Component {
                                     <div>
                                         {(event.direction && event.direction === "rev") ?
                                             <Tag color="#f50">Reverse</Tag> : null}
-                                        {(event.helmet) ? <Tag color="#f50">Without helmet</Tag> : null}
-
-                                        {(event.sectionSpeed) ? <Tag color="#f50">Overspeeding</Tag> : null}
+                                        <div>
+                                            <Text code><Icon type="schedule"/> <Moment
+                                                format="ll">{event.eventDate}</Moment>{' '}|{' '}<Moment
+                                                format="LTS">{event.eventDate}</Moment></Text>
+                                        </div>
+                                        <div style={{marginTop: "5px", textAlign: "left"}}>
+                                            <div>
+                                                <Text code><Icon type="environment"/> {event.location || "Location:NA"}</Text>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 }
                                 extra={<Dropdown overlay={<Menu>
-                                    <Menu.Item key="0" onClick={() => this.magnifyEvent(event)}><Icon type="zoom-in"/>Zoom
-                                        image
-                                    </Menu.Item>
                                     <Menu.Item key="1">
                                         <a
                                             title={"click here to download"}
-                                            href={"/public/anpr/vehicle/" + event.id + "/image.jpg"}
-                                            download={true}><Icon type="download"/>{' '} Full
-                                            image</a>
+                                            href={"/public/vids/image/" + event.id + "/image.jpg"}
+                                            download={true}><Icon type="download"/>{' '} Image</a>
                                     </Menu.Item>
                                     <Menu.Item key="2">
                                         <a
                                             title={"click here to download"}
-                                            href={"/public/anpr/lpr/" + event.id + "/image.jpg"}
-                                            download={true}><Icon type="download"/>{' '} Cropped image</a>
+                                            href={"/public/vids/video/" + event.id + "/image.mp4"}
+                                            download={true}><Icon type="download"/>{' '} Video</a>
                                     </Menu.Item>
                                     <Menu.Item key="3">
                                         <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon
@@ -250,56 +180,9 @@ export default class HighwayIncidentView extends Component {
                                     </Button>
                                 </Dropdown>}
                                 bordered={true}
-                                cover={(magnifyEventId === event.id) ?
-                                    <Magnifier src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}
-                                               zoomFactor={zoomFactor}/> : <img alt="event"
-                                                                                src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}/>
-
-                                }
+                                cover={<img alt="event" src={"/public/vids/image/" + event.id + "/image.jpg"}/>}
                             >
-                                <div>
-                                    {(magnifyEventId === event.id) ?
-                                        <Slider
-                                            marks={marks}
-                                            min={minZoomFactor}
-                                            max={maxZoomFactor}
-                                            onChange={this.updateZoomFactor}
-                                            value={typeof zoomFactor === 'number' ? zoomFactor : 0}
-                                        />
-                                        :
-                                        <div style={{height: "54px", textAlign: "center"}}>
-                                            <Button size="small" type="dashed" onClick={() => this.magnifyEvent(event)}>
-                                                <Icon type="zoom-in"/>Zoom Image
-                                            </Button>
-                                        </div>
 
-                                    }
-                                </div>
-                                <div style={{textAlign: "center"}}>
-                                    <img alt="event"
-                                         src={"/public/anpr/lpr/" + event.id + "/image.jpg"}/>
-                                </div>
-                                <div style={{marginTop: "5px", textAlign: "center"}}
-                                     onClick={() => this.editEvent(event)}>
-                                    <Paragraph
-                                        strong
-                                        editable={{onChange: this.updateEvent}}
-                                        copyable>{event.anprText}</Paragraph>
-                                    <Text
-                                        type="secondary">{(workingEventLoading && workingEvent.id === event.id) ? "saving..." : ""}</Text>
-                                    <Text
-                                        type="secondary">{(event.speed) ? "Speed: "+event.speed : ""}</Text>
-                                    <div>
-                                        <Text code><Icon type="schedule"/> <Moment
-                                            format="ll">{event.eventDate}</Moment>{' '}|{' '}<Moment
-                                            format="LTS">{event.eventDate}</Moment></Text>
-                                    </div>
-                                    <div>
-                                        <Text code><Icon type="environment"/> {event.location}</Text>
-                                    </div>
-
-
-                                </div>
 
                             </Card>
                         </Col>

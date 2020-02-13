@@ -6,6 +6,7 @@ import io.synlabs.synvision.entity.anpr.AnprEvent;
 import io.synlabs.synvision.entity.atcc.AtccRawData;
 import io.synlabs.synvision.entity.atcc.AtccSummaryData;
 import io.synlabs.synvision.entity.atcc.AtccVideoData;
+import io.synlabs.synvision.entity.vids.HighwayIncident;
 import io.synlabs.synvision.enums.TimeSpan;
 import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.ex.NotFoundException;
@@ -82,6 +83,8 @@ public class AtccDataService extends BaseService {
     @Autowired
     private AnprEventRepository anprEventRepository;
 
+    @Autowired
+    private HighwayIncidentRepository incidentRepository;
 
     @Qualifier("dataSource")
     @Autowired
@@ -641,6 +644,31 @@ public class AtccDataService extends BaseService {
             Optional<AnprEvent> eventop = anprEventRepository.findById(id);
             if (eventop.isPresent()) {
                 filename = eventop.get().getVehicleImage() + ".jpg";
+
+                Path filePath = Paths.get(this.fileStorageLocation.toString(), tag, filename).toAbsolutePath().normalize();
+                Resource resource = new UrlResource(filePath.toUri());
+                if (resource.exists()) {
+                    return resource;
+                } else {
+                    throw new NotFoundException("File not found " + filename);
+                }
+            } else {
+                throw new NotFoundException("File not found " + filename);
+            }
+
+        } catch (MalformedURLException ex) {
+            throw new NotFoundException("File not found " + filename, ex);
+        }
+    }
+
+    public Resource downloadIncidentImage(Long id) {
+
+        String filename = null;
+        String tag = "vids-image";
+        try {
+            Optional<HighwayIncident> incident = incidentRepository.findById(id);
+            if (incident.isPresent()) {
+                filename = incident.get().getIncidentImage() + ".jpg";
 
                 Path filePath = Paths.get(this.fileStorageLocation.toString(), tag, filename).toAbsolutePath().normalize();
                 Resource resource = new UrlResource(filePath.toUri());

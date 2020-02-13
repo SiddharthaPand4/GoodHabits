@@ -1,4 +1,4 @@
-package io.synlabs.synvision.controller.anpr;
+package io.synlabs.synvision.controller.peopleCounting;
 
 import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.ex.AuthException;
