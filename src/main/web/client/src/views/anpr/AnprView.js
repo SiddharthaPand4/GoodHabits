@@ -3,18 +3,24 @@ import {
     Card,
     Col,
     Collapse,
+    Divider,
     Empty,
     Icon,
     Pagination,
     Row,
     Table,
     Tag,
-    Input, Button, Menu, Dropdown, Typography, Slider
+    Input, Button, Menu, Dropdown, Typography, Slider,
+    Modal,
+    message,  Form
 } from 'antd';
 import GenericFilter from "../../components/GenericFilter";
 import Moment from "react-moment";
 import AnprService from "../../services/AnprService";
 import Magnifier from "react-magnifier";
+import moment from "moment";
+import {saveAs} from "file-saver";
+import AnprReportService from "../../services/AnprReportService";
 
 const {Paragraph, Text} = Typography;
 
@@ -43,6 +49,7 @@ export default class AnprView extends Component {
                 minZoomFactor: 1,
                 maxZoomFactor: 5
             },
+            downloading: false,
         };
 
         this.refresh = this.refresh.bind(this);
@@ -56,6 +63,9 @@ export default class AnprView extends Component {
         this.updateEvent = this.updateEvent.bind(this);
         this.magnifyEvent = this.magnifyEvent.bind(this);
         this.updateZoomFactor = this.updateZoomFactor.bind(this);
+        this.downloadAnprReport=this.downloadAnprReport.bind(this);
+
+
     }
 
     componentDidMount() {
@@ -157,7 +167,25 @@ export default class AnprView extends Component {
             this.setState({workingEventLoading});
         })
     }
+//shashank
+    downloadAnprReport(){
+        this.setState({downloading:true})
+        let filter= this.state.filter;
+        var req={
+            fromDateString: filter.from_date !=null?moment(filter.fromDate).format('YYYY-MM-DD HH:mm:ss'):"",
+            toDateString:filter.to_date !=null? moment(filter.toDate).format('YYYY-MM-DD HH:mm:ss"'):"",
+            lpr:filter.lpr,
+        }
 
+        AnprReportService.getAnprEventsReport(req).then(response => {
+            this.setState({downloading: false});
+            saveAs(response.data, "anpr-events.csv");
+        }).catch(error => {
+            this.setState({downloading: false});
+        });
+    }
+
+    //shashank
 
     render() {
 
@@ -169,10 +197,20 @@ export default class AnprView extends Component {
                 <h3>ANPR</h3>
                 <Collapse bordered={false} defaultActiveKey={['1']}>
                     <Panel header="Filter" key="1">
-                        LPR: <Input value={lpr} style={{"width": "200px"}} onChange={this.onLprInputChange}/> <br/><br/>
+
+                        LPR: <Input value={lpr} style={{"width": "200px"}} onChange={this.onLprInputChange}/>&nbsp;&nbsp;
+                        <Button onClick={() => {
+                            this.downloadAnprReport()
+                        }}><Icon type="download"/>Download</Button>
+
+                        <br/><br/>
                         <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
                                        handleFilterChange={this.handleFilterChange}
-                                       handleLayoutChange={this.handleLayoutChange}/>
+                                       handleLayoutChange={this.handleLayoutChange}
+                        />
+
+
+
                     </Panel>
                 </Collapse>
                 <div>

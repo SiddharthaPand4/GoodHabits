@@ -3,9 +3,12 @@ package io.synlabs.synvision.controller.anpr;
 import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.service.AnprService;
+import io.synlabs.synvision.service.parking.AnprReportService;
 import io.synlabs.synvision.views.UploadFileResponse;
 import io.synlabs.synvision.views.anpr.*;
 import io.synlabs.synvision.views.common.PageResponse;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +16,13 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 
 /**
  * Created by itrs on 10/21/2019.
@@ -30,6 +34,8 @@ public class AnprController {
     private static final Logger logger = LoggerFactory.getLogger(AnprController.class);
 
     @Autowired
+    private AnprReportService anprReportService;
+    @Autowired
     private FileStorageProperties fileStorageProperties;
 
     @Autowired
@@ -39,6 +45,42 @@ public class AnprController {
     public PageResponse<AnprResponse> list(@RequestBody AnprFilterRequest request) {
         return anprService.list(request);
     }
+    //shashank
+    @PostMapping("/anprevent")
+    public void anprEventReport(@RequestBody AnprReportRequest request, HttpServletResponse response) throws IOException {
+        File file=null;
+        String fileName=null;
+        fileName = anprReportService.downloadAnprEvents(request);
+
+        file = new File(fileName);
+
+        if (file != null && file.exists()) {
+            String extension = FilenameUtils.getExtension(file.getName());
+            fileName = fileName + UUID.randomUUID().toString();
+            try {
+                FileInputStream is = new FileInputStream(file);
+                OutputStream outputStream = response.getOutputStream();
+                response.setContentType("application/vnd.ms-excel");
+                response.setHeader("Content-Disposition", "attachment; filename=" + fileName + "." + extension);
+                IOUtils.copy(is, outputStream);
+                outputStream.flush();
+                outputStream.close();
+                is.close();
+
+                if (!file.delete()) {
+                    logger.warn("Coudn't delete the file : " + file.getAbsolutePath());
+                }
+            } catch (FileNotFoundException e) {
+                logger.error("UNABLE TO FIND FILE : " + file.getAbsolutePath(), e);
+            } catch (IOException e) {
+                logger.error("ERROR IN FILE : " + file.getAbsolutePath(), e);
+            }
+        } else {
+            logger.warn("Generated file is empty.");
+        }
+
+    }
+    //shashank
 
     @PostMapping("/events/list/lpr/count")
     public PageResponse<AnprResponse> getEventsCountListByLpr(@RequestBody AnprFilterRequest request) {
