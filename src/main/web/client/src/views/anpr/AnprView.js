@@ -172,8 +172,8 @@ export default class AnprView extends Component {
         this.setState({downloading:true})
         let filter= this.state.filter;
         var req={
-            fromDateString: moment(filter.fromDate).format('YYYY-MM-DD HH:mm:ss'),
-            toDateString: moment(filter.toDate).format('YYYY-MM-DD HH:mm:ss"'),
+            fromDateString: filter.from_date !=null?moment(filter.fromDate).format('YYYY-MM-DD HH:mm:ss'):"",
+            toDateString:filter.to_date !=null? moment(filter.toDate).format('YYYY-MM-DD HH:mm:ss"'):"",
             lpr:filter.lpr,
         }
 

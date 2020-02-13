@@ -3,7 +3,7 @@ package io.synlabs.synvision.controller.anpr;
 import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.service.AnprService;
-import io.synlabs.synvision.service.parking.AnprEventService;
+import io.synlabs.synvision.service.parking.AnprReportService;
 import io.synlabs.synvision.views.UploadFileResponse;
 import io.synlabs.synvision.views.anpr.*;
 import io.synlabs.synvision.views.common.PageResponse;
@@ -34,7 +34,7 @@ public class AnprController {
     private static final Logger logger = LoggerFactory.getLogger(AnprController.class);
 
     @Autowired
-    private AnprEventService anprEventService;
+    private AnprReportService anprReportService;
     @Autowired
     private FileStorageProperties fileStorageProperties;
 
@@ -50,7 +50,7 @@ public class AnprController {
     public void anprEventReport(@RequestBody AnprReportRequest request, HttpServletResponse response) throws IOException {
         File file=null;
         String fileName=null;
-        fileName = anprEventService.downloadAnprEvents(request);
+        fileName = anprReportService.downloadAnprEvents(request);
 
         file = new File(fileName);
 
