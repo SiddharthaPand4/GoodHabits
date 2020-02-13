@@ -92,8 +92,8 @@ public class AnprReportService extends BaseService {
                 report[0]=String.valueOf(i);
                 report[1]=String.valueOf(toFormattedDate(event.getEventDate(), "dd/MM/yyyy"));
                 report[2]=String.valueOf(toFormattedDate(event.getEventDate(), "HH:mm:ss"));
-                report[3]=String.valueOf(event.getAnprText());
-                report[4]=String.valueOf(event.getDirection());
+                report[3]=event.getAnprText();
+                report[4]=event.getDirection();
                 String helmet;
                 if (event.isHelmetMissing()) {
                     helmet = "Yes";
