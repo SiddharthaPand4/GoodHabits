@@ -29,13 +29,16 @@ public class HighwayTrafficStateResponse {
     private String source;
 
     public HighwayTrafficStateResponse(HighwayTrafficState trafficState) {
-        this.eventId = trafficState.getEventId();
-        this.updateDate = trafficState.getUpdateDate();
-        this.averageSpeed = trafficState.getAverageSpeed();
-        this.timeStamp = trafficState.getTimeStamp();
-        this.density = trafficState.getDensity();
-        this.flowImage = trafficState.getFlowImage();
-        this.flowVideo = trafficState.getFlowVideo();
-        this.source = trafficState.getSource();
+
+        if (trafficState != null) {
+            this.eventId = trafficState.getEventId();
+            this.updateDate = trafficState.getUpdateDate();
+            this.averageSpeed = trafficState.getAverageSpeed();
+            this.timeStamp = trafficState.getTimeStamp();
+            this.density = trafficState.getDensity();
+            this.flowImage = trafficState.getFlowImage();
+            this.flowVideo = trafficState.getFlowVideo();
+            this.source = trafficState.getSource();
+        }
     }
 }

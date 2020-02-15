@@ -5,6 +5,7 @@ import {Card, Col, Row, Skeleton} from "antd";
 import DashboardService from "../../services/DashboardService";
 
 import 'chartjs-plugin-datalabels';
+    import VidsService from "../../services/VidsService";
 
 let flow_hourly_data = {
     labels: [
@@ -58,7 +59,6 @@ export default class HighwayIncidentDashboardView extends Component {
         };
 
         this.refresh = this.refresh.bind(this);
-        this.refresh = this.refresh.bind(this);
 
     }
 
@@ -67,7 +67,9 @@ export default class HighwayIncidentDashboardView extends Component {
     }
 
     refresh() {
-
+        VidsService.getStats().then(response => {
+            this.setState({stats:response.data})
+        })
     }
 
     render() {

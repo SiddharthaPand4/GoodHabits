@@ -48,6 +48,10 @@ public class VidsController extends MediaUploadController {
         vidsService.updateFlow(request);
     }
 
+    @PostMapping("/flow/image")
+    public UploadFileResponse uploadFlowImage(@RequestParam("file") MultipartFile file, @RequestParam("tag") String tag) {
+        return UploadFile(file, tag, fileStorageProperties);
+    }
 
     @PostMapping("/image")
     public UploadFileResponse uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("tag") String tag) {

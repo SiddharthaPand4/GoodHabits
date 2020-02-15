@@ -70,12 +70,10 @@ public class VidsDashboardService {
     }
 
     private List<DashboardResponse> toList(List<Tuple> result) {
-        QAtccEvent rawData = QAtccEvent.atccEvent;
         List<DashboardResponse> stats = new ArrayList<>();
         for (int i = 0; i < result.size(); i++) {
             Tuple tuple = result.get(i);
-            Date date = tuple.get(0, Date.class);
-            String vehicleType = tuple.get(rawData.type);
+            String vehicleType = tuple.get(1, String.class);
             Long vehicleCount = tuple.get(2, Long.class);
             stats.add(new DashboardResponse(vehicleType, vehicleCount));
             result.set(i, null);

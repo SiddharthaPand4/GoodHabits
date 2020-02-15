@@ -26,6 +26,10 @@ class VidsService {
         return axios.get('/public/vids/video/' + id + '/video.mp4');
     }
 
+    getStats() {
+        return axios.get('/api/vids/stats');
+    }
+
 }
 
 export default VidsService.Instance()
