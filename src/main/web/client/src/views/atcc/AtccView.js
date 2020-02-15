@@ -17,7 +17,7 @@ export default class AtccView extends Component {
             video: null
         };
         this.getRawData = this.getRawData.bind(this);
-        setInterval(()=> this.refRawDataTable.fireFetchData(), 120000)
+        //setInterval(()=> this.refRawDataTable.fireFetchData(), 120000)
     }
 
     getRawData(page, pageSize, sorted, filtered, handleRetrievedData) {
