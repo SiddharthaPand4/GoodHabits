@@ -32,6 +32,12 @@ public class VidsFileController {
         return send(resource, request);
     }
 
+    @GetMapping("/flowimage/{id}/image.jpg")
+    public ResponseEntity<Resource> downloadFlowImage(@PathVariable Long id, HttpServletRequest request) throws IOException {
+        Resource resource = vidsService.downloadFlowImage(id);
+        return send(resource, request);
+    }
+
     @GetMapping("/video/{id}/video.mp4")
     public ResponseEntity<Resource> downloadVehicleVideo(@PathVariable Long id, HttpServletRequest request) throws IOException {
 

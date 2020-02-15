@@ -123,12 +123,12 @@ public class VidsService {
 
     public Resource downloadIncidentImage(Long id) {
 
-
+        String tag = "vids-image";
         Path fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
                 .toAbsolutePath().normalize();
 
         String filename = null;
-        String tag = "vids-image";
+
         try {
             Optional<HighwayIncident> incident = incidentRepository.findById(id);
             if (incident.isPresent()) {
@@ -152,11 +152,12 @@ public class VidsService {
 
     public Resource downloadIncidentVideo(Long id) {
 
+        String tag = "vids-video";
         Path fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
                 .toAbsolutePath().normalize();
 
         String filename = null;
-        String tag = "vids-video";
+
         try {
             Optional<HighwayIncident> incident = incidentRepository.findById(id);
             if (incident.isPresent()) {
@@ -177,5 +178,34 @@ public class VidsService {
             throw new NotFoundException("File not found " + filename, ex);
         }
     }
+
+    public Resource downloadFlowImage(Long id) {
+        String tag = "flow-image";
+        Path fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
+                .toAbsolutePath().normalize();
+
+        String filename = null;
+
+        try {
+            Optional<HighwayTrafficState> state = stateRepository.findById(id);
+            if (state.isPresent()) {
+                filename = state.get().getFlowImage();
+
+                Path filePath = Paths.get(fileStorageLocation.toString(), tag, filename).toAbsolutePath().normalize();
+                Resource resource = new UrlResource(filePath.toUri());
+                if (resource.exists()) {
+                    return resource;
+                } else {
+                    throw new NotFoundException("File not found " + filename);
+                }
+            } else {
+                throw new NotFoundException("File not found " + filename);
+            }
+
+        } catch (MalformedURLException ex) {
+            throw new NotFoundException("File not found " + filename, ex);
+        }
+    }
+
 
 }

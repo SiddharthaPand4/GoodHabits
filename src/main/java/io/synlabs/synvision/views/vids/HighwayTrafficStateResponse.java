@@ -12,6 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class HighwayTrafficStateResponse {
 
+    private Long id;
     private String eventId;
 
     private Date updateDate;
@@ -31,6 +32,7 @@ public class HighwayTrafficStateResponse {
     public HighwayTrafficStateResponse(HighwayTrafficState trafficState) {
 
         if (trafficState != null) {
+            this.id = trafficState.getId();
             this.eventId = trafficState.getEventId();
             this.updateDate = trafficState.getUpdateDate();
             this.averageSpeed = trafficState.getAverageSpeed();
