@@ -2,13 +2,11 @@ package io.synlabs.synvision.controller.vids;
 
 import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.controller.MediaUploadController;
+import io.synlabs.synvision.service.VidsDashboardService;
 import io.synlabs.synvision.service.VidsService;
 import io.synlabs.synvision.views.UploadFileResponse;
 import io.synlabs.synvision.views.common.PageResponse;
-import io.synlabs.synvision.views.vids.CreateIncidentRequest;
-import io.synlabs.synvision.views.vids.TrafficFlowUpdateRequest;
-import io.synlabs.synvision.views.vids.VidsFilterRequest;
-import io.synlabs.synvision.views.vids.VidsResponse;
+import io.synlabs.synvision.views.vids.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +25,8 @@ public class VidsController extends MediaUploadController {
     @Autowired
     private FileStorageProperties fileStorageProperties;
 
+    @Autowired
+    private VidsDashboardService dashboardService;
 
     @PostMapping("/incidents")
     public PageResponse<VidsResponse> list(@RequestBody VidsFilterRequest request) {
@@ -57,5 +57,10 @@ public class VidsController extends MediaUploadController {
     @PostMapping("/video")
     public UploadFileResponse uploadVideo(@RequestParam("file") MultipartFile file, @RequestParam("tag") String tag) {
         return UploadFile(file, tag, fileStorageProperties);
+    }
+
+    @GetMapping("/stats")
+    public VidsDashboardResponse getStats() {
+        return dashboardService.dashboardstats();
     }
 }

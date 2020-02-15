@@ -3,7 +3,7 @@ package io.synlabs.synvision.service;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import io.synlabs.synvision.entity.anpr.QAnprEvent;
-import io.synlabs.synvision.entity.atcc.QAtccRawData;
+import io.synlabs.synvision.entity.atcc.QAtccEvent;
 import io.synlabs.synvision.jpa.AnprEventRepository;
 import io.synlabs.synvision.views.DashboardRequest;
 import io.synlabs.synvision.views.DashboardResponse;
@@ -48,7 +48,7 @@ public class DashboardService extends BaseService {
             logger.info("Couldn't parse date", request.getFrom());
         }
 
-        QAtccRawData rawData = QAtccRawData.atccRawData;
+        QAtccEvent rawData = QAtccEvent.atccEvent;
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
         List<Tuple> result = null;
         Date date = null;
@@ -62,12 +62,12 @@ public class DashboardService extends BaseService {
             case "Hourly":
                 result = query
                         .select(
-                                rawData.time.hour(),
+                                rawData.eventDate.hour(),
                                 rawData.type,
                                 rawData.count())
                         .from(rawData)
-                        .where(rawData.date.between(request.getFrom(), request.getTo()))
-                        .groupBy(rawData.time.hour(), rawData.type)
+                        .where(rawData.eventDate.between(request.getFrom(), request.getTo()))
+                        .groupBy(rawData.eventDate.hour(), rawData.type)
                         .fetch();
 
                 for (int i = 0; i < result.size(); i++) {
@@ -84,12 +84,12 @@ public class DashboardService extends BaseService {
             default:
                 result = query
                         .select(
-                                rawData.date,
+                                rawData.eventDate,
                                 rawData.type,
                                 rawData.count())
                         .from(rawData)
-                        .where(rawData.date.between(request.getFrom(), request.getTo()))
-                        .groupBy(rawData.date, rawData.type)
+                        .where(rawData.eventDate.between(request.getFrom(), request.getTo()))
+                        .groupBy(rawData.eventDate, rawData.type)
                         .fetch();
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);

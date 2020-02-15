@@ -36,5 +36,4 @@ public class AtccEvent extends AbstractPersistable<Long> {
     private String eventImage;
 
     private String eventVideo;
-
 }

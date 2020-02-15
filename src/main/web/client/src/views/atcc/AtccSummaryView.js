@@ -24,7 +24,7 @@ export default class AtccSummaryView extends Component {
         this.makeChartData = this.makeChartData.bind(this);
         this.getSummaryData = this.getSummaryData.bind(this);
         this.changeInterval = this.changeInterval.bind(this);
-        setInterval(()=> this.changeInterval(), 120000)
+        //setInterval(()=> this.changeInterval(), 120000)
     }
 
 

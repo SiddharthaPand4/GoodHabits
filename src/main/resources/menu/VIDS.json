@@ -11,7 +11,7 @@
     },
     {
       "key": "vids-dashboard",
-      "title": "VIDS Dashboard",
+      "title": "Dashboard",
       "icon": "alert",
       "link": "/vids/dashboard"
     }

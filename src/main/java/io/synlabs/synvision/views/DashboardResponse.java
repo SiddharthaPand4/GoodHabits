@@ -10,10 +10,16 @@ import lombok.Getter;
 public class DashboardResponse implements Response {
 
     private String key;
-    private int countOfTotalVehicles;
+    private int count;
 
-    public DashboardResponse(String key, int value){
-        this.key=key;
-        this.countOfTotalVehicles=value;
+    public DashboardResponse(String key, int value) {
+        this.key = key;
+        this.count = value;
+    }
+
+
+    public DashboardResponse(String key, long value) {
+        this.key = key;
+        this.count = (int)value;
     }
 }

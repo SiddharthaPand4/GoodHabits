@@ -5,7 +5,7 @@
   "submenu": [
     {
       "key": "atcc-summary",
-      "title": "ATCC Dashboard",
+      "title": "ATCC Summary",
       "icon": "area-chart",
       "link": "/atcc/summary"
     },
