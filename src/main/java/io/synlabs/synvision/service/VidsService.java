@@ -1,20 +1,17 @@
 package io.synlabs.synvision.service;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
-
 import io.synlabs.synvision.config.FileStorageProperties;
-import io.synlabs.synvision.entity.anpr.AnprEvent;
 import io.synlabs.synvision.entity.core.Feed;
 import io.synlabs.synvision.entity.vids.HighwayIncident;
+import io.synlabs.synvision.entity.vids.HighwayTrafficState;
 import io.synlabs.synvision.entity.vids.QHighwayIncident;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.jpa.FeedRepository;
 import io.synlabs.synvision.jpa.HighwayIncidentRepository;
+import io.synlabs.synvision.jpa.HighwayTrafficStateRepository;
 import io.synlabs.synvision.views.common.PageResponse;
-import io.synlabs.synvision.views.vids.CreateIncidentRequest;
-import io.synlabs.synvision.views.vids.VidsFilterRequest;
-import io.synlabs.synvision.views.vids.VidsPageResponse;
-import io.synlabs.synvision.views.vids.VidsResponse;
+import io.synlabs.synvision.views.vids.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +44,9 @@ public class VidsService {
 
     @Autowired
     private FeedRepository feedRepository;
+
+    @Autowired
+    private HighwayTrafficStateRepository stateRepository;
 
     @Autowired
     private FileStorageProperties fileStorageProperties;
@@ -113,6 +113,13 @@ public class VidsService {
         incidentRepository.save(incident);
     }
 
+
+    public void updateFlow(TrafficFlowUpdateRequest request) {
+        HighwayTrafficState state = request.toEntity();
+        Feed feed = feedRepository.findOneByName(request.getSource());
+        state.setFeed(feed);
+        stateRepository.save(state);
+    }
 
     public Resource downloadIncidentImage(Long id) {
 

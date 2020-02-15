@@ -3,7 +3,7 @@ package io.synlabs.synvision.enums;
 public enum HighwayIncidentType {
 
     WrongDirection,
-    TrafficQueued,
+    HeavyTraffic,
     StoppedVehicle,
     Deceleration,
     FogSmoke,

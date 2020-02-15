@@ -6,6 +6,7 @@ import io.synlabs.synvision.service.VidsService;
 import io.synlabs.synvision.views.UploadFileResponse;
 import io.synlabs.synvision.views.common.PageResponse;
 import io.synlabs.synvision.views.vids.CreateIncidentRequest;
+import io.synlabs.synvision.views.vids.TrafficFlowUpdateRequest;
 import io.synlabs.synvision.views.vids.VidsFilterRequest;
 import io.synlabs.synvision.views.vids.VidsResponse;
 import org.slf4j.Logger;
@@ -41,6 +42,12 @@ public class VidsController extends MediaUploadController {
     public void addIncident(@RequestBody CreateIncidentRequest request) {
         vidsService.addIncident(request);
     }
+
+    @PostMapping("/flow")
+    public void updateFlow(@RequestBody TrafficFlowUpdateRequest request) {
+        vidsService.updateFlow(request);
+    }
+
 
     @PostMapping("/image")
     public UploadFileResponse uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("tag") String tag) {

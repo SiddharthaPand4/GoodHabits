@@ -26,8 +26,6 @@ public class CreateAtccEventRequest implements Request {
 
     private String type;
 
-    private String feed;
-
     private String eventImage;
 
     private String eventVideo;

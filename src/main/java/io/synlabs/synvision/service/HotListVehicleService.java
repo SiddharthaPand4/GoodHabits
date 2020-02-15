@@ -101,7 +101,6 @@ public class HotListVehicleService {
         return query;
     }
 
-
     public HotListVehicleResponse save(HotListVehicleRequest request) {
         HotListVehicle hotListVehicle = hotListVehicleRepository.findOneById(request.getId());
         if(hotListVehicle==null){

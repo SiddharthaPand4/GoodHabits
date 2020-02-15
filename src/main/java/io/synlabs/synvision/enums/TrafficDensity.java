@@ -1,6 +1,6 @@
 package io.synlabs.synvision.enums;
 
-public enum TrafficState {
+public enum TrafficDensity {
     Normal,
     Dense,
     Delayed,

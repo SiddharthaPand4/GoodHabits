@@ -15,9 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class CreateIncidentRequest implements Request {
 
-    private Long id;
     private long timeStamp;
-    private String location;
     private HighwayIncidentType incidentType;
     private String incidentImage;
     private String incidentVideo;
