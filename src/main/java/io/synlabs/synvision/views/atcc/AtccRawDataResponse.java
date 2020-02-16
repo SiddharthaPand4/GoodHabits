@@ -13,7 +13,7 @@ import java.util.Date;
 public class AtccRawDataResponse {
 
     private Long id;
-    private String time;
+
     private Date eventDate;
     private long timeStamp;
     private int lane;
@@ -22,10 +22,6 @@ public class AtccRawDataResponse {
     private String type;
     private String location;
     private String vehicleImage;
-
-    private long vid;
-    private long vts;
-    private int offset;
 
     public AtccRawDataResponse(AtccEvent atccEvent) {
         this.id = atccEvent.getId();

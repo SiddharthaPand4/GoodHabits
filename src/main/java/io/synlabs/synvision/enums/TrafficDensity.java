@@ -5,5 +5,6 @@ public enum TrafficDensity {
     Dense,
     Delayed,
     Congested,
-    StopAndGo
+    StopAndGo,
+    Queue
 }

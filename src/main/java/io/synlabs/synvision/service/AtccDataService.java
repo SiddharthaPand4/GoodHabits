@@ -5,27 +5,20 @@ import io.synlabs.synvision.entity.ImportStatus;
 import io.synlabs.synvision.entity.anpr.AnprEvent;
 import io.synlabs.synvision.entity.atcc.AtccEvent;
 import io.synlabs.synvision.entity.atcc.AtccSummaryData;
-import io.synlabs.synvision.entity.atcc.AtccVideoData;
 import io.synlabs.synvision.entity.core.Feed;
 import io.synlabs.synvision.enums.TimeSpan;
 import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.jpa.*;
-import io.synlabs.synvision.views.VideoSummary;
 import io.synlabs.synvision.views.atcc.AtccRawDataResponse;
 import io.synlabs.synvision.views.atcc.AtccSummaryDataResponse;
 import io.synlabs.synvision.views.atcc.CreateAtccEventRequest;
 import io.synlabs.synvision.views.common.DummyRequest;
 import io.synlabs.synvision.views.common.ResponseWrapper;
 import io.synlabs.synvision.views.common.SearchRequest;
-import net.bramp.ffmpeg.FFmpeg;
-import net.bramp.ffmpeg.FFmpegExecutor;
-import net.bramp.ffmpeg.FFprobe;
-import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.joda.time.DateTime;
 import org.simpleflatmapper.csv.CsvWriter;
 import org.simpleflatmapper.util.CheckedConsumer;
 import org.slf4j.Logger;
@@ -54,12 +47,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -76,8 +70,6 @@ public class AtccDataService extends BaseService {
 
     private final ImportStatusRepository statusRepository;
 
-    private AtccVideoDataRepository videoDataRepository;
-
     @Autowired
     private FeedRepository feedRepository;
 
@@ -91,19 +83,11 @@ public class AtccDataService extends BaseService {
     @Autowired
     private DataSource dataSource;
 
-    @Value("${ffmpeg.path}")
-    private String ffmpegpath;
-
-    @Value("${ffprobe.path}")
-    private String ffprobepath;
-
     public AtccDataService(AtccEventRepository atccEventRepository,
                            ImportStatusRepository statusRepository,
-                           FileStorageProperties fileStorageProperties,
-                           AtccVideoDataRepository videoDataRepository) {
+                           FileStorageProperties fileStorageProperties) {
 
         this.atccEventRepository = atccEventRepository;
-        this.videoDataRepository = videoDataRepository;
 
         this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
                 .toAbsolutePath().normalize();
@@ -120,29 +104,12 @@ public class AtccDataService extends BaseService {
     public ResponseWrapper<AtccRawDataResponse> listRawData(SearchRequest searchRequest) {
         Page<AtccEvent> page = atccEventRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(DESC, "eventDate")));
 
-        List<AtccRawDataResponse> collect = page.get().map(ar -> {
-            AtccRawDataResponse ard = new AtccRawDataResponse(ar);
-            setVideoId(ard);
-            return ard;
-        }).collect(Collectors.toList());
+        List<AtccRawDataResponse> collect = page.get().map(AtccRawDataResponse::new).collect(Collectors.toList());
         ResponseWrapper<AtccRawDataResponse> wrapper = new ResponseWrapper<>();
         wrapper.setData(collect);
         wrapper.setCurrPage(searchRequest.getPage());
         wrapper.setTotalElements(page.getTotalElements());
         return wrapper;
-    }
-
-    private VideoSummary getVideoSummary(AtccEvent ar) {
-        return videoDataRepository.getAssociatedVideo(ar.getTimeStamp(), ar.getFeed().getName());
-    }
-
-    private void setVideoId(AtccRawDataResponse ard) {
-        VideoSummary vs = videoDataRepository.getAssociatedVideo(ard.getTimeStamp(), ard.getLocation());
-        if (vs != null) {
-            ard.setVid(vs.getId());
-            ard.setVts(vs.getTimeStamp());
-            ard.setOffset(vs.getOffset());
-        }
     }
 
     public ResponseWrapper<AtccSummaryDataResponse> listSummaryData(SearchRequest searchRequest, String interval) {
@@ -261,135 +228,6 @@ public class AtccDataService extends BaseService {
         return atccSummaryData;
     }
 
-    public String importVideo(MultipartFile file, String tag) {
-        // Normalize file name
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        ImportStatus status = new ImportStatus();
-        status.setFilename(fileName);
-        status.setImportDate(new Date());
-
-        try {
-            // Check if the file's name contains invalid characters
-            if (fileName.contains("..")) {
-                throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
-            }
-
-            // Copy file to the target location (Replacing existing file with the same name)
-            Path targetLocation = this.fileStorageLocation.resolve(fileName);
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-
-            videoDataRepository.save(populateFields(fileName, tag));
-            status.setStatus("OK");
-
-            return fileName;
-        } catch (IOException ex) {
-            status.setStatus("FAILED");
-            status.setError(ex.getMessage());
-            throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
-        } finally {
-            statusRepository.save(status);
-        }
-    }
-
-    private AtccVideoData populateFields(String fileName, String tag) {
-        double dts = Double.parseDouble(fileName.split("_")[1]);
-        long ts = (long) dts;
-        DateTime videoDate = new DateTime(ts * 1000L);
-        AtccVideoData videoData = new AtccVideoData();
-        videoData.setDate(videoDate.toDate());
-        videoData.setTime(videoDate.toDate());
-        videoData.setTimeStamp(ts);
-        videoData.setFeed(tag);
-        videoData.setFilename(fileName);
-        videoData.setOffset(13);
-        return videoData;
-    }
-
-    private void addStatusSpan(List<AtccEvent> datalist, ImportStatus status) {
-        if (datalist == null || datalist.isEmpty()) return;
-        AtccEvent first = datalist.get(0);
-        AtccEvent last = datalist.get(datalist.size() - 1);
-        status.setFrom(first.getEventDate());
-        status.setTo(last.getEventDate());
-        status.setDataDate(first.getEventDate());
-    }
-
-    private List<AtccEvent> importData(Path fileName, String tag) {
-        try {
-            List<AtccEvent> raws = new LinkedList<>();
-            getCSVRecords(fileName, raws, tag);
-            return raws;
-        } catch (Exception e) {
-            logger.error("Error occurred while loading object list from file " + fileName, e);
-            return Collections.emptyList();
-        }
-
-    }
-
-    private void getCSVRecords(Path fileName, List<AtccEvent> raws, String tag) throws IOException, ParseException {
-        Reader reader = Files.newBufferedReader(fileName);
-        CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT
-                .withFirstRecordAsHeader()
-                .withSkipHeaderRecord()
-                .withTrim());
-
-        SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm:ss");
-        SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy");
-
-        sdfTime.setTimeZone(TimeZone.getTimeZone("GMT"));
-        sdfDate.setTimeZone(TimeZone.getTimeZone("GMT"));
-
-        for (CSVRecord csvRecord : csvParser) {
-            // Accessing Values by Column Index
-            String time = csvRecord.get(0);
-            String date = csvRecord.get(1);
-            String timestamp = csvRecord.get(2);
-            String lane = csvRecord.get(3);
-            String speed = csvRecord.get(4);
-            String direction = csvRecord.get(5);
-            String class_no = csvRecord.get(6);
-            String type = "";
-            String vid = csvRecord.size() == 7 ? "" : csvRecord.get(7);
-
-            long ts = (long) Double.parseDouble(timestamp);
-
-            AtccEvent atccEvent = new AtccEvent();
-            atccEvent.setEventDate(sdfTime.parse(time));
-            atccEvent.setTimeStamp(ts);
-            atccEvent.setLane(0);
-            atccEvent.setSpeed(new BigDecimal(speed));
-            atccEvent.setDirection(getDirection(direction));
-            atccEvent.setFeed(getFeed(tag));
-            atccEvent.setEventImage(vid);
-            switch (class_no) {
-                case "0":
-                case "lmv":
-                    type = "LMV";
-                    break;
-                case "lcv":
-                case "1":
-                    type = "LCV";
-                    break;
-                case "2":
-                case "truck":
-                    type = "Truck/Bus";
-                    break;
-                case "3":
-                case "2w":
-                    type = "2-Wheeler";
-                    break;
-                case "4":
-                    type = "OSV";
-                    break;
-                default:
-                    type = "NA";
-            }
-
-            atccEvent.setType(type);
-            raws.add(atccEvent);
-        }
-    }
-
     private int getDirection(String direction) {
         switch (direction) {
             case "fwd":
@@ -400,48 +238,6 @@ public class AtccDataService extends BaseService {
                 return -1;
         }
         return 1;
-    }
-
-    public String importFile(MultipartFile file, String tag) {
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-
-        long cnt = statusRepository.countByFilenameAndFeedAndStatus(fileName, tag, "OK");
-
-        if (cnt > 0) {
-            logger.warn("File {}  - {} is already imported, not importing again", tag, fileName);
-            return fileName;
-        }
-
-        ImportStatus status = new ImportStatus();
-        status.setFilename(fileName);
-        status.setImportDate(new Date());
-        status.setFeed(tag);
-        try {
-            // Check if the file's name contains invalid characters
-            if (fileName.contains("..")) {
-                throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
-            }
-
-            // Copy file to the target location (Replacing existing file with the same name)
-            Path targetLocation = this.fileStorageLocation.resolve(fileName);
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-
-            List<AtccEvent> datalist = importData(targetLocation, tag);
-
-            atccEventRepository.saveAll(datalist);
-
-            addStatusSpan(datalist, status);
-            status.setStatus("OK");
-
-            return fileName;
-        } catch (IOException ex) {
-            status.setStatus("FAILED");
-            status.setError(ex.getMessage());
-            throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
-        } finally {
-            statusRepository.save(status);
-        }
-
     }
 
     public Resource makeSummaryData(String interval) throws IOException {
@@ -549,9 +345,9 @@ public class AtccDataService extends BaseService {
     public Resource loadFileAsResource(String id) {
         String fileName = id;
         try {
-            Optional<AtccVideoData> data = videoDataRepository.findById(Long.parseLong(id));
+            Optional<AtccEvent> data = atccEventRepository.findById(Long.parseLong(id));
             if (data.isPresent()) {
-                fileName = data.get().getFilename();
+                fileName = data.get().getEventVideo();
                 Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
                 Resource resource = new UrlResource(filePath.toUri());
                 if (resource.exists()) {
@@ -573,55 +369,24 @@ public class AtccDataService extends BaseService {
 
         if (id == null) throw new NotFoundException("Not a valid id");
 
-        Optional<AtccEvent> odata = atccEventRepository.findById(id);
+        Optional<AtccEvent> data = atccEventRepository.findById(id);
 
-        if (odata.isPresent()) {
-            AtccEvent data = odata.get();
-            VideoSummary summary = getVideoSummary(data);
+        if (data.isPresent()) {
+            String fileName = data.get().getEventImage();
 
-            if (summary == null) {
-                throw new NotFoundException("video not found");
-            }
+            Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
 
-            Path screenshotfile = getScreenshotFileName(data);
-
-            if (Files.exists(screenshotfile)) {
-                return new UrlResource(screenshotfile.toUri());
-            }
-
-            FFmpeg ffmpeg = new FFmpeg(ffmpegpath);
-            FFprobe ffprobe = new FFprobe(ffprobepath);
-
-            //offset is data.ts - video.ts
-            long offset = data.getTimeStamp() - summary.getTimeStamp();
-            Path filePath = this.fileStorageLocation.resolve(summary.getFileName()).normalize();
-            FFmpegBuilder builder = new FFmpegBuilder()
-                    .setInput(filePath.toString())
-                    .overrideOutputFiles(true)
-                    .addOutput(screenshotfile.toString())
-                    .setStartOffset(offset, TimeUnit.SECONDS)
-                    .addExtraArgs("-vframes", "1")
-                    .done();
-
-            FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
-
-            // Run a one-pass encode
-            executor.createJob(builder).run();
-
-            Resource resource = new UrlResource(screenshotfile.toUri());
+            Resource resource = new UrlResource(filePath.toUri());
             if (resource.exists()) {
-                return new UrlResource(screenshotfile.toUri());
+                return resource;
             } else {
-                throw new NotFoundException("ffmpeg not working :( no screenshot generated");
+                throw new NotFoundException("File not found " + fileName);
             }
+
         } else {
             throw new NotFoundException("Not a valid id");
         }
 
-    }
-
-    private Path getScreenshotFileName(AtccEvent data) {
-        return this.fileStorageLocation.resolve(data.getFeed() + "_" + data.getTimeStamp() + ".jpg").normalize();
     }
 
     public Resource downloadVehicleImage(Long id) {
@@ -633,13 +398,11 @@ public class AtccDataService extends BaseService {
     }
 
     public Resource downloadByTag(String tag, Long mid) {
-
         long id = new DummyRequest().unmask(mid);
-        String filename = null;
         try {
             Optional<AnprEvent> eventop = anprEventRepository.findById(id);
             if (eventop.isPresent()) {
-                filename = eventop.get().getVehicleImage() + ".jpg";
+                String filename = eventop.get().getVehicleImage();
 
                 Path filePath = Paths.get(this.fileStorageLocation.toString(), tag, filename).toAbsolutePath().normalize();
                 Resource resource = new UrlResource(filePath.toUri());
@@ -649,11 +412,11 @@ public class AtccDataService extends BaseService {
                     throw new NotFoundException("File not found " + filename);
                 }
             } else {
-                throw new NotFoundException("File not found " + filename);
+                throw new NotFoundException("event not found ");
             }
 
         } catch (MalformedURLException ex) {
-            throw new NotFoundException("File not found " + filename, ex);
+            throw new NotFoundException("unknown error", ex);
         }
     }
 

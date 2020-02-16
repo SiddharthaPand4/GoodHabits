@@ -42,36 +42,7 @@ public class AtccController extends MediaUploadController {
 
     @PutMapping("summary")
     public ResponseWrapper<AtccSummaryDataResponse> findSummaryData(@RequestBody SearchRequest searchRequest, @RequestParam String interval) {
-
         return atccDataService.listSummaryData(searchRequest, interval);
-    }
-
-    @PostMapping("/import/csv")
-    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("key") String authKey, @RequestParam("tag") String tag) {
-
-        logger.info("File uploaded, now importing..{} with tag {}", file.getOriginalFilename(), tag);
-        if (uploadKey != null && !uploadKey.equals(authKey)) {
-            logger.error("Keys not matching! supplied - {}", authKey);
-            throw new AuthException("Not allowed");
-        }
-
-        String fileName = atccDataService.importFile(file, tag);
-
-        return new UploadFileResponse(fileName, file.getContentType(), file.getSize(), tag);
-    }
-
-    @PostMapping("/import/video")
-    public UploadFileResponse uploadVideo(@RequestParam("file") MultipartFile file, @RequestParam("key") String authKey, @RequestParam("tag") String tag) {
-
-        if (uploadKey != null && !uploadKey.equals(authKey)) {
-            logger.error("Keys not matching! supplied - {}", authKey);
-            throw new AuthException("Not allowed");
-        }
-
-        logger.info("video File uploaded, now importing..{}", file.getOriginalFilename());
-        String fileName = atccDataService.importVideo(file, tag);
-
-        return new UploadFileResponse(fileName,  file.getContentType(), file.getSize(), tag);
     }
 
     @PostMapping("/image")

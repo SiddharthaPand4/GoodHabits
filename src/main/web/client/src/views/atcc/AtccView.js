@@ -5,6 +5,7 @@ import "video-react/dist/video-react.css";
 import ReactTable from 'react-table-6'
 import { Player } from 'video-react';
 import AtccService from "../../services/AtccService";
+import Moment from "react-moment";
 export default class AtccView extends Component {
 
     constructor(props) {
@@ -17,7 +18,6 @@ export default class AtccView extends Component {
             video: null
         };
         this.getRawData = this.getRawData.bind(this);
-        //setInterval(()=> this.refRawDataTable.fireFetchData(), 120000)
     }
 
     getRawData(page, pageSize, sorted, filtered, handleRetrievedData) {
@@ -56,25 +56,19 @@ export default class AtccView extends Component {
             Cell: props => <span className='number'>{props.value}</span>, // Custom cell components!
             id: 'type'
         }, {
-            Header: 'Date',
-            accessor: 'date',
-            id: 'date'
-        }, {
-            Header: 'Time',
-            accessor: 'time',
-            id: 'time'
+            Header: 'DateTime',
+            accessor: 'eventDate',
+            id: 'eventDate',
+            Cell: props => <div><Moment format="ll">{props.value}</Moment>{' '}|{' '}<Moment format="LTS">{props.value}</Moment></div>
         }, {
             Header: 'Lane',
             accessor: 'lane',
             id: 'lane'
         }, {
-            Header: 'VID',
-            accessor: 'vehicleId',
-            id: 'VID'
-        }, {
             Header: 'Direction',
-            accessor: 'tag',
-            id: 'tag'
+            accessor: 'direction',
+            id: 'direction',
+            Cell : props => <span>{ props.value === 0 ? "fwd" : "rev" }</span>
         },
             {
                 Header: 'Video',
@@ -137,10 +131,10 @@ export default class AtccView extends Component {
                             startTime={this.state.seek}
                             autoPlay
                             playsInline
-                            poster="/logo.png"
+                            poster="/synlabs-logo.png"
                             src={this.state.video}
                         />
-                        <img src={this.state.ss || '/logo.png'} alt="event screenshot"/>
+                        <img src={this.state.ss || '/synlabs-logo.png'} alt="event screenshot"/>
                     </div>
                 </Col>
             </Row>)
@@ -148,22 +142,22 @@ export default class AtccView extends Component {
 
     showVideo(e) {
 
-        const seek = e.original.timeStamp - e.original.vts - e.original.offset - 5;
+        const seek = 0;//e.original.timeStamp - e.original.vts - e.original.offset - 5;
         //seek(time)
         this.setState({
             seek : seek,
-            video:'/video/' + e.original.vid + "?" + Math.random()
+            video:'/public/atcc/video/' + e.original.id + "?r=" + Math.random()
         });
     }
 
     showScreenshot(e) {
         this.setState({
-            ss:'/screenshot/' + e.original.id + "?" + Math.random()
+            ss:'/public/screenshot/' + e.original.id + "?r=" + Math.random()
         });
     }
 
     downloadVideo(e) {
-        fetch('/video/' + e.original.vid)
+        fetch('/api/atcc/video/' + e.original.vid)
             .then((response) => response.blob())
             .then((blob) => {
                 const url = window.URL.createObjectURL(new Blob([blob]));
@@ -177,7 +171,7 @@ export default class AtccView extends Component {
     }
 
     downloadCsv() {
-        fetch('/csv/')
+        fetch('/api/atcc/csv/')
             .then((response) => response.blob())
             .then((blob) => {
                 const url = window.URL.createObjectURL(new Blob([blob]));
