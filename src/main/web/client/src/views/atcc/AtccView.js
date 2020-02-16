@@ -76,12 +76,12 @@ export default class AtccView extends Component {
                 id: 'video',
                 Cell: e => e.value !== 0 ? <div style={{cursor:'pointer'}} onClick={() => this.showVideo(e)}>View</div> : <div>NA</div>
             },
-            /*{
+            {
                 Header: 'Screenshot',
                 accessor: 'id',
                 id: 'ss',
                 Cell: e => e.original.vid !== 0 ? <div style={{cursor:'pointer'}} onClick={() => this.showScreenshot(e)}>View</div> : <div>NA</div>
-            },*/
+            },
             {
                 Header: 'Download',
                 accessor: 'vid',
@@ -128,7 +128,8 @@ export default class AtccView extends Component {
                 <Col>
                     <div>
                         <Player
-                            startTime={this.state.seek}
+                            fluid={false}
+                            width={500}
                             autoPlay
                             playsInline
                             poster="/synlabs-logo.png"
@@ -152,7 +153,7 @@ export default class AtccView extends Component {
 
     showScreenshot(e) {
         this.setState({
-            ss:'/public/screenshot/' + e.original.id + "?r=" + Math.random()
+            ss:'/public/atcc/screenshot/' + e.original.id + "?r=" + Math.random()
         });
     }
 

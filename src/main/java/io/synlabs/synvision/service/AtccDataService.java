@@ -343,12 +343,12 @@ public class AtccDataService extends BaseService {
 
 
     public Resource loadFileAsResource(String id) {
-        String fileName = id;
+
         try {
             Optional<AtccEvent> data = atccEventRepository.findById(Long.parseLong(id));
             if (data.isPresent()) {
-                fileName = data.get().getEventVideo();
-                Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+                String fileName = data.get().getEventVideo();
+                Path filePath = this.fileStorageLocation.resolve("atcc-video").resolve(fileName).normalize();
                 Resource resource = new UrlResource(filePath.toUri());
                 if (resource.exists()) {
                     return resource;
@@ -356,12 +356,12 @@ public class AtccDataService extends BaseService {
                     throw new NotFoundException("File not found " + fileName);
                 }
             } else {
-                throw new NotFoundException("File not found " + fileName);
+                throw new NotFoundException("event not found ");
             }
         } catch (NumberFormatException ex) {
             throw new NotFoundException("number format for " + id, ex);
         } catch (MalformedURLException ex) {
-            throw new NotFoundException("File not found " + fileName, ex);
+            throw new NotFoundException("error:", ex);
         }
     }
 
@@ -374,7 +374,7 @@ public class AtccDataService extends BaseService {
         if (data.isPresent()) {
             String fileName = data.get().getEventImage();
 
-            Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+            Path filePath = this.fileStorageLocation.resolve("atcc-image").resolve(fileName).normalize();
 
             Resource resource = new UrlResource(filePath.toUri());
             if (resource.exists()) {
