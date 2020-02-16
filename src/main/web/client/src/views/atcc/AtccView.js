@@ -131,6 +131,7 @@ export default class AtccView extends Component {
                             fluid={false}
                             width={500}
                             autoPlay
+                            startTime={this.state.seek}
                             playsInline
                             poster="/synlabs-logo.png"
                             src={this.state.video}
@@ -143,7 +144,7 @@ export default class AtccView extends Component {
 
     showVideo(e) {
 
-        const seek = 0;//e.original.timeStamp - e.original.vts - e.original.offset - 5;
+        const seek = e.original.seek;
         //seek(time)
         this.setState({
             seek : seek,

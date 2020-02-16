@@ -20,6 +20,8 @@ public class CreateAtccEventRequest implements Request {
 
     private int lane;
 
+    private int seek;
+
     private BigDecimal speed;
 
     private int direction;
@@ -43,6 +45,7 @@ public class CreateAtccEventRequest implements Request {
         atccEvent.setType(type);
         atccEvent.setEventImage(eventImage);
         atccEvent.setEventVideo(eventVideo);
+        atccEvent.setSeek(seek);
         return atccEvent;
     }
 }

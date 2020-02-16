@@ -30,6 +30,8 @@ public class AtccEvent extends AbstractPersistable<Long> {
 
     private String type;
 
+    private int seek;
+
     @ManyToOne
     private Feed feed;
 

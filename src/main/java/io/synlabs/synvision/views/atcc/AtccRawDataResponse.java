@@ -19,6 +19,7 @@ public class AtccRawDataResponse {
     private int lane;
     private BigDecimal speed;
     private int direction;
+    private int seek;
     private String type;
     private String location;
     private String vehicleImage;
@@ -33,5 +34,6 @@ public class AtccRawDataResponse {
         this.type = atccEvent.getType();
         this.location = atccEvent.getFeed().getLocation();
         this.vehicleImage = atccEvent.getEventImage();
+        this.seek = atccEvent.getSeek();
     }
 }
