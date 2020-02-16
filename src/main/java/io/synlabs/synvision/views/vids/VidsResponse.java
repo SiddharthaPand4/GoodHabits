@@ -1,6 +1,7 @@
 package io.synlabs.synvision.views.vids;
 
 import io.synlabs.synvision.entity.vids.HighwayIncident;
+import io.synlabs.synvision.views.common.FeedResponse;
 import io.synlabs.synvision.views.common.Response;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ public class VidsResponse implements Response {
     private String incidentType;
     private String incidentImage;
     private String incidentVideo;
+    private FeedResponse feed;
 
     public VidsResponse(HighwayIncident incident) {
         this.id = incident.getId();
@@ -31,5 +33,10 @@ public class VidsResponse implements Response {
         this.location = incident.getFeed().getLocation();
         this.incidentImage = incident.getIncidentImage();
         this.incidentVideo = incident.getIncidentVideo();
+
+        if (incident.getFeed() != null) {
+            this.feed = new FeedResponse(incident.getFeed());
+        }
+
     }
 }

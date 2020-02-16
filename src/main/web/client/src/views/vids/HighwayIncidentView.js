@@ -149,7 +149,8 @@ export default class HighwayIncidentView extends Component {
                                         </div>
                                         <div style={{marginTop: "5px", textAlign: "left"}}>
                                             <div>
-                                                <Text code><Icon type="environment"/> {event.location || "Location:NA"}</Text>
+                                                <Text code>
+                                                    <Icon type="environment"/> {event.feed.site} > {event.feed.location} > {event.feed.name}</Text>
                                             </div>
                                         </div>
 
