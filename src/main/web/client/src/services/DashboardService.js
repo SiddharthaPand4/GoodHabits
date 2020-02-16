@@ -7,6 +7,20 @@ class DashboardService {
         return new DashboardService()
     }
 
+    colors = [
+        '#e83e8c',
+        '#dc3545',
+        '#007bff',
+        '#6610f2',
+        '#fd7e14',
+        '#ffc107',
+        '#28a745',
+        '#20c997',
+        '#17a2b8',
+        '#6c757d',
+        '#343a40',
+        '#6f42c1'];
+
     getTotalNoOfVehiclesBetweenTwoDates(filter) {
         return axios.post('/api/dashboard/vehiclescount/datefilter', filter);
     }
@@ -46,30 +60,17 @@ class DashboardService {
         return axios.post('/api/apms/guidance/parking/vehicle/count', filter);
     }
 
-    getColor(index) {
-        let color = "";
-        let colors = [
-            '#e83e8c',
-            '#dc3545',
-            '#007bff',
-            '#6610f2',
-            '#fd7e14',
-            '#ffc107',
-            '#28a745',
-            '#20c997',
-            '#17a2b8',
-            '#6c757d',
-            '#343a40',
-            '#6f42c1'];
+    getColors() {
+        return this.colors;
+    }
 
-        color = colors[index];
+    getColor(index) {
+        let color = this.colors[index];
         if (color) {
             return color;
         }
         return this.getRandomColor();
-
     }
-
 
     getRandomColor() {
         let letters = '0123456789ABCDEF';

@@ -17,9 +17,4 @@ public class DashboardResponse implements Response {
         this.count = value;
     }
 
-
-    public DashboardResponse(String key, long value) {
-        this.key = key;
-        this.count = (int)value;
-    }
 }

@@ -13,11 +13,16 @@ public class VidsDashboardResponse {
 
     private List<DashboardResponse> onehourstats;
     private List<DashboardResponse> todaystats;
+    private List<DashboardResponse> incidents;
     private HighwayTrafficStateResponse trafficState;
 
-    public VidsDashboardResponse(List<DashboardResponse> onehourstats, List<DashboardResponse> todaystats, HighwayTrafficState trafficState) {
+    public VidsDashboardResponse(List<DashboardResponse> onehourstats,
+                                 List<DashboardResponse> todaystats,
+                                 List<DashboardResponse> incidents,
+                                 HighwayTrafficState trafficState) {
         this.onehourstats = onehourstats;
         this.todaystats = todaystats;
+        this.incidents = incidents;
         this.trafficState = new HighwayTrafficStateResponse(trafficState);
     }
 }

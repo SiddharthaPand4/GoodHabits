@@ -4,6 +4,7 @@ import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import io.synlabs.synvision.entity.atcc.QAtccEvent;
 import io.synlabs.synvision.entity.vids.HighwayTrafficState;
+import io.synlabs.synvision.entity.vids.QHighwayIncident;
 import io.synlabs.synvision.jpa.HighwayTrafficStateRepository;
 import io.synlabs.synvision.views.DashboardResponse;
 import io.synlabs.synvision.views.atcc.AtccVehicleCountResponse;
@@ -42,40 +43,56 @@ public class VidsDashboardService {
 
         List<Tuple> result = query
                 .select(
-                        rawData.eventDate.hour(),
                         rawData.type,
                         rawData.count())
                 .from(rawData)
                 .where(rawData.eventDate.between(startofday, now))
-                .groupBy(rawData.eventDate.hour(), rawData.type)
+                .groupBy(rawData.type)
                 .fetch();
 
         List<DashboardResponse> todaystats = toList(result);
 
         result = query
                 .select(
-                        rawData.eventDate.hour(),
                         rawData.type,
                         rawData.count())
                 .from(rawData)
                 .where(rawData.eventDate.between(hr1, now))
-                .groupBy(rawData.eventDate.hour(), rawData.type)
+                .groupBy(rawData.type)
                 .fetch();
 
         List<DashboardResponse> onehourstats = toList(result);
 
         //current traffic status
+        List<DashboardResponse> incidents = getIncidentStats(startofday, now);
+
         HighwayTrafficState state = trafficStateRepository.findFirstByOrderByUpdateDateDesc();
-        return new VidsDashboardResponse(onehourstats, todaystats, state);
+        return new VidsDashboardResponse(onehourstats, todaystats, incidents, state);
+    }
+
+    private List<DashboardResponse> getIncidentStats(Date startofday, Date now) {
+        QHighwayIncident inci = QHighwayIncident.highwayIncident;
+        JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
+
+        List<Tuple> result = query
+                .select(
+                        inci.incidentType,
+                        inci.count())
+                .from(inci)
+                .where(inci.incidentDate.between(startofday, now))
+                .groupBy(inci.incidentType)
+                .fetch();
+
+        return toList(result);
     }
 
     private List<DashboardResponse> toList(List<Tuple> result) {
         List<DashboardResponse> stats = new ArrayList<>();
         for (int i = 0; i < result.size(); i++) {
             Tuple tuple = result.get(i);
-            String vehicleType = tuple.get(1, String.class);
-            Long vehicleCount = tuple.get(2, Long.class);
-            stats.add(new DashboardResponse(vehicleType, vehicleCount));
+            String vehicleType = tuple.get(0, String.class);
+            Long vehicleCount = tuple.get(1, Long.class);
+            stats.add(new DashboardResponse(vehicleType, Math.toIntExact(vehicleCount)));
             result.set(i, null);
         }
         return stats;
