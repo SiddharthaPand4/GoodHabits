@@ -6,6 +6,7 @@ import io.synlabs.synvision.entity.core.Feed;
 import io.synlabs.synvision.entity.vids.HighwayIncident;
 import io.synlabs.synvision.entity.vids.HighwayTrafficState;
 import io.synlabs.synvision.entity.vids.QHighwayIncident;
+import io.synlabs.synvision.enums.HighwayIncidentType;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.jpa.FeedRepository;
 import io.synlabs.synvision.jpa.HighwayIncidentRepository;
@@ -27,10 +28,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -117,8 +115,28 @@ public class VidsService {
     public void updateFlow(TrafficFlowUpdateRequest request) {
         HighwayTrafficState state = request.toEntity();
         Feed feed = feedRepository.findOneByName(request.getSource());
+
+        switch (state.getDensity()) {
+            case Queue:
+                createIncident(request);
+                break;
+            default:
+        }
         state.setFeed(feed);
         stateRepository.save(state);
+    }
+
+    private void createIncident(TrafficFlowUpdateRequest request) {
+        HighwayIncident incident = new HighwayIncident();
+        incident.setEventId(UUID.randomUUID().toString());
+        incident.setIncidentDate(new Date(request.getTimeStamp() * 1000));
+        incident.setTimeStamp(request.getTimeStamp());
+        incident.setIncidentType(HighwayIncidentType.Queue);
+        incident.setIncidentImage(request.getFlowImage());
+        incident.setIncidentVideo(request.getFlowVideo());
+        Feed feed = feedRepository.findOneByName(request.getSource());
+        incident.setFeed(feed);
+        incidentRepository.save(incident);
     }
 
     public Resource downloadIncidentImage(Long id) {
