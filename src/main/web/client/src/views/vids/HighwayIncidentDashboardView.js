@@ -37,14 +37,13 @@ export default class HighwayIncidentDashboardView extends Component {
         super(props);
 
         this.state = {
-            loaded: false,
             flow_hourly_data: flow_hourly_data,
             flow_today_data: flow_today_data,
-            incident_data: incident_data
+            incident_data: incident_data,
+            loaded: false,
         };
 
         this.refresh = this.refresh.bind(this);
-
     }
 
     componentDidMount() {
@@ -75,9 +74,22 @@ export default class HighwayIncidentDashboardView extends Component {
             flow_today_data.labels = dailylabels;
             flow_today_data.datasets[0].data = dailyvalues;
 
+            let incilabels = [];
+            let incivalues = [];
+
+            for (let i = 0; i < response.data.incidents.length; i++) {
+                let pt = response.data.incidents[i];
+                incilabels.push(pt.key);
+                incivalues.push(pt.count);
+            }
+
+            incident_data.labels = incilabels;
+            incident_data.datasets[0].data = incivalues;
+
             this.setState({
                 flow_today_data: flow_today_data,
                 flow_hourly_data: flow_hourly_data,
+                incident_data: incident_data,
                 stats: response.data,
                 loaded: true
             });
@@ -86,7 +98,7 @@ export default class HighwayIncidentDashboardView extends Component {
     }
 
     render() {
-        let {flow_hourly_data, flow_today_data, loaded} = this.state;
+        let {flow_hourly_data, flow_today_data, incident_data, loaded} = this.state;
         let stats = this.state.stats;
 
         if (!loaded) {
@@ -169,7 +181,7 @@ export default class HighwayIncidentDashboardView extends Component {
                         <Row>
                             <Col>
                                 <Card>
-                                    <Pie data={flow_hourly_data} options={{
+                                    <Pie data={incident_data} options={{
                                         title: {
                                             display: true,
                                             text: 'Traffic Flow (Last Hour)'

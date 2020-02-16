@@ -5,9 +5,9 @@ import com.querydsl.jpa.impl.JPAQuery;
 import io.synlabs.synvision.entity.atcc.QAtccEvent;
 import io.synlabs.synvision.entity.vids.HighwayTrafficState;
 import io.synlabs.synvision.entity.vids.QHighwayIncident;
+import io.synlabs.synvision.enums.HighwayIncidentType;
 import io.synlabs.synvision.jpa.HighwayTrafficStateRepository;
 import io.synlabs.synvision.views.DashboardResponse;
-import io.synlabs.synvision.views.atcc.AtccVehicleCountResponse;
 import io.synlabs.synvision.views.vids.VidsDashboardResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -83,7 +83,15 @@ public class VidsDashboardService {
                 .groupBy(inci.incidentType)
                 .fetch();
 
-        return toList(result);
+        List<DashboardResponse> stats = new ArrayList<>();
+        for (int i = 0; i < result.size(); i++) {
+            Tuple tuple = result.get(i);
+            String vehicleType = tuple.get(0, HighwayIncidentType.class).name();
+            Long vehicleCount = tuple.get(1, Long.class);
+            stats.add(new DashboardResponse(vehicleType, Math.toIntExact(vehicleCount)));
+            result.set(i, null);
+        }
+        return stats;
     }
 
     private List<DashboardResponse> toList(List<Tuple> result) {
