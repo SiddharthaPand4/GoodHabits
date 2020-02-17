@@ -23,6 +23,7 @@ public class AtccRawDataResponse {
     private String type;
     private String location;
     private String vehicleImage;
+    private String vid;
 
     public AtccRawDataResponse(AtccEvent atccEvent) {
         this.id = atccEvent.getId();
@@ -35,5 +36,6 @@ public class AtccRawDataResponse {
         this.location = atccEvent.getFeed().getLocation();
         this.vehicleImage = atccEvent.getEventImage();
         this.seek = atccEvent.getSeek();
+        this.vid = atccEvent.getVid();
     }
 }
