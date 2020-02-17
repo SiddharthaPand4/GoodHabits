@@ -25,10 +25,10 @@ public class AnprEvent extends BaseEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date eventDate;
 
-    @Column(length = 50)
+    @Column(length = 200)
     private String vehicleImage;
 
-    @Column(length = 50)
+    @Column(length = 200)
     private String ocrImage;
 
     @Column(length = 50)

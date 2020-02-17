@@ -29,12 +29,12 @@ public class VidsResponse implements Response {
         this.id = incident.getId();
         this.incidentDate = incident.getIncidentDate();
         this.timeStamp = incident.getTimeStamp();
-        this.incidentType = incident.getIncidentType().name();
-        this.location = incident.getFeed().getLocation();
+        this.incidentType = incident.getIncidentType() == null ? "NA" : incident.getIncidentType().name();
         this.incidentImage = incident.getIncidentImage();
         this.incidentVideo = incident.getIncidentVideo();
 
         if (incident.getFeed() != null) {
+            this.location = incident.getFeed().getLocation();
             this.feed = new FeedResponse(incident.getFeed());
         }
 

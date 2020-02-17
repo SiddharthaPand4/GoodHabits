@@ -28,6 +28,7 @@ public class AtccEvent extends AbstractPersistable<Long> {
 
     private int direction;
 
+    @Column(length = 10)
     private String type;
 
     private int seek;
@@ -35,7 +36,12 @@ public class AtccEvent extends AbstractPersistable<Long> {
     @ManyToOne
     private Feed feed;
 
+    @Column(length = 200)
     private String eventImage;
 
+    @Column(length = 200)
     private String eventVideo;
+
+    @Column(length = 10)
+    private String vid;
 }

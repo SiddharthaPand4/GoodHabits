@@ -34,6 +34,8 @@ public class CreateAtccEventRequest implements Request {
 
     private String source;
 
+    private String vid;
+
     public AtccEvent toEntity() {
         AtccEvent atccEvent = new AtccEvent();
         atccEvent.setEventDate(new Date(timeStamp * 1000));

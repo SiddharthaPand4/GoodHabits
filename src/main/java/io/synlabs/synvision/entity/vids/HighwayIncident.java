@@ -29,10 +29,10 @@ public class HighwayIncident extends AbstractPersistable<Long> {
     @ManyToOne
     private Feed feed;
 
-    @Column(length = 50)
+    @Column(length = 200)
     private String incidentImage;
 
-    @Column(length = 50)
+    @Column(length = 200)
     private String incidentVideo;
 
     private boolean archived;

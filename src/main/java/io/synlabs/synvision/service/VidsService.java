@@ -181,6 +181,10 @@ public class VidsService {
             if (incident.isPresent()) {
                 filename = incident.get().getIncidentVideo();
 
+                if (filename == null) {
+                    throw new NotFoundException("Missing video file name");
+                }
+
                 Path filePath = Paths.get(fileStorageLocation.toString(), tag, filename).toAbsolutePath().normalize();
                 Resource resource = new UrlResource(filePath.toUri());
                 if (resource.exists()) {
