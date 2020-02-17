@@ -3,9 +3,10 @@ import {Col, Row} from "antd";
 import 'react-table-6/react-table.css'
 import "video-react/dist/video-react.css";
 import ReactTable from 'react-table-6'
-import { Player } from 'video-react';
+import {Player} from 'video-react';
 import AtccService from "../../services/AtccService";
 import Moment from "react-moment";
+
 export default class AtccView extends Component {
 
     constructor(props) {
@@ -48,45 +49,63 @@ export default class AtccView extends Component {
         const columns = [{
             Header: 'Id',
             accessor: 'id',
-            id: 'id'
+            id: 'id',
+            headerStyle: {textAlign: 'left'}
         }, {
 
             Header: 'Type',
             accessor: 'type',
             Cell: props => <span className='number'>{props.value}</span>, // Custom cell components!
-            id: 'type'
+            id: 'type',
+            headerStyle: {textAlign: 'left'}
         }, {
             Header: 'DateTime',
             accessor: 'eventDate',
             id: 'eventDate',
-            Cell: props => <div><Moment format="ll">{props.value}</Moment>{' '}|{' '}<Moment format="LTS">{props.value}</Moment></div>
+            headerStyle: {textAlign: 'left'},
+            Cell: props => <div><Moment format="ll">{props.value}</Moment>{' '}|{' '}<Moment
+                format="LTS">{props.value}</Moment></div>
         }, {
             Header: 'Lane',
             accessor: 'lane',
-            id: 'lane'
+            id: 'lane',
+            headerStyle: {textAlign: 'left'}
         }, {
             Header: 'Direction',
             accessor: 'direction',
             id: 'direction',
-            Cell : props => <span>{ props.value === 0 ? "fwd" : "rev" }</span>
+            headerStyle: {textAlign: 'left'},
+            Cell: props => <span>{props.value === 1 ? "fwd" : "rev"}</span>
+        }, {
+            Header: 'VID',
+            accessor: 'vid',
+            id: 'vid',
+            headerStyle: {textAlign: 'left'}
         },
             {
                 Header: 'Video',
                 accessor: 'vid',
                 id: 'video',
-                Cell: e => e.value !== 0 ? <div style={{cursor:'pointer'}} onClick={() => this.showVideo(e)}>View</div> : <div>NA</div>
+                headerStyle: {textAlign: 'left'},
+                Cell: e => e.value !== 0 ?
+                    <div style={{cursor: 'pointer'}} onClick={() => this.showVideo(e)}>View</div> : <div>NA</div>
             },
             {
                 Header: 'Screenshot',
                 accessor: 'id',
                 id: 'ss',
-                Cell: e => e.original.vid !== 0 ? <div style={{cursor:'pointer'}} onClick={() => this.showScreenshot(e)}>View</div> : <div>NA</div>
+                headerStyle: {textAlign: 'left'},
+                Cell: e => e.original.vid !== 0 ?
+                    <div style={{cursor: 'pointer'}} onClick={() => this.showScreenshot(e)}>View</div> : <div>NA</div>
             },
             {
                 Header: 'Download',
                 accessor: 'vid',
                 id: 'dlvideo',
-                Cell: e => e.original.vid !== 0 ? <div style={{cursor:'pointer'}} onClick={() => this.downloadVideo(e)}>Download</div> : <div>NA</div>
+                headerStyle: {textAlign: 'left'},
+                Cell: e => e.original.vid !== 0 ?
+                    <div style={{cursor: 'pointer'}} onClick={() => this.downloadVideo(e)}>Download</div> :
+                    <div>NA</div>
             }
         ];
 
@@ -123,7 +142,7 @@ export default class AtccView extends Component {
                         }}
                     />
 
-                    <div style={{cursor:'pointer'}} onClick={()=>this.downloadCsv()}> Download Data</div>
+                    <div style={{cursor: 'pointer'}} onClick={() => this.downloadCsv()}> Download Data</div>
                 </Col>
                 <Col>
                     <div>
@@ -144,17 +163,16 @@ export default class AtccView extends Component {
 
     showVideo(e) {
 
-        const seek = e.original.seek;
-        //seek(time)
+        const seek = Math.max(e.original.seek - 5, 0);
         this.setState({
-            seek : seek,
-            video:'/public/atcc/video/' + e.original.id + "?r=" + Math.random()
+            seek: seek,
+            video: '/public/atcc/video/' + e.original.id + "?r=" + Math.random()
         });
     }
 
     showScreenshot(e) {
         this.setState({
-            ss:'/public/atcc/screenshot/' + e.original.id + "?r=" + Math.random()
+            ss: '/public/atcc/screenshot/' + e.original.id + "?r=" + Math.random()
         });
     }
 

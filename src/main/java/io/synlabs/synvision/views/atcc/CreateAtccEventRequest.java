@@ -48,6 +48,7 @@ public class CreateAtccEventRequest implements Request {
         atccEvent.setEventImage(eventImage);
         atccEvent.setEventVideo(eventVideo);
         atccEvent.setSeek(seek);
+        atccEvent.setVid(vid);
         return atccEvent;
     }
 }
