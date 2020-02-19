@@ -47,7 +47,12 @@ export default class HighwayIncidentDashboardView extends Component {
     }
 
     componentDidMount() {
+        this.intervalID = setInterval(this.refresh.bind(this), 5 * 1000);
         this.refresh();
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.intervalID);
     }
 
     refresh() {
