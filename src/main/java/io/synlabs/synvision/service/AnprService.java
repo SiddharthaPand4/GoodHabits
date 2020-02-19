@@ -1,18 +1,24 @@
 package io.synlabs.synvision.service;
 
+import com.google.gson.Gson;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import io.synlabs.synvision.entity.anpr.*;
 import io.synlabs.synvision.entity.core.Feed;
 import io.synlabs.synvision.entity.parking.ParkingEvent;
+import io.synlabs.synvision.entity.parking.QParkingEvent;
 import io.synlabs.synvision.enums.VehicleType;
 import io.synlabs.synvision.jpa.*;
 import io.synlabs.synvision.views.anpr.*;
 import io.synlabs.synvision.views.common.PageResponse;
+import io.synlabs.synvision.views.parking.ParkingEventResponse;
+import io.synlabs.synvision.views.parking.ParkingReportRequest;
+import io.synlabs.synvision.views.parking.ParkingReportResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,11 +27,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -52,6 +62,9 @@ public class AnprService extends BaseService {
 
     @Autowired
     private EntityManager entityManager;
+
+    @Value("${file.upload-dir}")
+    private String uploadDirPath;
 
 
     private static final Logger logger = LoggerFactory.getLogger(AnprService.class);
@@ -501,5 +514,226 @@ public class AnprService extends BaseService {
         });
         return (PageResponse<AnprResponse>) new IncidentRepeatPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
 
+    }
+
+    public String downloadAnprEvents(AnprReportRequest request) throws IOException {
+        int page = 1;
+        int offset = 0;
+        int limit = 1000;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            request.setFrom(sdf.parse(request.getFromDateString()));
+            request.setTo(sdf.parse(request.getToDateString()));
+        } catch (ParseException e) {
+            logger.info("Couldn't parse date", request.getFrom());
+        }
+
+        QAnprEvent anprEvent = QAnprEvent.anprEvent;
+        JPAQuery<AnprEvent> query = new JPAQuery<>(entityManager);
+        List<AnprEvent> result = null;
+        List<com.querydsl.core.Tuple> result1 = null;
+        String xAxis = StringUtils.isEmpty(request.getXAxis()) ? "" : request.getXAxis();
+
+        switch (xAxis) {
+            case "All Entry-Exit":
+                query
+                        .select(anprEvent)
+                        .from(anprEvent)
+                        .where(anprEvent.eventDate.between(request.getFrom(), request.getTo()))
+                        .orderBy(anprEvent.eventDate.asc());
+                break;
+
+        }
+        long totalRecordsCount = query.fetchCount();
+        Path path = Paths.get(uploadDirPath);
+        String filename = null;
+        FileWriter fileWriter = null;
+
+        switch(request.getReportType()) {
+            case "CSV":
+                filename = path.resolve(UUID.randomUUID().toString() + ".csv").toString();
+                fileWriter = new FileWriter(filename);
+
+                fileWriter.append("Sr. No");
+                fileWriter.append(',');
+                fileWriter.append("Event Date");
+                fileWriter.append(',');
+                fileWriter.append("Event Time");
+                fileWriter.append(',');
+                fileWriter.append("Vehicle Id");
+                fileWriter.append(',');
+                fileWriter.append("LPR");
+                fileWriter.append(',');
+                fileWriter.append("Vehicle Image");
+                fileWriter.append(',');
+                fileWriter.append("Direction");
+                fileWriter.append(',');
+                fileWriter.append("Location");
+                fileWriter.append('\n');
+                while (totalRecordsCount > offset) {
+                    offset = (page - 1) * limit;
+                    if (offset > 0) {
+                        query.offset(offset);
+                    }
+                    query.limit(limit);
+                    result = query.fetch();
+
+                    int i = 0;
+                    for (AnprEvent event : result) {
+                        fileWriter.append(String.valueOf('"')).append(String.valueOf(i + 1)).append(String.valueOf('"'));
+                        fileWriter.append(',');
+                        fileWriter.append(String.valueOf('"')).append(toFormattedDate(event.getEventDate(), "dd-MM-yyyy")).append(String.valueOf('"'));
+                        fileWriter.append(',');
+                        fileWriter.append(String.valueOf('"')).append(toFormattedDate(event.getEventDate(), "HH:mm:ss")).append(String.valueOf('"'));
+                        fileWriter.append(',');
+                        fileWriter.append(String.valueOf('"')).append(event.getVehicleId()).append(String.valueOf('"'));
+                        fileWriter.append(',');
+                        fileWriter.append(String.valueOf('"')).append(event.getAnprText()).append(String.valueOf('"'));
+                        fileWriter.append(',');
+                        fileWriter.append(String.valueOf('"')).append(event.getVehicleImage().concat(".png")).append(String.valueOf('"'));
+                        fileWriter.append(',');
+                        fileWriter.append(String.valueOf('"')).append(event.getDirection()).append(String.valueOf('"'));
+                        fileWriter.append(',');
+                        fileWriter.append(String.valueOf('"')).append(event.getSource()).append(String.valueOf('"'));
+
+                        fileWriter.append('\n');
+                        i++;
+                    }
+                    page++;
+                }
+                break;
+
+            case "JSON":
+                filename = path.resolve(UUID.randomUUID().toString() + ".json").toString();
+                fileWriter = new FileWriter(filename);
+                while (totalRecordsCount > offset) {
+                    offset = (page - 1) * limit;
+                    if (offset > 0) {
+                        query.offset(offset);
+                    }
+                    query.limit(limit);
+
+                    result = query.fetch();
+
+                    List<AnprResponse> responses=result.stream().map(AnprResponse::new).collect(Collectors.toList());
+
+                    if(responses.size()>0) {
+                        Gson gson = new Gson();
+                        gson.toJson(responses, fileWriter);
+                    }
+                    page++;
+                }
+
+                break;
+        }
+
+
+        fileWriter.flush();
+        fileWriter.close();
+        return filename;
+    }
+
+    public String downloadAnprEventsOnDailyBasis(AnprReportRequest request) throws IOException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf1 = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            request.setFrom(sdf.parse(request.getFromDateString()));
+            request.setTo(sdf.parse(request.getToDateString()));
+        } catch (ParseException e) {
+            logger.info("Couldn't parse date", request.getFrom());
+        }
+
+        QAnprEvent anprEvent = QAnprEvent.anprEvent;
+        JPAQuery<AnprEvent> query = new JPAQuery<>(entityManager);
+        Date eventDate = null;
+        Long eventCount= null ;
+        List<com.querydsl.core.Tuple> result = null;
+        String xAxis = StringUtils.isEmpty(request.getXAxis()) ? "" : request.getXAxis();
+        Map<Date, AnprReportResponse> totalEventsByDate = new TreeMap<Date, AnprReportResponse>();
+
+        switch (xAxis) {
+
+            case "DayWise Summary":
+                result = query
+                        .select(anprEvent.eventDate,
+                                anprEvent.count())
+                        .from(anprEvent)
+                        .where(anprEvent.eventDate.between(request.getFrom(),request.getTo()))
+                        .groupBy(anprEvent.eventDate.dayOfMonth(), anprEvent.eventDate.month(), anprEvent.eventDate.year())
+                        .orderBy(anprEvent.eventDate.asc())
+                        .fetch();
+
+
+                for (int i = 0; i < result.size(); i++) {
+                    com.querydsl.core.Tuple tuple = result.get(i);
+
+                    eventDate = tuple.get(0, Date.class);
+                    String eventDateString = toFormattedDate(eventDate,"dd/MM/yyyy");
+
+                    try {
+                        eventDate= sdf1.parse(eventDateString);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    eventCount = tuple.get(1, Long.class);
+
+                    totalEventsByDate.put(eventDate,new AnprReportResponse(eventCount,eventDateString));
+                    result.set(i, null);
+                }
+
+
+                break;
+        }
+        List<AnprReportResponse> responses = new ArrayList<>();
+        for(Date date: totalEventsByDate.keySet()){
+            responses.add(new AnprReportResponse( totalEventsByDate.get(date).getTotalEvents(),toFormattedDate(date,"dd/MM/yyyy")));
+        }
+
+        Path path = Paths.get(uploadDirPath);
+        String filename=null;
+        FileWriter fileWriter= null;
+        switch (request.getReportType()){
+            case "CSV":
+                filename = path.resolve(UUID.randomUUID().toString() + ".csv").toString();
+                fileWriter = new FileWriter(filename);
+                fileWriter.append("Sr. No");
+                fileWriter.append(',');
+                fileWriter.append("Date");
+                fileWriter.append(',');
+                fileWriter.append("Total Events");
+                fileWriter.append('\n');
+
+                int i=0;
+                for (AnprReportResponse response1: responses) {
+
+                    fileWriter.append(String.valueOf('"')).append(String.valueOf(i+1)).append(String.valueOf('"'));
+                    fileWriter.append(',');
+                    fileWriter.append(String.valueOf('"')).append(response1.getDate()).append(String.valueOf('"'));
+                    fileWriter.append(',');
+                    fileWriter.append(String.valueOf('"')).append(String.valueOf(response1.getTotalEvents())).append(String.valueOf('"'));
+
+                    fileWriter.append('\n');
+
+                    i++;
+
+                }
+                break;
+
+            case "JSON":
+                filename = path.resolve(UUID.randomUUID().toString() + ".json").toString();
+                fileWriter = new FileWriter(filename);
+
+                Gson gson = new Gson();
+                gson.toJson(responses, fileWriter);
+
+                break;
+
+        }
+
+
+        fileWriter.flush();
+        fileWriter.close();
+        return  filename;
     }
 }

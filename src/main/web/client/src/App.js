@@ -32,6 +32,7 @@ import AtccView from "./views/atcc/AtccView";
 import AtccSummaryView from "./views/atcc/AtccSummaryView";
 import HighwayIncidentView from "./views/vids/HighwayIncidentView";
 import HighwayIncidentDashboardView from "./views/vids/HighwayIncidentDashboardView";
+import AnprReportView from "./views/anpr/AnprReportView";
 
 const {Content} = Layout;
 
@@ -72,6 +73,7 @@ class App extends Component {
                                 <PrivateRoute path='/incidents' exact={true} component={TrafficIncidentView}/>
                                 <PrivateRoute path='/incidents/hotlisted' exact={true} component={IncidentHotlistView}/>
                                 <PrivateRoute path='/incidents/repeated' exact={true} component={IncidentRepeatedView}/>
+                                <PrivateRoute path='/anpr/report' exact={true} component={AnprReportView}/>
                                 <PrivateRoute path='/anpr' exact={true} component={AnprView}/>
                                 <PrivateRoute path='/anpr/masterdata' exact={true} component={MasterDataView}/>
                                 <PrivateRoute path='/user' exact={true} component={UserListView}/>

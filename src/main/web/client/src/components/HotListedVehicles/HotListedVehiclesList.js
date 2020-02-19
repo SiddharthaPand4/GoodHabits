@@ -33,7 +33,8 @@ export default class HotListedVehiclesList extends Component {
             },
             loading: {
                 vehiclesList: false
-            }
+            },
+            pageSizeOptions:[12,24,48,96]
         };
 
         this.refresh = this.refresh.bind(this);
@@ -253,7 +254,7 @@ export default class HotListedVehiclesList extends Component {
                                         showSizeChanger
                                         showQuickJumper
                                         defaultCurrent={1} total={count} current={this.state.filter.page}
-                                        pageSize={this.state.filter.pageSize}/>
+                                        pageSize={this.state.filter.pageSize} pageSizeOptions={this.state.pageSizeOptions}/>
                         </div> : null}
 
 

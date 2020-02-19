@@ -30,6 +30,7 @@ public class AnprResponse implements Response {
     private String location;
     private Float speed;
     private boolean sectionSpeed;
+    private String vehicleId;
 
     public AnprResponse(AnprEvent anprEvent){
         this.id=mask(anprEvent.getId());
@@ -43,5 +44,6 @@ public class AnprResponse implements Response {
         this.location = anprEvent.getSource();
         this.speed = anprEvent.getSpeed();
         this.sectionSpeed = anprEvent.isSectionSpeedViolated();
+        this.vehicleId=anprEvent.getVehicleId();
     }
 }

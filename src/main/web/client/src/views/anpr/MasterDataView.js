@@ -31,7 +31,8 @@ export default class MasterDataView extends Component {
                     lpr: "",
                     incidentType: "",
                 }
-            }
+            },
+            pageSizeOptions:[12,24,48,96]
         };
 
         this.refresh = this.refresh.bind(this);
@@ -198,7 +199,9 @@ export default class MasterDataView extends Component {
             showQuickJumper: true,
             onShowSizeChange: this.onMasterDataPageSizeChange,
             onChange: this.onMasterDataPageChange,
-            total: count
+            total: count,
+            pageSizeOptions:this.state.pageSizeOptions
+
         };
 
         const pagination = {
