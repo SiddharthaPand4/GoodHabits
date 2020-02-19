@@ -50,6 +50,7 @@ export default class AnprView extends Component {
                 maxZoomFactor: 5
             },
             downloading: false,
+            pageSizeOptions:[12,24,48,96]
         };
 
         this.refresh = this.refresh.bind(this);
@@ -348,7 +349,7 @@ export default class AnprView extends Component {
                 <Pagination onChange={this.onPageChange} onShowSizeChange={this.onPageSizeChange} showSizeChanger
                             showQuickJumper
                             defaultCurrent={1} total={count} current={this.state.filter.page}
-                            pageSize={this.state.filter.pageSize}/>
+                            pageSize={this.state.filter.pageSize} pageSizeOptions={this.state.pageSizeOptions}/>
             </div>
 
         </div>
@@ -368,7 +369,8 @@ export default class AnprView extends Component {
             showQuickJumper: true,
             onShowSizeChange: this.onPageSizeChange,
             onChange: this.onPageChange,
-            total: count
+            total: count,
+            pageSizeOptions:this.state.pageSizeOptions
         };
 
         const pagination = {

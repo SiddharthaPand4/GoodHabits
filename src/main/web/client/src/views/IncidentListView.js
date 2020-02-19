@@ -38,7 +38,9 @@ export default class IncidentListView extends Component {
             filter: {
                 page: 1,
                 pageSize: 10
-            }
+            },
+            pageSizeOptions:[12,24,48,96],
+
         };
         this.handleDone = this.handleDone.bind(this);
         this.archiveIncident = this.archiveIncident.bind(this);
@@ -245,7 +247,7 @@ export default class IncidentListView extends Component {
                     <Pagination onChange={this.onPageChange} onShowSizeChange={this.onPageSizeChange} showSizeChanger
                                 showQuickJumper
                                 defaultCurrent={1} total={count} current={this.state.filter.page}
-                                pageSize={this.state.filter.pageSize}/>
+                                pageSize={this.state.filter.pageSize} pageSizeOptions={this.state.pageSizeOptions}/>
                 </Col>
             </Row>
 
@@ -298,7 +300,8 @@ export default class IncidentListView extends Component {
             showQuickJumper: true,
             onShowSizeChange: this.onPageSizeChange,
             onChange: this.onPageChange,
-            total: count
+            total: count,
+            pageSizeOptions:this.state.pageSizeOptions
         };
 
         const pagination = {

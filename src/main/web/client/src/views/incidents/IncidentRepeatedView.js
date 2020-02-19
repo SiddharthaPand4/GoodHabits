@@ -53,7 +53,8 @@ export default class IncidentRepeatedView extends Component {
                     lpr: "",
                     incidentType: ""
                 }
-            }
+            },
+            pageSizeOptions:[12,24,48,96]
         };
 
         this.refresh = this.refresh.bind(this);
@@ -242,7 +243,8 @@ export default class IncidentRepeatedView extends Component {
             showQuickJumper: true,
             onShowSizeChange: this.onReverseDirectionPageSizeChange,
             onChange: this.onReverseDirectionPageChange,
-            total: count
+            total: count,
+            pageSizeOptions:this.state.pageSizeOptions
         };
 
         const pagination = {
@@ -287,7 +289,8 @@ export default class IncidentRepeatedView extends Component {
             showQuickJumper: true,
             onShowSizeChange: this.onHelmetMissingPageSizeChange,
             onChange: this.onHelmetMissingPageChange,
-            total: count
+            total: count,
+            pageSizeOptions:this.state.pageSizeOptions
         };
 
         const pagination = {

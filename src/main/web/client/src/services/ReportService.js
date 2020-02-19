@@ -21,6 +21,18 @@ class ReportService {
         return axios(request);
     }
 
+    getAnprReport(req) {
+
+        const request = {
+            method: 'POST',
+            headers: authHeader(),
+            responseType: 'blob',
+            data: JSON.stringify(req),
+            url: config.apiUrl + 'api/report/anprevents'
+        };
+        return axios(request);
+    }
+
 }
 
 export default ReportService.Instance()

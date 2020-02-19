@@ -21,4 +21,8 @@ public class AnprReportRequest implements Request {
     private String lpr;
     public int page;
     public int pageSize;
+
+    public String filterType;
+    public String xAxis;
+    public String reportType;
 }
