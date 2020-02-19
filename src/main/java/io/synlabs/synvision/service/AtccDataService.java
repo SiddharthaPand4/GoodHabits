@@ -402,7 +402,7 @@ public class AtccDataService extends BaseService {
         try {
             Optional<AnprEvent> eventop = anprEventRepository.findById(id);
             if (eventop.isPresent()) {
-                String filename = eventop.get().getVehicleImage();
+                String filename = eventop.get().getVehicleImage() +".jpg";
 
                 Path filePath = Paths.get(this.fileStorageLocation.toString(), tag, filename).toAbsolutePath().normalize();
                 Resource resource = new UrlResource(filePath.toUri());

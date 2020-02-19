@@ -6,7 +6,7 @@
 
     <groupId>io.synlabs</groupId>
     <artifactId>synvision</artifactId>
-    <version>0.9.5</version>
+    <version>0.9.6</version>
     <name>synvision</name>
     <description>Synvision Management Application</description>
     <packaging>war</packaging>
@@ -146,16 +146,16 @@
             <version>1.1.44</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
-            <version>1.1.44</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-webflux-ui</artifactId>
-            <version>1.1.44</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.springdoc</groupId>-->
+            <!--<artifactId>springdoc-openapi-ui</artifactId>-->
+            <!--<version>1.1.44</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.springdoc</groupId>-->
+            <!--<artifactId>springdoc-openapi-webflux-ui</artifactId>-->
+            <!--<version>1.1.44</version>-->
+        <!--</dependency>-->
 
     </dependencies>
 
