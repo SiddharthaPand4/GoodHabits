@@ -8,9 +8,9 @@ import java.util.List;
 /**
  * Created by itrs on 10/21/2019.
  */
-public class AnprPageResponse extends PageResponse {
+public class AnprPageResponse extends PageResponse<AnprResponse> {
 
-    private List<AnprResponse> events = new ArrayList<>();
+    private List<AnprResponse> events;
 
     public AnprPageResponse(int pageSize,int pageCount, int pageNumber, List<AnprResponse> anpr)
     {

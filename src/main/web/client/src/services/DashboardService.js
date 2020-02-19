@@ -7,6 +7,20 @@ class DashboardService {
         return new DashboardService()
     }
 
+    colors = [
+        '#e83e8c',
+        '#dc3545',
+        '#007bff',
+        '#6610f2',
+        '#fd7e14',
+        '#ffc107',
+        '#28a745',
+        '#20c997',
+        '#17a2b8',
+        '#6c757d',
+        '#343a40',
+        '#6f42c1'];
+
     getTotalNoOfVehiclesBetweenTwoDates(filter) {
         return axios.post('/api/dashboard/vehiclescount/datefilter', filter);
     }
@@ -37,30 +51,26 @@ class DashboardService {
         return axios.post('/api/dashboard/incident/vehicle/count', filter);
     }
 
-    getColor(index) {
-        let color = "";
-        let colors = [
-            '#e83e8c',
-            '#dc3545',
-            '#007bff',
-            '#6610f2',
-            '#fd7e14',
-            '#ffc107',
-            '#28a745',
-            '#20c997',
-            '#17a2b8',
-            '#6c757d',
-            '#343a40',
-            '#6f42c1'];
+    getParkingVehicleCount(fromDate, toDate, xAxis) {
+        let filter = {
+            fromDateString: moment(fromDate).format('YYYY-MM-DD HH:mm:ss'),
+            toDateString: moment(toDate).format('YYYY-MM-DD HH:mm:ss'),
+            xAxis: xAxis
+        };
+        return axios.post('/api/apms/guidance/parking/vehicle/count', filter);
+    }
 
-        color = colors[index];
+    getColors() {
+        return this.colors;
+    }
+
+    getColor(index) {
+        let color = this.colors[index];
         if (color) {
             return color;
         }
         return this.getRandomColor();
-
     }
-
 
     getRandomColor() {
         let letters = '0123456789ABCDEF';
@@ -148,7 +158,8 @@ class DashboardService {
                 from_date = baseDate.startOf('year').toDate();
                 to_date = baseDate.endOf('year').toDate();
                 break;
-            case  "Custom":
+            case "Custom":
+            default:
                 from_date = selectedCustomDateRangeMoment[0].toDate();
                 to_date = selectedCustomDateRangeMoment[1].toDate();
                 break;

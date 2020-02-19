@@ -28,8 +28,11 @@ public class AnprResponse implements Response {
     private String direction;
     private boolean helmet;
     private String location;
+    private Float speed;
+    private boolean sectionSpeed;
+    private String vehicleId;
 
-    public AnprResponse(AnprEvent anprEvent, String location){
+    public AnprResponse(AnprEvent anprEvent){
         this.id=mask(anprEvent.getId());
         this.eventDate= anprEvent.getEventDate();
         this.eventId= anprEvent.getEventId();
@@ -38,6 +41,9 @@ public class AnprResponse implements Response {
         this.anprText= anprEvent.getAnprText();
         this.direction = anprEvent.getDirection();
         this.helmet = anprEvent.isHelmetMissing();
-        this.location = location;
+        this.location = anprEvent.getSource();
+        this.speed = anprEvent.getSpeed();
+        this.sectionSpeed = anprEvent.isSectionSpeedViolated();
+        this.vehicleId=anprEvent.getVehicleId();
     }
 }

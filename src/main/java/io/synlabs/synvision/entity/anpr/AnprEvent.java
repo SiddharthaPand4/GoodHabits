@@ -1,13 +1,11 @@
 package io.synlabs.synvision.entity.anpr;
 
 import io.synlabs.synvision.entity.BaseEntity;
+import io.synlabs.synvision.entity.core.Feed;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -27,10 +25,10 @@ public class AnprEvent extends BaseEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date eventDate;
 
-    @Column(length = 50)
+    @Column(length = 200)
     private String vehicleImage;
 
-    @Column(length = 50)
+    @Column(length = 200)
     private String ocrImage;
 
     @Column(length = 50)
@@ -47,5 +45,14 @@ public class AnprEvent extends BaseEntity {
     private boolean helmetMissing;
 
     private boolean hotlisted;
+
+    private Float speed;
+
+    private String source;
+
+    @ManyToOne
+    private Feed feed;
+
+    private boolean sectionSpeedViolated;
 
 }

@@ -10,6 +10,10 @@ class UserService {
         return new UserService()
     }
 
+    getMenu() {
+        return axios.get('/api/user/menu');
+    }
+
     getUser(userId) {
         return axios.get('/api/user/' + userId);
     }

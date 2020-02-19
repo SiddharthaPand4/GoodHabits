@@ -6,6 +6,6 @@ public class PasswordUtil {
 
     public static void main(String []args) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        System.out.println("password> " + encoder.encode("hello"));
+        System.out.println("password> " + encoder.encode("synorbit"));
     }
 }

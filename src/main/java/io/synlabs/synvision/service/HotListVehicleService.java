@@ -89,7 +89,7 @@ public class HotListVehicleService {
                 query = query.where(hotListVehicle.createdDate.after(startingDate));
             }
 
-            if (request.getToTime() != null) {
+            if (request.getToDate() != null) {
                 String toTime = request.getToTime() == null ? "00:00:00" : request.getToTime();
                 String ending = toDate + " " + toTime;
                 Date endingDate = dateFormat.parse(ending);
@@ -100,7 +100,6 @@ public class HotListVehicleService {
         }
         return query;
     }
-
 
     public HotListVehicleResponse save(HotListVehicleRequest request) {
         HotListVehicle hotListVehicle = hotListVehicleRepository.findOneById(request.getId());

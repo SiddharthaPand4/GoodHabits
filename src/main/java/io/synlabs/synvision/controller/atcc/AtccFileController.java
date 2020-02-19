@@ -22,7 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 @Controller
-@RequestMapping("/api/atcc/")
+@RequestMapping("/public/atcc/")
 public class AtccFileController {
 
     private static final Logger logger = LoggerFactory.getLogger(AtccFileController.class);

@@ -3,20 +3,17 @@ import {
     Card,
     Col,
     Collapse,
-    Divider,
     Empty,
     Icon,
     Pagination,
     Row,
     Table,
     Tag,
-    Modal,
-    message, Input, Button, Menu, Dropdown, Typography, Slider, Popconfirm,
+    Input, Button, Menu, Dropdown, Typography, Slider
 } from 'antd';
 import GenericFilter from "../components/GenericFilter";
 import Moment from "react-moment";
 import AnprService from "../services/AnprService";
-import HotListVehicleService from "../services/HotListVehicleService";
 import Magnifier from "react-magnifier";
 import HotListedVehiclesList from "../components/HotListedVehicles/HotListedVehiclesList";
 
@@ -57,6 +54,8 @@ export default class IncidentHotlistView extends Component {
                 minZoomFactor: 1,
                 maxZoomFactor: 5
             },
+            pageSizeOptions:[12,24,48,96]
+
 
         };
 
@@ -273,8 +272,8 @@ export default class IncidentHotlistView extends Component {
                                     </Menu.Item>
                                     <Menu.Item key="3">
                                         <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon
-                                            type="delete"/>{' '}
-                                            Delete
+                                            type="warning"/>{' '}
+                                            Archive
                                         </Button>
                                     </Menu.Item>
 
@@ -301,7 +300,7 @@ export default class IncidentHotlistView extends Component {
                                             value={typeof zoomFactor === 'number' ? zoomFactor : 0}
                                         />
                                         : <div style={{height:"54px",textAlign: "center"}}>
-                                               <Button size="small" type="primary" onClick={() => this.magnifyEvent(event)} >
+                                               <Button size="small" type="dashed" onClick={() => this.magnifyEvent(event)} >
                                                    <Icon type="zoom-in"/>Zoom Image
                                                </Button>
                                            </div>
@@ -320,7 +319,7 @@ export default class IncidentHotlistView extends Component {
                                     <Text
                                         type="secondary">{(workingEventLoading && workingEvent.id === event.id) ? "saving..." : ""}</Text>
                                     <div>
-                                        <Text code> <Moment format="lll">{event.eventDate}</Moment>{' '}|{' '}<Moment
+                                        <Text code> <Moment format="ll">{event.eventDate}</Moment>{' '}|{' '}<Moment
                                             format="LTS">{event.eventDate}</Moment></Text>
                                     </div>
                                     <div>
@@ -338,7 +337,7 @@ export default class IncidentHotlistView extends Component {
                 <Pagination onChange={this.onPageChange} onShowSizeChange={this.onPageSizeChange} showSizeChanger
                             showQuickJumper
                             defaultCurrent={1} total={count} current={this.state.filter.page}
-                            pageSize={this.state.filter.pageSize}/>
+                            pageSize={this.state.filter.pageSize}  pageSizeOptions={this.state.pageSizeOptions}/>
             </div>
 
         </div>
@@ -358,7 +357,8 @@ export default class IncidentHotlistView extends Component {
             showQuickJumper: true,
             onShowSizeChange: this.onPageSizeChange,
             onChange: this.onPageChange,
-            total: count
+            total: count,
+            pageSizeOptions:this.state.pageSizeOptions
         };
 
         const pagination = {
@@ -391,8 +391,8 @@ export default class IncidentHotlistView extends Component {
                 <Column title="Action"
                         key="action"
                         render={(text, event) => (
-                            <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon type="delete"/>{' '}
-                                Delete</Button>
+                            <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon type="warning"/>{' '}
+                               Archive</Button>
                         )}
                 />
             </Table>

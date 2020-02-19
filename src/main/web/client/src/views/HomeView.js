@@ -1,28 +1,24 @@
 import React, {Component} from "react";
-import {Col, Row, Statistic, TimePicker, DatePicker, Button, Icon, message, Card, Modal,Menu, Dropdown, Select} from "antd";
+import {Button, Card, DatePicker, Dropdown, Icon, Menu, Modal} from "antd";
 import DashboardService from "../services/DashboardService";
 import CommonService from "../services/CommonService";
 import Moment from 'moment';
-import classnames from 'classnames';
-import {Bar, Pie, Line} from 'react-chartjs-2';
-import * as name from "chartjs-plugin-colorschemes";
-import cloneDeep from 'lodash/cloneDeep';
+import {Line} from 'react-chartjs-2';
 
-const {Option} = Select;
-const { RangePicker } = DatePicker;
+const {RangePicker} = DatePicker;
 
 export default class HomeView extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            isOpencustomDateRangeModal:"",
+            isOpencustomDateRangeModal: "",
             atcc: {
                 filter: {
                     selectedCustomDateRange: "Today",
                     selectedXAxisOption: "Hourly",
-                    fromDate:{},
-                    toDate:{}
+                    fromDate: {},
+                    toDate: {}
                 },
                 chartData: {
                     labels: [],
@@ -32,8 +28,8 @@ export default class HomeView extends Component {
                 filter: {
                     selectedCustomDateRange: "Today",
                     selectedXAxisOption: "Hourly",
-                    fromDate:{},
-                    toDate:{}
+                    fromDate: {},
+                    toDate: {}
                 },
                 chartData: {
                     labels: [],
@@ -58,17 +54,18 @@ export default class HomeView extends Component {
     componentDidMount() {
         this.refresh();
     }
-    showCustomDateRangeModal(graphName){
+
+    showCustomDateRangeModal(graphName) {
         this.setState({
-          isOpencustomDateRangeModal: graphName,
+            isOpencustomDateRangeModal: graphName,
         });
     };
 
-    handleCancel = e => {
+    handleCancel = () => {
         this.setState({
-          isOpencustomDateRangeModal: "",
+            isOpencustomDateRangeModal: "",
         });
-      };
+    };
 
     selectDateRange(graphName, selectedCustomDateRangeEnum, selectedCustomDateRangeMoment) {
         let {isOpencustomDateRangeModal} = this.state;
@@ -79,7 +76,7 @@ export default class HomeView extends Component {
         graph.filter.toDate = fromToDate.to_date;
 
 
-        if(selectedCustomDateRangeEnum=== "Custom"){
+        if (selectedCustomDateRangeEnum === "Custom") {
             isOpencustomDateRangeModal = ""
         }
         this.setState({[graphName]: graph, isOpencustomDateRangeModal}, () => {
@@ -241,14 +238,10 @@ export default class HomeView extends Component {
         });
     }
 
-    handleDateRangeChange(dates, dateString){
-
-        let startDate = dates[0].toDate();
-        let endDate = dates[1].toDate();
-        this.setState( () => {
-                    this.refresh();
-                });
-         console.log(dates, dateString);
+    handleDateRangeChange() {
+        this.setState(() => {
+            this.refresh();
+        });
     }
 
     getXAxisOptions(graphName) {
@@ -289,7 +282,7 @@ export default class HomeView extends Component {
                 <Menu.Item key="7" onClick={() => this.selectDateRange(graphName, "Last year")}>
                     Last year
                 </Menu.Item>
-                <Menu.Item  onClick={() =>this.showCustomDateRangeModal(graphName)}>
+                <Menu.Item onClick={() => this.showCustomDateRangeModal(graphName)}>
                     Custom
                 </Menu.Item>
 
@@ -350,20 +343,19 @@ export default class HomeView extends Component {
         const incidentChartOptions = this.getBarChartOptions("incident");
         return (
             <div>
-            <div>
+                <div>
 
                     <Modal
-                     onCancel={this.handleCancel}
-                      title="Custom Date Range"
-                      visible={this.state.isOpencustomDateRangeModal ? true : false}
-                      footer={[
-                      ]}
+                        onCancel={this.handleCancel}
+                        title="Custom Date Range"
+                        visible={!!this.state.isOpencustomDateRangeModal}
+                        footer={[]}
 
                     >
-                         <RangePicker
-                          onChange={(changedDateRange)=> this.selectDateRange(this.state.isOpencustomDateRangeModal, "Custom", changedDateRange)} />
+                        <RangePicker
+                            onChange={(changedDateRange) => this.selectDateRange(this.state.isOpencustomDateRangeModal, "Custom", changedDateRange)}/>
                     </Modal>
-                  </div>
+                </div>
                 <div>
                     <Card title={<div>ATCC
                         &nbsp;

@@ -3,15 +3,13 @@ import {
     Card,
     Col,
     Collapse,
-    Divider,
     Empty,
     Icon,
     Pagination,
     Row,
     Table,
     Tag,
-    Modal,
-    message, Input, Button, Menu, Dropdown, Typography, Slider
+    Input, Button, Menu, Dropdown, Typography, Slider
 } from 'antd';
 import GenericFilter from "../components/GenericFilter";
 import Moment from "react-moment";
@@ -33,7 +31,7 @@ export default class TrafficIncidentView extends Component {
             events: {},
             filter: {
                 page: 1,
-                pageSize: 24
+                pageSize: 12
             },
             workingEvent: {},
             workingEventLoading: false,
@@ -43,6 +41,7 @@ export default class TrafficIncidentView extends Component {
                 minZoomFactor: 1,
                 maxZoomFactor: 5
             },
+            pageSizeOptions:[12,24,48,96]
         };
 
         this.refresh = this.refresh.bind(this);
@@ -230,8 +229,8 @@ export default class TrafficIncidentView extends Component {
                                     </Menu.Item>
                                     <Menu.Item key="3">
                                         <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon
-                                            type="delete"/>{' '}
-                                            Delete
+                                            type="warning"/>{' '}
+                                            Archive
                                         </Button>
                                     </Menu.Item>
 
@@ -244,7 +243,7 @@ export default class TrafficIncidentView extends Component {
                                 cover={(magnifyEventId === event.id) ?
                                     <Magnifier src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}
                                                zoomFactor={zoomFactor}/> : <img alt="event"
-                                                                    src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}/>
+                                                                                src={"/public/anpr/vehicle/" + event.id + "/image.jpg"}/>
 
                                 }
                             >
@@ -257,11 +256,11 @@ export default class TrafficIncidentView extends Component {
                                             onChange={this.updateZoomFactor}
                                             value={typeof zoomFactor === 'number' ? zoomFactor : 0}
                                         />
-                                        : <div style={{height:"54px",textAlign: "center"}}>
-                                               <Button size="small" type="primary" onClick={() => this.magnifyEvent(event)} >
-                                                   <Icon type="zoom-in"/>Zoom Image
-                                               </Button>
-                                           </div>
+                                        : <div style={{height: "54px", textAlign: "center"}}>
+                                            <Button size="small" type="dashed" onClick={() => this.magnifyEvent(event)}>
+                                                <Icon type="zoom-in"/>Zoom Image
+                                            </Button>
+                                        </div>
                                     }
                                 </div>
                                 <div style={{textAlign: "center"}}>
@@ -277,7 +276,7 @@ export default class TrafficIncidentView extends Component {
                                     <Text
                                         type="secondary">{(workingEventLoading && workingEvent.id === event.id) ? "saving..." : ""}</Text>
                                     <div>
-                                        <Text code> <Moment format="lll">{event.eventDate}</Moment>{' '}|{' '}<Moment
+                                        <Text code> <Moment format="ll">{event.eventDate}</Moment>{' '}|{' '}<Moment
                                             format="LTS">{event.eventDate}</Moment></Text>
                                     </div>
                                     <div>
@@ -295,7 +294,7 @@ export default class TrafficIncidentView extends Component {
                 <Pagination onChange={this.onPageChange} onShowSizeChange={this.onPageSizeChange} showSizeChanger
                             showQuickJumper
                             defaultCurrent={1} total={count} current={this.state.filter.page}
-                            pageSize={this.state.filter.pageSize}/>
+                            pageSize={this.state.filter.pageSize}  pageSizeOptions={this.state.pageSizeOptions}/>
             </div>
 
         </div>
@@ -315,7 +314,8 @@ export default class TrafficIncidentView extends Component {
             showQuickJumper: true,
             onShowSizeChange: this.onPageSizeChange,
             onChange: this.onPageChange,
-            total: count
+            total: count,
+            pageSizeOptions:this.state.pageSizeOptions
         };
 
         const pagination = {
@@ -348,8 +348,8 @@ export default class TrafficIncidentView extends Component {
                 <Column title="Action"
                         key="action"
                         render={(text, event) => (
-                            <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon type="delete"/>{' '}
-                                Delete</Button>
+                            <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon type="warning"/>{' '}
+                                Archive</Button>
                         )}
                 />
             </Table>

@@ -1,5 +1,6 @@
 package io.synlabs.synvision.views.common;
 
+import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.List;
 /**
  * Created by itrs on 10/21/2019.
  */
+@NoArgsConstructor
 public class PageResponse<T extends Response>
 {
     private int     pageSize;
@@ -34,6 +36,7 @@ public class PageResponse<T extends Response>
         this.totalPages = totalPages;
         this.list=list;
     }
+
 
     public List<T> getList()
     {

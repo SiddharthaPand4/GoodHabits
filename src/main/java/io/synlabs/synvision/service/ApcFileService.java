@@ -1,11 +1,17 @@
 package io.synlabs.synvision.service;
 
+import com.querydsl.jpa.impl.JPAQuery;
 import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.entity.ImportStatus;
 import io.synlabs.synvision.entity.apc.ApcEvent;
+import io.synlabs.synvision.entity.apc.QApcEvent;
 import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.jpa.ApcEventRepository;
 import io.synlabs.synvision.jpa.ImportStatusRepository;
+import io.synlabs.synvision.views.apc.ApcFilterRequest;
+import io.synlabs.synvision.views.apc.ApcRequest;
+import io.synlabs.synvision.views.apc.ApcResponse;
+import io.synlabs.synvision.views.common.PageResponse;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -15,8 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.annotation.PostConstruct;
+import javax.persistence.EntityManager;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
@@ -24,10 +30,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
-public class ApcFileService {
+public class ApcFileService  {
 
     private static final Logger logger = LoggerFactory.getLogger(ApcFileService.class);
 
@@ -40,7 +47,10 @@ public class ApcFileService {
     private ImportStatusRepository statusRepository;
 
     @Autowired
-    private ApcEventRepository apcEventRepository;
+    private  ApcEventRepository apcEventRepository;
+    @Autowired
+    private EntityManager entityManager;
+
 
 
     @PostConstruct
@@ -139,8 +149,72 @@ public class ApcFileService {
             apcEvent.setDirection(direction);
             apcEvent.setSource(tag);
             apcEvent.setArchived(false);
-
-            items.add(apcEvent);
         }
+
+
+        }
+
+    public PageResponse<ApcResponse> listPeople(ApcFilterRequest request) {
+        int currentPage = request.getPage();
+        int pageSize = request.getPageSize();
+        QApcEvent apcEvent = QApcEvent.apcEvent;
+        JPAQuery<ApcEvent> query= new JPAQuery<>(entityManager);
+        query = query.select(apcEvent).from(apcEvent);
+        if(request.getEventId()!=null&&!request.getEventId().equals(""))
+         query= query.where(apcEvent.eventId.eq(request.getEventId()));
+        query =  query.where(apcEvent.archived.eq(false));
+        try {
+            String fromDate = request.getFromDate();
+            String toDate = request.getToDate();
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            if (request.getFromDate() != null) {
+                String fromTime = (request.getFromTime() == null ? "00:00:00" : request.getFromTime());
+                String starting = fromDate + " " + fromTime;
+                Date startingDate = format.parse(starting);
+                query = query.where(apcEvent.eventDate.after(startingDate).or(apcEvent.eventDate.eq(startingDate)));
+            }
+
+            if (request.getToDate() != null) {
+                String toTime = (request.getToTime() == null ? "00:00:00" : request.getToTime());
+                String ending = toDate + " " + toTime;
+                Date endingDate = format.parse(ending);
+                query = query.where(apcEvent.eventDate.before(endingDate).or(apcEvent.eventDate.eq(endingDate)));
+            }
+        } catch (ParseException e) {
+            logger.error("Error in parsing date", e);
+        }
+
+
+        int count = (int) query.fetchCount();
+        int pageCount = (int) Math.ceil(count * 1.0 / pageSize);
+        int offset = (currentPage - 1) * pageSize;
+
+        query.offset(offset);
+        query.limit(pageSize);
+
+
+
+        List<ApcEvent> data = query.fetch();
+        List<ApcResponse> list = new ArrayList<>(pageSize);
+        data.forEach(item -> {
+            ApcResponse res = new ApcResponse(item);
+            list.add(res);
+        });
+        return (PageResponse<ApcResponse>) new PageResponse(pageSize,currentPage, pageCount, list);
     }
+
+    public void archiveEvent(ApcRequest request){
+
+        ApcEvent apcEvent = apcEventRepository.getOne(request.getId());
+        apcEvent.setArchived(true);
+        apcEventRepository.save(apcEvent);
+
+    }
+
 }
+
+
+
+
+
+

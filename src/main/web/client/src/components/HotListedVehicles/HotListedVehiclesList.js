@@ -2,7 +2,6 @@ import React, {Component} from "react";
 import {
     Card,
     Col,
-    Empty,
     Icon,
     Pagination,
     Row,
@@ -34,7 +33,8 @@ export default class HotListedVehiclesList extends Component {
             },
             loading: {
                 vehiclesList: false
-            }
+            },
+            pageSizeOptions:[12,24,48,96]
         };
 
         this.refresh = this.refresh.bind(this);
@@ -162,21 +162,12 @@ export default class HotListedVehiclesList extends Component {
         });
     };
 
-    onLprInputChange(e) {
-
-        let filter = this.state.filter;
-        filter.lpr = e.target.value;
-        console.log(filter);
-        this.setState({filter: filter})
-    }
-
     search(searchText) {
         let {filter} = this.state;
         filter.lpr = searchText;
         this.setState({filter: filter});
         this.refresh(filter)
     }
-
 
     onLprInputChange(e) {
 
@@ -263,7 +254,7 @@ export default class HotListedVehiclesList extends Component {
                                         showSizeChanger
                                         showQuickJumper
                                         defaultCurrent={1} total={count} current={this.state.filter.page}
-                                        pageSize={this.state.filter.pageSize}/>
+                                        pageSize={this.state.filter.pageSize} pageSizeOptions={this.state.pageSizeOptions}/>
                         </div> : null}
 
 

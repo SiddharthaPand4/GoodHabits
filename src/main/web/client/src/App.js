@@ -16,13 +16,23 @@ import DeviceConfigView from "./views/DeviceConfigView";
 import UserService from "./services/UserService";
 import {EventBus} from "./components/event"
 import LoginView from "./views/LoginView";
-import IncidentListView from "./views/IncidentListView";
 import TriggerView from "./views/TriggerView";
-import AnprView from "./views/AnprView";
+import AnprView from "./views/anpr/AnprView";
 import TrafficIncidentView from "./views/TrafficIncidentView";
-import IncidentRepeatedView from "./views/incidentsRepeated/IncidentRepeatedView";
+import IncidentRepeatedView from "./views/incidents/IncidentRepeatedView";
 import IncidentHotlistView from "./views/IncidentHotlistView";
 import MasterDataView from "./views/masterData/MasterDataView";
+import ParkingDashboardView from "./views/parking/ParkingDashboardView";
+import ParkingConsoleView from "./views/parking/ParkingConsoleView";
+import PgsReportView from "./views/parking/ParkingReportView";
+import ParkingInOutView from "./views/parking/ParkingInOutView";
+import PeopleCounting from "./views/PeopleCount/PeopleCounting";
+import ApcDashboard from "./views/PeopleCount/ApcDashboard";
+import AtccView from "./views/atcc/AtccView";
+import AtccSummaryView from "./views/atcc/AtccSummaryView";
+import HighwayIncidentView from "./views/vids/HighwayIncidentView";
+import HighwayIncidentDashboardView from "./views/vids/HighwayIncidentDashboardView";
+import AnprReportView from "./views/anpr/AnprReportView";
 import FaceMatchView from "./components/facerec/FaceMatchView";
 
 const {Content} = Layout;
@@ -57,14 +67,14 @@ class App extends Component {
                 <Layout style={{minHeight: '100vh'}}>
                     {sideBar}
                     <Layout>
-                        {header}
-                        <Content style={{margin: '24px 16px 0'}}>
-                            <div style={{padding: 4}} >
+                        <Content style={{margin: '16px'}}>
+                            <div style={{padding: 4}}>
                                 <Route path='/login' exact={true} component={LoginView}/>
                                 <PrivateRoute path='/' exact={true} component={HomeView}/>
                                 <PrivateRoute path='/incidents' exact={true} component={TrafficIncidentView}/>
                                 <PrivateRoute path='/incidents/hotlisted' exact={true} component={IncidentHotlistView}/>
                                 <PrivateRoute path='/incidents/repeated' exact={true} component={IncidentRepeatedView}/>
+                                <PrivateRoute path='/anpr/report' exact={true} component={AnprReportView}/>
                                 <PrivateRoute path='/anpr' exact={true} component={AnprView}/>
                                 <PrivateRoute path='/anpr/masterdata' exact={true} component={MasterDataView}/>
                                 <PrivateRoute path='/user' exact={true} component={UserListView}/>
@@ -72,6 +82,25 @@ class App extends Component {
                                 <PrivateRoute path='/trigger' exact={true} component={TriggerView}/>
                                 <PrivateRoute path='/device' exact={true} component={DeviceView}/>
                                 <PrivateRoute path='/device/conf' exact={true} component={DeviceConfigView}/>
+                                <PrivateRoute path='/people-counting/events' exact={true} component={PeopleCounting}/>
+
+
+                                {/* PGS is parking guideance and management system */}
+                                <PrivateRoute path='/pgs/dashboard' exact={true} component={ParkingDashboardView}/>
+                                <PrivateRoute path='/pgs/console' exact={true} component={ParkingConsoleView}/>
+                                <PrivateRoute path='/pgs/inout' exact={true} component={ParkingInOutView}/>
+                                <PrivateRoute path='/pgs/reports' exact={true} component={PgsReportView}/>
+                                <PrivateRoute path='/people-counting/Dashboard' exact={true} component={ApcDashboard}/>
+
+                                {/* atcc */}
+                                <PrivateRoute path='/atcc' exact={true} component={AtccView}/>
+                                <PrivateRoute path='/atcc/summary' exact={true} component={AtccSummaryView}/>
+
+                                {/* vids */}
+                                <PrivateRoute path='/vids' exact={true} component={HighwayIncidentView}/>
+                                <PrivateRoute path='/vids/dashboard' exact={true} component={HighwayIncidentDashboardView}/>
+
+                                {/* face rec */}
                                 <PrivateRoute path='/ngofr' exact={true} component={FaceMatchView}/>
                             </div>
                         </Content>
