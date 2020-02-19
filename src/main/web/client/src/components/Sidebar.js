@@ -74,6 +74,9 @@ export default class Sidebar extends Component {
                         <Menu.Item key="2" className="sidebar-nav-link">
                             <Link to='/anpr/masterdata'><span className='nav-text'>Repeated Events</span></Link>
                         </Menu.Item>
+                        <Menu.Item key="3" className="sidebar-nav-link">
+                            <Link to='/anpr/report'><span className='nav-text'>ANPR Report</span></Link>
+                        </Menu.Item>
                     </SubMenu>
                     <SubMenu key="sub2" title={
                         <span>
@@ -88,6 +91,7 @@ export default class Sidebar extends Component {
                         <Menu.Item key="4" className="sidebar-nav-link">
                             <Link to='/incidents/repeated'><span className='nav-text'>Repeated Events</span></Link>
                         </Menu.Item>
+
                     </SubMenu>
 
                     <Menu.Item key="5" className="sidebar-nav-link">

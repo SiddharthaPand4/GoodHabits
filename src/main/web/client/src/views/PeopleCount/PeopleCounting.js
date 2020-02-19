@@ -26,6 +26,7 @@ export default class PeopleCounting extends Component {
                 pageSize: 24
 
             },
+            pageSizeOptions:[12,24,48,96]
         };
 
         this.refresh = this.refresh.bind(this);
@@ -125,7 +126,8 @@ export default class PeopleCounting extends Component {
             showQuickJumper: true,
             onShowSizeChange: this.onPageSizeChange,
             onChange: this.onPageChange,
-            total: count
+            total: count,
+            pageSizeOptions:this.state.pageSizeOptions
         };
         const pagination = {
             ...paginationOptions,
