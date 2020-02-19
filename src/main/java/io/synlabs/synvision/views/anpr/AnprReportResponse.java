@@ -9,9 +9,6 @@ public class AnprReportResponse {
     public String date;
     public Long totalEvents;
 
-    public AnprReportResponse(Long events) {
-        this.totalEvents = events == null ? 0 : events;
-    }
 
     public AnprReportResponse(Long events ,String date) {
         this.totalEvents = events == null ? 0 : events;
