@@ -118,8 +118,9 @@ class UserForm extends Component {
     }
 
     lookup() {
+        let self = this;
         FaceMatchService.lookup(this.state.image).then(response => {
-            this.setState({userdata: response.data});
+            this.setState({userdata: response.data, validationError:null});
             EventBus.publish('frs-refresh', response.data)
         }).catch(function (error) {
             if (error.response.data.message) {

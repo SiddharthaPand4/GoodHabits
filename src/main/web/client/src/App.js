@@ -21,7 +21,7 @@ import AnprView from "./views/anpr/AnprView";
 import TrafficIncidentView from "./views/TrafficIncidentView";
 import IncidentRepeatedView from "./views/incidents/IncidentRepeatedView";
 import IncidentHotlistView from "./views/IncidentHotlistView";
-import MasterDataView from "./views/masterData/MasterDataView";
+import MasterDataView from "./views/anpr/MasterDataView";
 import ParkingDashboardView from "./views/parking/ParkingDashboardView";
 import ParkingConsoleView from "./views/parking/ParkingConsoleView";
 import PgsReportView from "./views/parking/ParkingReportView";
@@ -34,6 +34,7 @@ import HighwayIncidentView from "./views/vids/HighwayIncidentView";
 import HighwayIncidentDashboardView from "./views/vids/HighwayIncidentDashboardView";
 import AnprReportView from "./views/anpr/AnprReportView";
 import FaceMatchView from "./components/facerec/FaceMatchView";
+import AttendanceListView from "./components/facerec/AttendanceListView";
 
 const {Content} = Layout;
 
@@ -76,7 +77,7 @@ class App extends Component {
                                 <PrivateRoute path='/incidents/repeated' exact={true} component={IncidentRepeatedView}/>
                                 <PrivateRoute path='/anpr/report' exact={true} component={AnprReportView}/>
                                 <PrivateRoute path='/anpr' exact={true} component={AnprView}/>
-                                <PrivateRoute path='/anpr/masterdata' exact={true} component={MasterDataView}/>
+                                {/*<PrivateRoute path='/anpr/masterdata' exact={true} component={MasterDataView}/>*/}
                                 <PrivateRoute path='/user' exact={true} component={UserListView}/>
                                 <PrivateRoute path='/feed' exact={true} component={FeedView}/>
                                 <PrivateRoute path='/trigger' exact={true} component={TriggerView}/>
@@ -102,6 +103,7 @@ class App extends Component {
 
                                 {/* face rec */}
                                 <PrivateRoute path='/ngofr' exact={true} component={FaceMatchView}/>
+                                <PrivateRoute path='/frs/list' exact={true} component={AttendanceListView}/>
                             </div>
                         </Content>
                         <Footerbar/>
