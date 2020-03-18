@@ -35,6 +35,7 @@ export default class Sidebar extends Component {
 
         return (
             <Sider
+                className={"no-print"}
                 collapsible
                 breakpoint="lg"
                 collapsedWidth="0"

@@ -71,6 +71,7 @@ public class AnprService extends BaseService {
 
     public PageResponse<AnprResponse> list(AnprFilterRequest request) {
         BooleanExpression query = getQuery(request);
+
         int count = (int) anprEventRepository.count(query);
         int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
         Pageable paging = PageRequest.of(request.getPage() - 1, request.getPageSize(), Sort.by(DESC, "eventDate"));

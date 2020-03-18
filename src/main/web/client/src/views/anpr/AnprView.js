@@ -12,7 +12,7 @@ import {
     Tag,
     Input, Button, Menu, Dropdown, Typography, Slider,
     Modal,
-    message,  Form
+    message, Form, Spin
 } from 'antd';
 import GenericFilter from "../../components/GenericFilter";
 import Moment from "react-moment";
@@ -21,6 +21,7 @@ import Magnifier from "react-magnifier";
 import moment from "moment";
 import {saveAs} from "file-saver";
 import AnprReportService from "../../services/AnprReportService";
+import ReactToPrint from 'react-to-print';
 
 const {Paragraph, Text} = Typography;
 
@@ -33,13 +34,16 @@ export default class AnprView extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            activePanelKey: ["1"],
             visible: true,
             loading: true,
             layout: "list",
             events: {},
             filter: {
                 page: 1,
-                pageSize: 12
+                pageSize: 12,
+                lpr: ""
+
             },
             workingEvent: {},
             workingEventLoading: false,
@@ -50,10 +54,11 @@ export default class AnprView extends Component {
                 maxZoomFactor: 5
             },
             downloading: false,
-            pageSizeOptions:[12,24,48,96]
+            pageSizeOptions: ['12', '24', '48', '96', "500", "1000"]
         };
 
         this.refresh = this.refresh.bind(this);
+
         this.handleFilterChange = this.handleFilterChange.bind(this);
         this.handleLayoutChange = this.handleLayoutChange.bind(this);
         this.handleRefresh = this.handleRefresh.bind(this);
@@ -64,9 +69,12 @@ export default class AnprView extends Component {
         this.updateEvent = this.updateEvent.bind(this);
         this.magnifyEvent = this.magnifyEvent.bind(this);
         this.updateZoomFactor = this.updateZoomFactor.bind(this);
-        this.downloadAnprReport=this.downloadAnprReport.bind(this);
+        this.downloadAnprReport = this.downloadAnprReport.bind(this);
 
+        this.preparePrint = this.preparePrint.bind(this);
+        this.onCollapse = this.onCollapse.bind(this);
 
+        this.componentRef = React.createRef()
     }
 
     componentDidMount() {
@@ -74,15 +82,12 @@ export default class AnprView extends Component {
     }
 
     refresh() {
-        AnprService.getEvents(this.state.filter).then(request => {
-            this.setState({"anprresponse": request.data, loading: false})
-        })
-    }
-
-    //cant use refresh to read from state as state may not have been set
-    refreshNow(filter) {
-        AnprService.getEvents(this.state.filter).then(request => {
-            this.setState({"anprresponse": request.data, loading: false})
+        this.setState({loading: true});
+        AnprService.getEvents(this.state.filter).then(response => {
+            this.setState({"anprresponse": response.data, loading: false})
+        }).catch(error => {
+            alert("Something went wrong!");
+            this.setState({loading: false});
         })
     }
 
@@ -96,7 +101,6 @@ export default class AnprView extends Component {
 
         let filter = this.state.filter;
         filter.lpr = e.target.value;
-        console.log(filter);
         this.setState({filter: filter})
     }
 
@@ -109,7 +113,6 @@ export default class AnprView extends Component {
     }
 
     handleOnClick = e => {
-        console.log(e);
         this.setState({
             visible: false,
         });
@@ -123,13 +126,17 @@ export default class AnprView extends Component {
         let filter = this.state.filter;
         filter.page = page;
         filter.pageSize = pageSize;
-        this.refreshNow(filter)
+        this.setState({filter}, () => {
+            this.refresh();
+        });
     }
 
     onPageSizeChange(current, pageSize) {
         let filter = this.state.filter;
         filter.pageSize = pageSize;
-        this.refreshNow(filter);
+        this.setState({filter}, () => {
+            this.refresh();
+        });
     }
 
     editEvent(event) {
@@ -168,15 +175,15 @@ export default class AnprView extends Component {
             this.setState({workingEventLoading});
         })
     }
-//shashank
-    downloadAnprReport(){
-        this.setState({downloading:true})
-        let filter= this.state.filter;
-        var req={
-            fromDateString: filter.from_date !=null?moment(filter.fromDate).format('YYYY-MM-DD HH:mm:ss'):"",
-            toDateString:filter.to_date !=null? moment(filter.toDate).format('YYYY-MM-DD HH:mm:ss"'):"",
-            lpr:filter.lpr,
-        }
+
+    downloadAnprReport() {
+        this.setState({downloading: true})
+        let filter = this.state.filter;
+        let req = {
+            fromDateString: filter.from_date != null ? moment(filter.fromDate).format('YYYY-MM-DD HH:mm:ss') : "",
+            toDateString: filter.to_date != null ? moment(filter.toDate).format('YYYY-MM-DD HH:mm:ss"') : "",
+            lpr: filter.lpr,
+        };
 
         AnprReportService.getAnprEventsReport(req).then(response => {
             this.setState({downloading: false});
@@ -186,37 +193,62 @@ export default class AnprView extends Component {
         });
     }
 
-    //shashank
+    preparePrint() {
+        //this.onCollapse()
+        //this.setState({activePanelKey: []})
+        window.print();
+
+    }
+
+    onCollapse(change) {
+        this.setState({activePanelKey: change})
+    }
 
     render() {
 
         let layout = this.state.layout;
         let lpr = this.state.filter.lpr;
+        let activePanelKey = this.state.activePanelKey;
 
         return (
             <div>
                 <h3>ANPR</h3>
-                <Collapse bordered={false} defaultActiveKey={['1']}>
-                    <Panel header="Filter" key="1">
+                <Button onClick={this.preparePrint}>windoew print <Icon type="printer"/></Button>
+                <ReactToPrint
+                    trigger={() => <Button>Print this out! <Icon type="printer"/></Button>}
+                    content={() => this.componentRef}
+                />
 
-                        LPR: <Input value={lpr} style={{"width": "200px"}} onChange={this.onLprInputChange}/>&nbsp;&nbsp;
-                        <Button onClick={() => {
-                            this.downloadAnprReport()
-                        }}><Icon type="download"/>Download</Button>
+                <div ref={el => (this.componentRef = el)}>
+                    <Collapse className={"no-print"} bordered={false} defaultActiveKey={['1']}
+                              activeKey={activePanelKey}
+                              onChange={(e) => this.onCollapse(e)}>
+                        <Panel header="Filter" key="1">
 
-                        <br/><br/>
-                        <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
-                                       handleFilterChange={this.handleFilterChange}
-                                       handleLayoutChange={this.handleLayoutChange}
-                        />
+                            LPR: <Input value={lpr} style={{"width": "200px"}}
+                                        onChange={this.onLprInputChange}/>&nbsp;&nbsp;
+                            <Button onClick={() => {
+                                this.downloadAnprReport()
+                            }}><Icon type="download"/>Download</Button>
+
+                            <br/><br/>
+                            <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
+                                           handleFilterChange={this.handleFilterChange}
+                                           handleLayoutChange={this.handleLayoutChange}
+                            />
 
 
+                        </Panel>
+                    </Collapse>
 
-                    </Panel>
-                </Collapse>
-                <div>
-                    {layout === "table" ? (this.renderTable()) : (this.renderGrid())}
+                    <div>
+                        <Spin spinning={this.state.loading}>
+                            {layout === "table" ? (this.renderTable()) : (this.renderGrid())}
+                        </Spin>
+                    </div>
                 </div>
+
+
             </div>)
     }
 
@@ -327,7 +359,7 @@ export default class AnprView extends Component {
                                     <Text
                                         type="secondary">{(workingEventLoading && workingEvent.id === event.id) ? "saving..." : ""}</Text>
                                     <Text
-                                        type="secondary">{(event.speed) ? "Speed: "+event.speed : ""}</Text>
+                                        type="secondary">{(event.speed) ? "Speed: " + event.speed : ""}</Text>
                                     <div>
                                         <Text code><Icon type="schedule"/> <Moment
                                             format="ll">{event.eventDate}</Moment>{' '}|{' '}<Moment
@@ -370,7 +402,7 @@ export default class AnprView extends Component {
             onShowSizeChange: this.onPageSizeChange,
             onChange: this.onPageChange,
             total: count,
-            pageSizeOptions:this.state.pageSizeOptions
+            pageSizeOptions: this.state.pageSizeOptions
         };
 
         const pagination = {

@@ -25,7 +25,8 @@
     "react-scripts": "3.1.1",
     "react-table-6": "^6.11.0",
     "use-image": "^1.0.5",
-    "video-react": "^0.14.1"
+    "video-react": "^0.14.1",
+    "react-to-print": "2.6.3"
   },
   "scripts": {
     "start": "./node_modules/.bin/react-scripts start",
