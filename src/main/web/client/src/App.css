@@ -10,10 +10,6 @@
     .no-print, .no-print * {
         display: none !important;
         -webkit-print-color-adjust: exact;
-        font-size: 5pt;
-        /*size: 25cm 35.7cm;
-        margin: 5mm 5mm 5mm 5mm;*/
-
     }
 
     body, main {
