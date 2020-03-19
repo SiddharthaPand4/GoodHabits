@@ -9,7 +9,7 @@
     <version>0.9.6</version>
     <name>synvision</name>
     <description>Synvision Management Application</description>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
