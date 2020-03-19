@@ -21,7 +21,6 @@ import Magnifier from "react-magnifier";
 import moment from "moment";
 import {saveAs} from "file-saver";
 import AnprReportService from "../../services/AnprReportService";
-import ReactToPrint from 'react-to-print';
 
 const {Paragraph, Text} = Typography;
 
@@ -74,7 +73,6 @@ export default class AnprView extends Component {
         this.preparePrint = this.preparePrint.bind(this);
         this.onCollapse = this.onCollapse.bind(this);
 
-        this.componentRef = React.createRef()
     }
 
     componentDidMount() {
@@ -194,11 +192,9 @@ export default class AnprView extends Component {
     }
 
     preparePrint() {
-        //this.onCollapse()
-        //this.setState({activePanelKey: []})
         window.print();
-
     }
+
 
     onCollapse(change) {
         this.setState({activePanelKey: change})
@@ -213,13 +209,9 @@ export default class AnprView extends Component {
         return (
             <div>
                 <h3>ANPR</h3>
-                <Button onClick={this.preparePrint}>windoew print <Icon type="printer"/></Button>
-                <ReactToPrint
-                    trigger={() => <Button>Print this out! <Icon type="printer"/></Button>}
-                    content={() => this.componentRef}
-                />
 
-                <div ref={el => (this.componentRef = el)}>
+
+                <div>
                     <Collapse className={"no-print"} bordered={false} defaultActiveKey={['1']}
                               activeKey={activePanelKey}
                               onChange={(e) => this.onCollapse(e)}>
@@ -227,9 +219,11 @@ export default class AnprView extends Component {
 
                             LPR: <Input value={lpr} style={{"width": "200px"}}
                                         onChange={this.onLprInputChange}/>&nbsp;&nbsp;
-                            <Button onClick={() => {
+                            <Button type="dashed" style={{float: "right"}} onClick={() => {
                                 this.downloadAnprReport()
-                            }}><Icon type="download"/>Download</Button>
+                            }}><Icon type="file-excel"/></Button>
+                            <Button type="dashed" style={{float: "right"}} onClick={this.preparePrint}>Print <Icon
+                                type="printer"/></Button>
 
                             <br/><br/>
                             <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
@@ -413,13 +407,13 @@ export default class AnprView extends Component {
         };
 
         return (
-            <Table dataSource={events} pagination={pagination}>
+            <Table dataSource={events} pagination={pagination} size="small">
                 <Column title="Location" dataIndex="location" key="location"
                         render={location => location}/>
                 <Column title="Date" dataIndex="eventDate" key="eventDate"
                         render={eventDate => (<Moment format="L">{eventDate}</Moment>)}/>
                 <Column title="Time" dataIndex="eventDate" key="eventTime"
-                        render={eventDate => (<Moment format="LTS">{eventDate}</Moment>)}/>
+                        render={eventDate => (<Moment format="LT">{eventDate}</Moment>)}/>
                 <Column title="LPR" dataIndex="anprText" key="anprText"
                         render={anprText => anprText}/>
                 <Column title="LP Image" dataIndex="id" key="anprimage"
@@ -427,8 +421,9 @@ export default class AnprView extends Component {
                             <a title={"click here to download"} href={"/public/anpr/lpr/" + id + "/image.jpg"}
                                download={true}>
                                 <img alt="event"
+                                     style={{maxWidth: 120}}
                                      src={"/public/anpr/lpr/" + id + "/image.jpg"}/></a> )}/>
-                <Column title="direction" dataIndex="direction" key="direction"
+                <Column title="Direction" dataIndex="direction" key="direction"
                         render={direction => direction}/>
                 <Column title="Helmet?" dataIndex="helmet" key="helmet"
                         render={helmet => helmet ? <span>No</span> : <span>N/A</span>}/>
@@ -437,8 +432,9 @@ export default class AnprView extends Component {
                 <Column title="Action"
                         key="action"
                         render={(text, event) => (
-                            <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon type="warning"/>{' '}
-                                Archive</Button>
+                            <Button type="danger" title={"Archive"} onClick={() => this.archiveEvent(event)}><Icon
+                                type="warning"/>{' '}
+                            </Button>
                         )}
                 />
 
