@@ -53,7 +53,7 @@ export default class AnprView extends Component {
                 maxZoomFactor: 5
             },
             downloading: false,
-            pageSizeOptions: ['12', '24', '48', '96', "500", "1000"]
+            pageSizeOptions: ['12', '24', '48', '100', "250", "500", "1000", "2500", "5000"]
         };
 
         this.refresh = this.refresh.bind(this);
