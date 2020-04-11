@@ -3,19 +3,27 @@ package io.synlabs.synvision.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.synlabs.synvision.entity.core.Module;
+import io.synlabs.synvision.ex.UploadException;
 import io.synlabs.synvision.jpa.ModuleRepository;
 import io.synlabs.synvision.views.core.Menu;
 import io.synlabs.synvision.views.core.MenuItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @Component
@@ -32,11 +40,26 @@ public class UserMenuBuilder {
 
     private Menu navigation;
 
+    @Value("${file.upload-dir}")
+    private String uploaddir;
+
 
     @PostConstruct
     public void init() {
 
         //List<Module> modules = moduleRepository.findByEnabledTrue();
+        Path uploadpath = Paths.get(uploaddir);
+        if (uploadpath.toFile().exists()) {
+            if (!uploadpath.toFile().isDirectory()) {
+                logger.error("{} is not a dir, cant continue", uploaddir);
+                throw new UploadException(uploaddir + "is not a dir, cant continue");
+            }
+        } else {
+            if (!uploadpath.toFile().mkdirs()) {
+                logger.error("cannot create upload directory", uploaddir);
+                throw new UploadException(uploaddir + "cannot create upload directory!");
+            }
+        }
 
         navigation = new Menu();
         try {
@@ -45,8 +68,13 @@ public class UserMenuBuilder {
                     .getResources("classpath*:/menu/*.json");
 
             for (Resource resource : resources) {
-                logger.info("Loaded menu from {}", resource.getFilename());
-                MenuItem item = jsonMapper.readValue(resource.getFile(), MenuItem.class);
+                Path finalOutputPath = uploadpath.resolve(resource.getFilename());
+                InputStream inputStream = resource.getInputStream();
+                Files.copy(inputStream, finalOutputPath, StandardCopyOption.REPLACE_EXISTING);
+                File file = finalOutputPath.toFile();
+
+                logger.info("Loaded menu from {}", file.getName());
+                MenuItem item = jsonMapper.readValue(file, MenuItem.class);
                 navigation.merge(item);
             }
 
