@@ -7,5 +7,6 @@ public enum HighwayIncidentType {
     StoppedVehicle,
     Deceleration,
     FogSmoke,
-    NoVideo
+    NoVideo,
+    Animal
 }
