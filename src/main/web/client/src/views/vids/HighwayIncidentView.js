@@ -14,8 +14,9 @@ import {
 import GenericFilter from "../../components/GenericFilter";
 import Moment from "react-moment";
 import VidsService from "../../services/VidsService";
-import { Player } from 'video-react';
+import {Player} from 'video-react';
 import "video-react/dist/video-react.css";
+
 const {Text} = Typography;
 
 const {Column} = Table;
@@ -149,8 +150,20 @@ export default class HighwayIncidentView extends Component {
                                         </div>
                                         <div style={{marginTop: "5px", textAlign: "left"}}>
                                             <div>
+                                                {event.feed
+                                                    ? <Text code>
+                                                        <Icon type="environment"/>
+                                                        {event.feed.site} > {event.feed.location} > {event.feed.name}
+                                                    </Text>
+                                                    : <Text code>
+                                                        <Icon type="environment"/>
+                                                        {event.feed.site} > {event.feed.location} > {event.feed.name}
+                                                    </Text>
+                                                }
                                                 <Text code>
-                                                    <Icon type="environment"/> {event.feed.site} > {event.feed.location} > {event.feed.name}</Text>
+                                                    <Icon type="environment"/>
+                                                    {event.feed.site} > {event.feed.location} > {event.feed.name}
+                                                </Text>
                                             </div>
                                         </div>
 
