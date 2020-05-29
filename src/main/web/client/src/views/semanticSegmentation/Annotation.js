@@ -45,6 +45,8 @@ export default compose(
         onMouseDown: T.func,
         onMouseMove: T.func,
         onClick: T.func,
+        // This prop represents how zoom the image is (default: 1)
+        //imageZoomAmount: T.number,
         // For Polygon Selector
         onSelectionComplete: T.func,
         onSelectionClear: T.func,
@@ -94,17 +96,25 @@ export default compose(
     static defaultProps = defaultProps
 
     componentDidMount = () => {
-        window.addEventListener("resize", this.windowResizing);
+        //window.addEventListener("resize", this.windowResizing);
+        window.addEventListener("resize", this.forceUpdateComponent);
     }
 
     componentWillUnmount = () => {
-        window.removeEventListener("resize", this.windowResizing);
+        //window.removeEventListener("resize", this.windowResizing);
+        window.removeEventListener("resize", this.forceUpdateComponent);
     }
-
-    windowResizing = () => {
+    forceUpdateComponent = () => {
         this.forceUpdate();
     }
-
+   //windowResizing = () => {
+   //    this.forceUpdate();
+   //}
+    componentDidUpdate = prevProps => {
+        if (prevProps.imageZoomAmount !== this.props.imageZoomAmount) {
+            this.forceUpdateComponent();
+        }
+    }
     setInnerRef = (el) => {
         this.container = el
         this.props.relativeMousePos.innerRef(el)
