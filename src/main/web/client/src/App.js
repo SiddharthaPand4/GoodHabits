@@ -33,6 +33,9 @@ import AtccSummaryView from "./views/atcc/AtccSummaryView";
 import HighwayIncidentView from "./views/vids/HighwayIncidentView";
 import HighwayIncidentDashboardView from "./views/vids/HighwayIncidentDashboardView";
 import AnprReportView from "./views/anpr/AnprReportView";
+import Semantic from "./views/semanticSegmentation/Semantic";
+import PolygonView from "./views/Polygon/PolygonView";
+//import Semantic from "./views/semanticSegmentation/Semantic";
 
 const {Content} = Layout;
 
@@ -98,6 +101,8 @@ class App extends Component {
                                 {/* vids */}
                                 <PrivateRoute path='/vids' exact={true} component={HighwayIncidentView}/>
                                 <PrivateRoute path='/vids/dashboard' exact={true} component={HighwayIncidentDashboardView}/>
+                                <PrivateRoute path='/polygon' exact={true} component={Semantic}/>
+                                <PrivateRoute path='/polygonview' exact={true} component={PolygonView}/>
                             </div>
                         </Content>
                         <Footerbar/>

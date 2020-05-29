@@ -1,0 +1,113 @@
+@import '../../../node_modules/antd/dist/antd.css';
+
+.logo {
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 16px;
+}
+
+.breadCrumb{
+    margin: auto;
+    padding-left: 5px;
+    background-color:lightskyblue;
+    border-radius: 5px;
+}
+
+
+
+.dashboardcard{
+    height: 100px ;
+    width: 220px;
+    border:1px solid #3c6384;
+    box-shadow:0 8px 8px 0px #BEBEBE;
+    margin: 10px 10px 10px 10px;
+    background-color: #F1F2F6;
+}
+
+.dashboardcard:hover{
+    border:3px solid #3c6384;
+    box-shadow:0 15px 15px 0 slategrey;
+}
+
+
+.Innercard{
+    min-height: 200px;
+    border:1px solid #BEBEBE;
+    box-shadow:0 8px 8px 0 #BEBEBE;
+    margin-top: 50px;
+}
+.site-page-header {
+    background-color: #ff5402;
+
+}
+.ant-page-header-heading-title {
+    display: block;
+    float: left;
+    margin-bottom: 0;
+    padding-right: 12px;
+    color: white;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 32px;
+}
+.ant-page-header-back-button {
+    text-decoration: none;
+    outline: none;
+    -webkit-transition: color 0.3s;
+    transition: color 0.3s;
+    color: #fff;
+    cursor: pointer;
+}
+.ant-page-header-back-button:hover{
+    color: #3c6384;
+}
+
+.div-dataset{
+    height: 40px;
+    border: 1px solid #BEBEBE;
+    background-color:dodgerblue
+}
+.div-dataset:hover{
+    box-shadow:0 8px 8px 0 #BEBEBE;
+    border: 1px solid #BEBEBE;
+}
+
+
+.button{
+    border-radius: 4px;
+    background-color: #3c6384;
+    border:1px solid #3c6384;
+    color:#ffffff;
+}
+ .ant-btn:hover {
+     color: #ffffff;
+    background-color: #043957;
+     border:1px solid #3c6384;
+}
+
+
+
+
+
+
+
+.ant-tabs.ant-tabs-card .ant-tabs-card-bar .ant-tabs-tab-active {
+    height: 40px;
+    color: white;
+    background: #3c6384;
+
+
+}
+.ant-tabs-vertical.ant-tabs-card.ant-tabs-left .ant-tabs-card-bar.ant-tabs-left-bar .ant-tabs-tab {
+    margin-right: 1px;
+    border-radius: 10px 0px 0px 10px;
+    border: 1px solid #3c6384;
+}
+.ant-tabs .ant-tabs-left-content {
+    padding-left: 0px;
+
+}
+
+
+
+
