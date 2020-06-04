@@ -122,6 +122,15 @@ export default class HighwayIncidentView extends Component {
             </div>)
     }
 
+    getFeedString(event) {
+        let result = "NA";
+        if (event && event.feed) {
+            result = event.feed.site + " > " + event.feed.location + " > " + event.feed.name;
+        }
+        return result;
+
+    }
+
     renderGrid() {
 
 
@@ -150,19 +159,9 @@ export default class HighwayIncidentView extends Component {
                                         </div>
                                         <div style={{marginTop: "5px", textAlign: "left"}}>
                                             <div>
-                                                {event.feed
-                                                    ? <Text code>
-                                                        <Icon type="environment"/>
-                                                        {event.feed.site} > {event.feed.location} > {event.feed.name}
-                                                    </Text>
-                                                    : <Text code>
-                                                        <Icon type="environment"/>
-                                                        {event.feed.site} > {event.feed.location} > {event.feed.name}
-                                                    </Text>
-                                                }
                                                 <Text code>
                                                     <Icon type="environment"/>
-                                                    {event.feed.site} > {event.feed.location} > {event.feed.name}
+                                                    {this.getFeedString(event)}
                                                 </Text>
                                             </div>
                                         </div>
