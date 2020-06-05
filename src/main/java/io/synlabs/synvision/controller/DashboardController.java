@@ -3,6 +3,7 @@ package io.synlabs.synvision.controller;
 import io.synlabs.synvision.service.DashboardService;
 import io.synlabs.synvision.views.DashboardRequest;
 import io.synlabs.synvision.views.DashboardResponse;
+import io.synlabs.synvision.views.anpr.AnprVehicleCountResponse;
 import io.synlabs.synvision.views.atcc.AtccVehicleCountResponse;
 import io.synlabs.synvision.views.incident.IncidentGroupCountResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,10 @@ public class DashboardController {
         return dashboardService.getIncidentsCount(request);
     }
 
+    @PostMapping("anpr/vehicle/count")
+    public List<AnprVehicleCountResponse> getAnprCount(@RequestBody DashboardRequest request){
+        return dashboardService.getAnprCount(request);
+    }
 
 
 

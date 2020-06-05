@@ -650,16 +650,28 @@ public class AnprService extends BaseService {
 
         QAnprEvent anprEvent = QAnprEvent.anprEvent;
         JPAQuery<AnprEvent> query = new JPAQuery<>(entityManager);
+        JPAQuery<AnprEvent> query1 = new JPAQuery<>(entityManager);
+        JPAQuery<AnprEvent> query2 = new JPAQuery<>(entityManager);
+
         Date eventDate = null;
         Long eventCount= null ;
-        List<com.querydsl.core.Tuple> result = null;
-        String xAxis = StringUtils.isEmpty(request.getXAxis()) ? "" : request.getXAxis();
-        Map<Date, AnprReportResponse> totalEventsByDate = new TreeMap<Date, AnprReportResponse>();
+        String vehicleClass= null ;
 
+        List<com.querydsl.core.Tuple> result = null;
+        List<com.querydsl.core.Tuple> result1 = null;
+        String xAxis = StringUtils.isEmpty(request.getXAxis()) ? "" : request.getXAxis();
+        Map<Date, List<AnprReportResponse>> totalEventsByDate = new TreeMap<Date, List<AnprReportResponse>>();
+        Map<Date, AnprReportJsonResponse> totalEventsByDateForJsonFormat = new TreeMap<Date, AnprReportJsonResponse>();
+
+        List<String> vehicleClassList= query1.select(anprEvent.vehicleClass).distinct()
+                                    .from(anprEvent)
+                                    .fetch();
         switch (xAxis) {
 
             case "DayWise Summary":
-                result = query
+
+                //---FOR JSON format
+                result1 = query2
                         .select(anprEvent.eventDate,
                                 anprEvent.count())
                         .from(anprEvent)
@@ -667,6 +679,35 @@ public class AnprService extends BaseService {
                         .groupBy(anprEvent.eventDate.dayOfMonth(), anprEvent.eventDate.month(), anprEvent.eventDate.year())
                         .orderBy(anprEvent.eventDate.asc())
                         .fetch();
+
+
+                for (int i = 0; i < result1.size(); i++) {
+                    com.querydsl.core.Tuple tuple = result1.get(i);
+
+                    eventDate = tuple.get(0, Date.class);
+                    String eventDateString = toFormattedDate(eventDate,"dd/MM/yyyy");
+
+                    try {
+                        eventDate= sdf1.parse(eventDateString);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    eventCount = tuple.get(1, Long.class);
+
+                    totalEventsByDateForJsonFormat.put(eventDate,new AnprReportJsonResponse(eventCount,eventDateString));
+                    result1.set(i, null);
+                }
+
+                //---- For CSV format, groupby with vehicleclass also
+                result = query
+                        .select(anprEvent.eventDate,anprEvent.vehicleClass,
+                                anprEvent.count())
+                        .from(anprEvent)
+                        .where(anprEvent.eventDate.between(request.getFrom(),request.getTo()))
+                        .groupBy(anprEvent.eventDate.dayOfMonth(), anprEvent.eventDate.month(), anprEvent.eventDate.year(),anprEvent.vehicleClass)
+                        .orderBy(anprEvent.eventDate.asc())
+                        .fetch();
+
 
 
                 for (int i = 0; i < result.size(); i++) {
@@ -680,18 +721,28 @@ public class AnprService extends BaseService {
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                    eventCount = tuple.get(1, Long.class);
 
-                    totalEventsByDate.put(eventDate,new AnprReportResponse(eventCount,eventDateString));
+                    vehicleClass =tuple.get(1,String.class);
+                    eventCount = tuple.get(2, Long.class);
+
+                    AnprReportResponse response= new AnprReportResponse(vehicleClass,eventCount,eventDateString);
+                    List<AnprReportResponse> responses= totalEventsByDate.get(eventDate);
+                    if(responses==null){
+                        responses= new ArrayList<AnprReportResponse>() ;
+                    }
+
+                    responses.add(response);
+
+                    totalEventsByDate.put(eventDate,responses);
                     result.set(i, null);
                 }
 
 
                 break;
         }
-        List<AnprReportResponse> responses = new ArrayList<>();
-        for(Date date: totalEventsByDate.keySet()){
-            responses.add(new AnprReportResponse( totalEventsByDate.get(date).getTotalEvents(),toFormattedDate(date,"dd/MM/yyyy")));
+        List<AnprReportJsonResponse> responses = new ArrayList<>();
+        for(Date date: totalEventsByDateForJsonFormat.keySet()){
+            responses.add(new AnprReportJsonResponse( totalEventsByDateForJsonFormat.get(date).getTotalEvents(),toFormattedDate(date,"dd/MM/yyyy")));
         }
 
         Path path = Paths.get(uploadDirPath);
@@ -705,23 +756,40 @@ public class AnprService extends BaseService {
                 fileWriter.append(',');
                 fileWriter.append("Date");
                 fileWriter.append(',');
+                for(String vehicleclass : vehicleClassList){
+                    fileWriter.append(vehicleclass);
+                    fileWriter.append(',');
+                }
                 fileWriter.append("Total Events");
                 fileWriter.append('\n');
 
                 int i=0;
-                for (AnprReportResponse response1: responses) {
 
+                for (Date key : totalEventsByDate.keySet()){
                     fileWriter.append(String.valueOf('"')).append(String.valueOf(i+1)).append(String.valueOf('"'));
                     fileWriter.append(',');
-                    fileWriter.append(String.valueOf('"')).append(response1.getDate()).append(String.valueOf('"'));
+                    fileWriter.append(String.valueOf('"')).append(toFormattedDate(key,"dd/MM/yyyy")).append(String.valueOf('"'));
                     fileWriter.append(',');
-                    fileWriter.append(String.valueOf('"')).append(String.valueOf(response1.getTotalEvents())).append(String.valueOf('"'));
-
+                    for(String vehicleclass : vehicleClassList){
+                        int count=0;
+                        for(AnprReportResponse anprReportResponse: totalEventsByDate.get(key)){
+                            if(vehicleclass.equals(anprReportResponse.getVehicleClass())){
+                                count= anprReportResponse.getTotalEvents().intValue();
+                                break;
+                            }
+                        }
+                        fileWriter.append(String.valueOf('"')).append(String.valueOf(count)).append(String.valueOf('"'));
+                        fileWriter.append(',');
+                    }
+                    int totalEvents=0;
+                    for(AnprReportResponse anprReportResponse: totalEventsByDate.get(key)){
+                        totalEvents=totalEvents+anprReportResponse.getTotalEvents().intValue();
+                    }
+                    fileWriter.append(String.valueOf('"')).append(String.valueOf(totalEvents)).append(String.valueOf('"'));
                     fileWriter.append('\n');
-
                     i++;
-
                 }
+
                 break;
 
             case "JSON":

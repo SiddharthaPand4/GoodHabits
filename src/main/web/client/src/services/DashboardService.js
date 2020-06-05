@@ -42,6 +42,15 @@ class DashboardService {
         return axios.post('/api/dashboard/atcc/vehicle/count', filter);
     }
 
+    getAnprVehicleCount(fromDate, toDate, xAxis) {
+        let filter = {
+            fromDateString: moment(fromDate).format('YYYY-MM-DD HH:mm:ss'),
+            toDateString: moment(toDate).format('YYYY-MM-DD HH:mm:ss"'),
+            xAxis: xAxis
+        };
+        return axios.post('/api/dashboard/anpr/vehicle/count', filter);
+    }
+
     getIncidentVehicleCount(fromDate, toDate, xAxis) {
         let filter = {
             fromDateString: moment(fromDate).format('YYYY-MM-DD HH:mm:ss'),
