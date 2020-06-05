@@ -567,6 +567,8 @@ public class AnprService extends BaseService {
                 fileWriter.append(',');
                 fileWriter.append("Vehicle Image");
                 fileWriter.append(',');
+                fileWriter.append("Vehicle Class");
+                fileWriter.append(',');
                 fileWriter.append("Direction");
                 fileWriter.append(',');
                 fileWriter.append("Location");
@@ -592,6 +594,8 @@ public class AnprService extends BaseService {
                         fileWriter.append(String.valueOf('"')).append(event.getAnprText()).append(String.valueOf('"'));
                         fileWriter.append(',');
                         fileWriter.append(String.valueOf('"')).append(event.getVehicleImage().concat(".png")).append(String.valueOf('"'));
+                        fileWriter.append(',');
+                        fileWriter.append(String.valueOf('"')).append(event.getVehicleClass()).append(String.valueOf('"'));
                         fileWriter.append(',');
                         fileWriter.append(String.valueOf('"')).append(event.getDirection()).append(String.valueOf('"'));
                         fileWriter.append(',');
