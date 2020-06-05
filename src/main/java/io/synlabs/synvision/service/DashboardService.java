@@ -7,6 +7,7 @@ import io.synlabs.synvision.entity.atcc.QAtccEvent;
 import io.synlabs.synvision.jpa.AnprEventRepository;
 import io.synlabs.synvision.views.DashboardRequest;
 import io.synlabs.synvision.views.DashboardResponse;
+import io.synlabs.synvision.views.anpr.AnprVehicleCountResponse;
 import io.synlabs.synvision.views.atcc.AtccVehicleCountResponse;
 import io.synlabs.synvision.views.incident.IncidentCountResponse;
 import io.synlabs.synvision.views.incident.IncidentGroupCountResponse;
@@ -401,5 +402,74 @@ public class DashboardService extends BaseService {
         }
 
         return responses;
+    }
+
+    public List<AnprVehicleCountResponse> getAnprCount(DashboardRequest request) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            request.setFrom(sdf.parse(request.getFromDateString()));
+            request.setTo(sdf.parse(request.getToDateString()));
+        } catch (ParseException e) {
+            logger.info("Couldn't parse date", request.getFrom());
+        }
+
+        QAnprEvent rawData = QAnprEvent.anprEvent;
+        JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
+        List<Tuple> result = null;
+        Date date = null;
+        Integer timeSpan = null;
+        String vehicleType = null;
+        Long vehicleCount = null;
+        List<AnprVehicleCountResponse> response = new ArrayList<>();
+        String xAxis = StringUtils.isEmpty(request.getXAxis()) ? "" : request.getXAxis();
+
+        switch (xAxis) {
+            case "Hourly":
+                result = query
+                        .select(
+                                rawData.eventDate.hour(),
+                                rawData.vehicleClass,
+                                rawData.count())
+                        .from(rawData)
+                        .where(rawData.eventDate.between(request.getFrom(), request.getTo()))
+                        .groupBy(rawData.eventDate.hour(), rawData.vehicleClass)
+                        .fetch();
+
+                for (int i = 0; i < result.size(); i++) {
+                    Tuple tuple = result.get(i);
+                    timeSpan = tuple.get(0, Integer.class);
+                    vehicleType = tuple.get(rawData.vehicleClass);
+                    vehicleCount = tuple.get(2, Long.class);
+                    response.add(new AnprVehicleCountResponse(timeSpan.toString(), vehicleType, vehicleCount));
+                    result.set(i, null);
+                }
+                break;
+
+            case "Daily":
+            default:
+                result = query
+                        .select(
+                                rawData.eventDate,
+                                rawData.vehicleClass,
+                                rawData.count())
+                        .from(rawData)
+                        .where(rawData.eventDate.between(request.getFrom(), request.getTo()))
+                        .groupBy(rawData.eventDate, rawData.vehicleClass)
+                        .fetch();
+                for (int i = 0; i < result.size(); i++) {
+                    Tuple tuple = result.get(i);
+                    date = tuple.get(0, Date.class);
+                    vehicleType = tuple.get(rawData.vehicleClass);
+                    vehicleCount = tuple.get(2, Long.class);
+                    response.add(new AnprVehicleCountResponse(date.toString(), vehicleType, vehicleCount));
+                    result.set(i, null);
+                }
+                break;
+        }
+
+
+        return response;
     }
 }
