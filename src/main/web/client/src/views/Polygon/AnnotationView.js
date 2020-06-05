@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import {Button, message} from "antd";
 import AnnotationService from "../../services/AnnotationService";
 
-export default class PolygonView extends Component {
+export default class AnnotationView extends Component {
     constructor(props) {
         super(props);
 //added state
