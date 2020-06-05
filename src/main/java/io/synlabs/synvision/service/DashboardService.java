@@ -83,6 +83,7 @@ public class DashboardService extends BaseService {
 
             case "Daily":
             default:
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                 result = query
                         .select(
                                 rawData.eventDate,
@@ -90,14 +91,13 @@ public class DashboardService extends BaseService {
                                 rawData.count())
                         .from(rawData)
                         .where(rawData.eventDate.between(request.getFrom(), request.getTo()))
-                        .groupBy(rawData.eventDate, rawData.type)
+                        .groupBy(rawData.eventDate.dayOfMonth(), rawData.eventDate.month(), rawData.eventDate.year(),rawData.type)
                         .fetch();
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
-                    date = tuple.get(0, Date.class);
                     vehicleType = tuple.get(rawData.type);
                     vehicleCount = tuple.get(2, Long.class);
-                    String eventDateString = toFormattedDate(date,"dd/MM/yyyy");
+                    String eventDateString = formatter.format(tuple.get(0, Date.class));
                     response.add(new AtccVehicleCountResponse(eventDateString, vehicleType, vehicleCount));
                     result.set(i, null);
                 }
@@ -450,6 +450,7 @@ public class DashboardService extends BaseService {
 
             case "Daily":
             default:
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                 result = query
                         .select(
                                 rawData.eventDate,
@@ -457,14 +458,14 @@ public class DashboardService extends BaseService {
                                 rawData.count())
                         .from(rawData)
                         .where(rawData.eventDate.between(request.getFrom(), request.getTo()))
-                        .groupBy(rawData.eventDate, rawData.vehicleClass)
+                        .groupBy(rawData.eventDate.dayOfMonth(), rawData.eventDate.month(), rawData.eventDate.year(),rawData.vehicleClass)
                         .fetch();
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
                     date = tuple.get(0, Date.class);
                     vehicleType = tuple.get(rawData.vehicleClass);
                     vehicleCount = tuple.get(2, Long.class);
-                    String eventDateString = toFormattedDate(date,"dd/MM/yyyy");
+                    String eventDateString =formatter.format(tuple.get(0, Date.class));
                     response.add(new AnprVehicleCountResponse(eventDateString, vehicleType, vehicleCount));
                     result.set(i, null);
                 }
