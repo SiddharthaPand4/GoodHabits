@@ -97,7 +97,8 @@ public class DashboardService extends BaseService {
                     date = tuple.get(0, Date.class);
                     vehicleType = tuple.get(rawData.type);
                     vehicleCount = tuple.get(2, Long.class);
-                    response.add(new AtccVehicleCountResponse(date.toString(), vehicleType, vehicleCount));
+                    String eventDateString = toFormattedDate(date,"dd/MM/yyyy");
+                    response.add(new AtccVehicleCountResponse(eventDateString, vehicleType, vehicleCount));
                     result.set(i, null);
                 }
                 break;
@@ -463,7 +464,8 @@ public class DashboardService extends BaseService {
                     date = tuple.get(0, Date.class);
                     vehicleType = tuple.get(rawData.vehicleClass);
                     vehicleCount = tuple.get(2, Long.class);
-                    response.add(new AnprVehicleCountResponse(date.toString(), vehicleType, vehicleCount));
+                    String eventDateString = toFormattedDate(date,"dd/MM/yyyy");
+                    response.add(new AnprVehicleCountResponse(eventDateString, vehicleType, vehicleCount));
                     result.set(i, null);
                 }
                 break;
