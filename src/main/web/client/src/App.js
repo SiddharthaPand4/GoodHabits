@@ -102,7 +102,7 @@ class App extends Component {
                                 <PrivateRoute path='/vids' exact={true} component={HighwayIncidentView}/>
                                 <PrivateRoute path='/vids/dashboard' exact={true} component={HighwayIncidentDashboardView}/>
                                 <PrivateRoute path='/polygon' exact={true} component={Semantic}/>
-                                <PrivateRoute path='/polygonview' exact={true} component={PolygonView}/>
+                                <PrivateRoute path='/canvasview' exact={true} component={PolygonView}/>
                             </div>
                         </Content>
                         <Footerbar/>
