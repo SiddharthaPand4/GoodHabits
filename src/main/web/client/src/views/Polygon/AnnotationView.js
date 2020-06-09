@@ -1,7 +1,10 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import {Button, message} from "antd";
+import {Button, Col, message} from "antd";
 import AnnotationService from "../../services/AnnotationService";
+import Row from "antd/es/grid/row";
+import Card from "@material-ui/core/Card";
+import Iframe from 'react-iframe'
 
 export default class AnnotationView extends Component {
     constructor(props) {
@@ -18,6 +21,8 @@ export default class AnnotationView extends Component {
             finalPointY: '',
             boxes:[],
             lines:[],
+            playing: true,
+            image: null
         }
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -25,53 +30,76 @@ export default class AnnotationView extends Component {
         this.handleArrow = this.handleArrow.bind(this);
         this.drawArrow = this.drawArrow.bind(this);
         this.drawLine = this.drawLine.bind(this);
+        this.capture = this.capture.bind(this);
+
     }
 
     save = ()=>{
            AnnotationService.saveAnnotation(this.state.lines)
                .then( res => {
                    message.success("Annotation Saved")
+                  // this.setState({lines:null})
                }).catch( err => {
 
                message.error("Something went wrong")
            })
+
+
+
     }
 
     render() {
         let arrow = this.state.arrow;
         return (
             <div>
-                <canvas id="canvas" ref="canvas"
-                        width={640}
-                        height={425}
+                <Card>
+                    <Row>
+                        <Col span={12}>
+                            <img id="video" controls width="500" height="260" src="http://localhost:9000/stream"></img>
+                            <br/><br/><Button style={{width:"500px"}} type="primary" block onClick={this.capture}>Capture</Button>
+                        </Col>
 
-                        onMouseDown={
-                            e => {
-                                let nativeEvent = e.nativeEvent;
-                                this.handleMouseDown(nativeEvent);
-                            }}
-                        onMouseMove={
-                            e => {
-                                let nativeEvent = e.nativeEvent;
-                                this.handleMouseMove(nativeEvent);
-                            }}
-                        onMouseUp={
-                            e => {
-                                let nativeEvent = e.nativeEvent;
-                                if (arrow === false) {
-                                    this.handleMouseUp(nativeEvent);
-                                } else {
-                                    this.handleArrow(nativeEvent);
-                                }
-                            }}
+                        <Col span={12}>
+                            <canvas id="canvas" ref="canvas"
+                                    width={640}
+                                    height={425}
 
-                />
+
+                                    onMouseDown={
+                                        e => {
+                                            let nativeEvent = e.nativeEvent;
+                                            this.handleMouseDown(nativeEvent);
+                                        }}
+                                    onMouseMove={
+                                        e => {
+                                            let nativeEvent = e.nativeEvent;
+                                            this.handleMouseMove(nativeEvent);
+                                        }}
+                                    onMouseUp={
+                                        e => {
+                                            let nativeEvent = e.nativeEvent;
+                                            if (arrow === false) {
+                                                this.handleMouseUp(nativeEvent);
+                                            } else {
+                                                this.handleArrow(nativeEvent);
+                                            }
+                                        }}
+
+                            />
+                        </Col>
+                    </Row>
+                </Card>
+
+                <div align={"right"}>
                 <Button onClick={this.drawLine}>line</Button>
                 <Button onClick={this.drawArrow}>arrow</Button>
                 <Button onClick={this.clearAll}>Clear All</Button>
-                <Button onClick={this.save}>Save</Button>
+                <Button onClick={this.save}>Save</Button></div>
+
 
             </div>
+
+
         );
     }
 
@@ -97,20 +125,22 @@ export default class AnnotationView extends Component {
         const canvas =this.refs.canvas;
         var ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+
         // var canvas = ReactDOM.findDOMNode(this.refs.canvas),
-        ctx = canvas.getContext("2d");
-
-        canvas.width = this.state.canvasWidth;
-        canvas.height = this.state.canvasHeight;
-
-
-        var background = new Image();
-        background.src = "/pgs/p-001.png";
-
-// Make sure the image is loaded first otherwise nothing will draw.
-        background.onload = function () {
-            ctx.drawImage(background, 0, 0);
-        }
+       // ctx = canvas.getContext("2d");
+//
+       // canvas.width = this.state.canvasWidth;
+       // canvas.height = this.state.canvasHeight;
+//
+//
+       // var background = new Image();
+       // background.src = "/pgs/p-001.png";
+//
+// Make// sure the image is loaded first otherwise nothing will draw.
+       // background.onload = function () {
+       //     ctx.drawImage(background, 0, 0);
+       // }
     }
 
 
@@ -236,26 +266,22 @@ export default class AnnotationView extends Component {
         });
 //}
     }
+    capture(){
+        this.clearAll();
+        var canvas = document.getElementById('canvas');
+        var video = document.getElementById('video');
+
+        canvas.getContext('2d').drawImage(video, 0, 0, 500, 278);
+        //this.clearAll();
+        this.setState({
+            lines:[],
+        })
+
+
+    }
 
 
     componentDidMount() {
-        //  const canvas = ReactDOM.findDOMNode(this.refs.canvas);
-        //  const ctx = canvas.getContext("2d");
-        //  ctx.fillStyle = 'rgb(200,255,255)';
-        //  ctx.fillRect(0, 0, 640, 425);
-        var canvas = this.refs.canvas,
-            ctx = canvas.getContext("2d");
-
-        canvas.width = this.state.canvasWidth;
-        canvas.height = this.state.canvasHeight;
 
 
-        var background = new Image();
-        background.src = "/pgs/p-001.png";
-
-// Make sure the image is loaded first otherwise nothing will draw.
-        background.onload = function () {
-            ctx.drawImage(background, 0, 0);
-        }
-    }
-}
+}}
