@@ -1,4 +1,7 @@
 import axios from './axios';
+import {authHeader} from "../helpers/auth-header";
+import {config} from "../helpers/config";
+import FeedView from "../views/FeedView";
 
 class FeedService {
 
@@ -7,19 +10,19 @@ class FeedService {
     }
 
     getFeeds() {
-        return axios.get('/api/feeds');
+        return axios.get('/api/feed/list');
     }
 
-    getFeed(feed) {
-        return axios.get('/api/feed/' + feed.ID);
+    getFeed(url) {
+        return axios.get('/api/feed/' + url);
     }
 
     addFeed(feed) {
         return axios.post('/api/feed/', feed)
     }
 
-    removeFeed(feed) {
-        return axios.delete('/api/feed/' + feed.ID);
+    removeFeed(url) {
+        return axios.delete('/api/feed/?url='+url);
     }
 
     startFeed(feed) {
