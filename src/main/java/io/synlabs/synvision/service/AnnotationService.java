@@ -14,7 +14,10 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Base64;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static com.sun.jmx.snmp.EnumRowStatus.destroy;
@@ -27,12 +30,15 @@ public class AnnotationService {
     private Process process;
 
     public void saveAnnotation(AnnotationRequest request) throws IOException {
-        File file = new File("annotation.txt");
+        String filename = null;
+        Path path= Paths.get("d:/");
+        filename = path.resolve(UUID.randomUUID().toString() + ".txt").toString();
+        File file = new File(String.valueOf(path));
         if (file.exists()) {
             file.delete();
             //file.renameTo(new File(""));
         }
-        FileWriter fw = new FileWriter("annotation.txt");
+        FileWriter fw = new FileWriter(filename);
         for (LineSegment lineSegment : request.getLines()) {
             String line = String.format("[x1:%s, y1:%s, x2:%s, y2:%s]\n",
                     lineSegment.getX1(), lineSegment.getY1(), lineSegment.getX2(), lineSegment.getY2());
