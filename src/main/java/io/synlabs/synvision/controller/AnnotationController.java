@@ -16,7 +16,17 @@ public class AnnotationController {
     private AnnotationService annotationService;
 
     @PostMapping("/annotation")
+   // public void saveAnnotation(@RequestParam AnnotationRequest request) throws IOException {
     public void saveAnnotation(@RequestBody AnnotationRequest request) throws IOException {
        annotationService.saveAnnotation(request);
+    }
+
+    @GetMapping("/start/feed")
+    public void startFeed() throws IOException, InterruptedException {
+        annotationService.startFeed();
+    }
+    @GetMapping("/stop/feed")
+    public void stopFeed() throws IOException, InterruptedException {
+        annotationService.stopFeed();
     }
 }
