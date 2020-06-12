@@ -278,6 +278,7 @@ export default class AnprView extends Component {
                                 style={{margin: "5px"}}
                                 title={
                                     <div>
+                                        {(event.vehicleClass) ? <Tag color="#f50">{event.vehicleClass}</Tag> : null}
                                         {(event.direction && event.direction === "rev") ?
                                             <Tag color="#f50">Reverse</Tag> : null}
                                         {(event.helmet) ? <Tag color="#f50">Without helmet</Tag> : null}
