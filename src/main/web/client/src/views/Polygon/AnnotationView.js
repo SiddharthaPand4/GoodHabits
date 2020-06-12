@@ -130,7 +130,7 @@ export default class AnnotationView extends Component {
         let prevX = this.state.previousPointX;
         let prevY = this.state.previousPointY;
         let len = Math.sqrt(Math.pow(x - prevX, 2) + Math.pow((y - prevY), 2));
-        if (len < 30) {
+        if (len < 5) {
 
             return;
         }
@@ -257,8 +257,6 @@ export default class AnnotationView extends Component {
 
     }
 
-
-
     render() {
         let isPlaying = this.state.isPlaying;
         let arrow = this.state.arrow;
@@ -270,7 +268,9 @@ export default class AnnotationView extends Component {
 
                         <Col span={12}>
                             <br/><br/>&nbsp;&nbsp;<Button  onClick={this.startFeed}><Icon type="play-circle" />Start Feed</Button>
-                            &nbsp;&nbsp;<Button onClick={this.stopFeed}><Icon type="pause-circle" />Stop Feed</Button><br/><br/>
+                            &nbsp;&nbsp;<Button onClick={this.stopFeed}><Icon type="pause-circle" />Stop Feed</Button>
+                            &nbsp;&nbsp;<Button
+                                    onClick={this.capture}><Icon type="camera" />Capture</Button><br/><br/>
                             {isPlaying
                                 ? <img style={{border:"1px solid black"}} id="video" controls width="500" height="260" src="http://localhost:9000/stream"></img>
                                 :
@@ -278,8 +278,7 @@ export default class AnnotationView extends Component {
                             }
                             <br/><br/><Button style={{width: "500px"}} type="primary"
                                               onClick={() => this.setState({isPlaying: !isPlaying})}>PLAY/PAUSE</Button>
-                            <br/><br/><Button style={{width: "500px"}} type="primary" block
-                                              onClick={this.capture}>Capture</Button><br/><br/>
+
                         </Col>
 
                         <Col  span={12}>
@@ -314,8 +313,8 @@ export default class AnnotationView extends Component {
 
                             />
                             <div align={"center"}>
-                                <h4>Draw using:</h4><Button onClick={this.drawLine}>line</Button>
-                                &nbsp;&nbsp;<Button onClick={this.drawArrow}>arrow</Button><br/><br/>
+                                <h4>Draw using:</h4><Button onClick={this.drawLine}><Icon type="line" />line</Button>
+                                &nbsp;&nbsp;<Button onClick={this.drawArrow}><Icon type="arrow-up" /><Icon type="arrow-down" />arrow</Button><br/><br/>
                             </div>
                                 <div align={"right"}> <Button block type={"primary"}  onClick={this.save}>Save</Button>
                                 &nbsp;&nbsp;<Button block onClick={this.clearAll}>Clear All</Button><br/><br/>
