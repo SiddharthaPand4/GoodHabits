@@ -36,10 +36,23 @@ export default class HomeView extends Component {
                     datasets: []
                 }
             },
+            anpr: {
+                filter: {
+                    selectedCustomDateRange: "Today",
+                    selectedXAxisOption: "Hourly",
+                    fromDate: {},
+                    toDate: {}
+                },
+                chartData: {
+                    labels: [],
+                    datasets: []
+                }
+            },
         };
 
         this.getIncidentVehicleCount = this.getIncidentVehicleCount.bind(this);
         this.getAtccVehicleCount = this.getAtccVehicleCount.bind(this);
+        this.getAnprVehicleCount = this.getAnprVehicleCount.bind(this);
         this.getBarChartOptions = this.getBarChartOptions.bind(this);
         this.selectDateRange = this.selectDateRange.bind(this);
         this.selectXAxisOption = this.selectXAxisOption.bind(this);
@@ -96,6 +109,7 @@ export default class HomeView extends Component {
     refresh() {
 
         this.getAtccVehicleCount(this.state.atcc.filter.fromDate, this.state.atcc.filter.toDate, this.state.atcc.filter.selectedXAxisOption);
+        this.getAnprVehicleCount(this.state.anpr.filter.fromDate, this.state.anpr.filter.toDate, this.state.anpr.filter.selectedXAxisOption);
 
         this.getIncidentVehicleCount(this.state.incident.filter.fromDate, this.state.incident.filter.toDate, this.state.incident.filter.selectedXAxisOption);
     }
@@ -136,6 +150,7 @@ export default class HomeView extends Component {
                     let dataSet = {
                         label: vehicleType,
                         data: [],
+                        borderColor: color,
                         backgroundColor: color
                     };
 
@@ -151,6 +166,62 @@ export default class HomeView extends Component {
                 }
             }
             this.setState({atcc});
+        }).catch(error => {
+            console.log(error);
+        });
+    }
+
+    getAnprVehicleCount(from_date, to_date, xAxis) {
+        let {anpr} = this.state;
+        anpr.chartData = {
+            labels: [],
+            datasets: []
+        };
+        DashboardService.getAnprVehicleCount(from_date, to_date, xAxis).then(resposne => {
+
+            let rawData = resposne.data;
+            if (rawData && rawData.length > 0) {
+                //let labelDates = DashboardService.enumerateDaysBetweenDates(from_date, to_date);
+                let labelDates = [];
+
+                let rawDataByVehicleData = [];
+                for (let i in rawData) {
+
+                    if (!labelDates.includes(rawData[i].date)) {
+                        labelDates.push(rawData[i].date)
+                    }
+
+                    if (!rawDataByVehicleData[rawData[i].vehicleType]) {
+                        rawDataByVehicleData[rawData[i].vehicleType] = {};
+                    }
+                    if (!rawDataByVehicleData[rawData[i].vehicleType][rawData[i].date]) {
+                        rawDataByVehicleData[rawData[i].vehicleType][rawData[i].date] = rawData[i];
+                    }
+                }
+                anpr.chartData.labels = labelDates;
+                let vehicleTypeIndex = 0;
+                for (let vehicleType in rawDataByVehicleData) {
+
+                    let color = DashboardService.getColor(vehicleTypeIndex);
+                    let dataSet = {
+                        label: vehicleType,
+                        data: [],
+                        borderColor: color,
+                        backgroundColor: color
+                    };
+
+                    for (let i in labelDates) {
+                        if (rawDataByVehicleData[vehicleType][labelDates[i]]) {
+                            dataSet.data.push(rawDataByVehicleData[vehicleType][labelDates[i]].vehicleCount);
+                        } else {
+                            dataSet.data.push(0);
+                        }
+                    }
+                    anpr.chartData.datasets.push(dataSet);
+                    vehicleTypeIndex++;
+                }
+            }
+            this.setState({anpr});
         }).catch(error => {
             console.log(error);
         });
@@ -200,11 +271,13 @@ export default class HomeView extends Component {
             let helmetMissingDataset = {
                 label: "Without Helmet",
                 data: [],
+                borderColor: DashboardService.getColor(0),
                 backgroundColor: DashboardService.getColor(0)
             };
             let reverseDirectionDataset = {
                 label: "Reverse Direction",
                 data: [],
+                borderColor: DashboardService.getColor(2),
                 backgroundColor: DashboardService.getColor(2)
             };
 
@@ -332,15 +405,40 @@ export default class HomeView extends Component {
                         labelString: yAxisLabel
                     }
                 }]
+            },
+            elements: {
+                line: {
+                    fill: false,
+                }
+            },
+            plugins: {
+                datalabels: {
+                    display: false,
+                    anchor: 'end',
+                    clamp: true,
+                    align: 'end',
+                    offset: 6,
+                    backgroundColor: function (context) {
+                        return context.dataset.backgroundColor;
+                    },
+                    color: 'white',
+                    font: {
+                        weight: 'bold'
+                    }
+                }
             }
+
+
+
         };
         return options;
     }
 
     render() {
-        let {atcc, incident} = this.state;
+        let {atcc, incident,anpr} = this.state;
         const atccChartOptions = this.getBarChartOptions("atcc");
         const incidentChartOptions = this.getBarChartOptions("incident");
+        const anprChartOptions = this.getBarChartOptions("anpr");
         return (
             <div>
                 <div>
@@ -357,6 +455,26 @@ export default class HomeView extends Component {
                     </Modal>
                 </div>
                 <div>
+                    <Card title={<div>ANPR
+                        &nbsp;
+                        <Dropdown overlay={() => this.getDateRangeOptions("anpr")}>
+                            <Button>
+                                {anpr.filter.selectedCustomDateRange ? anpr.filter.selectedCustomDateRange : "Select"}
+                                <Icon
+                                    type="down"/>
+                            </Button>
+                        </Dropdown>
+                        &nbsp;<Dropdown overlay={() => this.getXAxisOptions("anpr")}>
+                            <Button>
+                                {anpr.filter.selectedXAxisOption ? anpr.filter.selectedXAxisOption : "Select"}
+                                <Icon
+                                    type="down"/>
+                            </Button>
+                        </Dropdown>
+                    </div>}>
+                        <Line data={anpr.chartData} options={anprChartOptions}/>
+                    </Card>
+                    <br/>
                     <Card title={<div>ATCC
                         &nbsp;
                         <Dropdown overlay={() => this.getDateRangeOptions("atcc")}>
