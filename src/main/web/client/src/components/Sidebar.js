@@ -120,9 +120,21 @@ export default class Sidebar extends Component {
                         </Menu.Item>
                     </SubMenu>
 
-                    <Menu.Item key="6">
-                        <Link to='/feed'><Icon type='video-camera'/><span className='nav-text'>Feed</span></Link>
-                    </Menu.Item>
+
+                    <SubMenu key="6" title={
+                        <span>
+                          <Icon type='box-plot'/>
+                          <span>Feed</span>
+                        </span>
+                    }
+                    >
+                        <Menu.Item key="1" className="sidebar-nav-link">
+                            <Link to='/feed'><span className='nav-text'>Feed</span></Link>
+                        </Menu.Item>
+                        <Menu.Item key="2" className="sidebar-nav-link">
+                            <Link to='/canvasview'><span className='nav-text'>Capture Feed</span></Link>
+                        </Menu.Item>
+                    </SubMenu>
                     <SubMenu key="admin" title={<span><Icon type="deployment-unit"/>Admin</span>}>
                         <Menu.Item key="51">
                             <Link to='/user'><Icon type='user'/><span className='nav-text'>Users</span></Link>

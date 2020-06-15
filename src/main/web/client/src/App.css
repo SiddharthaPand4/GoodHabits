@@ -6,6 +6,19 @@
     margin: 16px;
 }
 
+main.ant-layout-content
+{
+    overflow:hidden;
+    margin:0 !important;
+}
+.sc-fjdhpX.dIWoiE {
+    /*position: unset !important;*/
+}
+
+.linesContainer:nth-child(2) {
+   /* display: none !important;*/
+}
+
 @media print {
     .no-print, .no-print * {
         display: none !important;

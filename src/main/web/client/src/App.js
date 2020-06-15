@@ -34,6 +34,9 @@ import HighwayIncidentView from "./views/vids/HighwayIncidentView";
 import HighwayIncidentDashboardView from "./views/vids/HighwayIncidentDashboardView";
 import AnprReportView from "./views/anpr/AnprReportView";
 
+import AnnotationView from "./views/Polygon/AnnotationView";
+
+
 const {Content} = Layout;
 
 class App extends Component {
@@ -98,6 +101,8 @@ class App extends Component {
                                 {/* vids */}
                                 <PrivateRoute path='/vids' exact={true} component={HighwayIncidentView}/>
                                 <PrivateRoute path='/vids/dashboard' exact={true} component={HighwayIncidentDashboardView}/>
+
+                                <PrivateRoute path='/canvasview' exact={true} component={AnnotationView}/>
                             </div>
                         </Content>
                         <Footerbar/>
