@@ -7,6 +7,7 @@ import ButtonGroup from "antd/es/button/button-group";
 
 const {Text} = Typography;
 const {Column} = Table;
+let flag=false;// true to enable editing & false for adding new feed
 export default class FeedView extends Component {
 
     constructor(props) {
@@ -17,10 +18,12 @@ export default class FeedView extends Component {
             videoVisible: false,
             formVisible:false,
             layout: "list", //list || grid
-            feeds: [],
+            mode:"Add", //Add || Edit
+            feed:{url:"",site:"",location:"",name:""},
+            feeds: []
         };
 
-        //EventBus.subscribe('feed-refresh', (event) => this.refresh())
+        EventBus.subscribe('feed-refresh', (event) => this.refresh())
         this.removeFeed = this.removeFeed.bind(this);
         this.addFeeds=this.addFeeds.bind(this);
         this.close=this.close.bind(this);
@@ -35,6 +38,9 @@ export default class FeedView extends Component {
         FeedService.getFeeds().then(request => {
             this.setState({"feeds": request.data, loading: false})
         })
+    }
+    refreshFeed(){
+        this.refresh();
     }
 
     removeFeed(feed) {
@@ -70,7 +76,8 @@ export default class FeedView extends Component {
     }
 
     addFeeds(){
-    this.setState({"formVisible":true})
+    this.setState({formVisible:true,mode:"Add",feed:{url:"",site:"",location:"",name:""},})
+    flag=false;
     }
     close(){
         this.setState({"formVisible":false})
@@ -78,9 +85,11 @@ export default class FeedView extends Component {
 
 
     showFeed(url){
-        this.setState({"formVisible":true})
+        this.setState({"formVisible":true,"mode":"Edit"})
+        flag=true;
         FeedService.getFeed(url)
-            .then(response =>{console.log(response.data)
+            .then(response =>{
+                this.setState({feed : response.data})
             },
             error=>{
                 message.error(error.response.data.message);
@@ -119,16 +128,17 @@ export default class FeedView extends Component {
                         ?
                         (this.state.feeds && this.state.feeds.length > 0)
                             ?
+
                             <Col span={12}>
                                 <Card>
                                     <Table dataSource={this.state.feeds} pagination={false}>
                                         <Column title="Feed URL" dataIndex="url" key="url"/>
                                         <Column title="Location" dataIndex="location" key="location"/>
                                         <Column title="Name" dataIndex="name" key="name"/>
-                                            <Column title="Site" dataIndex="site" key="site"/>
-                                            <Column title="Action" render={(text, record) => (
-                                            <a onClick={this.showFeed.bind(this,record.url)}>Edit</a>
-                                            )}/>
+                                        <Column title="Site" dataIndex="site" key="site"/>
+                                        <Column title="Action" render={(text, record) => (
+                                            <a onClick={this.showFeed.bind(this, record.url)}>Edit</a>
+                                        )}/>
                                     </Table>
 
                                 </Card>
@@ -170,21 +180,21 @@ export default class FeedView extends Component {
 
                     {this.state.formVisible ?
                     <Col span={12}>
-                        <Card title="Add Feed" >
-                            <WrappedFeedForm/>
-                            <Button type="secondary" className="user-form-button"  size="small" onClick={this.close}>
-                                Close
-                            </Button>
-                        </Card>
+                        {this.state.mode == "Add" ?
+                            <Card title="Add Feed">
+                                <WrappedFeedForm feed={this.state.feed} close={this.close}/>
+                            </Card>
+                            :
+                            <Card title="Edit Feed">
+                                <WrappedFeedForm feed={this.state.feed} refresh={this.refreshFeed} close={this.close}/>
+
+                            </Card>
+                        }
                     </Col>
-                    :null
+                    : null
                 }
                 </Row>
-
-
-
-
-            </div>
+ </div>
 
 
         )
@@ -205,11 +215,16 @@ class FeedForm extends Component {
             submitted: false,
             loading: false,
             loginError: '',
+            feed:{url:"",site:"",location:"",name:""}
         };
 
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.close = this.close.bind(this);
     }
-
+close()
+{
+    this.props.close();
+}
 
 
     handleSubmit(e) {
@@ -247,9 +262,16 @@ class FeedForm extends Component {
         console.log('saving feed', feed);
         this.setState({submitted: true, loading: true});
 
-        FeedService.addFeed(feed).then(response => {
-            message.success("Feed Saved Successfully")
+        FeedService.addFeed(feed,flag).then(response => {
+            if(flag){
+                message.success("Feed updated")
+                this.close()
+            }
+            else{
+                message.success("Feed Added")
+            }
             EventBus.publish('feed-refresh', {})
+
         }).catch(error => {
             let msg = "Something went wrong!";
             if (error && error.response && error.response.data && error.response.data.message) {
@@ -269,19 +291,24 @@ class FeedForm extends Component {
 
                   <Form title={"ADD FEED"} onSubmit={this.handleSubmit}>
                             <Form.Item>
-                                {getFieldDecorator('url', {rules: [{required: true, message: 'enter feed url!'}],})(
+                                {getFieldDecorator('url', {
+                                        initialValue:this.props.feed.url,
+                                        rules: [{required: true, message: 'enter feed url!'}],})(
                                     <Input addonBefore="Feed&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
                                            placeholder="rtsp://"/>,
                                 )}
                             </Form.Item>
                             <Form.Item>
-                                {getFieldDecorator('site', {rules: [{required: true, message: 'enter site!'}],})(
+                                {getFieldDecorator('site', {
+                                    initialValue:this.props.feed.site,
+                                    rules: [{required: true, message: 'enter site!'}],})(
                                     <Input addonBefore="Site&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
                                            placeholder="Site (e.g. gurgaon)"/>,
                                 )}
                             </Form.Item>
                             <Form.Item>
                                 {getFieldDecorator('location', {
+                                    initialValue:this.props.feed.location,
                                     rules: [{
                                         required: true,
                                         message: 'enter location!'
@@ -291,14 +318,19 @@ class FeedForm extends Component {
                                 )}
                             </Form.Item>
                             <Form.Item>
-                                {getFieldDecorator('name', {rules: [{required: true, message: 'enter name!'}],})(
+                                {getFieldDecorator('name', {
+                                    initialValue:this.props.feed.name,
+                                    rules: [{required: true, message: 'enter name!'}],})(
                                     <Input addonBefore="Name&nbsp;&nbsp;&nbsp;&nbsp;"
                                            placeholder="Name (e.g. front gate )"/>,
                                 )}
                             </Form.Item>
-                            <Button htmlType="submit" type="primary" disabled={hasErrors(getFieldsError())}>Add</Button>
+                            <Button htmlType="submit" type="primary" disabled={hasErrors(getFieldsError())}>Save</Button>
                             {validationError && <Text type="danger">{validationError}</Text>}
-
+                      <span>&nbsp;&nbsp;</span>
+                      <Button type="secondary" className="user-form-button" size="small" onClick={this.close}>
+                          Close
+                      </Button>
 
                         </Form>
             </div>

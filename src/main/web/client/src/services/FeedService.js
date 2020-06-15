@@ -14,16 +14,35 @@ class FeedService {
     }
 
     getFeed(url) {
-        return axios.get('/api/feed/' + url);
+        return axios.get('/api/feed/' +url);
     }
 
-    addFeed(feed) {
-        return axios.post('/api/feed/', feed)
+    addFeed(feed,flag)
+    {
+        const requestBody={
+            url:feed.url,
+            location:feed.location,
+            site:feed.site,
+            name:feed.name
+        };
+        const request = {
+            method: 'POST',
+            headers: authHeader(),
+            data: JSON.stringify(requestBody),
+            url: config.apiUrl + 'api/feed/'
+        };
+        if(flag){
+            request.method='PUT';
+        }
+        return axios(request);
     }
+
+
 
     removeFeed(url) {
         return axios.delete('/api/feed/?url='+url);
     }
+
 
     startFeed(feed) {
         return axios.get('/api/feed/' +feed.ID+ '/start');

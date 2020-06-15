@@ -7,6 +7,7 @@ import io.synlabs.synvision.jpa.FeedRepository;
 import io.synlabs.synvision.views.common.FeedRequest;
 import io.synlabs.synvision.views.common.FeedResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,7 +25,7 @@ public class FeedService {
 
         Feed feed = feedRepository.findByUrl(request.getUrl());
         if (feed != null) {
-            throw new ValidationException(String.format("Already exists URL", request.getUrl()));
+            throw new ValidationException(String.format("Feed ID already exists", request.getUrl()));
 
         }
         feed = request.toEntity();
@@ -44,5 +45,41 @@ public class FeedService {
              feedRepository.delete(feed);
     }
 
+    public Feed getFeed(String url) {
+        return feedRepository.findByUrl(url);
+
+    }
+
+    public Feed updateFeed(FeedRequest request) {
+        validateFeed(request);
+        Feed feed=feedRepository.findByUrl(request.getUrl());
+        request.toEntity(feed);
+        return feedRepository.save(feed);
+
+    }
+
+    private void validateFeed(FeedRequest request)
+    {
+        if (StringUtils.isEmpty(request.getUrl()))
+        {
+            throw new ValidationException("Url is required");
+        }
+
+
+        if (StringUtils.isEmpty(request.getLocation()))
+        {
+            throw new ValidationException("Location is required.");
+        }
+
+        if (StringUtils.isEmpty(request.getName()))
+        {
+            throw new ValidationException("Name is required.");
+        }
+
+        if (StringUtils.isEmpty(request.getSite()))
+        {
+            throw new ValidationException("Site is required.");
+        }
+    }
 
 }
