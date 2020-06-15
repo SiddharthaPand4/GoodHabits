@@ -72,7 +72,7 @@ public class AnnotationService {
     }
 
     public void startFeed() throws IOException, InterruptedException {
-        System.out.println("Process started");
+
         File dir = new File("E://LiveFeed");
 
         process = Runtime.getRuntime().exec("streamer https://www.radiantmediaplayer.com/media/bbb-360p.mp4 localhost:9000 ", null, dir);
