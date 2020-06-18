@@ -1,12 +1,20 @@
 import React, {Component} from "react";
-import {Button, Card, Col, Divider, Form, Input, message, Row, Spin, Table, Tag, Typography} from "antd";
+import {Button, Card, Col, Divider, Form, Input, message, Modal, Row, Spin, Table, Tag, Typography} from "antd";
 import FeedService from "../services/FeedService";
 import {EventBus} from "../components/event";
 import ButtonGroup from "antd/es/button/button-group";
+import DeleteOutlined from "@ant-design/icons/lib/icons/DeleteOutlined";
+import UserService from "../services/UserService";
+import PlayCircleOutlined from "@ant-design/icons/lib/icons/PlayCircleOutlined";
+import FormOutlined from "@ant-design/icons/lib/icons/FormOutlined";
+import AnnotationView from "./Polygon/AnnotationView";
+import PlaySquareOutlined from "@ant-design/icons/lib/icons/PlaySquareOutlined";
+import {Link} from "react-router-dom";
 
 
 const {Text} = Typography;
 const {Column} = Table;
+const { confirm } = Modal;
 let flag=false;// true to enable editing & false for adding new feed
 export default class FeedView extends Component {
 
@@ -24,10 +32,11 @@ export default class FeedView extends Component {
         };
 
         EventBus.subscribe('feed-refresh', (event) => this.refresh())
-        this.removeFeed = this.removeFeed.bind(this);
         this.addFeeds=this.addFeeds.bind(this);
         this.close=this.close.bind(this);
         this.showFeed=this.showFeed.bind(this);
+        this.showDeleteConfirm=this.showDeleteConfirm.bind(this);
+        this.refresh=this.refresh.bind(this);
     }
 
     componentDidMount() {
@@ -43,18 +52,31 @@ export default class FeedView extends Component {
         this.refresh();
     }
 
-    removeFeed(feed) {
-        FeedService.removeFeed(feed.url)
-            .then(() => {
-            this.refresh()
-                message.success("Deleted Successfully!")
-        }).catch(error => {
-            let msg = "Something went wrong!";
-            if (error && error.response && error.response.data && error.response.data.message) {
-                msg = error.response.data.message;
-                message.warn(msg);
-            }
+    showDeleteConfirm(feed,refresh) {
+        confirm({
+            title: 'Are you sure you want to Delete this Feed',
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk() {
+                console.log(feed);
+                FeedService.removeFeed(feed.url)
+                    .then(() => {
+                        refresh();
+                        message.success("Deleted Successfully!")
+                    }).catch(error => {
+                    let msg = "Something went wrong!";
+                    if (error && error.response && error.response.data && error.response.data.message) {
+                        msg = error.response.data.message;
+                        message.warn(msg);
+                    }
 
+                });
+            },
+            onCancel() {
+                console.log('Cancel');
+
+            },
         });
     }
 
@@ -109,6 +131,8 @@ export default class FeedView extends Component {
         return (
             <div>
                 <Row gutter={10}>
+                    <br/>
+                    <span>&nbsp;&nbsp;</span>
                     <Button type="primary" onClick={this.addFeeds}>
                         + New Feed
                     </Button>&nbsp;&nbsp;&nbsp;
@@ -128,8 +152,7 @@ export default class FeedView extends Component {
                         ?
                         (this.state.feeds && this.state.feeds.length > 0)
                             ?
-
-                            <Col span={12}>
+                        <Col span={12}>
                                 <Card>
                                     <Table dataSource={this.state.feeds} pagination={false}>
                                         <Column title="Feed URL" dataIndex="url" key="url"/>
@@ -137,7 +160,13 @@ export default class FeedView extends Component {
                                         <Column title="Name" dataIndex="name" key="name"/>
                                         <Column title="Site" dataIndex="site" key="site"/>
                                         <Column title="Action" render={(text, record) => (
-                                            <a onClick={this.showFeed.bind(this, record.url)}>Edit</a>
+                                            <span>
+                                             <FormOutlined onClick={this.showFeed.bind(this, record.url)}/>
+                                           <Divider type="vertical" />
+                                           <DeleteOutlined  style={{color: "#ff0000"}} onClick={this.showDeleteConfirm.bind(this,record,this.refresh)}/>
+                                           <Divider type="vertical" />
+                                           <Link to='/canvasview'><PlaySquareOutlined onClick={console.log("cutiya")}/></Link>
+                                            </span>
                                         )}/>
                                     </Table>
 
@@ -165,7 +194,7 @@ export default class FeedView extends Component {
                                                 this.stopFeed(feed)
                                             }}>Stop</Button>,
                                             <Button onClick={() => {
-                                                this.removeFeed(feed)
+                                                this.showDeleteConfirm(feed,this.refresh)
                                             }}>Delete</Button>
                                         ]}
                                     >
