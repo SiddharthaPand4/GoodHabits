@@ -165,7 +165,7 @@ export default class FeedView extends Component {
                                            <Divider type="vertical" />
                                            <DeleteOutlined  style={{color: "#ff0000"}} onClick={this.showDeleteConfirm.bind(this,record,this.refresh)}/>
                                            <Divider type="vertical" />
-                                           <Link to='/canvasview'><PlaySquareOutlined onClick={console.log("cutiya")}/></Link>
+                                           <Link to='/canvasview'><PlaySquareOutlined/></Link>
                                             </span>
                                         )}/>
                                     </Table>
