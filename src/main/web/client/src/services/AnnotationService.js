@@ -7,19 +7,20 @@ class AnnotationService {
     }
 
 
-
-    saveAnnotation(lines){
+    saveAnnotation(lines) {
 
         return axios.post("/save/annotation", JSON.stringify({
             lines: lines,
-           // dataURL:dataURL
+            // dataURL:dataURL
 
         }));
     }
-    startFeed(){
-        return axios.get("/save/start/feed");
+
+    startFeed(feedUrl) {
+        return axios.get("/save/start?feedUrl=" + feedUrl);
     }
-    stopFeed(){
+
+    stopFeed() {
         return axios.get("/save/stop/feed");
     }
 }

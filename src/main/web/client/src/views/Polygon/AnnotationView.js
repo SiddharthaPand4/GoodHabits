@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import {Button, Col,Icon, message} from "antd";
+import {Button, Col, Icon, message, Tag} from "antd";
 import AnnotationService from "../../services/AnnotationService";
 import Row from "antd/es/grid/row";
 import Card from "@material-ui/core/Card";
@@ -33,7 +33,7 @@ export default class AnnotationView extends Component {
         this.drawArrow = this.drawArrow.bind(this);
         this.drawLine = this.drawLine.bind(this);
         this.capture = this.capture.bind(this);
-        this.refressh=this.refresh.bind(this);
+        this.refresh=this.refresh.bind(this);
 
     }
 
@@ -68,15 +68,18 @@ export default class AnnotationView extends Component {
 
     }
 
-    startFeed = () => {
-        AnnotationService.startFeed().then(res => {
+    startFeed(feedUrl){
+
+        AnnotationService.startFeed(feedUrl)
+            .then(res => {
             message.success("Feed started")
-            window.location.reload();
+                //window.location.reload();
 
         }).catch(err => {
             message.error("Something Went Wrong!")
         })
     }
+
     stopFeed = () => {
         AnnotationService.stopFeed().then(res => {
             message.success("Feed stoped")
@@ -267,10 +270,13 @@ export default class AnnotationView extends Component {
                     <Row>
 
                         <Col span={12}>
-                            <br/><br/>&nbsp;&nbsp;<Button  onClick={this.startFeed}><Icon type="play-circle" />Start Feed</Button>
+
+                            <br/><br/>&nbsp;&nbsp;<Button  onClick={()=> this.startFeed(this.props.location.feedUrl)}><Icon type="play-circle" />Start Feed</Button>
                             &nbsp;&nbsp;<Button onClick={this.stopFeed}><Icon type="pause-circle" />Stop Feed</Button>
                             &nbsp;&nbsp;<Button
                                     onClick={this.capture}><Icon type="camera" />Capture</Button><br/><br/>
+                            <Tag color="#f50">{this.props.location.feedUrl}</Tag>
+                            <br/><br/>
                             {isPlaying
                                 ? <img style={{border:"1px solid black"}} id="video" controls width="500" height="260" src="http://localhost:9000/stream"></img>
                                 :

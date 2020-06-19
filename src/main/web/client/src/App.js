@@ -102,7 +102,7 @@ class App extends Component {
                                 <PrivateRoute path='/vids' exact={true} component={HighwayIncidentView}/>
                                 <PrivateRoute path='/vids/dashboard' exact={true} component={HighwayIncidentDashboardView}/>
 
-                                <PrivateRoute path='/canvasview' exact={true} component={AnnotationView}/>
+                                <PrivateRoute path='/feedStream' exact={true} component={AnnotationView}/>
                             </div>
                         </Content>
                         <Footerbar/>

@@ -20,7 +20,7 @@ public class Feed extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String site;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 100)
     private String url;
 
     private boolean checkSectionSpeed;

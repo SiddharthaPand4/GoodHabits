@@ -2,6 +2,7 @@ package io.synlabs.synvision.service;
 
 import io.synlabs.synvision.views.AnnotationRequest;
 import io.synlabs.synvision.views.LineSegment;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -10,10 +11,7 @@ import sun.misc.BASE64Decoder;
 import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
@@ -71,11 +69,26 @@ public class AnnotationService {
         //  ImageIO.write(image, "png", outputfile);
     }
 
-    public void startFeed() throws IOException, InterruptedException {
+    public void startFeed(String feedUrl) throws IOException, InterruptedException {
 
         File dir = new File("E://LiveFeed");
+            if(SystemUtils.IS_OS_LINUX)
+            Runtime.getRuntime().exec("kill -9 $(lsof -t -i:9000)");
 
-        process = Runtime.getRuntime().exec("streamer https://www.radiantmediaplayer.com/media/bbb-360p.mp4 localhost:9000 ", null, dir);
+            //For Windows we have to look for alternate code or We can do it manually
+            // cmd > netstat -ano | find "9000" - this will return PID
+            // taskkill /f /pid PID
+
+        //Runtime.getRuntime().exec("cmd /c start cmd.exe /K " + "ver > Desktop\\output.txt");
+      // String s;
+      // System.out.println(pro.getOutputStream());
+      // BufferedReader stdInput = new BufferedReader(new
+      //         InputStreamReader(pro.getInputStream()));
+      // while((s=stdInput.readLine())!=null) {
+      //     System.out.println(s);
+      //  }
+
+        process = Runtime.getRuntime().exec("streamer "+feedUrl+" localhost:9000 ", null, dir);
 
     }
 

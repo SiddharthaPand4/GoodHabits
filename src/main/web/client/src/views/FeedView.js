@@ -152,7 +152,7 @@ export default class FeedView extends Component {
                         ?
                         (this.state.feeds && this.state.feeds.length > 0)
                             ?
-                        <Col span={12}>
+                        <Col span={15}>
                                 <Card>
                                     <Table dataSource={this.state.feeds} pagination={false}>
                                         <Column title="Feed URL" dataIndex="url" key="url"/>
@@ -165,7 +165,11 @@ export default class FeedView extends Component {
                                            <Divider type="vertical" />
                                            <DeleteOutlined  style={{color: "#ff0000"}} onClick={this.showDeleteConfirm.bind(this,record,this.refresh)}/>
                                            <Divider type="vertical" />
-                                           <Link to='/canvasview'><PlaySquareOutlined/></Link>
+                                           <Link to={ {pathname:'/feedStream',
+                                               feedUrl:record.url
+                                               }
+                                           }>
+                                           <PlaySquareOutlined/></Link>
                                             </span>
                                         )}/>
                                     </Table>
@@ -208,7 +212,7 @@ export default class FeedView extends Component {
 
 
                     {this.state.formVisible ?
-                    <Col span={12}>
+                    <Col span={9}>
                         {this.state.mode == "Add" ?
                             <Card title="Add Feed">
                                 <WrappedFeedForm feed={this.state.feed} close={this.close}/>

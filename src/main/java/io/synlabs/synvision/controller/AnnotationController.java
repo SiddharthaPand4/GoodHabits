@@ -21,10 +21,11 @@ public class AnnotationController {
        annotationService.saveAnnotation(request);
     }
 
-    @GetMapping("/start/feed")
-    public void startFeed() throws IOException, InterruptedException {
-        annotationService.startFeed();
+    @GetMapping("/start")
+    public void startFeed(@RequestParam String feedUrl) throws IOException, InterruptedException {
+        annotationService.startFeed(feedUrl);
     }
+
     @GetMapping("/stop/feed")
     public void stopFeed() throws IOException, InterruptedException {
         annotationService.stopFeed();
