@@ -38,7 +38,7 @@ public class VidsDashboardService {
         //daily atcc from 6 am today
         Date startofday = Date.from( localDateTime.withHour(6).withMinute(0).withSecond(0).atZone( ZoneId.systemDefault()).toInstant());
 
-        QAtccEvent rawData = QAtccEvent.atccEvent;
+        QAtccEvent rawData = new QAtccEvent("atccEvent");
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
 
         List<Tuple> result = query
@@ -71,7 +71,7 @@ public class VidsDashboardService {
     }
 
     private List<DashboardResponse> getIncidentStats(Date startofday, Date now) {
-        QHighwayIncident inci = QHighwayIncident.highwayIncident;
+        QHighwayIncident inci = new QHighwayIncident("highwayIncident");
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
 
         List<Tuple> result = query

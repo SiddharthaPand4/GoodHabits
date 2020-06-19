@@ -73,7 +73,7 @@ public class VidsService {
 
             String fromDate = request.getFromDate();
             String toDate = request.getToDate();
-            QHighwayIncident root = QHighwayIncident.highwayIncident;
+            QHighwayIncident root = new QHighwayIncident("highwayIncident");
             BooleanExpression query = root.archived.isFalse();
 
             //TODO add time also
