@@ -33,7 +33,7 @@ public class ApcDashboardService extends BaseService {
 
     public List<ApcDashboardResponse> getApcPeopleCount(ApcDashboardRequest request) {
         List<ApcDashboardResponse> response = new ArrayList<>();
-        QApcEvent apcEvent = QApcEvent.apcEvent;
+        QApcEvent apcEvent =new QApcEvent("apcEvent");
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
         List<Tuple> result = null;
         String xAxis = StringUtils.isEmpty(request.getxAxis()) ? "" : request.getxAxis();

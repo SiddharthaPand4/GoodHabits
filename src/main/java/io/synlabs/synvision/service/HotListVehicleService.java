@@ -36,7 +36,7 @@ public class HotListVehicleService {
 
     public PageResponse<HotListVehicleResponse> listHotListedVehicles(HotListVehicleFilterRequest request) {
 
-        QHotListVehicle hotListVehicle = QHotListVehicle.hotListVehicle;
+        QHotListVehicle hotListVehicle = new QHotListVehicle("hotListVehicle");
 
 
         JPAQuery<HotListVehicle> query = createHotListVehicleQuery(hotListVehicle);
