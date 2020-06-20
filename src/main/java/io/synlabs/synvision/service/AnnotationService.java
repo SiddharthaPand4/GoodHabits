@@ -1,5 +1,7 @@
 package io.synlabs.synvision.service;
 
+import io.synlabs.synvision.entity.core.Feed;
+import io.synlabs.synvision.ex.FeedStreamException;
 import io.synlabs.synvision.views.AnnotationRequest;
 import io.synlabs.synvision.views.LineSegment;
 import org.apache.commons.lang3.SystemUtils;
@@ -69,12 +71,18 @@ public class AnnotationService {
         //  ImageIO.write(image, "png", outputfile);
     }
 
-    public void startFeed(String feedUrl) throws IOException, InterruptedException {
+    public void startFeed(Long feedId) {
 
         File dir = new File("E://LiveFeed");
-            if(SystemUtils.IS_OS_LINUX)
-            Runtime.getRuntime().exec("kill -9 $(lsof -t -i:9000)");
-
+        String killCommand = "kill -9 $(lsof -t -i:9000)";
+        if (SystemUtils.IS_OS_LINUX) {
+            try {
+                Runtime.getRuntime().exec(killCommand);
+            } catch (IOException e) {
+                logger.info("Couldn't kill the running process by executing cmd => " + killCommand);
+            }
+        }
+    }
             //For Windows we have to look for alternate code or We can do it manually
             // cmd > netstat -ano | find "9000" - this will return PID
             // taskkill /f /pid PID
@@ -88,13 +96,19 @@ public class AnnotationService {
       //     System.out.println(s);
       //  }
 
-        process = Runtime.getRuntime().exec("streamer "+feedUrl+" localhost:9000 ", null, dir);
+       // Feed feed = feedReposoitory.findById(feedId);
 
-    }
+   //     try {
+   //         process = Runtime.getRuntime().exec("streamer "+feed.getUrl()+" localhost:9000 ", null, dir);
+   //     } catch (IOException e) {
+   //         throw new FeedStreamException("Couldn't start streaming from feed by command");
+   //     }
+//
+   // }
 
-    public void stopFeed() throws IOException, InterruptedException {
+   //public void stopFeed() throws IOException, InterruptedException {
 
-        process.destroy();
+   //    process.destroy();
 
-    }
+   //}
 }
