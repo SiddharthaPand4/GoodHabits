@@ -1,12 +1,15 @@
 package io.synlabs.synvision.controller;
 
+import io.jsonwebtoken.io.IOException;
 import io.synlabs.synvision.service.FeedService;
 import io.synlabs.synvision.views.common.FeedRequest;
 import io.synlabs.synvision.views.common.FeedResponse;
+import io.synlabs.synvision.views.core.UserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/feed/")
@@ -27,18 +30,29 @@ public class FeedController {
 
     @GetMapping("list")
     public List<FeedResponse> getFeeds() {
-        return feedService.getFeeds();
+        return feedService.getFeeds().stream().map(FeedResponse::new).collect(Collectors.toList());
     }
 
-    @GetMapping("{url}")
-    public FeedResponse getFeed(@PathVariable String url){
-        return new FeedResponse(feedService.getFeed(url));
+    @GetMapping("{FeedId}")
+    public FeedResponse getFeed(@PathVariable Long FeedId){
+        return new FeedResponse(feedService.getFeed(new FeedRequest(FeedId)));
     }
 
-    @DeleteMapping
-    public void deleteFeed(@RequestParam String url)
+    @DeleteMapping("{FeedId}")
+    public void deleteFeed(@PathVariable Long FeedId)
     {
-        feedService.deleteFeed(url);
+        feedService.deleteFeed(new FeedRequest(FeedId));
     }
 
+    // Feed Streaming part
+
+    @GetMapping("/start")
+     public void startFeed(@RequestParam Long feedId) throws IOException, InterruptedException {
+       feedService.startFeed(new FeedRequest(feedId));
+     }
+
+    @GetMapping("/stop")
+    public void stopFeed() {
+         feedService.stopFeed();
+    }
 }

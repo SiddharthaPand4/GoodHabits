@@ -13,8 +13,8 @@ class FeedService {
         return axios.get('/api/feed/list');
     }
 
-    getFeed(url) {
-        return axios.get('/api/feed/' +url);
+    getFeed(FeedId) {
+        return axios.get('/api/feed/' +FeedId);
     }
 
     addFeed(feed,flag)
@@ -23,7 +23,8 @@ class FeedService {
             url:feed.url,
             location:feed.location,
             site:feed.site,
-            name:feed.name
+            name:feed.name,
+            id:feed.id
         };
         const request = {
             method: 'POST',
@@ -39,18 +40,18 @@ class FeedService {
 
 
 
-    removeFeed(url) {
-        return axios.delete('/api/feed/?url='+url);
+    removeFeed(FeedId) {
+        return axios.delete('/api/feed/'+FeedId);
     }
 
 
-    startFeed(feed) {
-        return axios.get('/api/feed/' +feed.ID+ '/start');
-    }
+   startFeed(feedId) {
+       return axios.get('/api/feed/start?feedId='+ feedId);
+   }
 
-    stopFeed(feed) {
-        return axios.get('/api/feed/' +feed.ID+ '/stop');
-    }
+   stopFeed() {
+       return axios.get('/api/feed/stop');
+   }
 }
 
 export default FeedService.Instance()

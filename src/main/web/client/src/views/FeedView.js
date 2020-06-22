@@ -7,7 +7,7 @@ import DeleteOutlined from "@ant-design/icons/lib/icons/DeleteOutlined";
 import UserService from "../services/UserService";
 import PlayCircleOutlined from "@ant-design/icons/lib/icons/PlayCircleOutlined";
 import FormOutlined from "@ant-design/icons/lib/icons/FormOutlined";
-import AnnotationView from "./Polygon/AnnotationView";
+import ConfigView from "./Polygon/ConfigView";
 import PlaySquareOutlined from "@ant-design/icons/lib/icons/PlaySquareOutlined";
 import {Link} from "react-router-dom";
 
@@ -27,7 +27,7 @@ export default class FeedView extends Component {
             formVisible:false,
             layout: "list", //list || grid
             mode:"Add", //Add || Edit
-            feed:{url:"",site:"",location:"",name:""},
+            feed:{url:"",site:"",location:"",name:"",id:""},
             feeds: []
         };
 
@@ -52,15 +52,14 @@ export default class FeedView extends Component {
         this.refresh();
     }
 
-    showDeleteConfirm(feed,refresh) {
+    showDeleteConfirm(feedId,refresh) {
         confirm({
             title: 'Are you sure you want to Delete this Feed',
             okText: 'Yes',
             okType: 'danger',
             cancelText: 'No',
             onOk() {
-                console.log(feed);
-                FeedService.removeFeed(feed.url)
+                FeedService.removeFeed(feedId)
                     .then(() => {
                         refresh();
                         message.success("Deleted Successfully!")
@@ -80,19 +79,21 @@ export default class FeedView extends Component {
         });
     }
 
-    startFeed(feed) {
-        FeedService.startFeed(feed).then(() => {
-            //this should force re-render :)
-            this.setState({"refresh_state": Math.random()})
-        })
-    }
+ // startFeed(feed) {
+ //     FeedService.startFeed(feed).then(() => {
+ //         //this should force re-render :)
+ //         this.setState({"refresh_state": Math.random()})
+ //     })
+ // }
 
-    stopFeed(feed) {
-        FeedService.stopFeed(feed).then(() => {
-            //this should force re-render :)
-            this.setState({"refresh_state": Math.random()})
-        })
-    }
+ // stopFeed(feed) {
+ //     FeedService.stopFeed(feed).then(() => {
+ //         //this should force re-render :)
+ //         this.setState({"refresh_state": Math.random()})
+ //     })
+ // }
+
+
     changeLayout(layout) {
         this.setState({"layout": layout});
     }
@@ -106,10 +107,10 @@ export default class FeedView extends Component {
     }
 
 
-    showFeed(url){
+    showFeed(FeedId){
         this.setState({"formVisible":true,"mode":"Edit"})
         flag=true;
-        FeedService.getFeed(url)
+        FeedService.getFeed(FeedId)
             .then(response =>{
                 this.setState({feed : response.data})
             },
@@ -161,12 +162,12 @@ export default class FeedView extends Component {
                                         <Column title="Site" dataIndex="site" key="site"/>
                                         <Column title="Action" render={(text, record) => (
                                             <span>
-                                             <FormOutlined onClick={this.showFeed.bind(this, record.url)}/>
+                                             <FormOutlined onClick={this.showFeed.bind(this, record.id)}/>
                                            <Divider type="vertical" />
-                                           <DeleteOutlined  style={{color: "#ff0000"}} onClick={this.showDeleteConfirm.bind(this,record,this.refresh)}/>
+                                           <DeleteOutlined  style={{color: "#ff0000"}} onClick={this.showDeleteConfirm.bind(this,record.id,this.refresh)}/>
                                            <Divider type="vertical" />
                                            <Link to={ {pathname:'/feedStream',
-                                               feedUrl:record.url
+                                               feed:record
                                                }
                                            }>
                                            <PlaySquareOutlined/></Link>
@@ -191,14 +192,12 @@ export default class FeedView extends Component {
                                         cover={<img alt="feedview" src={"/api/feed/" + feed.ID + "/view"}/>}
                                         bordered={true}
                                         actions={[
+                                            <Link to={{pathname:'/feedStream',
+                                                feed:feed
+                                            }}>
+                                                <Button>Play</Button></Link>,
                                             <Button onClick={() => {
-                                                this.startFeed(feed)
-                                            }}>Start</Button>,
-                                            <Button onClick={() => {
-                                                this.stopFeed(feed)
-                                            }}>Stop</Button>,
-                                            <Button onClick={() => {
-                                                this.showDeleteConfirm(feed,this.refresh)
+                                                this.showDeleteConfirm(feed.id,this.refresh)
                                             }}>Delete</Button>
                                         ]}
                                     >
@@ -270,6 +269,7 @@ close()
         feed.site = form.getFieldValue("site");
         feed.location = form.getFieldValue("location");
         feed.name = form.getFieldValue("name");
+        feed.id=this.props.feed.id
         let validationError;
         if (!feed.url) {
             validationError = "Missing url"

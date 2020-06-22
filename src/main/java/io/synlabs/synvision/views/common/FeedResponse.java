@@ -8,7 +8,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class FeedResponse {
+public class FeedResponse implements Response{
+    private Long id;
     private String url;
     private String name;
     private String location;
@@ -17,6 +18,7 @@ public class FeedResponse {
 
 
     public FeedResponse(Feed feed) {
+        this.id = mask(feed.getId());
         this.url=feed.getUrl();
         this.name = feed.getName();
         this.location = feed.getLocation();
