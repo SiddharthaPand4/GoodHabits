@@ -49,7 +49,7 @@ public class DashboardService extends BaseService {
             logger.info("Couldn't parse date", request.getFrom());
         }
 
-        QAtccEvent rawData = QAtccEvent.atccEvent;
+        QAtccEvent rawData = new QAtccEvent("atccEvent");
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
         List<Tuple> result = null;
         Date date = null;
@@ -132,7 +132,7 @@ public class DashboardService extends BaseService {
     public List<IncidentCountResponse> getHelmetMissingIncidents(DashboardRequest request) {
 
         List<IncidentCountResponse> helmetMissingIncidents = new ArrayList<>();
-        QAnprEvent anprEvent = QAnprEvent.anprEvent;
+        QAnprEvent anprEvent =new QAnprEvent("anprEvent");
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
         List<Tuple> result = null;
 
@@ -191,7 +191,7 @@ public class DashboardService extends BaseService {
     public List<IncidentCountResponse> getReverseDirectionIncidents(DashboardRequest request) {
 
         List<IncidentCountResponse> reverseDirectionIncidents = new ArrayList<>();
-        QAnprEvent anprEvent = QAnprEvent.anprEvent;
+        QAnprEvent anprEvent =new QAnprEvent("anprEvent");
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
         List<Tuple> result = null;
 
@@ -416,7 +416,7 @@ public class DashboardService extends BaseService {
             logger.info("Couldn't parse date", request.getFrom());
         }
 
-        QAnprEvent rawData = QAnprEvent.anprEvent;
+        QAnprEvent rawData = new QAnprEvent("anprEvent");
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
         List<Tuple> result = null;
         Date date = null;
