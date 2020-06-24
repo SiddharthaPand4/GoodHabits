@@ -93,7 +93,7 @@ public class AnprService extends BaseService {
 
             String fromDate = request.getFromDate();
             String toDate = request.getToDate();
-            QAnprEvent root = QAnprEvent.anprEvent;
+            QAnprEvent root = new QAnprEvent("anprEvent");
             BooleanExpression query = root.archived.isFalse();
 
             if (request.getLpr() != null) {
