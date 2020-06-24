@@ -1,37 +1,26 @@
 package io.synlabs.synvision.service;
 
-import io.synlabs.synvision.views.AnnotationRequest;
+import io.synlabs.synvision.views.ConfigRequest;
 import io.synlabs.synvision.views.LineSegment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import sun.misc.BASE64Decoder;
 
-import javax.annotation.PostConstruct;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Base64;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
-import static com.sun.jmx.snmp.EnumRowStatus.destroy;
 
 @Service
-public class AnnotationService {
+public class ConfigService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AnnotationService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigService.class);
 
     private Process process;
 
-    public void saveAnnotation(AnnotationRequest request) throws IOException {
+    public void saveAnnotation(ConfigRequest request) throws IOException {
         String filename = null;
-        Path path= Paths.get("d:/");
+        Path path = Paths.get("d:/");
         filename = path.resolve(UUID.randomUUID().toString() + ".txt").toString();
         File file = new File(String.valueOf(path));
         if (file.exists()) {
@@ -71,17 +60,4 @@ public class AnnotationService {
         //  ImageIO.write(image, "png", outputfile);
     }
 
-    public void startFeed() throws IOException, InterruptedException {
-
-        File dir = new File("E://LiveFeed");
-
-        process = Runtime.getRuntime().exec("streamer https://www.radiantmediaplayer.com/media/bbb-360p.mp4 localhost:9000 ", null, dir);
-
-    }
-
-    public void stopFeed() throws IOException, InterruptedException {
-
-        process.destroy();
-
-    }
 }

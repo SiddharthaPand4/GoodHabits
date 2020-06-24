@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class AnnotationRequest {
+public class ConfigRequest {
    // private MultipartFile file;
     private List<LineSegment> lines;
    // private String dataURL;
