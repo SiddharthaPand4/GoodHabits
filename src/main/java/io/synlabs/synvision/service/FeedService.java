@@ -15,8 +15,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +25,8 @@ public class FeedService {
     private Process process;
 
     private final FeedRepository feedRepository;
+    HashMap<Long,Integer> processMap=new HashMap<Long,Integer>();
+
 
     public FeedService(FeedRepository feedRepository) {
         this.feedRepository = feedRepository;
@@ -87,34 +88,43 @@ public class FeedService {
     }
 //Feed streaming part
 
-    public void startFeed(FeedRequest request) {
+    public int startFeed(FeedRequest request) {
         File dir = new File("E://LiveFeed");
-        String killCommand = "kill -9 $(lsof -t -i:9000)";
-        if (SystemUtils.IS_OS_LINUX) {
-            try {
-                Runtime.getRuntime().exec(killCommand);
-            } catch (IOException e) {
-                logger.info("Couldn't kill the running process by executing cmd => " + killCommand);
-            }
-        }
-        //For Windows we have to look for alternate code or We can do it manually
-        // cmd > netstat -ano | find "9000" - this will return PID
-        // taskkill /f /pid PID
-
         Feed feed = feedRepository.getOne(request.getId());
-        String StreamCmd="streamer " + feed.getUrl() + " localhost:9000 ";
+        int port =0;
+
+        if(processMap.containsKey(request.getId()))
+        {
+           port= processMap.get(request.getId());
+        }
+        else
+        {
+            Random rand =  new Random();
+            port=rand.nextInt((9005-9000)+1)+9000;//small range for trial.can be scaled as per use
+            if(!processMap.containsValue(port)){
+                processMap.put(request.getId(),port);
+            } 
+
+        }
+
+        String StreamCmd="streamer " + feed.getUrl() + " localhost:" +port;
         try {
             process = Runtime.getRuntime().exec(StreamCmd, null, dir);
-           // System.out.println(StreamCmd);
+            System.out.println(Arrays.asList(processMap));
+          return port;
+
         } catch (IOException e) {
             throw new FeedStreamException("Couldn't start streaming from feed by command =>" + StreamCmd);
         }
 
     }
 
-    public void stopFeed() {
-
+    public void stopFeed(Long feedId) {
         process.destroy();
+        // still need something to free the port in backend
+        //We can do it manually
+        // cmd > netstat -ano | find "9000" - this will return PID
+        // taskkill /f /pid PID
+        processMap.remove(feedId);
     }
-
 }

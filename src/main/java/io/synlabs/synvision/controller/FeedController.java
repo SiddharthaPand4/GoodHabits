@@ -18,6 +18,20 @@ public class FeedController {
     @Autowired
     private FeedService feedService;
 
+    // Feed Streaming part start /stop feed
+
+    @GetMapping("/start")
+    public int startFeed(@RequestParam Long feedId) throws IOException, InterruptedException {
+        return feedService.startFeed(new FeedRequest(feedId));
+    }
+
+    @GetMapping("/stop")
+    public void stopFeed(@RequestParam Long feedId) {
+        feedService.stopFeed(feedId);
+    }
+
+    //feed operations add ,update,delete
+
     @PostMapping
     public FeedResponse addFeed(@RequestBody FeedRequest request) {
         return new FeedResponse(feedService.addFeed(request));
@@ -44,15 +58,5 @@ public class FeedController {
         feedService.deleteFeed(new FeedRequest(FeedId));
     }
 
-    // Feed Streaming part
 
-    @GetMapping("/start")
-     public void startFeed(@RequestParam Long feedId) throws IOException, InterruptedException {
-       feedService.startFeed(new FeedRequest(feedId));
-     }
-
-    @GetMapping("/stop")
-    public void stopFeed() {
-         feedService.stopFeed();
-    }
 }

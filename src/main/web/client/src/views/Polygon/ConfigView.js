@@ -25,7 +25,8 @@ export default class ConfigView extends Component {
             lines: [],
             isPlaying: true,
             image: null,
-            dataURL: ""
+            dataURL: "",
+            port:null
         }
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -71,9 +72,11 @@ export default class ConfigView extends Component {
 
     startFeed(feedId){
 
-        FeedService.startFeed(feedId)
+       FeedService.startFeed(feedId)
             .then(res => {
             message.success("Feed started")
+                this.state.port=res.data
+                console.log(res.data)
                 //window.location.reload();
 
         }).catch(err => {
@@ -81,8 +84,8 @@ export default class ConfigView extends Component {
         })
     }
 
-    stopFeed() {
-        FeedService.stopFeed().then(res => {
+    stopFeed(feedId) {
+        FeedService.stopFeed(feedId).then(res => {
             message.success("Feed stoped")
 
         }).catch(err => {
@@ -273,15 +276,17 @@ export default class ConfigView extends Component {
                         <Col span={12}>
 
                             <br/><br/>&nbsp;&nbsp;<Button  onClick={()=>this.startFeed(this.props.location.feed.id)}><Icon type="play-circle" />Start Feed</Button>
-                            &nbsp;&nbsp;<Button onClick={this.stopFeed}><Icon type="pause-circle" />Stop Feed</Button>
+                            &nbsp;&nbsp;<Button onClick={()=>this.stopFeed(this.props.location.feed.id)}><Icon type="pause-circle" />Stop Feed</Button>
                             &nbsp;&nbsp;<Button
                                     onClick={this.capture}><Icon type="camera" />Capture</Button><br/><br/>
                             <Tag color="#f50">{this.props.location.feed.site} / {this.props.location.feed.location} / {this.props.location.feed.name}/ {this.props.location.feed.url}</Tag>
                             <br/><br/>
                             {isPlaying
-                                ? <img style={{border:"1px solid black"}} id="video" controls width="500" height="260" src="http://localhost:9000/stream"></img>
+                                ? <img style={{border:"1px solid black"}} id="video" controls width="500" height="260" src={"http://localhost:"+this.state.port+"/stream"}></img>
+
+
                                 :
-                                <img style={{border:"1px solid black"}} id="video" controls width="500" height="260" src="http://localhost:9000/ss"></img>
+                                <img style={{border:"1px solid black"}} id="video" controls width="500" height="260" src={"http://localhost:"+this.state.port+"/ss"}></img>
                             }
                             <br/><br/><Button style={{width: "500px"}} type="primary"
                                               onClick={() => this.setState({isPlaying: !isPlaying})}>PLAY/PAUSE</Button>

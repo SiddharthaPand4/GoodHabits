@@ -49,8 +49,8 @@ class FeedService {
        return axios.get('/api/feed/start?feedId='+ feedId);
    }
 
-   stopFeed() {
-       return axios.get('/api/feed/stop');
+   stopFeed(feedId) {
+       return axios.get('/api/feed/stop?feedId='+ feedId);
    }
 }
 

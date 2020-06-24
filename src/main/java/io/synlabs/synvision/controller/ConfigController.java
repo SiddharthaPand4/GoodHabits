@@ -17,9 +17,10 @@ public class ConfigController {
 
     @PostMapping("/annotation")
     // public void saveAnnotation(@RequestParam AnnotationRequest request) throws IOException {
-    public void saveAnnotation(@RequestBody ConfigRequest request) throws IOException {
+    public void saveConfig(@RequestBody ConfigRequest request) throws IOException {
         configService.saveAnnotation(request);
     }
+
 
 
 }
