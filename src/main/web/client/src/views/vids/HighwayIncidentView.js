@@ -9,13 +9,17 @@ import {
     Row,
     Table,
     Tag,
-    Button, Menu, Dropdown, Typography
+    Button, Menu, Dropdown, Typography, Input
 } from 'antd';
 import GenericFilter from "../../components/GenericFilter";
 import Moment from "react-moment";
 import VidsService from "../../services/VidsService";
+import feedService from "../../services/FeedService";
+
 import {Player} from 'video-react';
 import "video-react/dist/video-react.css";
+import UserOutlined from "@ant-design/icons/lib/icons/UserOutlined";
+import DownOutlined from "@ant-design/icons/lib/icons/DownOutlined";
 
 const {Text} = Typography;
 
@@ -31,11 +35,17 @@ export default class HighwayIncidentView extends Component {
             visible: true,
             loading: true,
             layout: "list",
+            incidentType:"",
+            location:"",
+            feedOptions: [],
             incidents: {},
             playVideo: false,
             filter: {
                 page: 1,
-                pageSize: 12
+                pageSize: 12,
+                incidentType:"",
+                location:""
+
             },
         };
 
@@ -45,20 +55,31 @@ export default class HighwayIncidentView extends Component {
         this.handleRefresh = this.handleRefresh.bind(this);
         this.onPageChange = this.onPageChange.bind(this);
         this.onPageSizeChange = this.onPageSizeChange.bind(this);
+        this.handleIncidentMenuClick=this.handleIncidentMenuClick.bind(this);
+
+        this.handleLocationMenuClick=this.handleLocationMenuClick.bind(this);
+        this.getFeeds=this.getFeeds.bind(this);
     }
 
     componentDidMount() {
         this.refresh();
+        this.getFeeds();
+
     }
 
     refresh() {
+        this.IncidentFilter();
+        this.LocationFilter();
         VidsService.getIncidents(this.state.filter).then(request => {
             this.setState({"incidents": request.data, loading: false})
+
         })
     }
 
     //cant use refresh to read from state as state may not have been set
     refreshNow() {
+        this.IncidentFilter();
+        this.LocationFilter();
         VidsService.getIncidents(this.state.filter).then(request => {
             this.setState({"incidents": request.data, loading: false})
         })
@@ -101,16 +122,93 @@ export default class HighwayIncidentView extends Component {
         this.refreshNow(filter);
     }
 
-    render() {
+    handleIncidentMenuClick(choice) {
+        if(choice.item.props.children=="All")
+        {this.setState({incidentType:""})}
+        else
+       this.setState({incidentType:choice.item.props.children});
+    }
 
+    handleLocationMenuClick(choice) {
+        if(choice.item.props.children=="All")
+        {this.setState({location:""})}
+        else
+            this.setState({location:choice.item.props.children});
+    }
+
+    render() {
+        let location=this.state.filter.location;
         let layout = this.state.layout;
+        let LocationOptions=this.state.LocationOptions;
+
+        const incidentMenu = (
+            <Menu onClick={this.handleIncidentMenuClick}>
+                <Menu.Item key="1" icon={<UserOutlined />}>
+                    All
+                </Menu.Item>
+                <Menu.Item key="2" icon={<UserOutlined />}>
+                    WrongDirection
+                </Menu.Item>
+                <Menu.Item key="3" icon={<UserOutlined />}>
+                    Queue
+                </Menu.Item>
+                <Menu.Item key="4" icon={<UserOutlined/>}>
+                    StoppedVehicle
+
+                </Menu.Item>
+                <Menu.Item key="5" icon={<UserOutlined />}>
+                    Deceleration
+
+                </Menu.Item>
+                <Menu.Item key="6" icon={<UserOutlined />}>
+                    FogSmoke
+
+                </Menu.Item>
+                <Menu.Item key="7" icon={<UserOutlined />}>
+                    NoVideo
+                </Menu.Item>
+                <Menu.Item key="8" icon={<UserOutlined />}>
+                    Animal
+                </Menu.Item>
+            </Menu>
+        );
+
+
+        const locationMenu = (
+
+            <Menu onClick={this.handleLocationMenuClick}>
+                <Menu.Item key={1}>All</Menu.Item>
+                {(this.state.feedOptions || []).map((loc) =>
+            <Menu.Item key={loc} icon={<UserOutlined />}>
+                    {loc.site+">"+loc.location}
+                </Menu.Item>
+                )}
+            </Menu>
+
+        );
+
+
 
         return (
             <div>
                 <h3>Highway Incidents</h3>
                 <Collapse bordered={false} defaultActiveKey={['1']}>
+                    <span>&nbsp;&nbsp;</span>
                     <Panel header="Filter" key="1">
+                        Location <Dropdown overlay={locationMenu} >
+                        <Button color="#f50">
+                            {this.state.location}<DownOutlined />
+                        </Button>
+                    </Dropdown>
+                        <span>&nbsp;&nbsp;</span>
+                        Incident Type <Dropdown overlay={incidentMenu} >
+                            <Button color="#f50">
+                                {this.state.incidentType}<DownOutlined />
+                            </Button>
+                        </Dropdown>
 
+                        <br/>
+                        <br/>
                         <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
                                        handleFilterChange={this.handleFilterChange}
                                        handleLayoutChange={this.handleLayoutChange}/>
@@ -127,8 +225,7 @@ export default class HighwayIncidentView extends Component {
         if (event && event.feed) {
             result = event.feed.site + " > " + event.feed.location + " > " + event.feed.name;
         }
-        return result;
-
+    return result;
     }
 
     renderGrid() {
@@ -169,6 +266,7 @@ export default class HighwayIncidentView extends Component {
                                     </div>
 
                                 }
+
                                 extra={<Dropdown overlay={<Menu>
                                     <Menu.Item key="1">
                                         <a
@@ -197,6 +295,7 @@ export default class HighwayIncidentView extends Component {
                                 bordered={true}
 
                             >
+
 
                                 <Player
                                     playsInline
@@ -274,5 +373,27 @@ export default class HighwayIncidentView extends Component {
 
             </Table>
         )
+    }
+
+    IncidentFilter() {
+        let filter=this.state.filter;
+        filter.incidentType=this.state.incidentType;
+        this.setState({filter:filter})
+    }
+
+
+    getFeeds(){
+        feedService.getFeeds().then(response=>{
+            this.setState({feedOptions: response.data});
+        }).catch(error=>{
+            alert("somthing went wrong");
+        })
+    }
+
+
+    LocationFilter(loc) {
+        let filter = this.state.filter;
+        filter.location =this.state.location;
+        this.setState({filter: filter})
     }
 }

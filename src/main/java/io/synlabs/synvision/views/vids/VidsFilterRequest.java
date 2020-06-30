@@ -8,4 +8,5 @@ import lombok.Setter;
 @Setter
 public class VidsFilterRequest extends IncidentsFilterRequest {
     private String incidentType;
+    private String location;
 }

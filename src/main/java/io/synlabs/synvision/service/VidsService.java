@@ -52,6 +52,7 @@ public class VidsService {
     public PageResponse<VidsResponse> listIncidents(VidsFilterRequest request) {
         BooleanExpression query = getQuery(request);
         int count = (int) incidentRepository.count(query);
+
         int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
         Pageable paging = PageRequest.of(request.getPage() - 1, request.getPageSize(), Sort.by(DESC, "incidentDate"));
 
@@ -90,7 +91,36 @@ public class VidsService {
                 Date endingDate = dateFormat.parse(ending);
                 query = query.and(root.incidentDate.before(endingDate));
             }
+            if(request.getIncidentType()!=""){
+                String incidentType=request.getIncidentType();
+                query =query.and(root.incidentType.eq(HighwayIncidentType.valueOf(incidentType)));
+            }
+            if(request.getLocation()!="")
+            {
+                String location=request.getLocation();
+                String[] feed=location.split(">");
+                String loc="",site="";
+                int flg=0;
+                for (String a : feed) {
+                    if (flg == 0)
+                    {
+                        site=a;
+                        flg=1;
+                    }
+                    else
+                    {
+                        loc=a;
+                        flg=0;
+                    }
+
+                }
+
+                query=query.and(root.feed.site.eq(site));
+                query=query.and(root.feed.location.eq(loc));
+            }
+            System.out.println(query);
             return query;
+
         } catch (Exception e) {
             logger.error("Error in parsing date", e);
         }
@@ -228,6 +258,5 @@ public class VidsService {
             throw new NotFoundException("File not found " + filename, ex);
         }
     }
-
 
 }
