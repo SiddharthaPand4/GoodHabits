@@ -13,6 +13,12 @@ import javax.persistence.Entity;
 @Setter
 public class RegisteredPerson extends BaseEntity {
 
+    @Column(length = 200)
+    private String fullImage;
+
+    @Column(length = 200)
+    private String faceImage;
+
     private PersonType personType;
 
     @Column(length = 20)
@@ -20,9 +26,6 @@ public class RegisteredPerson extends BaseEntity {
 
     @Column(length = 20)
     private String name;
-
-    @Column(length = 255)
-    private String address;
 
     private boolean active;
 
