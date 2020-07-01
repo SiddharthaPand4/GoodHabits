@@ -35,6 +35,9 @@ import HighwayIncidentDashboardView from "./views/vids/HighwayIncidentDashboardV
 import AnprReportView from "./views/anpr/AnprReportView";
 import FaceMatchView from "./components/facerec/FaceMatchView";
 
+import ConfigView from "./views/Polygon/ConfigView";
+
+
 const {Content} = Layout;
 
 class App extends Component {
@@ -100,8 +103,10 @@ class App extends Component {
                                 <PrivateRoute path='/vids' exact={true} component={HighwayIncidentView}/>
                                 <PrivateRoute path='/vids/dashboard' exact={true} component={HighwayIncidentDashboardView}/>
 
+                                <PrivateRoute path='/feedStream' exact={true} component={ConfigView}/>
+
                                 {/* face rec */}
-                                <PrivateRoute path='/ngofr' exact={true} component={FaceMatchView}/>
+                                <PrivateRoute path='/ngofr'
                             </div>
                         </Content>
                         <Footerbar/>

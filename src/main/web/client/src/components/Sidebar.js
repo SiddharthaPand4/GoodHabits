@@ -35,6 +35,7 @@ export default class Sidebar extends Component {
 
         return (
             <Sider
+                className={"no-print"}
                 collapsible
                 breakpoint="lg"
                 collapsedWidth="0"
@@ -119,9 +120,15 @@ export default class Sidebar extends Component {
                         </Menu.Item>
                     </SubMenu>
 
-                    <Menu.Item key="6">
-                        <Link to='/feed'><Icon type='video-camera'/><span className='nav-text'>Feed</span></Link>
+
+                    <Menu.Item key="6" className="sidebar-nav-link">
+                    <Link to='/feed'>  <Icon type='box-plot'/>
+                    <span  className='nav-text'>
+                           <span>Feed</span>
+                        </span></Link>
                     </Menu.Item>
+
+
                     <SubMenu key="admin" title={<span><Icon type="deployment-unit"/>Admin</span>}>
                         <Menu.Item key="51">
                             <Link to='/user'><Icon type='user'/><span className='nav-text'>Users</span></Link>

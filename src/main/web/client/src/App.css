@@ -1,8 +1,48 @@
 @import '../node_modules/antd/dist/antd.css';
 
 .logo {
-  height: 40px;
-  background: rgba(255, 255, 255, 0.2);
-  margin: 16px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 16px;
 }
+
+main.ant-layout-content
+{
+    overflow:hidden;
+    margin:0 !important;
+}
+.sc-fjdhpX.dIWoiE {
+    /*position: unset !important;*/
+}
+
+.linesContainer:nth-child(2) {
+   /* display: none !important;*/
+}
+
+@media print {
+    .no-print, .no-print * {
+        display: none !important;
+        -webkit-print-color-adjust: exact;
+    }
+
+    body, main {
+        border: 0;
+        float: none;
+        margin: 0;
+        overflow: visible;
+        padding: 0;
+        position: static;
+        width: 100%;
+    }
+
+    @page {
+        size: portrait;
+        width: 100%;
+        margin: 0.0cm 0.0cm 0.0cm 0.3cm;
+        padding: 10px;
+    }
+
+
+}
+
 
