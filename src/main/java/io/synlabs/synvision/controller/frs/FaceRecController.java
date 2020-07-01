@@ -1,10 +1,7 @@
 package io.synlabs.synvision.controller.frs;
 
 import io.synlabs.synvision.service.FaceRecService;
-import io.synlabs.synvision.views.frs.FRSLookupRequest;
-import io.synlabs.synvision.views.frs.FRSLookupResponse;
-import io.synlabs.synvision.views.frs.FRSRegisterRequest;
-import io.synlabs.synvision.views.frs.FRSRegisterResponse;
+import io.synlabs.synvision.views.frs.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +21,12 @@ public class FaceRecController {
     }
 
     @PostMapping("lookup")
-    public FRSLookupResponse register(@RequestBody FRSLookupRequest request){
+    public FRSLookupResponse lookup(@RequestBody FRSLookupRequest request){
         return new FRSLookupResponse(faceRecService.lookup(request));
+    }
+
+    @PostMapping("users")
+    public FrsUserPageResponse getRegisteredUsers(@RequestBody FrsFilterRequest request) {
+        return faceRecService.getRegistersUsers(request);
     }
 }

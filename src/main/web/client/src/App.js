@@ -35,6 +35,7 @@ import AnprReportView from "./views/anpr/AnprReportView";
 import FaceMatchView from "./components/facerec/FaceMatchView";
 
 import ConfigView from "./views/Polygon/ConfigView";
+import RegisteredView from "./components/facerec/RegisteredView";
 
 
 const {Content} = Layout;
@@ -104,7 +105,8 @@ class App extends Component {
                                 <PrivateRoute path='/feedStream' exact={true} component={ConfigView}/>
 
                                 {/* face rec */}
-                                <PrivateRoute path='/ngofr' exact={true} component={FaceMatchView}/>
+                                <PrivateRoute path='/register' exact={true} component={FaceMatchView}/>
+                                <PrivateRoute path='/frsuser' exact={true} component={RegisteredView}/>
                             </div>
                         </Content>
                         <Footerbar/>

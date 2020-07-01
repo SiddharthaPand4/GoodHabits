@@ -56,7 +56,7 @@ export default class Sidebar extends Component {
                         >
                             {(item.submenu || []).map((subitem, index) =>
                                 <Menu.Item key={subitem.key} className="sidebar-nav-link">
-                                <Link to={subitem.link}><span className='nav-text'>{subitem.title}</span></Link>
+                                    <Link to={subitem.link}><span className='nav-text'>{subitem.title}</span></Link>
                                 </Menu.Item>
                             )}
                         </SubMenu>
@@ -122,8 +122,8 @@ export default class Sidebar extends Component {
 
 
                     <Menu.Item key="6" className="sidebar-nav-link">
-                    <Link to='/feed'>  <Icon type='box-plot'/>
-                    <span  className='nav-text'>
+                        <Link to='/feed'> <Icon type='box-plot'/>
+                            <span className='nav-text'>
                            <span>Feed</span>
                         </span></Link>
                     </Menu.Item>
@@ -142,21 +142,6 @@ export default class Sidebar extends Component {
                         </Menu.Item>
                     </SubMenu>
 
-
-                    {/*<SubMenu
-                        key="sub3"
-                        title={
-                            <span>
-                         <Icon type='box-plot'/>
-                         <span>People Counting</span>
-                       </span>
-                        }
-                    >
-                        <Menu.Item key="7" className="sidebar-nav-link">
-                            <Link to='/people-counting/events'><span className='nav-text'>Events</span></Link>
-                        </Menu.Item>
-                    </SubMenu>*/}
-
                     <SubMenu
                         key="sub3"
                         title={
@@ -174,10 +159,25 @@ export default class Sidebar extends Component {
                         </Menu.Item>
                     </SubMenu>
 
-                    <Menu.Item key="7">
-                        <Link to='/ngofr'><Icon type='video-camera'/><span className='nav-text'>FRS</span></Link>
-                    </Menu.Item>
-                    <Menu.Item key="8">
+                    <SubMenu
+                        key="frs"
+                        title={
+                            <span>
+                                             <Icon type='box-plot'/>
+                                             <span>FRS</span>
+                                           </span>
+                        }
+                    >
+                        <Menu.Item key="frs-1">
+                            <Link to='/register'><Icon type='video-camera'/><span
+                                className='nav-text'>Register</span></Link>
+                        </Menu.Item>
+                        <Menu.Item key="frs-2">
+                            <Link to='/frsuser'><Icon type='video-camera'/><span
+                                className='nav-text'>Registered Users</span></Link>
+                        </Menu.Item>
+                    </SubMenu>
+                    <Menu.Item key="logout">
                         <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span
                             className='nav-text'>Logout</span></Link>
                     </Menu.Item>

@@ -1,22 +1,29 @@
 package io.synlabs.synvision.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import io.synlabs.synvision.entity.frs.QRegisteredPerson;
 import io.synlabs.synvision.entity.frs.RegisteredPerson;
 import io.synlabs.synvision.enums.PersonType;
 import io.synlabs.synvision.ex.ValidationException;
 import io.synlabs.synvision.jpa.RegisteredPersonRepository;
-import io.synlabs.synvision.views.frs.FRSLookupRequest;
-import io.synlabs.synvision.views.frs.FRSLookupResponse;
-import io.synlabs.synvision.views.frs.FRSRegisterRequest;
-import io.synlabs.synvision.views.frs.FRSRegisterResponse;
+import io.synlabs.synvision.views.frs.*;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 
 @Service
@@ -30,6 +37,43 @@ public class FaceRecService {
     @Autowired
     private RegisteredPersonRepository frsRepository;
 
+
+    public FrsUserPageResponse getRegistersUsers(FrsFilterRequest request) {
+        BooleanExpression query = getQuery(request);
+        int count = (int) frsRepository.count(query);
+        int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
+        Pageable paging = PageRequest.of(request.getPage() - 1, request.getPageSize(), Sort.by(DESC, "pid"));
+
+        Page<RegisteredPerson> page = frsRepository.findAll(query, paging);
+        List<FrsUserResponse> list = new ArrayList<>(page.getSize());
+        page.get().forEach(item -> {
+            list.add(new FrsUserResponse(item));
+        });
+
+        return new FrsUserPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
+    }
+
+    public BooleanExpression getQuery(FrsFilterRequest request) {
+
+        try {
+
+            QRegisteredPerson root = new QRegisteredPerson("registeredPerson");
+            BooleanExpression query = root.active.isTrue();
+
+            if (request.getName() != null) {
+                query = query.and(
+                        root.name.likeIgnoreCase("%" + request.getName() + "%").or(root.pid.likeIgnoreCase("%" + request.getName() + "%"))
+                );
+            }
+            //TODO add or for EID
+            return query;
+        } catch (Exception e) {
+            logger.error("Error in parsing date", e);
+        }
+        return null;
+    }
+
+
     public RegisteredPerson register(FRSRegisterRequest request) {
 
         RegisteredPerson re =  frsRepository.findOneByPidAndActiveTrue(request.getId());
@@ -38,41 +82,48 @@ public class FaceRecService {
             throw new ValidationException("Duplicate RE");
         }
 
-        OkHttpClient client = new OkHttpClient();
-        try {
-            Request okrequest = new Request.Builder()
-                    .header("Authorization", "your token")
-                    .url("http://localhost:5000/register")
-                    .post(RequestBody.create(request.toJsonString(), JSON))
-                    .build();
-
-            logger.info("Outbound: {}", okrequest);
-            Response okresponse = client.newCall(okrequest).execute();
-            if (okresponse.isSuccessful()) {
-
-                ObjectMapper mapper = new ObjectMapper();
-                RegisterResponse resp = mapper.readValue(Objects.requireNonNull(okresponse.body()).string(), RegisterResponse.class);
-
-                if (resp.error) {
-                    throw new ValidationException(resp.message);
-                }
-
-
-                RegisteredPerson person = new RegisteredPerson();
-                person.setPid(request.getId());
-                person.setName(request.getName());
-                person.setAddress(request.getAddress());
-                person.setPersonType(PersonType.Subject);
-                person.setActive(true);
-                frsRepository.save(person);
-                return person;
-            } else {
-                throw new IOException("Unexpected code " + okresponse);
-            }
-
-        } catch (IOException e) {
-            throw new ValidationException("Error!");
-        }
+        RegisteredPerson person = new RegisteredPerson();
+        person.setPid(request.getId());
+        person.setName(request.getName());
+        person.setPersonType(PersonType.valueOf(request.getType()));
+        person.setActive(true);
+        frsRepository.save(person);
+        return person;
+//
+//        OkHttpClient client = new OkHttpClient();
+//        try {
+//            Request okrequest = new Request.Builder()
+//                    .header("Authorization", "your token")
+//                    .url("http://localhost:5000/register")
+//                    .post(RequestBody.create(request.toJsonString(), JSON))
+//                    .build();
+//
+//            logger.info("Outbound: {}", okrequest);
+//            Response okresponse = client.newCall(okrequest).execute();
+//            if (okresponse.isSuccessful()) {
+//
+//                ObjectMapper mapper = new ObjectMapper();
+//                RegisterResponse resp = mapper.readValue(Objects.requireNonNull(okresponse.body()).string(), RegisterResponse.class);
+//
+//                if (resp.error) {
+//                    throw new ValidationException(resp.message);
+//                }
+//
+//
+//                RegisteredPerson person = new RegisteredPerson();
+//                person.setPid(request.getId());
+//                person.setName(request.getName());
+//                person.setPersonType(PersonType.Subject);
+//                person.setActive(true);
+//                frsRepository.save(person);
+//                return person;
+//            } else {
+//                throw new IOException("Unexpected code " + okresponse);
+//            }
+//
+//        } catch (IOException e) {
+//            throw new ValidationException("Error!");
+//        }
 
     }
 
@@ -101,8 +152,7 @@ public class FaceRecService {
             if (okresponse.isSuccessful()) {
                 ObjectMapper mapper = new ObjectMapper();
                 OkResponse resp = mapper.readValue(Objects.requireNonNull(okresponse.body()).string(), OkResponse.class);
-                RegisteredPerson re =  frsRepository.findOneByPidAndActiveTrue(resp.id);
-                return re;
+                return frsRepository.findOneByPidAndActiveTrue(resp.id);
             } else {
                 throw new IOException("Unexpected code " + okresponse);
             }

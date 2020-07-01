@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import Webcam from "react-webcam";
-import {Button, ButtonGroup, Col, Form, Input, Row, Typography} from "antd";
+import {Button, ButtonGroup, Col, Form, Input, Row, Select, Typography} from "antd";
 import FaceMatchService from "../../services/facerec/FaceMatchService";
 import {EventBus} from "../event";
 
@@ -87,11 +87,12 @@ class UserForm extends Component {
             userdata: this.props.userdata
         };
 
+        this.state.userdata.type = "Employee";
         this.handleSubmit = this.handleSubmit.bind(this);
         this.refresh = this.refresh.bind(this);
         this.screenshot = this.screenshot.bind(this);
         this.lookup = this.lookup.bind(this);
-
+        this.handleChange = this.handleChange.bind(this);
         EventBus.subscribe('frs-refresh', (data) => this.refresh(data));
         EventBus.subscribe('frs-screenshot', (data) => this.screenshot(data));
 
@@ -104,12 +105,20 @@ class UserForm extends Component {
         this.props.form.setFieldsInitialValue({
             id: this.state.userdata.id,
             name: this.state.userdata.name,
-            address: this.state.userdata.address
+            address: this.state.userdata.address,
+            type: this.state.userdata.type
         })
     }
 
     componentWillUnmount() {
         console.log('component unmounted');
+    }
+
+    handleChange(value) {
+        let userdata = this.state.userdata;
+        userdata.type = value;
+        this.setState({userdata: userdata});
+        console.log(`selected ${value}`);
     }
 
     screenshot(image) {
@@ -123,8 +132,11 @@ class UserForm extends Component {
             this.setState({userdata: response.data});
             EventBus.publish('frs-refresh', response.data)
         }).catch(function (error) {
-            if (error.response.data.message) {
+            if (error.response?.data?.message) {
                 self.setState({validationError: error.response.data.message});
+            }
+            else {
+                self.setState({validationError: "Server Error"});
             }
         });
     }
@@ -134,7 +146,8 @@ class UserForm extends Component {
         this.props.form.setFieldsValue({
             id: userdata.id,
             name: userdata.name,
-            address: userdata.address
+            address: userdata.address,
+            type: userdata.type
         })
     }
 
@@ -147,6 +160,7 @@ class UserForm extends Component {
         userdata.id = form.getFieldValue("id");
         userdata.name = form.getFieldValue("name");
         userdata.address = form.getFieldValue("address");
+        userdata.type = this.state.userdata.type;
 
         let validationError;
         if (!userdata.id) {
@@ -157,12 +171,8 @@ class UserForm extends Component {
             validationError = "Missing name"
         }
 
-        if (!userdata.address) {
-            validationError = "Missing address"
-        }
-
         if (!this.state.image) {
-            validationError = "First Capture image"
+            validationError = "Capture image First by Click on Capture"
         }
 
         if (validationError) {
@@ -177,8 +187,11 @@ class UserForm extends Component {
         FaceMatchService.register(userdata, this.state.image).then(function (response) {
             console.log(response)
         }).catch(function (error) {
-            if (error.response.data.message) {
+            if (error.response?.data?.message) {
                 self.setState({validationError: error.response.data.message});
+            }
+            else {
+                self.setState({validationError: "Server Error"});
             }
         })
     }
@@ -199,10 +212,13 @@ class UserForm extends Component {
                         <Input addonBefore="Name&nbsp;&nbsp;&nbsp;"/>,
                     )}
                 </Form.Item>
-                <Form.Item>
-                    {getFieldDecorator('address', {rules: [{required: true, message: 'enter address!'}],})(
-                        <Input addonBefore="Address"/>,
-                    )}
+                <Form.Item label="Type">
+                    <Select defaultValue="Employee" onChange={this.handleChange}>
+                        <Select.Option value="Employee">Employee</Select.Option>
+                        <Select.Option value="Visitor">Visitor</Select.Option>
+                        <Select.Option value="Vip">Vip</Select.Option>
+                        <Select.Option value="Blacklist">Blacklist</Select.Option>
+                    </Select>
                 </Form.Item>
                 <div>
                     <Button onClick={this.lookup}>Lookup</Button>{' '}

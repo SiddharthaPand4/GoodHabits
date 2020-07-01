@@ -13,6 +13,10 @@ class FaceMatchService {
         userdata.image = image;
         return axios.post('/api/frs/register', userdata)
     }
+
+    getRegisteredUsers(filter) {
+        return axios.post('/api/frs/users', filter);
+    }
 }
 
 export default FaceMatchService.Instance()
