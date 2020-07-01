@@ -118,6 +118,7 @@ class UserForm extends Component {
     }
 
     lookup() {
+        let self = this
         FaceMatchService.lookup(this.state.image).then(response => {
             this.setState({userdata: response.data});
             EventBus.publish('frs-refresh', response.data)

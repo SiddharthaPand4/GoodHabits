@@ -21,7 +21,6 @@ import AnprView from "./views/anpr/AnprView";
 import TrafficIncidentView from "./views/TrafficIncidentView";
 import IncidentRepeatedView from "./views/incidents/IncidentRepeatedView";
 import IncidentHotlistView from "./views/IncidentHotlistView";
-import MasterDataView from "./views/masterData/MasterDataView";
 import ParkingDashboardView from "./views/parking/ParkingDashboardView";
 import ParkingConsoleView from "./views/parking/ParkingConsoleView";
 import PgsReportView from "./views/parking/ParkingReportView";
@@ -79,7 +78,6 @@ class App extends Component {
                                 <PrivateRoute path='/incidents/repeated' exact={true} component={IncidentRepeatedView}/>
                                 <PrivateRoute path='/anpr/report' exact={true} component={AnprReportView}/>
                                 <PrivateRoute path='/anpr' exact={true} component={AnprView}/>
-                                <PrivateRoute path='/anpr/masterdata' exact={true} component={MasterDataView}/>
                                 <PrivateRoute path='/user' exact={true} component={UserListView}/>
                                 <PrivateRoute path='/feed' exact={true} component={FeedView}/>
                                 <PrivateRoute path='/trigger' exact={true} component={TriggerView}/>
@@ -106,7 +104,7 @@ class App extends Component {
                                 <PrivateRoute path='/feedStream' exact={true} component={ConfigView}/>
 
                                 {/* face rec */}
-                                <PrivateRoute path='/ngofr'
+                                <PrivateRoute path='/ngofr' exact={true} component={FaceMatchView}/>
                             </div>
                         </Content>
                         <Footerbar/>
