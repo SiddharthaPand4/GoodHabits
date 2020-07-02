@@ -52,6 +52,10 @@ public class RegisteredPersonService {
     @Value("${file.upload-dir}")
     private String uploadDirPath;
 
+    @Value("${frs.url}")
+    private String frsurl;
+
+
     private Path fileStorageLocation;
 
     @PostConstruct
@@ -146,7 +150,7 @@ public class RegisteredPersonService {
 //        try {
 //            Request okrequest = new Request.Builder()
 //                    .header("Authorization", "your token")
-//                    .url("http://localhost:5000/register")
+//                    .url(frsurl)
 //                    .post(RequestBody.create(request.toJsonString(), JSON))
 //                    .build();
 //
