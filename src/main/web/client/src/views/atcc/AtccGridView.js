@@ -41,7 +41,7 @@ export default class AtccGridView extends Component {
             events: {},
             filter: {
                 page: 1,
-                pageSize: 10,
+                pageSize: 12,
             },
             workingEvent:[],
             workingEventLoading: false,
@@ -52,7 +52,7 @@ export default class AtccGridView extends Component {
                 maxZoomFactor: 5
             },
             downloading: false,
-            pageSizeOptions: ['12', '24', '48', '100', "250", "500", "1000", "2500", "5000"]
+            pageSizeOptions: ['12', '24', '48', '100', "250", "500"]
         };
 
         this.refresh = this.refresh.bind(this);
@@ -93,11 +93,7 @@ export default class AtccGridView extends Component {
         })
     }
 
-    //archiveEvent(event) {
-   //    AtccService.archiveEvent(event).then(request => {
-   //         this.refresh();
-   //     })
-   // }
+
 
     handleFilterChange(data) {
         this.setState({filter: data})

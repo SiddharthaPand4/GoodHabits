@@ -17,9 +17,7 @@ class AtccService {
     getEvents(filter) {
         return axios.post('/api/atcc/events', filter);
     }
- //   archiveEvent(event) {
- //       return axios.delete('/api/atcc/' + event.id);
-   // }
+
 }
 
 export default AtccService.Instance()

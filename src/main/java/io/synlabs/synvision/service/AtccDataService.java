@@ -457,7 +457,7 @@ public class AtccDataService extends BaseService {
             String fromDate = request.getFromDate();
             String toDate = request.getToDate();
             QAtccEvent root = new QAtccEvent("atccEvent");
-            BooleanExpression query = root.archived.isFalse();
+            BooleanExpression query = root.archived.isFalse();//AtccEvent.archived used here
 
             if (request.getFromDate() != null) {
                 String fromTime = request.getFromTime() == null ? "00:00:00" : request.getFromTime();
@@ -478,10 +478,4 @@ public class AtccDataService extends BaseService {
         }
         return null;
     }
-
-//public void archiveAtccEvent(AtccRequest request) {
-//    AtccEvent atccEvent = atccEventRepository.getOne(request.getId());
-//    atccEvent.setArchived(true);
-//    atccEventRepository.saveAndFlush(atccEvent);
-//}
 }

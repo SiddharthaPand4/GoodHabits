@@ -2,9 +2,10 @@ package io.synlabs.synvision.views.atcc;
 
 import io.synlabs.synvision.views.anpr.AnprResponse;
 import io.synlabs.synvision.views.common.PageResponse;
+import lombok.Getter;
 
 import java.util.List;
-
+@Getter
 public class AtccPageResponse extends PageResponse<AtccRawDataResponse> {
     private List<AtccRawDataResponse> events;
 
@@ -13,7 +14,5 @@ public class AtccPageResponse extends PageResponse<AtccRawDataResponse> {
         super(pageSize, pageCount, pageNumber);
         this.events = atcc;
     }
-    public List<AtccRawDataResponse> getEvents() {
-        return events;
-    }
+
 }

@@ -96,9 +96,10 @@ class App extends Component {
                                 <PrivateRoute path='/people-counting/Dashboard' exact={true} component={ApcDashboard}/>
 
                                 {/* atcc */}
-                                <PrivateRoute path='/atcc' exact={true} component={AtccView}/>
+                                {//<PrivateRoute path='/atcc' exact={true} component={AtccView}/>
+                                }
                                 <PrivateRoute path='/atcc/summary' exact={true} component={AtccSummaryView}/>
-                                <PrivateRoute path='/atccgrid' exact={true} component={AtccGridView}/>
+                                <PrivateRoute path='/atcc' exact={true} component={AtccGridView}/>
 
                                 {/* vids */}
                                 <PrivateRoute path='/vids' exact={true} component={HighwayIncidentView}/>

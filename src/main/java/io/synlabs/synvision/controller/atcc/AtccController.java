@@ -71,9 +71,4 @@ public class AtccController extends MediaUploadController {
     }
 
 
-  // @DeleteMapping("/{id}")
-  // public void archiveAnpr(@PathVariable Long id) {
-  //     atccDataService.archiveAtccEvent(new AtccEventFilterRequest(id));
-  // }
-
 }

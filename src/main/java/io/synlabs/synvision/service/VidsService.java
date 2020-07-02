@@ -91,7 +91,7 @@ public class VidsService {
                 Date endingDate = dateFormat.parse(ending);
                 query = query.and(root.incidentDate.before(endingDate));
             }
-            if(request.getIncidentType()!=""){
+            if(!request.getIncidentType().isEmpty()){
                 String incidentType=request.getIncidentType();
                 query =query.and(root.incidentType.eq(HighwayIncidentType.valueOf(incidentType)));
           }
@@ -100,8 +100,6 @@ public class VidsService {
             Long locationid=request.getFeed().getId();
             query=query.and(root.feed.id.eq(locationid));
         }
-
-            System.out.println(query);
             return query;
 
         } catch (Exception e) {

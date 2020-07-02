@@ -23,7 +23,7 @@ import java.util.ArrayList;
 @RestController
 @RequestMapping("/api/incident")
 public class IncidentController {
-    private HighwayIncidentType incidentType;
+
     private static final Logger logger = LoggerFactory.getLogger(IncidentController.class);
     @Autowired
     private IncidentService incidentService;
