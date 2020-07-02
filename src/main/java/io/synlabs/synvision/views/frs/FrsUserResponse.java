@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class FrsUserResponse implements Response {
 
+    private String uid;
     private String fullImage;
     private String faceImage;
     private String type;
@@ -19,6 +20,7 @@ public class FrsUserResponse implements Response {
     private boolean active;
 
     public FrsUserResponse(RegisteredPerson rp) {
+        this.uid = rp.getUid();
         this.type = rp.getPersonType().name();
         this.pid = rp.getPid();
         this.name = rp.getName();

@@ -158,7 +158,7 @@ export default class FrsEventView extends Component {
     }
 
     render() {
-        let layout = this.state.layout;
+        let layout = "yahoo!";
         let name = this.state.filter.name;
         let activePanelKey = this.state.activePanelKey;
 
@@ -222,61 +222,28 @@ export default class FrsEventView extends Component {
                                 title={
                                     <div>
                                         <Tag color="#f50">{event.type}</Tag>
+                                        {(event.person) ? <Tag color="#f50">{event.person.type}</Tag> : ""}
+                                        <Text code><Icon type="schedule"/> <Moment
+                                            format="ll">{event.eventDate}</Moment>{' '}|{' '}<Moment
+                                            format="LTS">{event.eventDate}</Moment></Text><br/>
+                                        <Text
+                                            type="secondary">{(event.person) ? "ID: " + event.person.pid : ""}</Text>
+                                        <Text
+                                            type="secondary">{(event.person) ? "  Name: " + event.person.name : ""}</Text>
+
                                     </div>
                                 }
-                                extra={<Dropdown overlay={<Menu>
-
-                                    <Menu.Item key="1">
-                                        <a
-                                            title={"click here to download"}
-                                            href={"/public/frs/person/" + event.id + "/image.jpg"}
-                                            download={true}><Icon type="download"/>{' '} Full
-                                            image</a>
-                                    </Menu.Item>
-                                    <Menu.Item key="2">
-                                        <a
-                                            title={"click here to download"}
-                                            href={"/public/frs/face/" + event.id + "/image.jpg"}
-                                            download={true}><Icon type="download"/>{' '} Cropped image</a>
-                                    </Menu.Item>
-                                    <Menu.Item key="3">
-                                        <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon
-                                            type="warning"/>{' '}
-                                            Archive
-                                        </Button>
-                                    </Menu.Item>
-
-                                </Menu>}>
-                                    <Button>
-                                        More <Icon type="down"/>
-                                    </Button>
-                                </Dropdown>}
                                 bordered={true}
                             >
                                 <div style={{textAlign: "center"}}>
-                                    <img alt="event"
-                                         src={"/public/frs/face/" + event.id + "/image.jpg"}/>
+                                    <img alt="face" style={{width:100,height:100, borderRadius:"50%"}}
+                                         src={"/public/frs/event/face/" + event.eventId + "/image.jpg"}/>
                                 </div>
-                                <div style={{marginTop: "5px", textAlign: "center"}}
-                                     onClick={() => this.editEvent(event)}>
-                                    <Paragraph
-                                        strong
-                                        editable={{onChange: this.updateEvent}}
-                                        copyable>{event.person.pid}</Paragraph>
-                                    <Text
-                                        type="secondary">{(workingEventLoading && workingEvent.id === event.id) ? "saving..." : ""}</Text>
-                                    <Text
-                                        type="secondary">{(event.person) ? "Name: " + event.person.name : "Unknown"}</Text>
-                                    <div>
-                                        <Text code><Icon type="schedule"/> <Moment
-                                            format="ll">{event.eventDate}</Moment>{' '}|{' '}<Moment
-                                            format="LTS">{event.eventDate}</Moment></Text>
+                                <div style={{marginTop: "5px", textAlign: "center"}}>
+                                    <div style={{textAlign: "center"}}>
+                                        <img alt="person" style={{width:200,height:200}}
+                                             src={"/public/frs/event/full/" + event.eventId + "/image.jpg"}/>
                                     </div>
-                                    <div>
-                                        <Text code><Icon type="environment"/> {event.location}</Text>
-                                    </div>
-
-
                                 </div>
 
                             </Card>

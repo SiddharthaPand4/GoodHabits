@@ -7,4 +7,5 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 public interface RegisteredPersonRepository extends JpaRepository<RegisteredPerson, Long>, QuerydslPredicateExecutor<RegisteredPerson> {
     RegisteredPerson findOneByPidAndActiveTrue(String id);
+    RegisteredPerson findOneByUid(String uid);
 }

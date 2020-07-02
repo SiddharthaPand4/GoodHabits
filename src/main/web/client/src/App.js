@@ -32,7 +32,7 @@ import AtccSummaryView from "./views/atcc/AtccSummaryView";
 import HighwayIncidentView from "./views/vids/HighwayIncidentView";
 import HighwayIncidentDashboardView from "./views/vids/HighwayIncidentDashboardView";
 import AnprReportView from "./views/anpr/AnprReportView";
-import FaceMatchView from "./components/facerec/FaceMatchView";
+import FaceRegisterView from "./components/facerec/FaceRegisterView";
 
 import ConfigView from "./views/Polygon/ConfigView";
 import RegisteredView from "./components/facerec/RegisteredView";
@@ -106,7 +106,7 @@ class App extends Component {
                                 <PrivateRoute path='/feedStream' exact={true} component={ConfigView}/>
 
                                 {/* face rec */}
-                                <PrivateRoute path='/register' exact={true} component={FaceMatchView}/>
+                                <PrivateRoute path='/register' exact={true} component={FaceRegisterView}/>
                                 <PrivateRoute path='/frsuser' exact={true} component={RegisteredView}/>
                                 <PrivateRoute path='/frsevents' exact={true} component={FrsEventView}/>
 

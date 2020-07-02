@@ -124,11 +124,19 @@ export default class RegisteredView extends Component {
                                 title={
                                     <div>
                                         {(user.type) ? <Tag color="#f50">{user.type}</Tag> : null}
+                                        <h4>{user.pid}</h4>
+                                        <h5>{user.name}</h5>
                                     </div>
                                 }
                                 >
-                                <h4>{user.pid}</h4>
-                                <h5>{user.name}</h5>
+
+                                <div style={{textAlign: "center"}}>
+                                    <img alt="face" style={{width:100,height:100, borderRadius:"50%"}}
+                                         src={"/public/frs/person/face/" + user.uid + "/image.jpg"}/>
+                                    <br/>
+                                    <img alt="person" style={{width:200,height:200}}
+                                         src={"/public/frs/person/full/" + user.uid + "/image.jpg"}/>
+                                </div>
                             </Card>
                         </Col>
                             )

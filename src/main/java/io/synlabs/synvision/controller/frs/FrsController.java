@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/api/frs/")
 public class FrsController {
@@ -20,7 +22,7 @@ public class FrsController {
     private FrsEventService eventService;
 
     @PostMapping("register")
-    public FRSRegisterResponse register(@RequestBody FRSRegisterRequest request){
+    public FRSRegisterResponse register(@RequestBody FRSRegisterRequest request) throws IOException {
         return new FRSRegisterResponse(registeredPersonService.register(request));
     }
 

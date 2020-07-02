@@ -1,12 +1,12 @@
 import React, {Component} from "react";
 import Webcam from "react-webcam";
-import {Button, ButtonGroup, Col, Form, Input, Row, Select, Typography} from "antd";
+import {Button, message, Col, Form, Input, Row, Select, Typography} from "antd";
 import FaceMatchService from "../../services/facerec/FrsService";
 import {EventBus} from "../event";
 
 const {Text} = Typography;
 
-export default class FaceMatchView extends Component {
+export default class FaceRegisterView extends Component {
 
     constructor(props) {
         super(props);
@@ -185,8 +185,9 @@ class UserForm extends Component {
         this.setState({submitted: true, loading: true});
         const self = this;
         FaceMatchService.register(userdata, this.state.image).then(function (response) {
-            console.log(response)
+            message.success("Registration sucessfull");
         }).catch(function (error) {
+            message.error("Error registering user!");
             if (error.response?.data?.message) {
                 self.setState({validationError: error.response.data.message});
             }

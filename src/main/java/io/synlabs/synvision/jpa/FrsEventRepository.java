@@ -7,4 +7,5 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 public interface FrsEventRepository extends JpaRepository<FrsEvent, Long>, QuerydslPredicateExecutor<FrsEvent> {
 
+    FrsEvent findOneByEventId(String eid);
 }
