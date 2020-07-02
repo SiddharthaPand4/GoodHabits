@@ -1,7 +1,6 @@
 package io.synlabs.synvision.views.frs;
 
 import io.synlabs.synvision.entity.frs.FrsEvent;
-import io.synlabs.synvision.entity.frs.RegisteredPerson;
 import io.synlabs.synvision.views.common.Response;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

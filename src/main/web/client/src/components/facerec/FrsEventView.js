@@ -17,7 +17,7 @@ import moment from "moment";
 import {saveAs} from "file-saver";
 import FrsService from "../../services/facerec/FrsService";
 
-const {Paragraph, Text} = Typography;
+const {Text} = Typography;
 
 const {Column} = Table;
 const {Panel} = Collapse;

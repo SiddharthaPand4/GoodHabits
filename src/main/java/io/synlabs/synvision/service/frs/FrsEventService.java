@@ -140,4 +140,9 @@ public class FrsEventService {
         }
     }
 
+    public FrsEvent getEvent(String eid) {
+        FrsEvent event = eventRepository.findOneByEventId(eid);
+        if (event == null) throw new NotFoundException("Cannot locate event in database");
+        return event;
+    }
 }

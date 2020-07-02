@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import './App.css';
-import {Layout} from 'antd';
+import {Layout, notification, Modal, Tag, Icon, Card, Typography} from 'antd';
 import Sidebar from "./components/Sidebar";
 import Headbar from "./components/Headbar";
 import Footerbar from "./components/Footerbar";
@@ -37,21 +37,98 @@ import FaceRegisterView from "./components/facerec/FaceRegisterView";
 import ConfigView from "./views/Polygon/ConfigView";
 import RegisteredView from "./components/facerec/RegisteredView";
 import FrsEventView from "./components/facerec/FrsEventView";
-
-
+const {Text} = Typography;
 const {Content} = Layout;
+
+var stompClient = null;
 
 class App extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {loggedIn: false};
+        this.state = {
+            loggedIn: false,
+            channelConnected: false,
+            showAlert :false,
+            alert:{}
+        };
 
+        this.onConnected = this.onConnected.bind(this);
+        this.onMessageReceived = this.onMessageReceived.bind(this);
         EventBus.subscribe('login-logout', (event) => this.refreshMenu(event))
     }
 
     componentDidMount() {
         this.refreshMenu()
+        this.connect();
+    }
+
+    componentWillUnmount() {
+        this.disconnect();
+    }
+
+    connect() {
+        const Stomp = require('stompjs')
+
+        var SockJS = require('sockjs-client')
+
+        SockJS = new SockJS('/ws')
+
+        stompClient = Stomp.over(SockJS);
+
+        stompClient.connect({}, this.onConnected, this.onError);
+    }
+
+    onConnected() {
+        console.log("connected!")
+        this.setState({
+            channelConnected: true
+        })
+        stompClient.subscribe('/alert', this.onMessageReceived);
+    }
+
+    onError() {
+        console.log("error connecting!")
+    }
+
+    onMessageReceived(payload) {
+        const isLoggedIn = this.state.loggedIn;
+
+        if (!isLoggedIn) return;
+
+        let alert = JSON.parse(payload.body);
+        console.log("rcvd alert", alert);
+        const args = {
+            message: alert.message,
+            description: <Card
+                style={{margin: "5px"}}
+                title={
+                    <div>
+                        {(alert.person) ? <Tag color="#f50">{alert.person.type}</Tag> : ""}
+                        <Text
+                            type="secondary">{(alert.person) ? "ID: " + alert.person.pid : ""}</Text>
+                        <Text
+                            type="secondary">{(alert.person) ? "  Name: " + alert.person.name : ""}</Text>
+
+                    </div>
+                }
+                bordered={true}
+            >
+                <div style={{textAlign: "center"}}>
+                    <img alt="face" style={{width:100,height:100, borderRadius:"50%"}}
+                         src={"/public/frs/event/face/" + alert.uid + "/image.jpg"}/>
+                </div>
+                <div style={{marginTop: "5px", textAlign: "center"}}>
+                    <div style={{textAlign: "center"}}>
+                        <img alt="person" style={{width:200,height:200}}
+                             src={"/public/frs/event/full/" + alert.uid + "/image.jpg"}/>
+                    </div>
+                </div>
+
+            </Card>,
+            duration: 0,
+        };
+        notification.open(args);
     }
 
     refreshMenu() {
@@ -61,16 +138,21 @@ class App extends Component {
     render() {
 
         const isLoggedIn = this.state.loggedIn;
-
+        const showAlert = this.state.showAlert;
+        const alert = this.state.alert;
         const sideBar = isLoggedIn ? <Sidebar/> : null;
-        const header = isLoggedIn ? <Headbar isLoggedIn={isLoggedIn}/> : null;
+        const header = isLoggedIn && showAlert ? <Headbar alert={alert} isLoggedIn={isLoggedIn}/> : null;
 
 
         return (
             <div className="App">
+
                 <Layout style={{minHeight: '100vh'}}>
+
                     {sideBar}
+
                     <Layout>
+                        {header}
                         <Content style={{margin: '16px'}}>
                             <div style={{padding: 4}}>
                                 <Route path='/login' exact={true} component={LoginView}/>
@@ -115,6 +197,7 @@ class App extends Component {
                         <Footerbar/>
                     </Layout>
                 </Layout>
+
             </div>
         );
 
