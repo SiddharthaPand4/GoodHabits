@@ -15,18 +15,15 @@ public class FRSRegisterResponse {
 
     private String name;
 
-    private String address;
 
-    public FRSRegisterResponse(String id, String name, String address) {
+    public FRSRegisterResponse(String id, String name) {
         this.id = id;
         this.name = name;
-        this.address = address;
     }
 
     public FRSRegisterResponse(RegisteredPerson person) {
         this.id = person.getPid();
         this.name = person.getName();
-        this.address = person.getAddress();
     }
 
 }

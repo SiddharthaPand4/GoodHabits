@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Getter
@@ -15,6 +16,9 @@ public class FrsEvent extends BaseEntity {
 
     @Column(nullable = false, length = 50, unique = true)
     private String eventId;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date eventDate;
 
     @Enumerated(EnumType.STRING)
     private FrsEventType type;

@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import Webcam from "react-webcam";
 import {Button, ButtonGroup, Col, Form, Input, Row, Select, Typography} from "antd";
-import FaceMatchService from "../../services/facerec/FaceMatchService";
+import FaceMatchService from "../../services/facerec/FrsService";
 import {EventBus} from "../event";
 
 const {Text} = Typography;

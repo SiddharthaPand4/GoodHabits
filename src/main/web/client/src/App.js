@@ -36,6 +36,7 @@ import FaceMatchView from "./components/facerec/FaceMatchView";
 
 import ConfigView from "./views/Polygon/ConfigView";
 import RegisteredView from "./components/facerec/RegisteredView";
+import FrsEventView from "./components/facerec/FrsEventView";
 
 
 const {Content} = Layout;
@@ -107,6 +108,8 @@ class App extends Component {
                                 {/* face rec */}
                                 <PrivateRoute path='/register' exact={true} component={FaceMatchView}/>
                                 <PrivateRoute path='/frsuser' exact={true} component={RegisteredView}/>
+                                <PrivateRoute path='/frsevents' exact={true} component={FrsEventView}/>
+
                             </div>
                         </Content>
                         <Footerbar/>

@@ -1,4 +1,4 @@
-package io.synlabs.synvision.service;
+package io.synlabs.synvision.service.frs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -27,9 +27,9 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 
 
 @Service
-public class FaceRecService {
+public class RegisteredPersonService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FaceRecService.class);
+    private static final Logger logger = LoggerFactory.getLogger(RegisteredPersonService.class);
 
     public static final MediaType JSON
             = MediaType.get("application/json; charset=utf-8");

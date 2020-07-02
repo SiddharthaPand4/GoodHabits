@@ -1,8 +1,8 @@
 import axios from "../axios";
 
-class FaceMatchService {
+class FrsService {
     static Instance() {
-        return new FaceMatchService()
+        return new FrsService()
     }
 
     lookup(image) {
@@ -17,6 +17,11 @@ class FaceMatchService {
     getRegisteredUsers(filter) {
         return axios.post('/api/frs/users', filter);
     }
+
+    getEvents(filter) {
+        return axios.post('/api/frs/events', filter);
+    }
+
 }
 
-export default FaceMatchService.Instance()
+export default FrsService.Instance()

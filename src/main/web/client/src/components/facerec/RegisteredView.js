@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {Card, Col, Collapse, Empty, Input, Row, Spin, Tag} from "antd";
-import FaceMatchService from "../../services/facerec/FaceMatchService";
+import FaceMatchService from "../../services/facerec/FrsService";
 import GenericFilter from "../GenericFilter";
 
 const {Panel} = Collapse;

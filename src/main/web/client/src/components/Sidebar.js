@@ -176,6 +176,11 @@ export default class Sidebar extends Component {
                             <Link to='/frsuser'><Icon type='video-camera'/><span
                                 className='nav-text'>Registered Users</span></Link>
                         </Menu.Item>
+                        <Menu.Item key="frs-3">
+                            <Link to='/frsevents'><Icon type='video-camera'/><span
+                                className='nav-text'>Events</span></Link>
+                        </Menu.Item>
+
                     </SubMenu>
                     <Menu.Item key="logout">
                         <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span

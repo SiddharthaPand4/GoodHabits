@@ -14,12 +14,9 @@ public class FRSLookupResponse {
 
     private String name;
 
-    private String address;
-
-    public FRSLookupResponse(String id, String name, String address) {
+    public FRSLookupResponse(String id, String name) {
         this.id = id;
         this.name = name;
-        this.address = address;
     }
 
     public FRSLookupResponse(RegisteredPerson person) {
@@ -30,7 +27,6 @@ public class FRSLookupResponse {
         else {
             this.id = person.getPid();
             this.name = person.getName();
-            this.address = person.getAddress();
         }
     }
 
