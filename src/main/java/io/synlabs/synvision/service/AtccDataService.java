@@ -395,7 +395,7 @@ public class AtccDataService extends BaseService {
         try {
             Optional<AnprEvent> eventop = anprEventRepository.findById(id);
             if (eventop.isPresent()) {
-                String filename = eventop.get().getVehicleImage() +".jpg";
+                String filename = eventop.get().getVehicleImage() + ".jpg";
 
                 Path filePath = Paths.get(this.fileStorageLocation.toString(), tag, filename).toAbsolutePath().normalize();
                 Resource resource = new UrlResource(filePath.toUri());
@@ -448,12 +448,11 @@ public class AtccDataService extends BaseService {
     }
 
     private JPAQuery<AtccEvent> getQuery(AtccEventFilterRequest request) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String fromDate = request.getFromDate();
+        String toDate = request.getToDate();
+        QAtccEvent atccEvent = new QAtccEvent("atccEvent");
         try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String fromDate = request.getFromDate();
-            String toDate = request.getToDate();
-
-            QAtccEvent atccEvent= new QAtccEvent("atccEvent");
             JPAQuery<AtccEvent> query = new JPAQuery<>(entityManager);
             query = query.select(atccEvent).from(atccEvent);
 
@@ -478,5 +477,5 @@ public class AtccDataService extends BaseService {
         }
         return null;
     }
-
 }
+
