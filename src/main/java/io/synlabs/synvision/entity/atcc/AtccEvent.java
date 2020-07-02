@@ -13,7 +13,6 @@ import java.util.Date;
 @Setter
 @Entity
 public class AtccEvent extends AbstractPersistable<Long> {
-    private boolean archived;//needed to generate query
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date eventDate;

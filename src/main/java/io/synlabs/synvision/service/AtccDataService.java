@@ -1,10 +1,8 @@
 package io.synlabs.synvision.service;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import io.synlabs.synvision.config.FileStorageProperties;
-import io.synlabs.synvision.entity.ImportStatus;
 import io.synlabs.synvision.entity.anpr.AnprEvent;
-import io.synlabs.synvision.entity.anpr.QAnprEvent;
 import io.synlabs.synvision.entity.atcc.AtccEvent;
 import io.synlabs.synvision.entity.atcc.AtccSummaryData;
 import io.synlabs.synvision.entity.atcc.QAtccEvent;
@@ -13,50 +11,38 @@ import io.synlabs.synvision.enums.TimeSpan;
 import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.jpa.*;
-import io.synlabs.synvision.views.anpr.AnprPageResponse;
-import io.synlabs.synvision.views.anpr.AnprResponse;
 import io.synlabs.synvision.views.atcc.*;
 import io.synlabs.synvision.views.common.DummyRequest;
 import io.synlabs.synvision.views.common.PageResponse;
 import io.synlabs.synvision.views.common.ResponseWrapper;
 import io.synlabs.synvision.views.common.SearchRequest;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.simpleflatmapper.csv.CsvWriter;
 import org.simpleflatmapper.util.CheckedConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
-import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -83,6 +69,9 @@ public class AtccDataService extends BaseService {
 
     @Autowired
     private HighwayIncidentRepository incidentRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @Qualifier("dataSource")
     @Autowired
@@ -438,39 +427,50 @@ public class AtccDataService extends BaseService {
 
 
     public PageResponse<AtccRawDataResponse> list(AtccEventFilterRequest request) {
-        BooleanExpression query = getQuery(request);
-        int count = (int) atccEventRepository.count(query);
+        JPAQuery<AtccEvent> query = getQuery(request);
+
+        int count = (int) query.fetchCount();
         int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
-        Pageable paging = PageRequest.of(request.getPage() - 1, request.getPageSize(), Sort.by(DESC, "eventDate"));
-        Page<AtccEvent> page = atccEventRepository.findAll(query, paging);
-        List<AtccRawDataResponse> list = new ArrayList<>(page.getSize());
-        page.get().forEach(item -> {
+
+        int offset = (request.getPage() - 1) * request.getPageSize();
+        query.offset(offset);
+        if (request.getPageSize() > 0) {
+            query.limit(request.getPageSize());
+        }
+
+        List<AtccEvent> data = query.fetch();
+
+        List<AtccRawDataResponse> list = new ArrayList<>(request.getPageSize());
+        data.forEach(item -> {
             list.add(new AtccRawDataResponse(item));
         });
         return (PageResponse<AtccRawDataResponse>) new AtccPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
     }
 
-    private BooleanExpression getQuery(AtccEventFilterRequest request) {
+    private JPAQuery<AtccEvent> getQuery(AtccEventFilterRequest request) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
             String fromDate = request.getFromDate();
             String toDate = request.getToDate();
-            QAtccEvent root = new QAtccEvent("atccEvent");
-            BooleanExpression query = root.archived.isFalse();//AtccEvent.archived used here
+
+            QAtccEvent atccEvent= new QAtccEvent("atccEvent");
+            JPAQuery<AtccEvent> query = new JPAQuery<>(entityManager);
+            query = query.select(atccEvent).from(atccEvent);
 
             if (request.getFromDate() != null) {
                 String fromTime = request.getFromTime() == null ? "00:00:00" : request.getFromTime();
                 String starting = fromDate + " " + fromTime;
                 Date startingDate = dateFormat.parse(starting);
-                query = query.and(root.eventDate.after(startingDate));
+                query = query.where(atccEvent.eventDate.after(startingDate));
+
             }
 
             if (request.getToDate() != null) {
                 String toTime = request.getToTime() == null ? "00:00:00" : request.getToTime();
                 String ending = toDate + " " + toTime;
                 Date endingDate = dateFormat.parse(ending);
-                query = query.and(root.eventDate.before(endingDate));
+                query = query.where(atccEvent.eventDate.before(endingDate));
+
             }
             return query;
         } catch (Exception e) {
@@ -478,4 +478,5 @@ public class AtccDataService extends BaseService {
         }
         return null;
     }
+
 }
