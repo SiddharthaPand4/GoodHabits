@@ -1,19 +1,23 @@
 package io.synlabs.synvision.service;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.entity.ImportStatus;
 import io.synlabs.synvision.entity.anpr.AnprEvent;
+import io.synlabs.synvision.entity.anpr.QAnprEvent;
 import io.synlabs.synvision.entity.atcc.AtccEvent;
 import io.synlabs.synvision.entity.atcc.AtccSummaryData;
+import io.synlabs.synvision.entity.atcc.QAtccEvent;
 import io.synlabs.synvision.entity.core.Feed;
 import io.synlabs.synvision.enums.TimeSpan;
 import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.jpa.*;
-import io.synlabs.synvision.views.atcc.AtccRawDataResponse;
-import io.synlabs.synvision.views.atcc.AtccSummaryDataResponse;
-import io.synlabs.synvision.views.atcc.CreateAtccEventRequest;
+import io.synlabs.synvision.views.anpr.AnprPageResponse;
+import io.synlabs.synvision.views.anpr.AnprResponse;
+import io.synlabs.synvision.views.atcc.*;
 import io.synlabs.synvision.views.common.DummyRequest;
+import io.synlabs.synvision.views.common.PageResponse;
 import io.synlabs.synvision.views.common.ResponseWrapper;
 import io.synlabs.synvision.views.common.SearchRequest;
 import org.apache.commons.csv.CSVFormat;
@@ -30,6 +34,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,7 +104,6 @@ public class AtccDataService extends BaseService {
         }
         this.statusRepository = statusRepository;
     }
-
 
     public ResponseWrapper<AtccRawDataResponse> listRawData(SearchRequest searchRequest) {
         Page<AtccEvent> page = atccEventRepository.findAll(PageRequest.of(searchRequest.getPage(), searchRequest.getPageSize(), Sort.by(DESC, "eventDate")));
@@ -432,4 +436,52 @@ public class AtccDataService extends BaseService {
         return feedRepository.findOneByName(tag);
     }
 
+
+    public PageResponse<AtccRawDataResponse> list(AtccEventFilterRequest request) {
+        BooleanExpression query = getQuery(request);
+        int count = (int) atccEventRepository.count(query);
+        int pageCount = (int) Math.ceil(count * 1.0 / request.getPageSize());
+        Pageable paging = PageRequest.of(request.getPage() - 1, request.getPageSize(), Sort.by(DESC, "eventDate"));
+        Page<AtccEvent> page = atccEventRepository.findAll(query, paging);
+        List<AtccRawDataResponse> list = new ArrayList<>(page.getSize());
+        page.get().forEach(item -> {
+            list.add(new AtccRawDataResponse(item));
+        });
+        return (PageResponse<AtccRawDataResponse>) new AtccPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
+    }
+
+    private BooleanExpression getQuery(AtccEventFilterRequest request) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            String fromDate = request.getFromDate();
+            String toDate = request.getToDate();
+            QAtccEvent root = new QAtccEvent("atccEvent");
+            BooleanExpression query = root.archived.isFalse();
+
+            if (request.getFromDate() != null) {
+                String fromTime = request.getFromTime() == null ? "00:00:00" : request.getFromTime();
+                String starting = fromDate + " " + fromTime;
+                Date startingDate = dateFormat.parse(starting);
+                query = query.and(root.eventDate.after(startingDate));
+            }
+
+            if (request.getToDate() != null) {
+                String toTime = request.getToTime() == null ? "00:00:00" : request.getToTime();
+                String ending = toDate + " " + toTime;
+                Date endingDate = dateFormat.parse(ending);
+                query = query.and(root.eventDate.before(endingDate));
+            }
+            return query;
+        } catch (Exception e) {
+            logger.error("Error in parsing date", e);
+        }
+        return null;
+    }
+
+//public void archiveAtccEvent(AtccRequest request) {
+//    AtccEvent atccEvent = atccEventRepository.getOne(request.getId());
+//    atccEvent.setArchived(true);
+//    atccEventRepository.saveAndFlush(atccEvent);
+//}
 }

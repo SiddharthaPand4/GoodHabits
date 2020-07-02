@@ -1,5 +1,6 @@
 package io.synlabs.synvision.controller;
 
+import io.synlabs.synvision.enums.HighwayIncidentType;
 import io.synlabs.synvision.service.AnprService;
 import io.synlabs.synvision.service.IncidentService;
 import io.synlabs.synvision.views.anpr.AnprFilterRequest;
@@ -14,13 +15,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+
 /**
  * Created by itrs on 10/16/2019.
  */
 @RestController
 @RequestMapping("/api/incident")
 public class IncidentController {
-
+    private HighwayIncidentType incidentType;
     private static final Logger logger = LoggerFactory.getLogger(IncidentController.class);
     @Autowired
     private IncidentService incidentService;
@@ -49,5 +52,15 @@ public class IncidentController {
     @PostMapping("/timeline")
     public PageResponse<AnprResponse> getIncidentsTimeline(@RequestBody AnprFilterRequest request) {
         return anprService.getIncidentsTimeline(request);
+    }
+
+    @GetMapping("/getall")
+    public ArrayList<String> GetAllTypes()
+    {
+        ArrayList<String> list=new ArrayList<String>();
+        for(HighwayIncidentType t:HighwayIncidentType.values())
+        {list.add(t.toString());}
+        System.out.println(list);
+        return list;
     }
 }

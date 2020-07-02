@@ -35,6 +35,7 @@ import HighwayIncidentDashboardView from "./views/vids/HighwayIncidentDashboardV
 import AnprReportView from "./views/anpr/AnprReportView";
 
 import ConfigView from "./views/Polygon/ConfigView";
+import AtccGridView from "./views/atcc/AtccGridView";
 
 
 const {Content} = Layout;
@@ -97,6 +98,7 @@ class App extends Component {
                                 {/* atcc */}
                                 <PrivateRoute path='/atcc' exact={true} component={AtccView}/>
                                 <PrivateRoute path='/atcc/summary' exact={true} component={AtccSummaryView}/>
+                                <PrivateRoute path='/atccgrid' exact={true} component={AtccGridView}/>
 
                                 {/* vids */}
                                 <PrivateRoute path='/vids' exact={true} component={HighwayIncidentView}/>

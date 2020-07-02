@@ -5,9 +5,14 @@ import io.synlabs.synvision.controller.MediaUploadController;
 import io.synlabs.synvision.ex.AuthException;
 import io.synlabs.synvision.service.AtccDataService;
 import io.synlabs.synvision.views.*;
+import io.synlabs.synvision.views.anpr.AnprFilterRequest;
+import io.synlabs.synvision.views.anpr.AnprRequest;
+import io.synlabs.synvision.views.anpr.AnprResponse;
+import io.synlabs.synvision.views.atcc.AtccEventFilterRequest;
 import io.synlabs.synvision.views.atcc.AtccRawDataResponse;
 import io.synlabs.synvision.views.atcc.AtccSummaryDataResponse;
 import io.synlabs.synvision.views.atcc.CreateAtccEventRequest;
+import io.synlabs.synvision.views.common.PageResponse;
 import io.synlabs.synvision.views.common.ResponseWrapper;
 import io.synlabs.synvision.views.common.SearchRequest;
 import org.slf4j.Logger;
@@ -59,5 +64,16 @@ public class AtccController extends MediaUploadController {
     public void addEvent(@RequestBody CreateAtccEventRequest request) {
         atccDataService.addEvent(request);
     }
+
+    @PostMapping("/events")
+    public PageResponse<AtccRawDataResponse> list(@RequestBody AtccEventFilterRequest request) {
+      return atccDataService.list(request);
+    }
+
+
+  // @DeleteMapping("/{id}")
+  // public void archiveAnpr(@PathVariable Long id) {
+  //     atccDataService.archiveAtccEvent(new AtccEventFilterRequest(id));
+  // }
 
 }

@@ -19,7 +19,7 @@ public class AtccEvent extends AbstractPersistable<Long> {
 
     @Column(nullable = false, length = 50, unique = true)
     private String eventId;
-
+    private boolean archived;
     private long timeStamp;
 
     private int lane;

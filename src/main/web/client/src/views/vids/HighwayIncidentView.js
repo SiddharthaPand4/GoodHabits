@@ -20,6 +20,8 @@ import {Player} from 'video-react';
 import "video-react/dist/video-react.css";
 import UserOutlined from "@ant-design/icons/lib/icons/UserOutlined";
 import DownOutlined from "@ant-design/icons/lib/icons/DownOutlined";
+import TrafficIncidentService from "../../services/TrafficIncidentService";
+
 
 const {Text} = Typography;
 
@@ -37,14 +39,16 @@ export default class HighwayIncidentView extends Component {
             layout: "list",
             incidentType:"",
             location:"",
+            feed:{id:0,location:"",name:"",site:""},
             feedOptions: [],
+            incidentOptions:[],
             incidents: {},
             playVideo: false,
             filter: {
                 page: 1,
                 pageSize: 12,
                 incidentType:"",
-                location:""
+                feed:{}
 
             },
         };
@@ -64,10 +68,12 @@ export default class HighwayIncidentView extends Component {
     componentDidMount() {
         this.refresh();
         this.getFeeds();
+        this.getIncident();
 
     }
 
     refresh() {
+
         this.IncidentFilter();
         this.LocationFilter();
         VidsService.getIncidents(this.state.filter).then(request => {
@@ -78,6 +84,7 @@ export default class HighwayIncidentView extends Component {
 
     //cant use refresh to read from state as state may not have been set
     refreshNow() {
+
         this.IncidentFilter();
         this.LocationFilter();
         VidsService.getIncidents(this.state.filter).then(request => {
@@ -130,10 +137,28 @@ export default class HighwayIncidentView extends Component {
     }
 
     handleLocationMenuClick(choice) {
+        let feed;
         if(choice.item.props.children=="All")
-        {this.setState({location:""})}
-        else
+        {   feed={id:0,location:"",name:"",site:""}
+            this.setState({feed:feed})
+            this.setState({location:""})
+        }
+        else {
+            feed={id:choice.item.props.id.id,
+                location:choice.item.props.id.location,
+                site:choice.item.props.id.site,
+                name:choice.item.props.id.name}
+            this.setState({feed:feed});
             this.setState({location:choice.item.props.children});
+
+
+        }
+    }
+    LocationFilter() {
+        let filter = this.state.filter;
+        filter.feed=this.state.feed;
+        this.setState({filter: filter});
+
     }
 
     render() {
@@ -146,30 +171,11 @@ export default class HighwayIncidentView extends Component {
                 <Menu.Item key="1" icon={<UserOutlined />}>
                     All
                 </Menu.Item>
-                <Menu.Item key="2" icon={<UserOutlined />}>
-                    WrongDirection
-                </Menu.Item>
-                <Menu.Item key="3" icon={<UserOutlined />}>
-                    Queue
-                </Menu.Item>
-                <Menu.Item key="4" icon={<UserOutlined/>}>
-                    StoppedVehicle
-
-                </Menu.Item>
-                <Menu.Item key="5" icon={<UserOutlined />}>
-                    Deceleration
-
-                </Menu.Item>
-                <Menu.Item key="6" icon={<UserOutlined />}>
-                    FogSmoke
-
-                </Menu.Item>
-                <Menu.Item key="7" icon={<UserOutlined />}>
-                    NoVideo
-                </Menu.Item>
-                <Menu.Item key="8" icon={<UserOutlined />}>
-                    Animal
-                </Menu.Item>
+                {(this.state.incidentOptions || []).map((type) =>
+                    <Menu.Item key={type} icon={<UserOutlined />} >
+                        {type}
+                    </Menu.Item>
+                )}
             </Menu>
         );
 
@@ -178,9 +184,9 @@ export default class HighwayIncidentView extends Component {
 
             <Menu onClick={this.handleLocationMenuClick}>
                 <Menu.Item key={1}>All</Menu.Item>
-                {(this.state.feedOptions || []).map((loc) =>
-            <Menu.Item key={loc} icon={<UserOutlined />}>
-                    {loc.site+">"+loc.location}
+            {(this.state.feedOptions || []).map((feed) =>
+            <Menu.Item key={feed} icon={<UserOutlined />} id={feed}>
+                    {feed.site+">"+feed.location}
                 </Menu.Item>
                 )}
             </Menu>
@@ -391,9 +397,12 @@ export default class HighwayIncidentView extends Component {
     }
 
 
-    LocationFilter(loc) {
-        let filter = this.state.filter;
-        filter.location =this.state.location;
-        this.setState({filter: filter})
+    getIncident() {
+        TrafficIncidentService.getIncidentTypes().then(response=>{
+            this.setState({incidentOptions: response.data});
+        }).catch(error=>{
+            alert("somthing went wrong");
+        })
+
     }
 }

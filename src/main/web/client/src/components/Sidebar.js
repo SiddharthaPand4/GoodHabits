@@ -121,6 +121,8 @@ export default class Sidebar extends Component {
                     </SubMenu>
 
 
+
+
                     <Menu.Item key="6" className="sidebar-nav-link">
                     <Link to='/feed'>  <Icon type='box-plot'/>
                     <span  className='nav-text'>
@@ -178,6 +180,14 @@ export default class Sidebar extends Component {
                         <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span
                             className='nav-text'>Logout</span></Link>
                     </Menu.Item>
+
+                    <Menu.Item key="8" className="sidebar-nav-link">
+                        <Link to='/atccgrid'>  <Icon type='box-plot'/>
+                            <span  className='nav-text'>
+                           <span>ATCC Grid</span>
+                        </span></Link>
+                    </Menu.Item>
+
                 </Menu>
             </Sider>
         );

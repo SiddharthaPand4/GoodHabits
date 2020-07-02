@@ -1,5 +1,7 @@
 package io.synlabs.synvision.views.vids;
 
+import io.synlabs.synvision.views.common.FeedRequest;
+import io.synlabs.synvision.views.common.FeedResponse;
 import io.synlabs.synvision.views.incident.IncidentsFilterRequest;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,5 +10,5 @@ import lombok.Setter;
 @Setter
 public class VidsFilterRequest extends IncidentsFilterRequest {
     private String incidentType;
-    private String location;
+    private FeedRequest feed;
 }

@@ -94,30 +94,13 @@ public class VidsService {
             if(request.getIncidentType()!=""){
                 String incidentType=request.getIncidentType();
                 query =query.and(root.incidentType.eq(HighwayIncidentType.valueOf(incidentType)));
-            }
-            if(request.getLocation()!="")
-            {
-                String location=request.getLocation();
-                String[] feed=location.split(">");
-                String loc="",site="";
-                int flg=0;
-                for (String a : feed) {
-                    if (flg == 0)
-                    {
-                        site=a;
-                        flg=1;
-                    }
-                    else
-                    {
-                        loc=a;
-                        flg=0;
-                    }
+          }
+         if(request.getFeed().getId()!=0)
+        {
+            Long locationid=request.getFeed().getId();
+            query=query.and(root.feed.id.eq(locationid));
+        }
 
-                }
-
-                query=query.and(root.feed.site.eq(site));
-                query=query.and(root.feed.location.eq(loc));
-            }
             System.out.println(query);
             return query;
 
