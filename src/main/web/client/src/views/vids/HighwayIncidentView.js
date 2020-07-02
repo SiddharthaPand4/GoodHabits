@@ -154,17 +154,12 @@ export default class HighwayIncidentView extends Component {
 
         }
     }
-    LocationFilter() {
-        let filter = this.state.filter;
-        filter.feed=this.state.feed;
-        this.setState({filter: filter});
 
-    }
 
     render() {
-        let location=this.state.filter.location;
+
         let layout = this.state.layout;
-        let LocationOptions=this.state.LocationOptions;
+
 
         const incidentMenu = (
             <Menu onClick={this.handleIncidentMenuClick}>
@@ -387,6 +382,12 @@ export default class HighwayIncidentView extends Component {
         this.setState({filter:filter})
     }
 
+    LocationFilter() {
+        let filter = this.state.filter;
+        filter.feed=this.state.feed;
+        this.setState({filter: filter});
+
+    }
 
     getFeeds(){
         feedService.getFeeds().then(response=>{
