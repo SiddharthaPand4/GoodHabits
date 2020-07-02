@@ -134,52 +134,55 @@ public class RegisteredPersonService {
         String fullname = path.resolve(filename).toString();
         fileWriter = new FileOutputStream(fullname);
         fileWriter.write(decodedBytes);
+//
+//        RegisteredPerson person = new RegisteredPerson();
+//        person.setUid(uid);
+//        person.setPid(request.getId());
+//        person.setName(request.getName());
+//        person.setPersonType(PersonType.valueOf(request.getType()));
+//        person.setActive(true);
+//        person.setFaceImage(filename);
+//        person.setFullImage(filename);
+//        frsRepository.save(person);
+//        return person;
 
-        RegisteredPerson person = new RegisteredPerson();
-        person.setUid(uid);
-        person.setPid(request.getId());
-        person.setName(request.getName());
-        person.setPersonType(PersonType.valueOf(request.getType()));
-        person.setActive(true);
-        person.setFaceImage(filename);
-        person.setFullImage(filename);
-        frsRepository.save(person);
-        return person;
-//
-//        OkHttpClient client = new OkHttpClient();
-//        try {
-//            Request okrequest = new Request.Builder()
-//                    .header("Authorization", "your token")
-//                    .url(frsurl)
-//                    .post(RequestBody.create(request.toJsonString(), JSON))
-//                    .build();
-//
-//            logger.info("Outbound: {}", okrequest);
-//            Response okresponse = client.newCall(okrequest).execute();
-//            if (okresponse.isSuccessful()) {
-//
-//                ObjectMapper mapper = new ObjectMapper();
-//                RegisterResponse resp = mapper.readValue(Objects.requireNonNull(okresponse.body()).string(), RegisterResponse.class);
-//
-//                if (resp.error) {
-//                    throw new ValidationException(resp.message);
-//                }
-//
-//
-//                RegisteredPerson person = new RegisteredPerson();
-//                person.setPid(request.getId());
-//                person.setName(request.getName());
-//                person.setPersonType(PersonType.Subject);
-//                person.setActive(true);
-//                frsRepository.save(person);
-//                return person;
-//            } else {
-//                throw new IOException("Unexpected code " + okresponse);
-//            }
-//
-//        } catch (IOException e) {
-//            throw new ValidationException("Error!");
-//        }
+        OkHttpClient client = new OkHttpClient();
+        try {
+            Request okrequest = new Request.Builder()
+                    .header("Authorization", "your token")
+                    .url(frsurl)
+                    .post(RequestBody.create(request.toJsonString(), JSON))
+                    .build();
+
+            logger.info("Outbound: {}", okrequest);
+            Response okresponse = client.newCall(okrequest).execute();
+            if (okresponse.isSuccessful()) {
+
+                ObjectMapper mapper = new ObjectMapper();
+                RegisterResponse resp = mapper.readValue(Objects.requireNonNull(okresponse.body()).string(), RegisterResponse.class);
+
+                if (resp.error) {
+                    throw new ValidationException(resp.message);
+                }
+
+
+                RegisteredPerson person = new RegisteredPerson();
+                person.setUid(uid);
+                person.setPid(request.getId());
+                person.setName(request.getName());
+                person.setPersonType(PersonType.valueOf(request.getType()));
+                person.setActive(true);
+                //person.setFaceImage(filename);
+                person.setFullImage(filename);
+                frsRepository.save(person);
+                return person;
+            } else {
+                throw new IOException("Unexpected code " + okresponse);
+            }
+
+        } catch (IOException e) {
+            throw new ValidationException("Error!");
+        }
 
     }
 
