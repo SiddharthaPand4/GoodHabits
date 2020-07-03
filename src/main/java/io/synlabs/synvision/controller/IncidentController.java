@@ -54,7 +54,7 @@ public class IncidentController {
         return anprService.getIncidentsTimeline(request);
     }
 
-    @GetMapping("/getall")
+    @GetMapping("/get/types")
     public ArrayList<String> GetAllTypes()
     {
         ArrayList<String> list=new ArrayList<String>();

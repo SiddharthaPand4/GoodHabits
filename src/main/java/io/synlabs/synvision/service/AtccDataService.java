@@ -452,8 +452,9 @@ public class AtccDataService extends BaseService {
         String fromDate = request.getFromDate();
         String toDate = request.getToDate();
         QAtccEvent atccEvent = new QAtccEvent("atccEvent");
+        JPAQuery<AtccEvent> query = new JPAQuery<>(entityManager);
         try {
-            JPAQuery<AtccEvent> query = new JPAQuery<>(entityManager);
+
             query = query.select(atccEvent).from(atccEvent);
 
             if (request.getFromDate() != null) {
@@ -471,11 +472,12 @@ public class AtccDataService extends BaseService {
                 query = query.where(atccEvent.eventDate.before(endingDate));
 
             }
-            return query;
-        } catch (Exception e) {
+
+        }
+        catch (Exception e) {
             logger.error("Error in parsing date", e);
         }
-        return null;
+        return query;
     }
 }
 

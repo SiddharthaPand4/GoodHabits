@@ -68,7 +68,7 @@ export default class HighwayIncidentView extends Component {
     componentDidMount() {
         this.refresh();
         this.getFeeds();
-        this.getIncident();
+        this.getIncidentTypes();
 
     }
 
@@ -398,7 +398,7 @@ export default class HighwayIncidentView extends Component {
     }
 
 
-    getIncident() {
+    getIncidentTypes() {
         TrafficIncidentService.getIncidentTypes().then(response=>{
             this.setState({incidentOptions: response.data});
         }).catch(error=>{

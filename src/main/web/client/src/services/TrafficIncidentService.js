@@ -16,7 +16,7 @@ class TrafficIncidentService {
     }
 
     getIncidentTypes() {
-        return axios.get('api/incident/getall')
+        return axios.get('api/incident/get/types')
     }
 }
 

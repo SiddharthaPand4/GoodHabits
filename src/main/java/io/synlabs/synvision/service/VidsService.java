@@ -92,8 +92,7 @@ public class VidsService {
                 query = query.and(root.incidentDate.before(endingDate));
             }
             if(!request.getIncidentType().isEmpty()){
-                String incidentType=request.getIncidentType();
-                query =query.and(root.incidentType.eq(HighwayIncidentType.valueOf(incidentType)));
+                query =query.and(root.incidentType.eq(HighwayIncidentType.valueOf(request.getIncidentType())));
           }
          if(request.getFeed().getId()!=0)
         {
