@@ -218,7 +218,7 @@ class UserForm extends Component {
                         <Select.Option value="Employee">Employee</Select.Option>
                         <Select.Option value="Visitor">Visitor</Select.Option>
                         <Select.Option value="Vip">Vip</Select.Option>
-                        <Select.Option value="Blacklist">Blacklist</Select.Option>
+                        <Select.Option value="BlackList">Blacklist</Select.Option>
                     </Select>
                 </Form.Item>
                 <div>
