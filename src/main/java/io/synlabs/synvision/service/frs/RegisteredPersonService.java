@@ -5,7 +5,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.entity.frs.QRegisteredPerson;
 import io.synlabs.synvision.entity.frs.RegisteredPerson;
-import io.synlabs.synvision.enums.PersonType;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.ex.ValidationException;
 import io.synlabs.synvision.jpa.RegisteredPersonRepository;
@@ -25,13 +24,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -107,8 +108,6 @@ public class RegisteredPersonService {
                 );
             }
 
-
-            //TODO add or for EID
             return query;
         } catch (Exception e) {
             logger.error("Error in parsing date", e);
@@ -124,27 +123,6 @@ public class RegisteredPersonService {
         if (re != null) {
             throw new ValidationException("Duplicate ID");
         }
-
-        byte[] decodedBytes = Base64.getDecoder().decode(request.getImage().substring(23));
-
-        Path path = Paths.get(uploadDirPath);
-        FileOutputStream fileWriter;
-        String uid = UUID.randomUUID().toString();
-        String filename = uid + ".jpg";
-        String fullname = path.resolve(filename).toString();
-        fileWriter = new FileOutputStream(fullname);
-        fileWriter.write(decodedBytes);
-//
-//        RegisteredPerson person = new RegisteredPerson();
-//        person.setUid(uid);
-//        person.setPid(request.getId());
-//        person.setName(request.getName());
-//        person.setPersonType(PersonType.valueOf(request.getType()));
-//        person.setActive(true);
-//        person.setFaceImage(filename);
-//        person.setFullImage(filename);
-//        frsRepository.save(person);
-//        return person;
 
         OkHttpClient client = new OkHttpClient();
         try {
@@ -165,17 +143,7 @@ public class RegisteredPersonService {
                     throw new ValidationException(resp.message);
                 }
 
-
-                RegisteredPerson person = new RegisteredPerson();
-                person.setUid(uid);
-                person.setPid(request.getId());
-                person.setName(request.getName());
-                person.setPersonType(PersonType.valueOf(request.getType()));
-                person.setActive(true);
-                //person.setFaceImage(filename);
-                person.setFullImage(filename);
-                frsRepository.save(person);
-                return person;
+                return frsRepository.findOneByUid(resp.uid);
             } else {
                 throw new IOException("Unexpected code " + okresponse);
             }
@@ -186,11 +154,10 @@ public class RegisteredPersonService {
 
     }
 
-
-
     static class RegisterResponse {
         public boolean error;
         public String message;
+        public String uid;
     }
 
     static class OkResponse {
@@ -200,12 +167,11 @@ public class RegisteredPersonService {
 
     public RegisteredPerson lookup(FRSLookupRequest request) {
 
-
         OkHttpClient client = new OkHttpClient();
         try {
             Request okrequest = new Request.Builder()
                     .header("Authorization", "your token")
-                    .url("http://localhost:5000/lookup")
+                    .url(frsurl)
                     .post(RequestBody.create(request.toJsonString(), JSON))
                     .build();
 
