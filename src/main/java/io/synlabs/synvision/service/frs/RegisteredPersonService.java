@@ -5,6 +5,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.entity.frs.QRegisteredPerson;
 import io.synlabs.synvision.entity.frs.RegisteredPerson;
+import io.synlabs.synvision.enums.PersonType;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.ex.ValidationException;
 import io.synlabs.synvision.jpa.RegisteredPersonRepository;
@@ -102,10 +103,15 @@ public class RegisteredPersonService {
                 query = query.and(root.createdDate.before(endingDate));
             }
 
-            if (request.getName() != null) {
+            if (!StringUtils.isEmpty(request.getName())) {
                 query = query.and(
-                        root.name.likeIgnoreCase("%" + request.getName() + "%").or(root.pid.likeIgnoreCase("%" + request.getName() + "%"))
+                        root.name.likeIgnoreCase("%" + request.getName() + "%")
+                        .or(root.pid.likeIgnoreCase("%" + request.getName() + "%"))
                 );
+            }
+
+            if (!StringUtils.isEmpty(request.getType())) {
+                query = query.and(root.personType.eq(PersonType.valueOf(request.getType())));
             }
 
             return query;

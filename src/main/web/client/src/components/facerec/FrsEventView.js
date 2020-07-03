@@ -9,7 +9,7 @@ import {
     Row,
     Table,
     Tag,
-    Input, Button, Menu, Dropdown, Typography, Spin
+    Input, Button, Menu, Dropdown, Typography, Spin, Select
 } from 'antd';
 import GenericFilter from "../../components/GenericFilter";
 import Moment from "react-moment";
@@ -36,7 +36,9 @@ export default class FrsEventView extends Component {
             filter: {
                 page: 1,
                 pageSize: 12,
-                name: ""
+                name: "",
+                match: "",
+                type: ""
             },
             workingEvent: {},
             workingEventLoading: false,
@@ -64,6 +66,8 @@ export default class FrsEventView extends Component {
         this.preparePrint = this.preparePrint.bind(this);
         this.onCollapse = this.onCollapse.bind(this);
 
+        this.handleTypeChange = this.handleTypeChange.bind(this);
+        this.handleMatchChange = this.handleMatchChange.bind(this);
     }
 
     componentDidMount() {
@@ -92,6 +96,19 @@ export default class FrsEventView extends Component {
         filter.name = e.target.value;
         this.setState({filter: filter})
     }
+
+    handleTypeChange(value) {
+        let filter = this.state.filter;
+        filter.type = value;
+        this.setState({filter:filter})
+    }
+
+    handleMatchChange(value) {
+        let filter = this.state.filter;
+        filter.match = value;
+        this.setState({filter:filter})
+    }
+
 
     handleFilterChange(data) {
         this.setState({filter: data})
@@ -173,6 +190,23 @@ export default class FrsEventView extends Component {
 
                             Name: <Input value={name} style={{"width": "200px"}}
                                         onChange={this.onNameInputChange}/>&nbsp;&nbsp;
+
+                            Match: <Select defaultValue="" onChange={this.handleMatchChange}>
+                            <Select.Option value="">--Select--</Select.Option>
+                            <Select.Option value="Matched">Matched</Select.Option>
+                            <Select.Option value="Unmatched">Unmatched</Select.Option>
+                        </Select>
+
+                            Type: <Select defaultValue="" onChange={this.handleTypeChange}>
+                            <Select.Option value="">--Select--</Select.Option>
+                            <Select.Option value="Employee">Employee</Select.Option>
+                            <Select.Option value="Visitor">Visitor</Select.Option>
+                            <Select.Option value="Vip">Vip</Select.Option>
+                            <Select.Option value="BlackList">Blacklist</Select.Option>
+                        </Select>
+
+
+
                             <Button type="dashed" style={{float: "right"}} onClick={() => {
                                 this.downloadEventReport()
                             }}><Icon type="file-excel"/></Button>

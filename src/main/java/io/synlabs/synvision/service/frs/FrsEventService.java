@@ -4,6 +4,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.entity.frs.FrsEvent;
 import io.synlabs.synvision.entity.frs.QFrsEvent;
+import io.synlabs.synvision.enums.FrsEventType;
+import io.synlabs.synvision.enums.PersonType;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.jpa.FrsEventRepository;
 import io.synlabs.synvision.views.frs.FrsEventPageResponse;
@@ -91,6 +93,15 @@ public class FrsEventService {
                 Date endingDate = dateFormat.parse(ending);
                 query = query.and(root.eventDate.before(endingDate));
             }
+
+            if (!StringUtils.isEmpty(request.getMatch())) {
+                query = query.and(root.type.eq(FrsEventType.valueOf(request.getMatch())));
+            }
+
+            if (!StringUtils.isEmpty(request.getType())) {
+                query = query.and(root.person.personType.eq(PersonType.valueOf(request.getType())));
+            }
+
             return query;
         } catch (Exception e) {
             logger.error("Error in parsing date", e);

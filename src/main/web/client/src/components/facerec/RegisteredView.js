@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Card, Col, Collapse, Empty, Input, Row, Spin, Tag} from "antd";
+import {Card, Col, Collapse, Empty, Form, Input, Row, Select, Spin, Tag} from "antd";
 import FaceMatchService from "../../services/facerec/FrsService";
 import GenericFilter from "../GenericFilter";
 
@@ -16,7 +16,8 @@ export default class RegisteredView extends Component {
             filter: {
                 page: 1,
                 pageSize: 12,
-                name: ""
+                name: "",
+                type: ""
             },
         }
         this.refresh = this.refresh.bind(this);
@@ -26,7 +27,7 @@ export default class RegisteredView extends Component {
         this.onPageChange = this.onPageChange.bind(this);
         this.onPageSizeChange = this.onPageSizeChange.bind(this);
         this.onNameInputChange = this.onNameInputChange.bind(this);
-
+        this.handleTypeChange = this.handleTypeChange.bind(this);
     }
 
     componentDidMount() {
@@ -48,6 +49,12 @@ export default class RegisteredView extends Component {
         let filter = this.state.filter;
         filter.name = e.target.value;
         this.setState({filter: filter})
+    }
+
+    handleTypeChange(value) {
+        let filter = this.state.filter;
+        filter.type = value;
+        this.setState({filter:filter})
     }
 
     handleFilterChange(data) {
@@ -91,6 +98,14 @@ export default class RegisteredView extends Component {
                     <Panel header="Filter" key="1">
                         <div>      Name: <Input value={filtername} style={{"width": "200px"}}
                                                onChange={this.onNameInputChange}/>&nbsp;&nbsp;
+
+                            Type: <Select defaultValue="" onChange={this.handleTypeChange}>
+                                <Select.Option value="">--Select--</Select.Option>
+                                <Select.Option value="Employee">Employee</Select.Option>
+                                <Select.Option value="Visitor">Visitor</Select.Option>
+                                <Select.Option value="Vip">Vip</Select.Option>
+                                <Select.Option value="BlackList">Blacklist</Select.Option>
+                            </Select>
                         </div>
                         <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
                                        handleFilterChange={this.handleFilterChange}
