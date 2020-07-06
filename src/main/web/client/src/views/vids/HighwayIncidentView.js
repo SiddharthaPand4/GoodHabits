@@ -74,8 +74,8 @@ export default class HighwayIncidentView extends Component {
 
     refresh() {
 
-        this.IncidentFilter();
-        this.LocationFilter();
+        this.UpdateIncidentFilter();
+        this.UpdateLocationFilter();
         VidsService.getIncidents(this.state.filter).then(request => {
             this.setState({"incidents": request.data, loading: false})
 
@@ -85,8 +85,8 @@ export default class HighwayIncidentView extends Component {
     //cant use refresh to read from state as state may not have been set
     refreshNow() {
 
-        this.IncidentFilter();
-        this.LocationFilter();
+        this.UpdateIncidentFilter();
+        this.UpdateLocationFilter();
         VidsService.getIncidents(this.state.filter).then(request => {
             this.setState({"incidents": request.data, loading: false})
         })
@@ -376,13 +376,13 @@ export default class HighwayIncidentView extends Component {
         )
     }
 
-    IncidentFilter() {
+    UpdateIncidentFilter() {
         let filter=this.state.filter;
         filter.incidentType=this.state.incidentType;
         this.setState({filter:filter})
     }
 
-    LocationFilter() {
+    UpdateLocationFilter() {
         let filter = this.state.filter;
         filter.feed=this.state.feed;
         this.setState({filter: filter});

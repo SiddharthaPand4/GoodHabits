@@ -60,7 +60,6 @@ public class IncidentController {
         ArrayList<String> list=new ArrayList<String>();
         for(HighwayIncidentType t:HighwayIncidentType.values())
         {list.add(t.toString());}
-        System.out.println(list);
         return list;
     }
 }
