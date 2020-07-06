@@ -15,6 +15,8 @@ public class FrsUserResponse implements Response {
     private String fullImage;
     private String faceImage;
     private String type;
+    private String accessType;
+
     private String pid;
     private String name;
     private boolean active;
@@ -22,6 +24,7 @@ public class FrsUserResponse implements Response {
     public FrsUserResponse(RegisteredPerson rp) {
         this.uid = rp.getUid();
         this.type = rp.getPersonType().name();
+        this.accessType = rp.getAccessType().name();
         this.pid = rp.getPid();
         this.name = rp.getName();
         this.active = rp.isActive();

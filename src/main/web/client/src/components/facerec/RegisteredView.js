@@ -17,7 +17,8 @@ export default class RegisteredView extends Component {
                 page: 1,
                 pageSize: 12,
                 name: "",
-                type: ""
+                type: "",
+                accessType: ""
             },
         }
         this.refresh = this.refresh.bind(this);
@@ -28,6 +29,7 @@ export default class RegisteredView extends Component {
         this.onPageSizeChange = this.onPageSizeChange.bind(this);
         this.onNameInputChange = this.onNameInputChange.bind(this);
         this.handleTypeChange = this.handleTypeChange.bind(this);
+        this.handleAccessTypeChange = this.handleAccessTypeChange.bind(this);
     }
 
     componentDidMount() {
@@ -54,6 +56,12 @@ export default class RegisteredView extends Component {
     handleTypeChange(value) {
         let filter = this.state.filter;
         filter.type = value;
+        this.setState({filter:filter})
+    }
+
+    handleAccessTypeChange(value) {
+        let filter = this.state.filter;
+        filter.accessType = value;
         this.setState({filter:filter})
     }
 
@@ -102,9 +110,15 @@ export default class RegisteredView extends Component {
                             Type: <Select defaultValue="" onChange={this.handleTypeChange}>
                                 <Select.Option value="">--Select--</Select.Option>
                                 <Select.Option value="Employee">Employee</Select.Option>
+                                <Select.Option value="Vendor">Vendor</Select.Option>
                                 <Select.Option value="Visitor">Visitor</Select.Option>
-                                <Select.Option value="Vip">Vip</Select.Option>
-                                <Select.Option value="BlackList">Blacklist</Select.Option>
+                                <Select.Option value="Others">Others</Select.Option>
+                            </Select>
+
+                            Access Type: <Select defaultValue="" onChange={this.handleAccessTypeChange}>
+                                <Select.Option value="">--Select--</Select.Option>
+                                <Select.Option value="BlackList">BlackList</Select.Option>
+                                <Select.Option value="WhiteList">WhiteList</Select.Option>
                             </Select>
                         </div>
                         <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
@@ -139,6 +153,7 @@ export default class RegisteredView extends Component {
                                 title={
                                     <div>
                                         {(user.type) ? <Tag color="#f50">{user.type}</Tag> : null}
+                                        {(user.accessType) ? <Tag color="#f50">{user.accessType}</Tag> : null}
                                         <h4>{user.pid}</h4>
                                         <h5>{user.name}</h5>
                                     </div>

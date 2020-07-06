@@ -1,6 +1,7 @@
 package io.synlabs.synvision.entity.frs;
 
 import io.synlabs.synvision.entity.BaseEntity;
+import io.synlabs.synvision.enums.AccessType;
 import io.synlabs.synvision.enums.PersonType;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +28,10 @@ public class RegisteredPerson extends BaseEntity {
     @Column(length = 20)
     @Enumerated(EnumType.STRING)
     private PersonType personType;
+
+    @Column(length = 20)
+    @Enumerated(EnumType.STRING)
+    private AccessType accessType;
 
     @Column(length = 50)
     private String pid;

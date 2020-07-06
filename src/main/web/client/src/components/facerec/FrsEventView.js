@@ -38,7 +38,8 @@ export default class FrsEventView extends Component {
                 pageSize: 12,
                 name: "",
                 match: "",
-                type: ""
+                type: "",
+                accessType: ""
             },
             workingEvent: {},
             workingEventLoading: false,
@@ -67,6 +68,7 @@ export default class FrsEventView extends Component {
         this.onCollapse = this.onCollapse.bind(this);
 
         this.handleTypeChange = this.handleTypeChange.bind(this);
+        this.handleAccessTypeChange = this.handleAccessTypeChange.bind(this);
         this.handleMatchChange = this.handleMatchChange.bind(this);
     }
 
@@ -100,15 +102,20 @@ export default class FrsEventView extends Component {
     handleTypeChange(value) {
         let filter = this.state.filter;
         filter.type = value;
-        this.setState({filter:filter})
+        this.setState({filter: filter})
     }
 
     handleMatchChange(value) {
         let filter = this.state.filter;
         filter.match = value;
-        this.setState({filter:filter})
+        this.setState({filter: filter})
     }
 
+    handleAccessTypeChange(value) {
+        let filter = this.state.filter;
+        filter.accessType = value;
+        this.setState({filter: filter})
+    }
 
     handleFilterChange(data) {
         this.setState({filter: data})
@@ -189,7 +196,7 @@ export default class FrsEventView extends Component {
                         <Panel header="Filter" key="1">
 
                             Name: <Input value={name} style={{"width": "200px"}}
-                                        onChange={this.onNameInputChange}/>&nbsp;&nbsp;
+                                         onChange={this.onNameInputChange}/>&nbsp;&nbsp;
 
                             Match: <Select defaultValue="" onChange={this.handleMatchChange}>
                             <Select.Option value="">--Select--</Select.Option>
@@ -200,12 +207,16 @@ export default class FrsEventView extends Component {
                             Type: <Select defaultValue="" onChange={this.handleTypeChange}>
                             <Select.Option value="">--Select--</Select.Option>
                             <Select.Option value="Employee">Employee</Select.Option>
+                            <Select.Option value="Vendor">Vendor</Select.Option>
                             <Select.Option value="Visitor">Visitor</Select.Option>
-                            <Select.Option value="Vip">Vip</Select.Option>
-                            <Select.Option value="BlackList">Blacklist</Select.Option>
+                            <Select.Option value="Others">Others</Select.Option>
                         </Select>
 
-
+                            Access Type: <Select defaultValue="" onChange={this.handleAccessTypeChange}>
+                            <Select.Option value="">--Select--</Select.Option>
+                            <Select.Option value="BlackList">BlackList</Select.Option>
+                            <Select.Option value="WhiteList">WhiteList</Select.Option>
+                        </Select>
 
                             <Button type="dashed" style={{float: "right"}} onClick={() => {
                                 this.downloadEventReport()
@@ -270,12 +281,12 @@ export default class FrsEventView extends Component {
                                 bordered={true}
                             >
                                 <div style={{textAlign: "center"}}>
-                                    <img alt="face" style={{width:100,height:100, borderRadius:"50%"}}
+                                    <img alt="face" style={{width: 100, height: 100, borderRadius: "50%"}}
                                          src={"/public/frs/event/face/" + event.eventId + "/image.jpg"}/>
                                 </div>
                                 <div style={{marginTop: "5px", textAlign: "center"}}>
                                     <div style={{textAlign: "center"}}>
-                                        <img alt="person" style={{width:200,height:200}}
+                                        <img alt="person" style={{width: 200, height: 200}}
                                              src={"/public/frs/event/full/" + event.eventId + "/image.jpg"}/>
                                     </div>
                                 </div>
@@ -336,7 +347,7 @@ export default class FrsEventView extends Component {
                                download={true}>
                                 <img alt="event"
                                      style={{maxWidth: 120}}
-                                     src={"/public/frs/face/" + id + "/image.jpg"}/></a> )}/>
+                                     src={"/public/frs/face/" + id + "/image.jpg"}/></a>)}/>
 
                 <Column title="Action"
                         key="action"

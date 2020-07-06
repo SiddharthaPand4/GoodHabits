@@ -9,5 +9,6 @@ import lombok.Setter;
 public class FrsFilterRequest extends IncidentsFilterRequest {
     private String name;
     private String type;
+    private String accessType;
     private String match;
 }

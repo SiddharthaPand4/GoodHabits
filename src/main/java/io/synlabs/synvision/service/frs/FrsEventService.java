@@ -4,6 +4,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.entity.frs.FrsEvent;
 import io.synlabs.synvision.entity.frs.QFrsEvent;
+import io.synlabs.synvision.enums.AccessType;
 import io.synlabs.synvision.enums.FrsEventType;
 import io.synlabs.synvision.enums.PersonType;
 import io.synlabs.synvision.ex.NotFoundException;
@@ -100,6 +101,10 @@ public class FrsEventService {
 
             if (!StringUtils.isEmpty(request.getType())) {
                 query = query.and(root.person.personType.eq(PersonType.valueOf(request.getType())));
+            }
+
+            if (!StringUtils.isEmpty(request.getAccessType())) {
+                query = query.and(root.person.accessType.eq(AccessType.valueOf(request.getAccessType())));
             }
 
             return query;

@@ -21,6 +21,14 @@ export default class FaceRegisterView extends Component {
         this.resetcamera = this.resetcamera.bind(this);
     }
 
+    componentDidMount() {
+        setInterval(() => {
+            this.setState({
+                curTime : new Date().toLocaleString('in-IN')
+            })
+        }, 1000)
+    }
+
     capture() {
         var image = this.webcamRef.current.getScreenshot();
         console.log('publishing image on bus', image);
@@ -55,13 +63,16 @@ export default class FaceRegisterView extends Component {
         }
         return (<div>
             <Row>
-                <Col md={6}>
+                <Col md={12} >
                     {elmnt}
+                    <br/>
+                    <div><h5>Registration Time: {this.state.curTime}</h5></div>
                     <br/>
                     <Button type="primary" onClick={this.capture}>Capture photo</Button>{' '}
                     <Button onClick={this.resetcamera}>Reset</Button>
                 </Col>
                 <Col md={6}>
+
                     <WrapperUserForm userdata={this.state.userdata}/>
                 </Col>
             </Row>
@@ -80,7 +91,6 @@ class UserForm extends Component {
         this.state = {
             id: '',
             name: '',
-            address: '',
             submitted: false,
             loading: false,
             loginError: '',
@@ -88,11 +98,13 @@ class UserForm extends Component {
         };
 
         this.state.userdata.type = "Employee";
+        this.state.userdata.accessType = "WhiteList";
         this.handleSubmit = this.handleSubmit.bind(this);
         this.refresh = this.refresh.bind(this);
         this.screenshot = this.screenshot.bind(this);
         this.lookup = this.lookup.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.handleAccessTypeChange = this.handleAccessTypeChange.bind(this);
         EventBus.subscribe('frs-refresh', (data) => this.refresh(data));
         EventBus.subscribe('frs-screenshot', (data) => this.screenshot(data));
 
@@ -105,9 +117,11 @@ class UserForm extends Component {
         this.props.form.setFieldsInitialValue({
             id: this.state.userdata.id,
             name: this.state.userdata.name,
-            address: this.state.userdata.address,
-            type: this.state.userdata.type
+            type: this.state.userdata.type,
+            accessType: this.state.userdata.accessType
         })
+
+
     }
 
     componentWillUnmount() {
@@ -117,6 +131,13 @@ class UserForm extends Component {
     handleChange(value) {
         let userdata = this.state.userdata;
         userdata.type = value;
+        this.setState({userdata: userdata});
+        console.log(`selected ${value}`);
+    }
+
+    handleAccessTypeChange(value) {
+        let userdata = this.state.userdata;
+        userdata.accessType = value;
         this.setState({userdata: userdata});
         console.log(`selected ${value}`);
     }
@@ -159,9 +180,8 @@ class UserForm extends Component {
         var userdata = {};
         userdata.id = form.getFieldValue("id");
         userdata.name = form.getFieldValue("name");
-        userdata.address = form.getFieldValue("address");
         userdata.type = this.state.userdata.type;
-
+        userdata.accessType = this.state.userdata.accessType;
         let validationError;
         if (!userdata.id) {
             validationError = "Missing ID"
@@ -216,9 +236,15 @@ class UserForm extends Component {
                 <Form.Item label="Type">
                     <Select defaultValue="Employee" onChange={this.handleChange}>
                         <Select.Option value="Employee">Employee</Select.Option>
+                        <Select.Option value="Vendor">Vendor</Select.Option>
                         <Select.Option value="Visitor">Visitor</Select.Option>
-                        <Select.Option value="Vip">Vip</Select.Option>
-                        <Select.Option value="BlackList">Blacklist</Select.Option>
+                        <Select.Option value="Others">Others</Select.Option>
+                    </Select>
+                </Form.Item>
+                <Form.Item label="Access">
+                    <Select defaultValue="WhiteList" onChange={this.handleAccessTypeChange}>
+                        <Select.Option value="BlackList">BlackList</Select.Option>
+                        <Select.Option value="WhiteList">WhiteList</Select.Option>
                     </Select>
                 </Form.Item>
                 <div>

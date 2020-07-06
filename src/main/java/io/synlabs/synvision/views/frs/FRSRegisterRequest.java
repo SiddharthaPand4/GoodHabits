@@ -17,6 +17,8 @@ public class FRSRegisterRequest {
 
     private String type;
 
+    private String accessType;
+
     public String toJsonString() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(this);

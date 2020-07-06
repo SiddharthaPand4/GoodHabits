@@ -5,6 +5,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.entity.frs.QRegisteredPerson;
 import io.synlabs.synvision.entity.frs.RegisteredPerson;
+import io.synlabs.synvision.enums.AccessType;
 import io.synlabs.synvision.enums.PersonType;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.ex.ValidationException;
@@ -112,6 +113,10 @@ public class RegisteredPersonService {
 
             if (!StringUtils.isEmpty(request.getType())) {
                 query = query.and(root.personType.eq(PersonType.valueOf(request.getType())));
+            }
+
+            if (!StringUtils.isEmpty(request.getAccessType())) {
+                query = query.and(root.accessType.eq(AccessType.valueOf(request.getAccessType())));
             }
 
             return query;
