@@ -9,7 +9,8 @@ import {
     Row,
     Table,
     Tag,
-    Button, Menu, Dropdown, Typography, Input
+    Button, Menu, Dropdown, Typography, Input,
+    notification
 } from 'antd';
 import GenericFilter from "../../components/GenericFilter";
 import Moment from "react-moment";
@@ -21,6 +22,7 @@ import "video-react/dist/video-react.css";
 import UserOutlined from "@ant-design/icons/lib/icons/UserOutlined";
 import DownOutlined from "@ant-design/icons/lib/icons/DownOutlined";
 import TrafficIncidentService from "../../services/TrafficIncidentService";
+
 
 
 const {Text} = Typography;
@@ -39,7 +41,7 @@ export default class HighwayIncidentView extends Component {
             layout: "list",
             incidentType:"",
             location:"",
-            feed:{id:0,location:"",name:"",site:""},
+            feedID:0,
             feedOptions: [],
             incidentOptions:[],
             incidents: {},
@@ -48,7 +50,7 @@ export default class HighwayIncidentView extends Component {
                 page: 1,
                 pageSize: 12,
                 incidentType:"",
-                feed:{}
+                feedID:0,
 
             },
         };
@@ -69,6 +71,7 @@ export default class HighwayIncidentView extends Component {
         this.refresh();
         this.getFeeds();
         this.getIncidentTypes();
+
 
     }
 
@@ -137,18 +140,15 @@ export default class HighwayIncidentView extends Component {
     }
 
     handleLocationMenuClick(choice) {
-        let feed;
+        let feedID;
         if(choice.item.props.children=="All")
-        {   feed={id:0,location:"",name:"",site:""}
-            this.setState({feed:feed})
+        {   feedID=0;
+            this.setState({feedID:feedID})
             this.setState({location:""})
         }
         else {
-            feed={id:choice.item.props.id.id,
-                location:choice.item.props.id.location,
-                site:choice.item.props.id.site,
-                name:choice.item.props.id.name}
-            this.setState({feed:feed});
+            feedID=choice.item.props.id;
+            this.setState({feedID:feedID});
             this.setState({location:choice.item.props.children});
 
 
@@ -180,7 +180,7 @@ export default class HighwayIncidentView extends Component {
             <Menu onClick={this.handleLocationMenuClick}>
                 <Menu.Item key={1}>All</Menu.Item>
             {(this.state.feedOptions || []).map((feed) =>
-            <Menu.Item key={feed} icon={<UserOutlined />} id={feed}>
+            <Menu.Item key={feed} icon={<UserOutlined />} id={feed.id}>
                     {feed.site+">"+feed.location}
                 </Menu.Item>
                 )}
@@ -384,7 +384,7 @@ export default class HighwayIncidentView extends Component {
 
     UpdateLocationFilter() {
         let filter = this.state.filter;
-        filter.feed=this.state.feed;
+        filter.feedID=this.state.feedID;
         this.setState({filter: filter});
 
     }
@@ -393,17 +393,26 @@ export default class HighwayIncidentView extends Component {
         feedService.getFeeds().then(response=>{
             this.setState({feedOptions: response.data});
         }).catch(error=>{
-            alert("somthing went wrong");
+            notification.open({
+                message: 'Something went wrong ',
+                discription:error
+            });
         })
     }
 
 
     getIncidentTypes() {
+
         TrafficIncidentService.getIncidentTypes().then(response=>{
             this.setState({incidentOptions: response.data});
+
         }).catch(error=>{
-            alert("somthing went wrong");
+            notification.open({
+                message: 'Something went wrong ',
+                discription:error
+            });
         })
 
     }
+
 }
