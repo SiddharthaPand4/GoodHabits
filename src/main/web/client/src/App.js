@@ -156,7 +156,7 @@ class App extends Component {
                         <Content style={{margin: '16px'}}>
                             <div style={{padding: 4}}>
                                 <Route path='/login' exact={true} component={LoginView}/>
-                                <PrivateRoute path='/' exact={true} component={HomeView}/>
+                                <PrivateRoute path='/' exact={true} component={FrsEventView}/>
                                 <PrivateRoute path='/incidents' exact={true} component={TrafficIncidentView}/>
                                 <PrivateRoute path='/incidents/hotlisted' exact={true} component={IncidentHotlistView}/>
                                 <PrivateRoute path='/incidents/repeated' exact={true} component={IncidentRepeatedView}/>

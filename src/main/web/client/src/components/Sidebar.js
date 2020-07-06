@@ -32,7 +32,7 @@ export default class Sidebar extends Component {
     render() {
 
         let menu = this.state.menu;
-
+        console.log("admin?", menu.admin)
         return (
             <Sider
                 className={"no-print"}
@@ -78,11 +78,13 @@ export default class Sidebar extends Component {
                                 <span className='nav-text'>User Guide</span></Link>
                         </Menu.Item>
                     </SubMenu>
+                    {menu.admin &&
                     <SubMenu key="admin" title={<span><Icon type="deployment-unit"/>Admin</span>}>
                         <Menu.Item key="51">
                             <Link to='/user'><Icon type='user'/><span className='nav-text'>Users</span></Link>
                         </Menu.Item>
                     </SubMenu>
+                    }
                     <Menu.Item key="logout">
                         <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span
                             className='nav-text'>Logout</span></Link>
