@@ -11,4 +11,10 @@ import lombok.Setter;
 public class VidsFilterRequest extends IncidentsFilterRequest {
     private String incidentType;
     private FeedRequest feed;
+    private Long feedId;
+
+    public Long getFeedId()
+    {
+        return unmask(feedId);
+    }
 }

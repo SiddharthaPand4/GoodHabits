@@ -94,10 +94,10 @@ public class VidsService {
             if(!request.getIncidentType().isEmpty()){
                 query =query.and(root.incidentType.eq(HighwayIncidentType.valueOf(request.getIncidentType())));
           }
-         if(request.getFeed().getId()!=0)
+
+         if(request.getFeedId()!=null && request.getFeedId()!=0)
         {
-            Long locationid=request.getFeed().getId();
-            query=query.and(root.feed.id.eq(locationid));
+            query=query.and(root.feed.id.eq(request.getFeedId()));
         }
             return query;
 
