@@ -14,6 +14,10 @@ class TrafficIncidentService {
     archiveIncident(incident) {
         return axios.delete('/api/traffic/incident/' + incident.id);
     }
+
+    getIncidentTypes() {
+        return axios.get('api/incident/get/types')
+    }
 }
 
 export default TrafficIncidentService.Instance()
