@@ -10,6 +10,7 @@ import io.synlabs.synvision.views.common.FeedResponse;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -25,8 +26,10 @@ public class FeedService {
     private Process process;
 
     private final FeedRepository feedRepository;
-    HashMap<Long,Integer> processMap=new HashMap<Long,Integer>();
+    private HashMap<Long,Integer> processMap=new HashMap<Long,Integer>();
 
+    @Value("${streamer.dir}")
+    private String streamderDir;
 
     public FeedService(FeedRepository feedRepository) {
         this.feedRepository = feedRepository;
@@ -89,7 +92,7 @@ public class FeedService {
 //Feed streaming part
 
     public int startFeed(FeedRequest request) {
-        File dir = new File("E://LiveFeed");
+        File dir = new File(streamderDir);
         Feed feed = feedRepository.getOne(request.getId());
         int port =0;
 
