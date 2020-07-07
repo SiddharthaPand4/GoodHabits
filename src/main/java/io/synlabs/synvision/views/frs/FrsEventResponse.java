@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,6 +21,7 @@ public class FrsEventResponse implements Response {
     private boolean alert;
     private boolean acknowledged;
     private String acknowledgedBy;
+    private Date eventDate;
 
     public FrsEventResponse(FrsEvent event) {
         this.eventId = event.getEventId();
@@ -30,5 +33,6 @@ public class FrsEventResponse implements Response {
         this.alert = event.isAlert();
         this.acknowledged = event.isAcknowledged();
         this.acknowledgedBy = event.getAcknowledgedBy() == null ? null : event.getAcknowledgedBy().getUsername();
+        this.eventDate = event.getEventDate();
     }
 }
