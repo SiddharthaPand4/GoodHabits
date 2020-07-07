@@ -4,10 +4,7 @@ import io.synlabs.synvision.service.frs.FrsEventService;
 import io.synlabs.synvision.service.frs.RegisteredPersonService;
 import io.synlabs.synvision.views.frs.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -24,6 +21,11 @@ public class FrsController {
     @PostMapping("register")
     public FRSRegisterResponse register(@RequestBody FRSRegisterRequest request) throws IOException {
         return new FRSRegisterResponse(registeredPersonService.register(request));
+    }
+
+    @PostMapping("toggle/{uid}")
+    public void register(@PathVariable String uid)  {
+        registeredPersonService.toggle(uid);
     }
 
     @PostMapping("lookup")

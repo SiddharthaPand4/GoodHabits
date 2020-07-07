@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Card, Col, Collapse, Empty, Form, Input, Row, Select, Spin, Tag} from "antd";
+import {Button, Card, Col, Collapse, Empty, Form, Input, Row, Select, Spin, Tag} from "antd";
 import FaceMatchService from "../../services/facerec/FrsService";
 import GenericFilter from "../GenericFilter";
 
@@ -43,6 +43,13 @@ export default class RegisteredView extends Component {
         }).catch(error => {
             alert("Something went wrong!");
             this.setState({loading: false});
+        })
+    }
+
+    switchWhiteBlack(user) {
+        FaceMatchService.toggleWhiteList(user.uid)
+        .then( () => {
+            this.refresh();
         })
     }
 
@@ -167,6 +174,7 @@ export default class RegisteredView extends Component {
                                     <img alt="person" style={{width:200,height:200}}
                                          src={"/public/frs/person/full/" + user.uid + "/image.jpg"}/>
                                 </div>
+                                <Button onClick={() => this.switchWhiteBlack(user)}>{(user.accessType === "WhiteList") ? "BlackList" : "WhiteList"}</Button>
                             </Card>
                         </Col>
                             )
@@ -174,4 +182,6 @@ export default class RegisteredView extends Component {
             </Row>
         </div>
     }
+
+
 }

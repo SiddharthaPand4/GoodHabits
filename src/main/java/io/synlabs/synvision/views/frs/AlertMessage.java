@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class AlertMessage {
+    private String accessType;
     private String message;
     private String uid;
     private String fullImage;
@@ -18,13 +19,14 @@ public class AlertMessage {
 
     public AlertMessage(FrsEvent event) {
         this.uid = event.getEventId();
-        this.message = event.getType() + " alert!";
+        this.message = "Alert!";
         this.fullImage = event.getFullImage();
         this.faceImage = event.getFaceImage();
 
         if (event.getPerson() != null) {
             this.person = new FrsUserResponse(event.getPerson());
             this.type = event.getPerson().getPersonType().name();
+            this.accessType = event.getPerson().getAccessType().name();
         }
 
     }

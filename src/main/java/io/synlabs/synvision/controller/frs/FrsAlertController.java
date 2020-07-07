@@ -1,6 +1,7 @@
 package io.synlabs.synvision.controller.frs;
 
 import io.synlabs.synvision.entity.frs.FrsEvent;
+import io.synlabs.synvision.enums.AccessType;
 import io.synlabs.synvision.service.frs.FrsEventService;
 import io.synlabs.synvision.views.frs.AlertMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,12 @@ public class FrsAlertController {
     @GetMapping("{eid}")
     public void blacklistAlert(@PathVariable("eid") String eid) {
         FrsEvent event = eventService.getEvent(eid);
-        AlertMessage message = new AlertMessage(event);
-        websocket.convertAndSend("/alert", message);
+
+        if (event.getPerson() != null && event.getPerson().getAccessType().equals(AccessType.BlackList)) {
+            AlertMessage message = new AlertMessage(event);
+            websocket.convertAndSend("/alert", message);
+        }
+
     }
 
 }

@@ -105,6 +105,8 @@ class App extends Component {
                 title={
                     <div>
                         {(alert.person) ? <Tag color="#f50">{alert.person.type}</Tag> : ""}
+                        {(alert.person) ? <Tag color="#f50">{alert.person.accessType}</Tag> : ""}
+                        <br/>
                         <Text
                             type="secondary">{(alert.person) ? "ID: " + alert.person.pid : ""}</Text>
                         <Text

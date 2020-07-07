@@ -22,6 +22,9 @@ class FrsService {
         return axios.post('/api/frs/events', filter);
     }
 
+    toggleWhiteList(uid) {
+        return axios.post('/api/frs/toggle/' + uid)
+    }
 }
 
 export default FrsService.Instance()

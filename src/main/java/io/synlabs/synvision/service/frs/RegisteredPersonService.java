@@ -66,6 +66,18 @@ public class RegisteredPersonService {
         this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
                 .toAbsolutePath().normalize();
     }
+
+    public void toggle(String uid) {
+        RegisteredPerson person = frsRepository.findOneByUid(uid);
+
+        if (person.getAccessType().equals(AccessType.WhiteList)) {
+            person.setAccessType(AccessType.BlackList);
+        }
+        else {
+            person.setAccessType(AccessType.WhiteList);
+        }
+    }
+
     public FrsUserPageResponse getRegistersUsers(FrsFilterRequest request) {
         BooleanExpression query = getQuery(request);
         int count = (int) frsRepository.count(query);
@@ -164,6 +176,7 @@ public class RegisteredPersonService {
         }
 
     }
+
 
     static class RegisterResponse {
         public boolean error;
