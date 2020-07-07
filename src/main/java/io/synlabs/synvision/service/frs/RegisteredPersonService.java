@@ -76,6 +76,8 @@ public class RegisteredPersonService {
         else {
             person.setAccessType(AccessType.WhiteList);
         }
+
+        frsRepository.save(person);
     }
 
     public FrsUserPageResponse getRegistersUsers(FrsFilterRequest request) {

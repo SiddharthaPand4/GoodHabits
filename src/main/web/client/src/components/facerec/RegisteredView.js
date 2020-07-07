@@ -174,8 +174,10 @@ export default class RegisteredView extends Component {
                                     <img alt="person" style={{width:200,height:200}}
                                          src={"/public/frs/person/full/" + user.uid + "/image.jpg"}/>
                                 </div>
-                                <Button onClick={() => this.switchWhiteBlack(user)}>{(user.accessType === "WhiteList") ? "BlackList" : "WhiteList"}</Button>
-                            </Card>
+                                <div style={{textAlign: "center"}}>
+                                    <Button onClick={() => this.switchWhiteBlack(user)}>{(user.accessType === "WhiteList") ? "BlackList this Person" : "WhiteList this Person"}</Button>
+                                </div>
+                                </Card>
                         </Col>
                             )
                 }
