@@ -268,6 +268,8 @@ export default class FrsEventView extends Component {
                                     <div>
                                         <Tag color="#f50">{event.type}</Tag>
                                         {(event.person) ? <Tag color="#f50">{event.person.type}</Tag> : ""}
+                                        {(event.person) ? <Tag color="#f50">{event.person.accessType}</Tag> : ""}
+                                        <br/>
                                         <Text code><Icon type="schedule"/> <Moment
                                             format="ll">{event.eventDate}</Moment>{' '}|{' '}<Moment
                                             format="LTS">{event.eventDate}</Moment></Text><br/>
