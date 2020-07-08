@@ -20,5 +20,11 @@ public final class LicenseServerAuth
 
     public static final String DEVICE_READ = "ROLE_DEVICE_READ";
 
+    public static final String ROLE_READ = "ROLE_ROLE_READ";
+    public static final String ROLE_WRITE = "ROLE_ROLE_WRITE";
+
+    public static final String FEED_READ = "ROLE_FEED_READ";
+    public static final String FEED_WRITE = "ROLE_FEED_WRITE";
+
   }
 }
