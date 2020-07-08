@@ -10,6 +10,7 @@ class UserService {
         return new UserService()
     }
 
+
     getMenu() {
         return axios.get('/api/user/menu');
     }
@@ -52,6 +53,10 @@ class UserService {
         return axios.delete('/api/user/' + userId);
     }
 
+    tokenValid()
+    {
+        return axios.get('api/user/tokenCheck');
+    }
     isLoggedIn() {
         let token = JSON.parse(localStorage.getItem('syntoken'));
         if (!token) {

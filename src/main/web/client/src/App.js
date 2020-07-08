@@ -8,7 +8,7 @@ import Footerbar from "./components/Footerbar";
 import PrivateRoute from "./components/PrivateRoute";
 import HomeView from "./views/HomeView";
 import FeedView from "./views/FeedView";
-import {Route} from "react-router-dom";
+import {Redirect, Route} from "react-router-dom";
 import DeviceView from "./views/DeviceView";
 import UserListView from "./views/UserListView";
 import DeviceConfigView from "./views/DeviceConfigView";
@@ -36,6 +36,7 @@ import AnprReportView from "./views/anpr/AnprReportView";
 
 import ConfigView from "./views/Polygon/ConfigView";
 import AtccGridView from "./views/atcc/AtccGridView";
+import {history} from "./helpers/history";
 
 
 const {Content} = Layout;
@@ -45,7 +46,6 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {loggedIn: false};
-
         EventBus.subscribe('login-logout', (event) => this.refreshMenu(event))
     }
 
@@ -54,7 +54,20 @@ class App extends Component {
     }
 
     refreshMenu() {
-        this.setState({loggedIn: UserService.isLoggedIn()});
+
+            UserService.tokenValid().then(data => {
+                this.setState({loggedIn:UserService.isLoggedIn()});
+
+            }).catch(error => {
+                localStorage.clear();
+                this.setState({loggedIn: false});
+                history.push("/#/login")
+                console.log("Session Expired !! Login Again");
+
+
+
+            })
+
     }
 
     render() {
@@ -62,7 +75,7 @@ class App extends Component {
         const isLoggedIn = this.state.loggedIn;
 
         const sideBar = isLoggedIn ? <Sidebar/> : null;
-        const header = isLoggedIn ? <Headbar isLoggedIn={isLoggedIn}/> : null;
+        //const header = isLoggedIn ? <Headbar isLoggedIn={isLoggedIn}/> : null;
 
 
         return (
