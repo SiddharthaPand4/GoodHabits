@@ -68,4 +68,6 @@ public class UserController {
         return userService.getRoles().stream().map(RoleResponse::new).collect(Collectors.toList());
     }
 
+    @GetMapping("/tokenCheck")
+    public void tokenValid(){}
 }
