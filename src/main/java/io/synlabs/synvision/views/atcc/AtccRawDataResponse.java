@@ -1,6 +1,7 @@
 package io.synlabs.synvision.views.atcc;
 
 import io.synlabs.synvision.entity.atcc.AtccEvent;
+import io.synlabs.synvision.views.common.Response;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,10 +11,9 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class AtccRawDataResponse {
+public class AtccRawDataResponse implements Response {
 
     private Long id;
-
     private Date eventDate;
     private long timeStamp;
     private int lane;

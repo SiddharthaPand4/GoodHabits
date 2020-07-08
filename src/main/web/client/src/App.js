@@ -35,6 +35,7 @@ import HighwayIncidentDashboardView from "./views/vids/HighwayIncidentDashboardV
 import AnprReportView from "./views/anpr/AnprReportView";
 
 import ConfigView from "./views/Polygon/ConfigView";
+import AtccGridView from "./views/atcc/AtccGridView";
 import {history} from "./helpers/history";
 
 
@@ -108,8 +109,10 @@ class App extends Component {
                                 <PrivateRoute path='/people-counting/Dashboard' exact={true} component={ApcDashboard}/>
 
                                 {/* atcc */}
-                                <PrivateRoute path='/atcc' exact={true} component={AtccView}/>
+                                {//<PrivateRoute path='/atcc' exact={true} component={AtccView}/>
+                                }
                                 <PrivateRoute path='/atcc/summary' exact={true} component={AtccSummaryView}/>
+                                <PrivateRoute path='/atcc' exact={true} component={AtccGridView}/>
 
                                 {/* vids */}
                                 <PrivateRoute path='/vids' exact={true} component={HighwayIncidentView}/>

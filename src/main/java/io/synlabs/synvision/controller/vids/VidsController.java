@@ -5,6 +5,7 @@ import io.synlabs.synvision.controller.MediaUploadController;
 import io.synlabs.synvision.service.VidsDashboardService;
 import io.synlabs.synvision.service.VidsService;
 import io.synlabs.synvision.views.UploadFileResponse;
+import io.synlabs.synvision.views.common.FeedResponse;
 import io.synlabs.synvision.views.common.PageResponse;
 import io.synlabs.synvision.views.vids.*;
 import org.slf4j.Logger;
@@ -12,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/vids/")
@@ -67,4 +70,6 @@ public class VidsController extends MediaUploadController {
     public VidsDashboardResponse getStats() {
         return dashboardService.dashboardstats();
     }
+
+
 }
