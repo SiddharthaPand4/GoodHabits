@@ -50,7 +50,7 @@ class UserService {
         return axios.delete('/api/user/' + userId);
     }
     getRoles(){
-        return axios.get('/api/user/getroles');
+        return axios.get('/api/user/get/roles');
     }
 
     tokenValid()

@@ -8,7 +8,7 @@ class RoleService {
         return new RoleService()
     }
     getAllPrivilegeTypes(){
-        return axios.get('/api/privilege/get/types')
+        return axios.get('/api/privilege/get/list')
     }
 
     addRole(role,flag)

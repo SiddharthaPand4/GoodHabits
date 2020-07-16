@@ -18,7 +18,7 @@ public class PrivilegeController {
     @Autowired
     private PrivilegeService privilegeService;
 
-    @GetMapping("get/types")
+    @GetMapping("get/list")
     public List<PrivilegeResponse> getPrivilegeTypes() {
         return privilegeService.getPrivilegeTypes().stream().map(PrivilegeResponse::new).collect(Collectors.toList());
     }

@@ -62,14 +62,14 @@ public class UserController {
     // Role Part Below. (All above APIs for USER)
 
 
-    @GetMapping("/getroles")
+    @GetMapping("/get/roles")
     public List<RoleResponse> roles()
     {return userService.getRoles().stream().map(RoleResponse::new).collect(Collectors.toList());
     }
 
-    @GetMapping("/role/{RoleId}")
-    public RoleResponse getRole(@PathVariable Long RoleId){
-        return new RoleResponse(userService.getRole(new RoleRequest(RoleId)));
+    @GetMapping("/role/{roleId}")
+    public RoleResponse getRole(@PathVariable Long roleId){
+        return new RoleResponse(userService.getRole(new RoleRequest(roleId)));
     }
 
    @PostMapping("/role")
