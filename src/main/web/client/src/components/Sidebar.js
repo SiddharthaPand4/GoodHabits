@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Icon, Layout, Menu} from "antd";
 import {Link} from "react-router-dom";
 import UserService from "../services/UserService";
+import UserSwitchOutlined from "@ant-design/icons/lib/icons/UserSwitchOutlined";
 
 const {Sider} = Layout;
 const {SubMenu} = Menu;
@@ -136,9 +137,12 @@ export default class Sidebar extends Component {
                             <Link to='/user'><Icon type='user'/><span className='nav-text'>Users</span></Link>
                         </Menu.Item>
                         <Menu.Item key="52">
-                            <Link to='/device'><Icon type='laptop'/><span className='nav-text'>Device</span></Link>
+                            <Link to='/roles'><UserSwitchOutlined /><span className='nav-text'>Roles</span></Link>
                         </Menu.Item>
                         <Menu.Item key="53">
+                            <Link to='/device'><Icon type='laptop'/><span className='nav-text'>Device</span></Link>
+                        </Menu.Item>
+                        <Menu.Item key="54">
                             <Link to='/trigger'><Icon type="clock-circle"/><span
                                 className='nav-text'>Triggers</span></Link>
                         </Menu.Item>

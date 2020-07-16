@@ -4,6 +4,7 @@ import io.synlabs.synvision.entity.core.Role;
 import io.synlabs.synvision.views.common.Response;
 import lombok.Getter;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,17 +15,16 @@ import java.util.stream.Collectors;
 public class RoleResponse implements Response {
     private Long                   id;
     private String                 name;
-    private Set<PrivilegeResponse> privileges;
+    private Set<String> privileges = new HashSet<>();
 
     public RoleResponse(Role role)
     {
 
         this.id = mask(role.getId());
         this.name = role.getName();
-
-        if (role.getPrivileges() != null)
+         if (role.getPrivileges() != null)
         {
-            this.privileges = role.getPrivileges().stream().map(PrivilegeResponse::new).collect(Collectors.toSet());
+            role.getPrivileges().forEach(privilege -> this.privileges.add(privilege.getName()));
         }
     }
 
@@ -38,8 +38,8 @@ public class RoleResponse implements Response {
         return name;
     }
 
-    public Set<PrivilegeResponse> getPrivileges()
-    {
-        return privileges;
-    }
-}
+   // public Set<PrivilegeResponse> getPrivileges()
+   // {
+   //     return privileges;
+   // }
+}//

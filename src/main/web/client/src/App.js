@@ -37,6 +37,7 @@ import AnprReportView from "./views/anpr/AnprReportView";
 import ConfigView from "./views/Polygon/ConfigView";
 import AtccGridView from "./views/atcc/AtccGridView";
 import {history} from "./helpers/history";
+import RoleView from "./views/RoleView";
 
 
 const {Content} = Layout;
@@ -99,7 +100,7 @@ class App extends Component {
                                 <PrivateRoute path='/device' exact={true} component={DeviceView}/>
                                 <PrivateRoute path='/device/conf' exact={true} component={DeviceConfigView}/>
                                 <PrivateRoute path='/people-counting/events' exact={true} component={PeopleCounting}/>
-
+                                <PrivateRoute path='/roles' exact={true} component={RoleView}/>
 
                                 {/* PGS is parking guideance and management system */}
                                 <PrivateRoute path='/pgs/dashboard' exact={true} component={ParkingDashboardView}/>
