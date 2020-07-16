@@ -1,8 +1,11 @@
 import React, {Component} from "react";
-import {Table, Divider,Row,Col,Card,Form,Button,Input,Icon,Typography,Select,Modal,message} from 'antd';
+import {Table, Divider, Row, Col, Card, Form, Button, Input, Icon, Typography, Select, Modal, message, Tag} from 'antd';
 import UserService from "../services/UserService";
 
 import '../form.css';
+import PlusCircleOutlined from "@ant-design/icons/lib/icons/PlusCircleOutlined";
+import FormOutlined from "@ant-design/icons/lib/icons/FormOutlined";
+import DeleteOutlined from "@ant-design/icons/lib/icons/DeleteOutlined";
 const { Column} = Table;
 const {Text} = Typography;
 const { confirm } = Modal;
@@ -110,28 +113,41 @@ export default class UserListView extends Component {
             <Row gutter={2}>
                 <Col span={2}>
                     <Button type="primary" onClick={this.addUser}>
-                         + ADD
+                        <PlusCircleOutlined /> New User
                     </Button>
                 </Col>
             </Row>
             <br/>
             <Row gutter={24}>
-                <Col span={12}>
+                <Col span={16}>
                     <Card
                       className="limitable"
                       bodyStyle={{ padding: "0px", width: "100%" }}
                     >
                      <Table dataSource={this.state.users} pagination={false} scroll={{ x: true}} >
                             <Column title="Username" dataIndex="userName" key="userName" render={(text, record) => (
-                                <span><a href={"user/" + record.ID}>{text}</a></span>
+                                <span>{text}</span>
                             )}/>
                             <Column title="Email" dataIndex="email" key="email" />
-                            <Column title="Token" dataIndex="token" key="token" />
+                            <Column title="Role" dataIndex="roles" render={roles => (
+                                <>
+                                    {roles.map(role => {
+                                        return (
+                                            <Tag color="blue" key={role} >
+                                                {role}
+                                            </Tag>
+
+                                        );
+                                    })}
+                                </>
+                            )
+                            }/>
+
                             <Column title="Action" key="action" render={(text, record) => (
                                     <span>
-                                        <a onClick={this.showUser.bind(this,record.id)}>Edit</a>
+                                         <FormOutlined onClick={this.showUser.bind(this,record.id)}/>
                                         <Divider type="vertical" />
-                                        <a onClick={this.showDeleteConfirm.bind(this,record.id,this.refresh)}>Delete</a>
+                                        <DeleteOutlined  style={{color: "#ff0000"}} onClick={this.showDeleteConfirm.bind(this,record.id,this.refresh)} />
                                     </span>
                                 )}
                             />
@@ -140,7 +156,7 @@ export default class UserListView extends Component {
                 </Col>
 
                {showUserDetails ?
-                 <Col span={12}>
+                 <Col span={8}>
                    <WrappedUserForm user={this.state.user} roles={this.state.roles} refresh={this.refreshUsers} close={this.close} mode={this.state.mode}/>
                  </Col>
                 :null}
@@ -278,7 +294,7 @@ class UserForm extends Component {
                             />,
                         )}
                     </Form.Item>
-                    <Form.Item label="Role" className="formitem">
+                    <Form.Item label="Role" className="formitem" color="blue">
                           {getFieldDecorator('role', {
                             initialValue:this.props.user.roles,
                             rules: [{ required: true, message: 'Please select role!' }],
@@ -287,7 +303,7 @@ class UserForm extends Component {
                               placeholder="Select a role"
                             >
                             {this.props.roles.map(role =>
-                                 <option key={role.id} value={role.name} >{role.name}</option>
+                                 <option  key={role.id} value={role.name} >{role.name}</option>
                              )}
 
                             </Select>,
@@ -295,11 +311,11 @@ class UserForm extends Component {
                     </Form.Item>
                     <br/>
                     <div>
-                        <Button type="primary" htmlType="submit" className="user-form-button"  size="small" loading={this.state.loading}>
+                        <Button type="primary" htmlType="submit" className="user-form-button"  loading={this.state.loading}>
                             Save
                         </Button>
                         <span>&nbsp;&nbsp;</span>
-                        <Button type="secondary" className="user-form-button"  size="small" onClick={this.close}>
+                        <Button type="secondary" className="user-form-button"  onClick={this.close}>
                             Close
                         </Button>
                     </div>

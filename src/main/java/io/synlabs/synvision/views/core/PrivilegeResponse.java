@@ -17,15 +17,4 @@ public class PrivilegeResponse implements Response {
         this.id = mask(privilege.getId());
         this.name = privilege.getName();
     }
-
-    public Long getId()
-    {
-        return id;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
 }

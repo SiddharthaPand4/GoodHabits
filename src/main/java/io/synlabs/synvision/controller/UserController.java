@@ -1,10 +1,9 @@
 package io.synlabs.synvision.controller;
 
 import io.synlabs.synvision.service.UserService;
-import io.synlabs.synvision.views.core.Menu;
-import io.synlabs.synvision.views.core.RoleResponse;
-import io.synlabs.synvision.views.core.UserRequest;
-import io.synlabs.synvision.views.core.UserResponse;
+import io.synlabs.synvision.views.common.FeedRequest;
+import io.synlabs.synvision.views.common.FeedResponse;
+import io.synlabs.synvision.views.core.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -40,12 +39,12 @@ public class UserController {
         return new UserResponse(userService.getUserDetail(new UserRequest(userId)));
     }
 
-    @PostMapping
-    public UserResponse createUser(@RequestBody UserRequest request)
-    {
+     @PostMapping
+     public UserResponse createUser(@RequestBody UserRequest request)
+     {
 
-        return new UserResponse(userService.createUser(request));
-    }
+         return new UserResponse(userService.createUser(request));
+     }
 
     @PutMapping
     public UserResponse updateUser(@RequestBody UserRequest request)
@@ -53,8 +52,6 @@ public class UserController {
 
         return new UserResponse(userService.updateUser(request));
     }
-
-
     @DeleteMapping("{userId}")
     public void deleteUser(@PathVariable Long userId)
     {
@@ -62,12 +59,40 @@ public class UserController {
     }
 
 
-    @GetMapping("roles")
+    // Role Part Below. (All above APIs for USER)
+
+
+    @GetMapping("/getroles")
     public List<RoleResponse> roles()
-    {
-        return userService.getRoles().stream().map(RoleResponse::new).collect(Collectors.toList());
+    {return userService.getRoles().stream().map(RoleResponse::new).collect(Collectors.toList());
     }
 
+    @GetMapping("/role/{RoleId}")
+    public RoleResponse getRole(@PathVariable Long RoleId){
+        return new RoleResponse(userService.getRole(new RoleRequest(RoleId)));
+    }
+
+   @PostMapping("/role")
+   public RoleResponse addRole(@RequestBody RoleRequest request)
+   {
+       return new RoleResponse(userService.addRole(request));
+
+   }
+    @PutMapping("/role")
+    public RoleResponse updateRole(@RequestBody RoleRequest request)
+    {
+
+        return new RoleResponse(userService.updateRole(request));
+    }
+
+
+    @DeleteMapping("/role/{roleId}")
+    public void deleteFeed(@PathVariable Long roleId)
+    {
+        userService.deleteRole(new RoleRequest(roleId));
+    }
+
+    // API for Token Validation
     @GetMapping("/tokenCheck")
     public void tokenValid(){}
 }

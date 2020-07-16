@@ -23,9 +23,6 @@ class UserService {
         return axios.get('/api/user/');
     }
 
-    getRoles(){
-        return axios.get('/api/user/roles');
-    }
 
      createUser(user){
         const requestBody = {
@@ -51,6 +48,9 @@ class UserService {
 
     deleteUser(userId){
         return axios.delete('/api/user/' + userId);
+    }
+    getRoles(){
+        return axios.get('/api/user/getroles');
     }
 
     tokenValid()

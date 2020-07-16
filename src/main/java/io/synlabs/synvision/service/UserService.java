@@ -3,14 +3,13 @@ package io.synlabs.synvision.service;
 import io.synlabs.synvision.entity.core.SynVisionUser;
 import io.synlabs.synvision.entity.CurrentUser;
 import io.synlabs.synvision.entity.core.Role;
+import io.synlabs.synvision.entity.core.Privilege;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.ex.ValidationException;
+import io.synlabs.synvision.jpa.PrivilegeRepository;
 import io.synlabs.synvision.jpa.SynVisionUserRepository;
 import io.synlabs.synvision.jpa.RoleRepository;
-import io.synlabs.synvision.views.core.LoginRequest;
-import io.synlabs.synvision.views.core.Menu;
-import io.synlabs.synvision.views.core.UserRequest;
-import io.synlabs.synvision.views.core.UserResponse;
+import io.synlabs.synvision.views.core.*;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +41,9 @@ public class UserService extends BaseService implements UserDetailsService {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private PrivilegeRepository privilegeRepository;
 
     private PasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -97,8 +99,6 @@ public class UserService extends BaseService implements UserDetailsService {
 
         return null;
     }
-
-
     public SynVisionUser createUser(UserRequest request) {
 
         validateUser(request);
@@ -116,10 +116,10 @@ public class UserService extends BaseService implements UserDetailsService {
             user.addRole(roleRepository.getOneByName(role));
         }
 
-         //TODO do we send an email also?
-         //String randomPassword = RandomStringUtils.randomAlphanumeric(8);
-         logger.info("Temp password: {}", "nhaidemo");
-         user.setPasswordHash(encoder.encode("nhaidemo"));
+        //TODO do we send an email also?
+        //String randomPassword = RandomStringUtils.randomAlphanumeric(8);
+        logger.info("Temp password: {}", "nhaidemo");
+        user.setPasswordHash(encoder.encode("nhaidemo"));
 
         return userRepository.save(user);
     }
@@ -128,7 +128,6 @@ public class UserService extends BaseService implements UserDetailsService {
 
         validateUser(request);
         SynVisionUser user = userRepository.findByEmail(request.getEmail());
-
         request.toEntity(user);
         user.setOrg(getAtccUser().getOrg());
 
@@ -183,7 +182,7 @@ public class UserService extends BaseService implements UserDetailsService {
         {
             throw new ValidationException("You cannot deactivate yourself!");
         }
-
+        user.getRoles().clear();
         user.setActive(false);
         userRepository.saveAndFlush(user);
     }
@@ -199,10 +198,57 @@ public class UserService extends BaseService implements UserDetailsService {
     }
 
     public List<Role> getRoles(){
-        return roleRepository.findAllByOrg(getAtccUser().getOrg());
+        return roleRepository.findAll();
     }
 
     public Menu getCurrentUserMenu() {
         return menuBuilder.getMenu();
     }
+
+    public void deleteRole(RoleRequest roleRequest) {
+        Role role=roleRepository.getOne(roleRequest.getId());
+        if(getCurrentUser().getRoles().contains(role))
+        {
+            throw new ValidationException("You can't delete role assigned to you ");
+        }
+        try{roleRepository.delete(role);}
+      catch (Exception e)
+      {
+          throw new ValidationException("This Role is assigned to some User. Disable the User first ");
+      }
+    }
+
+    public Role getRole(RoleRequest roleRequest) {
+        return roleRepository.getOne(roleRequest.getId());
+
+    }
+
+    public Role addRole(RoleRequest request) {
+        Role role=roleRepository.findByName(request.getName());
+        if(role!=null)
+        {
+            throw new ValidationException(String.format("Already exist Role with name ", request.getName()));
+        }
+        role = request.toEntity();
+        for(String privilege : request.getPrivileges())
+        {
+           role.addPrivilege(privilegeRepository.getOneByName(privilege));
+        }
+
+        return roleRepository.save(role);
+
+    }
+
+    public Role updateRole(RoleRequest request) {
+        Role role=roleRepository.findByName(request.getName());
+       request.toEntity(role);
+        role.getPrivileges().clear();
+        for(String privilege : request.getPrivileges())
+        {
+            role.addPrivilege(privilegeRepository.getOneByName(privilege));
+        }
+
+        return roleRepository.save(role);
+    }
+
 }

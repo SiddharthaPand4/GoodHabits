@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.List;
 
 @Service
 public class PrivilegeService extends BaseService
@@ -57,6 +58,10 @@ public class PrivilegeService extends BaseService
         }
       }
     }
+  }
+
+  public List<Privilege> getPrivilegeTypes() {
+    return privilegeRepository.findAll();
   }
 }
 
