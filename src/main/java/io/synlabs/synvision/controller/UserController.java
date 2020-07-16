@@ -87,7 +87,7 @@ public class UserController {
 
 
     @DeleteMapping("/role/{roleId}")
-    public void deleteFeed(@PathVariable Long roleId)
+    public void deleteRole(@PathVariable Long roleId)
     {
         userService.deleteRole(new RoleRequest(roleId));
     }
