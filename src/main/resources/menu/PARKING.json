@@ -1,0 +1,28 @@
+{
+  "key": "parking",
+  "title": "Parking",
+  "icon": "car",
+  "privilege": "FEED_WRITE",
+  "submenu": [
+    {
+      "key": "1",
+      "title": "Dashboard",
+      "link": "/pgs/dashboard"
+    },
+    {
+      "key": "2",
+      "title": "Operator Console",
+      "link": "/pgs/console"
+    },
+    {
+      "key": "3",
+      "title": "Check-In/Out",
+      "link": "/pgs/inout"
+    },
+    {
+      "key": "4",
+      "title": "Reports",
+      "link": "/pgs/reports"
+    }
+  ]
+}

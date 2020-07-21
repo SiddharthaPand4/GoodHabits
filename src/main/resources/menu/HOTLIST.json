@@ -1,0 +1,8 @@
+{
+  "key": "hotlist",
+  "title": "Hotlist",
+  "icon": "alert",
+  "link": "/incidents/hotlisted",
+  "privilege": "",
+  "submenu": null
+}

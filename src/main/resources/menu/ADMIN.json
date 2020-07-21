@@ -1,0 +1,32 @@
+{
+  "key": "admin",
+  "title": "Admin",
+  "icon": "deployment-unit",
+  "privilege": "",
+  "submenu": [
+    {
+      "key": "1",
+      "title": "Users",
+      "link": "/user",
+      "icon": "user"
+    },
+    {
+      "key": "2",
+      "title": "Roles",
+      "link": "/roles",
+      "icon": "user"
+    },
+    {
+      "key": "3",
+      "title": "Device",
+      "link": "/device",
+      "icon": "laptop"
+    },
+    {
+      "key": "4",
+      "title": "Triggers",
+      "link": "/trigger",
+      "icon": "clock-circle"
+    }
+  ]
+}

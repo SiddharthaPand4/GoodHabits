@@ -1,0 +1,8 @@
+{
+  "key": "feed",
+  "title": "Feed",
+  "icon": "box-plot",
+  "link": "/feed",
+  "privilege": "FEED_WRITE",
+  "submenu": null
+}
