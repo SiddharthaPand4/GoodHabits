@@ -2,21 +2,23 @@
   "key": "anpr",
   "title": "ANPR",
   "icon": "box-plot",
-  "privilege": "",
   "submenu": [
     {
       "key": "1",
       "title": "Events",
+      "privilege": "ANPR_READ",
       "link": "/anpr"
     },
     {
       "key": "2",
       "title": "Repeated Events",
+      "privilege": "ANPR_READ",
       "link": "/anpr/masterdata"
     },
     {
       "key": "3",
       "title": "ANPR Report",
+      "privilege": "ANPR_READ",
       "link": "/anpr/report"
     }
   ]

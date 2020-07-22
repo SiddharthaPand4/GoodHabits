@@ -202,7 +202,7 @@ public class UserService extends BaseService implements UserDetailsService {
     }
 
     public Menu getCurrentUserMenu() {
-        return menuBuilder.getMenu();
+        return menuBuilder.getMenu(getCurrentUser());
     }
 
     public void deleteRole(RoleRequest roleRequest) {

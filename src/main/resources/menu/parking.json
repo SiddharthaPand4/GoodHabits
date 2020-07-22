@@ -2,26 +2,29 @@
   "key": "parking",
   "title": "Parking",
   "icon": "car",
-  "privilege": "FEED_WRITE",
   "submenu": [
     {
       "key": "1",
       "title": "Dashboard",
+      "privilege": "PARK_WRITE",
       "link": "/pgs/dashboard"
     },
     {
       "key": "2",
       "title": "Operator Console",
+      "privilege": "PARK_WRITE",
       "link": "/pgs/console"
     },
     {
       "key": "3",
       "title": "Check-In/Out",
+      "privilege": "PARK_WRITE",
       "link": "/pgs/inout"
     },
     {
       "key": "4",
       "title": "Reports",
+      "privilege": "PARK_WRITE",
       "link": "/pgs/reports"
     }
   ]

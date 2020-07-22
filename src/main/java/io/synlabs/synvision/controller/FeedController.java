@@ -4,12 +4,15 @@ import io.jsonwebtoken.io.IOException;
 import io.synlabs.synvision.service.FeedService;
 import io.synlabs.synvision.views.common.FeedRequest;
 import io.synlabs.synvision.views.common.FeedResponse;
-import io.synlabs.synvision.views.core.UserRequest;
+import io.synlabs.synvision.auth.LicenseServerAuth;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.FEED_WRITE;
 
 @RestController
 @RequestMapping("/api/feed/")
@@ -43,6 +46,7 @@ public class FeedController {
     }
 
     @GetMapping("list")
+    @Secured(FEED_WRITE)
     public List<FeedResponse> getFeeds() {
         return feedService.getFeeds().stream().map(FeedResponse::new).collect(Collectors.toList());
     }

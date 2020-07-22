@@ -25,6 +25,7 @@ public class UserController {
     //@Secured(SELF_READ)
     public Menu getMenu()
     {
+
         return userService.getCurrentUserMenu();
     }
 

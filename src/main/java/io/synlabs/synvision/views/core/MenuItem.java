@@ -16,8 +16,9 @@ public class MenuItem {
     private String icon;
     private String link;
     private String seq;
-
+    private String privilege;
     private Set<MenuItem> submenu = new LinkedHashSet<>();
+    private String parent;
 
     @Override
     public boolean equals(Object o) {
@@ -32,7 +33,23 @@ public class MenuItem {
         return Objects.hash(key);
     }
 
-    public void merge(Set<MenuItem> children) {
-        submenu.addAll(children);
+    public void merge(MenuItem child) {
+        submenu.add(child);
     }
+    public MenuItem(MenuItem copy)
+    {
+        this.key = copy.getKey();
+        this.title=copy.getTitle();
+        this.link = copy.getLink();
+        this.icon = copy.getIcon();
+        this.seq=copy.getSeq();
+        this.privilege = copy.getPrivilege();
+
+
+    }
+    public void setParent(String parent)
+    {
+        this.parent = parent;
+    }
+
 }

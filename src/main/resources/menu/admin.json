@@ -2,30 +2,33 @@
   "key": "admin",
   "title": "Admin",
   "icon": "deployment-unit",
-  "privilege": "",
   "submenu": [
     {
       "key": "1",
       "title": "Users",
       "link": "/user",
+      "privilege": "USER_WRITE",
       "icon": "user"
     },
     {
       "key": "2",
       "title": "Roles",
       "link": "/roles",
+      "privilege": "ROLE_WRITE",
       "icon": "user"
     },
     {
       "key": "3",
       "title": "Device",
       "link": "/device",
+      "privilege": "DEVICE_WRITE",
       "icon": "laptop"
     },
     {
       "key": "4",
       "title": "Triggers",
       "link": "/trigger",
+      "privilege": "TRIGGER_WRITE",
       "icon": "clock-circle"
     }
   ]

@@ -3,6 +3,7 @@ package io.synlabs.synvision.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.synlabs.synvision.entity.core.Module;
+import io.synlabs.synvision.entity.core.SynVisionUser;
 import io.synlabs.synvision.ex.UploadException;
 import io.synlabs.synvision.jpa.ModuleRepository;
 import io.synlabs.synvision.views.core.Menu;
@@ -24,7 +25,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class UserMenuBuilder {
@@ -37,6 +40,8 @@ public class UserMenuBuilder {
     private ModuleRepository moduleRepository;
 
     private ObjectMapper jsonMapper = new ObjectMapper();
+    private Map<String, MenuItem> menuMap = new HashMap<>();
+    private Map<String, MenuItem> submenuMap = new HashMap<>();
 
     private Menu navigation;
 
@@ -75,7 +80,12 @@ public class UserMenuBuilder {
 
                 logger.info("Loaded menu from {}", file.getName());
                 MenuItem item = jsonMapper.readValue(file, MenuItem.class);
-                navigation.merge(item);
+                menuMap.put(item.getKey(),item);
+
+                for(MenuItem submenu : item.getSubmenu()) {
+                    submenu.setParent(item.getKey());
+                    submenuMap.put(submenu.getKey(), submenu);
+                }
             }
 
 
@@ -84,8 +94,17 @@ public class UserMenuBuilder {
         }
     }
 
-    public Menu getMenu() {
-        return navigation;
+    public Menu getMenu(SynVisionUser currentUser) {
+
+        for(MenuItem submenu : menuMap.values())
+        {
+            if (currentUser.getPrivileges().contains(submenu.getPrivilege()))
+            {
+                MenuItem parent = menuMap.get(submenu.getParent());
+                navigation.add(parent,submenu);
+            }
+        }
+            return navigation;
     }
 }
 
@@ -93,5 +112,4 @@ public class UserMenuBuilder {
 TODO :
  a. user level based on role/privilege
  b. check if the module is enabled or not
-
  */

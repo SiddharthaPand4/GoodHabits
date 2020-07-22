@@ -3,6 +3,6 @@
   "title": "Hotlist",
   "icon": "alert",
   "link": "/incidents/hotlisted",
-  "privilege": "",
+  "privilege": "INCIDENT_READ",
   "submenu": null
 }

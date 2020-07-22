@@ -2,16 +2,17 @@
   "key": "offence",
   "title": "Offences",
   "icon": "box-plot",
-  "privilege": "",
   "submenu": [
     {
       "key": "1",
       "title": "Events",
+      "privilege": "INCIDENT_READ",
       "link": "/incidents"
     },
     {
       "key": "2",
       "title": "Repeated Events",
+      "privilege": "INCIDENT_READ",
       "link": "/incidents/repeated"
     }
   ]

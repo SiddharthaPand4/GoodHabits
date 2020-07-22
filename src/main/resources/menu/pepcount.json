@@ -2,16 +2,17 @@
   "key": "pepcount",
   "title": "People Counting",
   "icon": "box-plot",
-  "privilege": "",
   "submenu": [
     {
       "key": "1",
       "title": "Events",
+      "privilege": "PEP_READ",
       "link": "/people-counting/events"
     },
     {
       "key": "2",
       "title": "Dashboard",
+      "privilege": "PEP_READ",
       "link": "/people-counting/dashboard"
     }
   ]
