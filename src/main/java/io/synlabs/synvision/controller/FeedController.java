@@ -38,8 +38,8 @@ public class FeedController {
     }
 
     @PutMapping
-    public FeedResponse updateFeed(@RequestBody FeedRequest request)
-    {return new FeedResponse(feedService.updateFeed(request));
+    public FeedResponse updateFeed(@RequestBody FeedRequest request) {
+        return new FeedResponse(feedService.updateFeed(request));
     }
 
     @GetMapping("list")
@@ -48,13 +48,12 @@ public class FeedController {
     }
 
     @GetMapping("{FeedId}")
-    public FeedResponse getFeed(@PathVariable Long FeedId){
+    public FeedResponse getFeed(@PathVariable Long FeedId) {
         return new FeedResponse(feedService.getFeed(new FeedRequest(FeedId)));
     }
 
     @DeleteMapping("{FeedId}")
-    public void deleteFeed(@PathVariable Long FeedId)
-    {
+    public void deleteFeed(@PathVariable Long FeedId) {
         feedService.deleteFeed(new FeedRequest(FeedId));
     }
 

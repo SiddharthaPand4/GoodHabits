@@ -91,14 +91,13 @@ public class VidsService {
                 Date endingDate = dateFormat.parse(ending);
                 query = query.and(root.incidentDate.before(endingDate));
             }
-            if(!request.getIncidentType().isEmpty()){
-                query =query.and(root.incidentType.eq(HighwayIncidentType.valueOf(request.getIncidentType())));
-          }
+            if (!request.getIncidentType().isEmpty()) {
+                query = query.and(root.incidentType.eq(HighwayIncidentType.valueOf(request.getIncidentType())));
+            }
 
-         if(request.getFeedId()!=null && request.getFeedId()!=0)
-        {
-            query=query.and(root.feed.id.eq(request.getFeedId()));
-        }
+            if (request.getFeedId() != null && request.getFeedId() != 0) {
+                query = query.and(root.feed.id.eq(request.getFeedId()));
+            }
             return query;
 
         } catch (Exception e) {

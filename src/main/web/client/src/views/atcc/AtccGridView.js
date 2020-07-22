@@ -33,7 +33,7 @@ export default class AtccGridView extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            renderVid:false,
+            renderVid: false,
             activePanelKey: ["1"],
             visible: true,
             loading: true,
@@ -43,7 +43,7 @@ export default class AtccGridView extends Component {
                 page: 1,
                 pageSize: 12,
             },
-            workingEvent:[],
+            workingEvent: [],
             workingEventLoading: false,
             magnifyEvent: {
                 magnifyEventId: "",
@@ -61,7 +61,7 @@ export default class AtccGridView extends Component {
         this.handleRefresh = this.handleRefresh.bind(this);
         this.onPageChange = this.onPageChange.bind(this);
         this.onPageSizeChange = this.onPageSizeChange.bind(this);
-        this.videoSwitchChange=this.videoSwitchChange.bind(this);
+        this.videoSwitchChange = this.videoSwitchChange.bind(this);
         this.editEvent = this.editEvent.bind(this);
         this.magnifyEvent = this.magnifyEvent.bind(this);
         this.updateZoomFactor = this.updateZoomFactor.bind(this);
@@ -72,13 +72,13 @@ export default class AtccGridView extends Component {
     componentDidMount() {
         this.refresh();
     }
-    videoSwitchChange(){
-        if(this.state.renderVid===false)
-        { this.setState({renderVid:true});
-        this.refresh()}
-        else
-        {
-            this.setState({renderVid:false});
+
+    videoSwitchChange() {
+        if (this.state.renderVid === false) {
+            this.setState({renderVid: true});
+            this.refresh()
+        } else {
+            this.setState({renderVid: false});
             this.refresh()
         }
     };
@@ -92,7 +92,6 @@ export default class AtccGridView extends Component {
             this.setState({loading: false});
         })
     }
-
 
 
     handleFilterChange(data) {
@@ -177,7 +176,7 @@ export default class AtccGridView extends Component {
                                            handleLayoutChange={this.handleLayoutChange}
                             />
 
-                            </Panel>
+                        </Panel>
                     </Collapse>
 
                     <div>
@@ -193,7 +192,7 @@ export default class AtccGridView extends Component {
 
 
     renderGrid() {
-              if (this.state.loading || !this.state.atccresponse || this.state.atccresponse.totalPage === 0) {
+        if (this.state.loading || !this.state.atccresponse || this.state.atccresponse.totalPage === 0) {
             return <Empty description={false}/>
         }
 
@@ -201,7 +200,7 @@ export default class AtccGridView extends Component {
         let workingEventLoading = this.state.workingEventLoading;
         let workingEvent = this.state.workingEvent;
         let count = this.state.atccresponse.totalPages * this.state.atccresponse.pageSize;
-        let renderVid=this.state.renderVid;
+        let renderVid = this.state.renderVid;
         let {magnifyEventId, zoomFactor, minZoomFactor, maxZoomFactor} = this.state.magnifyEvent;
         const mid = ((maxZoomFactor - minZoomFactor) / 2).toFixed(5);
         const preColor = zoomFactor >= mid ? '' : 'rgba(0, 0, 0, .45)';
@@ -221,10 +220,10 @@ export default class AtccGridView extends Component {
                             <Card
                                 style={{margin: "5px"}}
                                 title={
-                                        <div>
-                                            {(event.type) ? <Tag color="#f50">{event.type}</Tag> : null}
-                                             <Tag color="#f50">{(event.direction === 1 ? "Fwd" : "Rev")}</Tag>
-                                            {(event.lane) ? <Tag color="#f50">Lane : {event.lane}</Tag> : null}
+                                    <div>
+                                        {(event.type) ? <Tag color="#f50">{event.type}</Tag> : null}
+                                        <Tag color="#f50">{(event.direction === 1 ? "Fwd" : "Rev")}</Tag>
+                                        {(event.lane) ? <Tag color="#f50">Lane : {event.lane}</Tag> : null}
 
                                     </div>
                                 }
@@ -235,14 +234,14 @@ export default class AtccGridView extends Component {
                                     <Menu.Item key="1">
                                         <a
                                             title={"click here to download"}
-                                            href={"/public/atcc/screenshot/" + event.id }
+                                            href={"/public/atcc/screenshot/" + event.id}
                                             download={true}><Icon type="download"/>{' '} Image</a>
                                     </Menu.Item>
                                     <Menu.Item key="2">
                                         <a
                                             title={"click here to download"}
-                                            onClick={()=>this.downloadVideo(event)}
-                                            ><Icon type="download" />{' '} Video</a>
+                                            onClick={() => this.downloadVideo(event)}
+                                        ><Icon type="download"/>{' '} Video</a>
                                     </Menu.Item>
 
                                 </Menu>}>
@@ -252,7 +251,7 @@ export default class AtccGridView extends Component {
                                 </Dropdown>}
 
                                 bordered={true}
-                                cover={renderVid===false ?
+                                cover={renderVid === false ?
                                     (
                                         (magnifyEventId === event.id) ?
                                             <Magnifier src={"/public/atcc/screenshot/" + event.id}
@@ -261,8 +260,8 @@ export default class AtccGridView extends Component {
                                             <img alt="event"
                                                  style={{maxWidth: 120}}
                                                  src={"/public/atcc/screenshot/" + event.id}/>
-                                )
-                                        :
+                                    )
+                                    :
                                     (<Player
                                         playsInline
                                         poster={"/public/atcc/screenshot/" + event.id}
@@ -271,29 +270,29 @@ export default class AtccGridView extends Component {
                                 }
 
                             >
-                                {renderVid===false ?
+                                {renderVid === false ?
                                     (
-                                    <div>
-                                        {(magnifyEventId === event.id) ?
-                                            <Slider
-                                                marks={marks}
-                                                min={minZoomFactor}
-                                                max={maxZoomFactor}
-                                                onChange={this.updateZoomFactor}
-                                                value={typeof zoomFactor === 'number' ? zoomFactor : 0}
-                                            />
-                                            :
-                                            <div style={{height: "54px", textAlign: "center"}}>
-                                                <Button size="small" type="dashed"
-                                                        onClick={() => this.magnifyEvent(event)}>
-                                                    <Icon type="zoom-in"/>Zoom Image
-                                                </Button>
-                                            </div>
+                                        <div>
+                                            {(magnifyEventId === event.id) ?
+                                                <Slider
+                                                    marks={marks}
+                                                    min={minZoomFactor}
+                                                    max={maxZoomFactor}
+                                                    onChange={this.updateZoomFactor}
+                                                    value={typeof zoomFactor === 'number' ? zoomFactor : 0}
+                                                />
+                                                :
+                                                <div style={{height: "54px", textAlign: "center"}}>
+                                                    <Button size="small" type="dashed"
+                                                            onClick={() => this.magnifyEvent(event)}>
+                                                        <Icon type="zoom-in"/>Zoom Image
+                                                    </Button>
+                                                </div>
 
-                                        }
-                                    </div>
+                                            }
+                                        </div>
                                     )
-                                : null}
+                                    : null}
                                 <div style={{textAlign: "center"}}>
                                     <Text code><Icon type="schedule"/> <Moment
                                         format="ll">{event.eventDate}</Moment>{' '}|{' '}<Moment
@@ -347,24 +346,26 @@ export default class AtccGridView extends Component {
                 <Column title="Date & Time" dataIndex="eventDate" format={"ll"} key="eventDate"
                         render={eventDate => (
                             <div>
-                            <Moment format="ll">{eventDate}</Moment>
+                                <Moment format="ll">{eventDate}</Moment>
                                 {' '}|{' '}
                                 <Moment format="LTS">{eventDate}</Moment>
                             </div>)}/>
                 <Column title="Lane" dataIndex="lane" key="lane"/>
                 <Column title="Direction" dataIndex="direction" key="direction"
-                        render={direction => (<div>{direction=== 1 ? "Fwd" : "Rev"}</div>)}/>
+                        render={direction => (<div>{direction === 1 ? "Fwd" : "Rev"}</div>)}/>
                 <Column title="Vid" dataIndex="vid" key="vid"/>
                 <Column title="Image" dataIndex="id" key="id"
                         render={(id) => (
-                            <Button type="primary"  title={"click here to download"} href={"/public/atcc/screenshot/" + id}
-                               download={true}>
+                            <Button type="primary" title={"click here to download"}
+                                    href={"/public/atcc/screenshot/" + id}
+                                    download={true}>
                                 <Icon type="download"/>
-                                </Button> )}/>
+                            </Button>)}/>
 
                 <Column title="Video"
                         render={(event) => (
-                            <Button type="primary" title={"Download vid"} onClick={() => this.downloadVideo(event)}><Icon
+                            <Button type="primary" title={"Download vid"}
+                                    onClick={() => this.downloadVideo(event)}><Icon
                                 type="download"/>
                             </Button>
                         )}

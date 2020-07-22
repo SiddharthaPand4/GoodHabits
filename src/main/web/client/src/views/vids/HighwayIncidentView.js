@@ -22,7 +22,6 @@ import "video-react/dist/video-react.css";
 import TrafficIncidentService from "../../services/TrafficIncidentService";
 
 
-
 const {Text} = Typography;
 
 const {Column} = Table;
@@ -37,18 +36,18 @@ export default class HighwayIncidentView extends Component {
             visible: true,
             loading: true,
             layout: "list",
-            incidentType:"",
-            location:"",
-            feedID:0,
+            incidentType: "",
+            location: "",
+            feedID: 0,
             feedOptions: [],
-            incidentOptions:[],
+            incidentOptions: [],
             incidents: {},
             playVideo: false,
             filter: {
                 page: 1,
                 pageSize: 12,
-                incidentType:"",
-                feedID:0,
+                incidentType: "",
+                feedID: 0,
 
             },
         };
@@ -59,10 +58,10 @@ export default class HighwayIncidentView extends Component {
         this.handleRefresh = this.handleRefresh.bind(this);
         this.onPageChange = this.onPageChange.bind(this);
         this.onPageSizeChange = this.onPageSizeChange.bind(this);
-        this.handleIncidentMenuClick=this.handleIncidentMenuClick.bind(this);
+        this.handleIncidentMenuClick = this.handleIncidentMenuClick.bind(this);
 
-        this.handleLocationMenuClick=this.handleLocationMenuClick.bind(this);
-        this.getFeeds=this.getFeeds.bind(this);
+        this.handleLocationMenuClick = this.handleLocationMenuClick.bind(this);
+        this.getFeeds = this.getFeeds.bind(this);
     }
 
     componentDidMount() {
@@ -131,23 +130,22 @@ export default class HighwayIncidentView extends Component {
     }
 
     handleIncidentMenuClick(choice) {
-        if(choice.item.props.children=="All")
-        {this.setState({incidentType:""})}
-        else
-       this.setState({incidentType:choice.item.props.children});
+        if (choice.item.props.children == "All") {
+            this.setState({incidentType: ""})
+        } else
+            this.setState({incidentType: choice.item.props.children});
     }
 
     handleLocationMenuClick(choice) {
         let feedID;
-        if(choice.item.props.children=="All")
-        {   feedID=0;
-            this.setState({feedID:feedID})
-            this.setState({location:""})
-        }
-        else {
-            feedID=choice.item.props.id;
-            this.setState({feedID:feedID});
-            this.setState({location:choice.item.props.children});
+        if (choice.item.props.children == "All") {
+            feedID = 0;
+            this.setState({feedID: feedID})
+            this.setState({location: ""})
+        } else {
+            feedID = choice.item.props.id;
+            this.setState({feedID: feedID});
+            this.setState({location: choice.item.props.children});
 
 
         }
@@ -165,7 +163,7 @@ export default class HighwayIncidentView extends Component {
                     All
                 </Menu.Item>
                 {(this.state.incidentOptions || []).map((type) =>
-                    <Menu.Item key={type}  >
+                    <Menu.Item key={type}>
                         {type}
                     </Menu.Item>
                 )}
@@ -177,15 +175,14 @@ export default class HighwayIncidentView extends Component {
 
             <Menu onClick={this.handleLocationMenuClick}>
                 <Menu.Item key={1}>All</Menu.Item>
-            {(this.state.feedOptions || []).map((feed) =>
-            <Menu.Item key={feed} id={feed.id}>
-                    {feed.site+">"+feed.location}
-                </Menu.Item>
+                {(this.state.feedOptions || []).map((feed) =>
+                    <Menu.Item key={feed} id={feed.id}>
+                        {feed.site + ">" + feed.location}
+                    </Menu.Item>
                 )}
             </Menu>
 
         );
-
 
 
         return (
@@ -194,17 +191,17 @@ export default class HighwayIncidentView extends Component {
                 <Collapse bordered={false} defaultActiveKey={['1']}>
                     <span>&nbsp;&nbsp;</span>
                     <Panel header="Filter" key="1">
-                        Location <Dropdown overlay={locationMenu} >
+                        Location <Dropdown overlay={locationMenu}>
                         <Button color="#f50">
-                            {this.state.location}<Icon type="down" />
+                            {this.state.location}<Icon type="down"/>
                         </Button>
                     </Dropdown>
                         <span>&nbsp;&nbsp;</span>
-                        Incident Type <Dropdown overlay={incidentMenu} >
-                            <Button color="#f50">
-                                {this.state.incidentType}<Icon type="down" />
-                            </Button>
-                        </Dropdown>
+                        Incident Type <Dropdown overlay={incidentMenu}>
+                        <Button color="#f50">
+                            {this.state.incidentType}<Icon type="down"/>
+                        </Button>
+                    </Dropdown>
 
                         <br/>
                         <br/>
@@ -224,7 +221,7 @@ export default class HighwayIncidentView extends Component {
         if (event && event.feed) {
             result = event.feed.site + " > " + event.feed.location + " > " + event.feed.name;
         }
-    return result;
+        return result;
     }
 
     renderGrid() {
@@ -355,7 +352,7 @@ export default class HighwayIncidentView extends Component {
                             <a title={"click here to download"} href={"/public/anpr/lpr/" + id + "/image.jpg"}
                                download={true}>
                                 <img alt="event"
-                                     src={"/public/anpr/lpr/" + id + "/image.jpg"}/></a> )}/>
+                                     src={"/public/anpr/lpr/" + id + "/image.jpg"}/></a>)}/>
                 <Column title="direction" dataIndex="direction" key="direction"
                         render={direction => direction}/>
                 <Column title="Helmet?" dataIndex="helmet" key="helmet"
@@ -375,25 +372,25 @@ export default class HighwayIncidentView extends Component {
     }
 
     UpdateIncidentFilter() {
-        let filter=this.state.filter;
-        filter.incidentType=this.state.incidentType;
-        this.setState({filter:filter})
+        let filter = this.state.filter;
+        filter.incidentType = this.state.incidentType;
+        this.setState({filter: filter})
     }
 
     UpdateLocationFilter() {
         let filter = this.state.filter;
-        filter.feedID=this.state.feedID;
+        filter.feedID = this.state.feedID;
         this.setState({filter: filter});
 
     }
 
-    getFeeds(){
-        feedService.getFeeds().then(response=>{
+    getFeeds() {
+        feedService.getFeeds().then(response => {
             this.setState({feedOptions: response.data});
-        }).catch(error=>{
+        }).catch(error => {
             notification.open({
                 message: 'Something went wrong ',
-                discription:error
+                discription: error
             });
         })
     }
@@ -401,13 +398,13 @@ export default class HighwayIncidentView extends Component {
 
     getIncidentTypes() {
 
-        TrafficIncidentService.getIncidentTypes().then(response=>{
+        TrafficIncidentService.getIncidentTypes().then(response => {
             this.setState({incidentOptions: response.data});
 
-        }).catch(error=>{
+        }).catch(error => {
             notification.open({
                 message: 'Something went wrong ',
-                discription:error
+                discription: error
             });
         })
 

@@ -21,36 +21,32 @@ import java.util.stream.Collectors;
 @Setter
 @NoArgsConstructor
 public class RoleRequest implements Request {
-    private Long                   id;
-    private String                 name;
+    private Long id;
+    private String name;
     private List<String> privileges = new ArrayList<>();
 
 
-    public RoleRequest(Long id)
-    {
+    public RoleRequest(Long id) {
         this.id = id;
     }
 
-    public Long getId()
-    {
+    public Long getId() {
         return unmask(id);
     }
-    public void setId(Long id)
-    {
+
+    public void setId(Long id) {
         this.id = id;
     }
 
     public Role toEntity(Role role) {
-        if(role==null)
-        {
-            role=new Role();
+        if (role == null) {
+            role = new Role();
         }
         role.setName(this.name);
         return role;
     }
 
-   public Role toEntity()
-    {
-        return toEntity( new Role());
+    public Role toEntity() {
+        return toEntity(new Role());
     }
 }
