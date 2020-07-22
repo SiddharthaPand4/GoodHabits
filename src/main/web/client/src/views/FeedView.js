@@ -1,15 +1,10 @@
 import React, {Component} from "react";
-import {Button, Card, Col, Divider, Form, Input, message, Modal, Row, Spin, Table, Tag, Typography} from "antd";
+import {Button, Card, Col, Divider, Form, Input, message, Modal, Row, Spin, Table, Tag, Typography,Icon} from "antd";
 import FeedService from "../services/FeedService";
 import {EventBus} from "../components/event";
 import ButtonGroup from "antd/es/button/button-group";
-import DeleteOutlined from "@ant-design/icons/lib/icons/DeleteOutlined";
-import UserService from "../services/UserService";
-import PlayCircleOutlined from "@ant-design/icons/lib/icons/PlayCircleOutlined";
-import FormOutlined from "@ant-design/icons/lib/icons/FormOutlined";
-import ConfigView from "./Polygon/ConfigView";
-import PlaySquareOutlined from "@ant-design/icons/lib/icons/PlaySquareOutlined";
 import {Link} from "react-router-dom";
+
 
 
 const {Text} = Typography;
@@ -162,15 +157,15 @@ export default class FeedView extends Component {
                                         <Column title="Site" dataIndex="site" key="site"/>
                                         <Column title="Action" render={(text, record) => (
                                             <span>
-                                             <FormOutlined onClick={this.showFeed.bind(this, record.id)}/>
+                                             <Icon type="edit" onClick={()=>this.showFeed(record.id)}/>
                                            <Divider type="vertical" />
-                                           <DeleteOutlined  style={{color: "#ff0000"}} onClick={this.showDeleteConfirm.bind(this,record.id,this.refresh)}/>
+                                           <Icon type="delete" style={{color: "#ff0000"}} onClick={()=>this.showDeleteConfirm(record.id,this.refresh)}/>
                                            <Divider type="vertical" />
                                            <Link to={ {pathname:'/feedStream',
                                                feed:record
                                                }
                                            }>
-                                           <PlaySquareOutlined/></Link>
+                                           <Icon type="play-circle" /></Link>
                                             </span>
                                         )}/>
                                     </Table>

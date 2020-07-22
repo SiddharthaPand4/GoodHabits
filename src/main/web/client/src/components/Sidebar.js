@@ -137,7 +137,7 @@ export default class Sidebar extends Component {
                             <Link to='/user'><Icon type='user'/><span className='nav-text'>Users</span></Link>
                         </Menu.Item>
                         <Menu.Item key="52">
-                            <Link to='/roles'><UserSwitchOutlined /><span className='nav-text'>Roles</span></Link>
+                            <Link to='/roles'><Icon type="team" /><span className='nav-text'>Roles</span></Link>
                         </Menu.Item>
                         <Menu.Item key="53">
                             <Link to='/device'><Icon type='laptop'/><span className='nav-text'>Device</span></Link>

@@ -6,7 +6,7 @@ import {
     Col,
     Divider,
     Dropdown,
-    Form,
+    Form, Icon,
     Input,
     Menu,
     message,
@@ -17,17 +17,10 @@ import {
     Tag, Typography
 } from "antd";
 import '../form.css';
-import FormOutlined from "@ant-design/icons/lib/icons/FormOutlined";
-import DeleteOutlined from "@ant-design/icons/lib/icons/DeleteOutlined";
-import DownOutlined from "@ant-design/icons/lib/icons/DownOutlined";
-import UserOutlined from "@ant-design/icons/lib/icons/UserOutlined";
-import TrafficIncidentService from "../services/TrafficIncidentService";
 import RoleService from "../services/RoleService";
-import FeedService from "../services/FeedService";
 import UserService from "../services/UserService";
 import Column from "antd/lib/table/Column";
 import {EventBus} from "../components/event";
-import PlusCircleOutlined from "@ant-design/icons/lib/icons/PlusCircleOutlined";
 
 const {Text} = Typography;
 const { confirm } = Modal;
@@ -118,7 +111,7 @@ export default class RoleView extends Component{
                 <Row gutter={2}>
                     <Col span={2}>
                         <Button type="primary" onClick={this.addNewRole}>
-                            <PlusCircleOutlined /> New Role
+                            <Icon type="plus-circle" /> New Role
                         </Button>
                     </Col>
                 </Row>
@@ -146,9 +139,9 @@ export default class RoleView extends Component{
                                            }/>
                                      <Column title="Actions" render={(record) => (
                                          <div>
-                                         <FormOutlined onClick={this.editRole.bind(this,record.id)}/>
+                                             <Icon type="edit" onClick={()=>this.editRole(record.id)}/>
                                          <Divider type="vertical" />
-                                         <DeleteOutlined  style={{color: "#ff0000"}} onClick={this.showDeleteConfirm.bind(this,record.id,this.refresh)} />
+                                             <Icon type="delete" style={{color: "#ff0000"}} onClick={()=>this.showDeleteConfirm(record.id,this.refresh)} />
                                          </div>
                                          )}/>
 
@@ -254,7 +247,7 @@ class AddRoleForm extends Component{
         const PrivilegeMenu=(
             <Menu onClick={this.handlePrivilegeMenuClick }>
                 {(this.state.PrivilegeOptions || []).map((privilege) =>
-                    <Menu.Item key={privilege.id} icon={<UserOutlined />}>
+                    <Menu.Item key={privilege.id} >
                         {privilege.name}
                     </Menu.Item>
                 )}
@@ -279,7 +272,7 @@ class AddRoleForm extends Component{
                         })(
                             <Dropdown overlay={PrivilegeMenu} >
                                 <Button>
-                                    Add Privileges<DownOutlined />
+                                    Add Privileges <Icon type="down" />
 
                                 </Button>
                             </Dropdown>

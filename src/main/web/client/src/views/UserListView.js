@@ -3,9 +3,6 @@ import {Table, Divider, Row, Col, Card, Form, Button, Input, Icon, Typography, S
 import UserService from "../services/UserService";
 
 import '../form.css';
-import PlusCircleOutlined from "@ant-design/icons/lib/icons/PlusCircleOutlined";
-import FormOutlined from "@ant-design/icons/lib/icons/FormOutlined";
-import DeleteOutlined from "@ant-design/icons/lib/icons/DeleteOutlined";
 const { Column} = Table;
 const {Text} = Typography;
 const { confirm } = Modal;
@@ -53,13 +50,6 @@ export default class UserListView extends Component {
     refreshUsers(){
         this.refresh();
     }
-
-    showModal = () => {
-        this.setState({
-          visible: true,
-        });
-    };
-
 
     addUser(){
         this.setState({mode:"Add",showUserDetails:true, user:{userName:"", lastName:"",firstName:"",email:"",password:""}})
@@ -113,7 +103,7 @@ export default class UserListView extends Component {
             <Row gutter={2}>
                 <Col span={2}>
                     <Button type="primary" onClick={this.addUser}>
-                        <PlusCircleOutlined /> New User
+                        <Icon type="plus-circle" /> New User
                     </Button>
                 </Col>
             </Row>
@@ -145,9 +135,9 @@ export default class UserListView extends Component {
 
                             <Column title="Action" key="action" render={(text, record) => (
                                     <span>
-                                         <FormOutlined onClick={this.showUser.bind(this,record.id)}/>
+                                          <Icon type="edit" onClick={()=>this.showUser(record.id)}/>
                                         <Divider type="vertical" />
-                                        <DeleteOutlined  style={{color: "#ff0000"}} onClick={this.showDeleteConfirm.bind(this,record.id,this.refresh)} />
+                                        <Icon type="delete" style={{color: "#ff0000"}} onClick={()=>this.showDeleteConfirm(record.id,this.refresh)} />
                                     </span>
                                 )}
                             />

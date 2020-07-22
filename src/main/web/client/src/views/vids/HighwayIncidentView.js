@@ -19,8 +19,6 @@ import feedService from "../../services/FeedService";
 
 import {Player} from 'video-react';
 import "video-react/dist/video-react.css";
-import UserOutlined from "@ant-design/icons/lib/icons/UserOutlined";
-import DownOutlined from "@ant-design/icons/lib/icons/DownOutlined";
 import TrafficIncidentService from "../../services/TrafficIncidentService";
 
 
@@ -163,11 +161,11 @@ export default class HighwayIncidentView extends Component {
 
         const incidentMenu = (
             <Menu onClick={this.handleIncidentMenuClick}>
-                <Menu.Item key="1" icon={<UserOutlined />}>
+                <Menu.Item key="1">
                     All
                 </Menu.Item>
                 {(this.state.incidentOptions || []).map((type) =>
-                    <Menu.Item key={type} icon={<UserOutlined />} >
+                    <Menu.Item key={type}  >
                         {type}
                     </Menu.Item>
                 )}
@@ -180,7 +178,7 @@ export default class HighwayIncidentView extends Component {
             <Menu onClick={this.handleLocationMenuClick}>
                 <Menu.Item key={1}>All</Menu.Item>
             {(this.state.feedOptions || []).map((feed) =>
-            <Menu.Item key={feed} icon={<UserOutlined />} id={feed.id}>
+            <Menu.Item key={feed} id={feed.id}>
                     {feed.site+">"+feed.location}
                 </Menu.Item>
                 )}
@@ -198,13 +196,13 @@ export default class HighwayIncidentView extends Component {
                     <Panel header="Filter" key="1">
                         Location <Dropdown overlay={locationMenu} >
                         <Button color="#f50">
-                            {this.state.location}<DownOutlined />
+                            {this.state.location}<Icon type="down" />
                         </Button>
                     </Dropdown>
                         <span>&nbsp;&nbsp;</span>
                         Incident Type <Dropdown overlay={incidentMenu} >
                             <Button color="#f50">
-                                {this.state.incidentType}<DownOutlined />
+                                {this.state.incidentType}<Icon type="down" />
                             </Button>
                         </Dropdown>
 
