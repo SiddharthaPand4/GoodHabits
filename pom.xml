@@ -6,7 +6,7 @@
 
     <groupId>io.synlabs</groupId>
     <artifactId>synvision</artifactId>
-    <version>13</version>
+    <version>14</version>
     <name>synvision</name>
     <description>Synvision Management Application</description>
     <packaging>jar</packaging>

@@ -14,6 +14,12 @@
       "title": "Dashboard",
       "icon": "alert",
       "link": "/vids/dashboard"
+    },
+    {
+      "key": "atcc",
+      "title": "ATCC",
+      "icon": "fund",
+      "link": "/atcc"
     }
   ]
 }

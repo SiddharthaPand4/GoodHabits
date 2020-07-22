@@ -79,7 +79,7 @@ class LoginForm extends Component {
             <Row>
                 <Col xl={{span: 8}} lg={{span: 6}} md={{span: 4}} sm={{span: 2}} xs={{span: 2}}/>
                 <Col xl={{span: 8}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}}>
-                    <Card title={<img style={{}} src={"synlabs-logo.png"}/>} style={{top: 50}}>
+                    <Card title={<img style={{}} src={"park-n-secure-logo.jpg"}/>} style={{top: 50}}>
                         <Form onSubmit={this.handleSubmit} className="login-form">
                             <Form.Item>
                                 {getFieldDecorator('username', {

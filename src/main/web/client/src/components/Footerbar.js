@@ -8,7 +8,7 @@ export default class Headbar extends Component {
     render() {
         return (
             <Footer style={{textAlign: 'center'}}>
-                Powered by SynergyLabs © 2019</Footer>
+                Powered by PARKnSECURE © 2020</Footer>
         )
     }
 }
