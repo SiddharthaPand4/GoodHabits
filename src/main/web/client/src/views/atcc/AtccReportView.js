@@ -1,0 +1,213 @@
+import React, {Component} from "react";
+import {Button, Card, DatePicker, Dropdown, Icon, Menu, Modal, Select, Row, Col, Form, Spin} from "antd";
+import DashboardService from "../../services/DashboardService";
+import AtccService from "../../services/AtccService";
+import moment from 'moment';
+import {saveAs} from 'file-saver';
+
+const {Option} = Select;
+const {RangePicker} = DatePicker;
+
+export default class AtccReportView extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            isOpenCustomDateRangeModal: "",
+            report: {
+                filter: {
+                    selectedCustomDateRange: "Today",
+                    reportType: "All Incidents",
+                    reportFormat: "CSV",
+                    fromDate: moment().startOf('day').toDate(),
+                    toDate: moment().endOf('day').toDate(),
+                }
+            },
+            downloading: false,
+        };
+
+        this.selectDateRange = this.selectDateRange.bind(this);
+        this.selectReportType = this.selectReportType.bind(this);
+
+        this.getDateRangeOptions = this.getDateRangeOptions.bind(this);
+        this.getReportTypeOptions = this.getReportTypeOptions.bind(this);
+        this.downloadReport = this.downloadReport.bind(this);
+        this.handleChangeReportType = this.handleChangeReportType.bind(this);
+    }
+
+
+    handleChangeReportType(value) {
+        let report = {...this.state.report};
+        let filter = report.filter;
+        filter.reportFormat = value;
+        this.setState({report: report})
+    }
+
+    showCustomDateRangeModal() {
+        this.setState({
+            isOpenCustomDateRangeModal: true,
+        });
+    };
+
+    handleCancel = e => {
+        this.setState({
+            isOpenCustomDateRangeModal: false,
+        });
+    };
+
+    selectDateRange(selectedCustomDateRangeEnum, selectedCustomDateRangeMoment) {
+        let {isOpenCustomDateRangeModal} = this.state;
+        let report = this.state.report;
+        report.filter.selectedCustomDateRange = selectedCustomDateRangeEnum;
+        let fromToDate = DashboardService.extractFromToDate(report.filter.selectedCustomDateRange, selectedCustomDateRangeMoment);
+        report.filter.fromDate = fromToDate.from_date;
+        report.filter.toDate = fromToDate.to_date;
+
+
+        if (selectedCustomDateRangeEnum === "Custom") {
+            isOpenCustomDateRangeModal = ""
+        }
+        this.setState({report, isOpenCustomDateRangeModal});
+
+    }
+
+    downloadReport() {
+        this.setState({downloading: true});
+        let filter = this.state.report.filter;
+        let req = {
+            fromDateString: moment(filter.fromDate).format('YYYY-MM-DD HH:mm:ss'),
+            toDateString: moment(filter.toDate).format('YYYY-MM-DD HH:mm:ss"'),
+            reportType: filter.reportType,
+            reportFormat: filter.reportFormat,
+        };
+
+        AtccService.getAtccReport(req).then(response => {
+            this.setState({downloading: false});
+
+            if (filter.reportFormat === "CSV") {
+                saveAs(response.data, "anpr-events.csv");
+            }
+            else if (filter.reportFormat === "JSON") {
+                saveAs(response.data, "anpr-events.json");
+            }
+
+        }).catch(error => {
+            this.setState({downloading: false});
+            console.log(error);
+        });
+    }
+
+    selectReportType(reportType) {
+        let {report} = this.state;
+        report.filter.reportType = reportType;
+        this.setState({report});
+    }
+
+    getReportTypeOptions() {
+        return (<Menu>
+
+            <Menu.Item key="1"
+                       onClick={() => this.selectReportType("All Incidents")}>
+                All Incidents
+            </Menu.Item>
+            <Menu.Item key="2"
+                       onClick={() => this.selectReportType("DayWise Incidents Summary")}>
+                DayWise Incidents Summary
+            </Menu.Item>
+        </Menu>)
+    }
+
+    getDateRangeOptions() {
+        return (
+            <Menu>
+                <Menu.Item key="1" onClick={() => this.selectDateRange("Today")}>
+                    Today
+                </Menu.Item>
+                <Menu.Item key="2" onClick={() => this.selectDateRange("Yesterday")}>
+                    Yesterday
+                </Menu.Item>
+                <Menu.Item key="3" onClick={() => this.selectDateRange("This week")}>
+                    This week
+                </Menu.Item>
+                <Menu.Item key="4" onClick={() => this.selectDateRange("Last week")}>
+                    Last week
+                </Menu.Item>
+                <Menu.Item key="5" onClick={() => this.selectDateRange("This month")}>
+                    This month
+                </Menu.Item>
+                <Menu.Item key="6" onClick={() => this.selectDateRange("This year")}>
+                    This year
+                </Menu.Item>
+                <Menu.Item key="7" onClick={() => this.selectDateRange("Last year")}>
+                    Last year
+                </Menu.Item>
+                <Menu.Item onClick={this.showCustomDateRangeModal}>
+                    Custom
+                </Menu.Item>
+            </Menu>
+        );
+    }
+
+    render() {
+        let {report} = this.state;
+        return (
+            <div>
+                <div>
+                    <Modal
+                        onCancel={this.handleCancel}
+                        title="Custom Date Range"
+                        visible={this.state.isOpenCustomDateRangeModal}
+                        footer={[]}
+                    >
+                        <RangePicker
+                            onChange={(changedDateRange) => this.selectDateRange(this.state.isOpenCustomDateRangeModal, "Custom", changedDateRange)}/>
+                    </Modal>
+                </div>
+                <Row>
+                    <Col xl={{span: 8}} lg={{span: 6}} md={{span: 4}} sm={{span: 2}} xs={{span: 2}}/>
+                    <Col xl={{span: 8}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}}>
+                        <Card title={<div>Anpr Report</div>}>
+                            <Form>
+                                <Form.Item>
+                                    Select Date Range
+                                    <Dropdown overlay={() => this.getDateRangeOptions("report")}>
+                                        <Button style={{width: '-webkit-fill-available'}}>
+                                            {report.filter.selectedCustomDateRange ? report.filter.selectedCustomDateRange : "Select"}
+                                            <Icon
+                                                type="down"/>
+                                        </Button>
+                                    </Dropdown>
+                                </Form.Item>
+
+                                <Form.Item>
+                                    Report Type
+                                    <Dropdown overlay={() => this.getReportTypeOptions("report")}>
+                                        <Button style={{width: '-webkit-fill-available'}}>
+                                            {report.filter.reportType ? report.filter.reportType : "Select"}
+                                            <Icon
+                                                type="down"/>
+                                        </Button>
+                                    </Dropdown>
+
+                                </Form.Item>
+                                <Form.Item>
+                                    Report Format
+                                    <Select defaultValue="CSV" onChange={this.handleChangeReportType}>
+                                        <Option value="CSV">CSV</Option>
+                                        <Option value="JSON">JSON</Option>
+                                    </Select>
+                                </Form.Item>
+                                <Form.Item>
+                                    <Button type="primary" htmlType="submit" onClick={this.downloadReport} block
+                                            loading={this.state.downloading}>
+                                        Download
+                                    </Button>
+                                </Form.Item>
+                            </Form>
+                        </Card>
+                    </Col>
+                </Row>
+            </div>
+        )
+    }
+}

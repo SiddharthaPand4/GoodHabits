@@ -1,14 +1,13 @@
 package io.synlabs.synvision.controller;
 
-import ch.qos.logback.core.util.FileUtil;
-import io.synlabs.synvision.entity.parking.ParkingEvent;
 import io.synlabs.synvision.jpa.ParkingEventRepository;
 import io.synlabs.synvision.service.AnprService;
+import io.synlabs.synvision.service.report.AtccReportService;
 import io.synlabs.synvision.service.parking.ApmsService;
-import io.synlabs.synvision.views.anpr.AnprFilterRequest;
+import io.synlabs.synvision.service.report.VidsReportService;
 import io.synlabs.synvision.views.anpr.AnprReportRequest;
+import io.synlabs.synvision.views.atcc.AtccReportRequest;
 import io.synlabs.synvision.views.parking.ParkingReportRequest;
-import io.synlabs.synvision.views.parking.ParkingReportResponse;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -37,72 +36,65 @@ public class ReportController {
     private AnprService anprService;
 
     @Autowired
+    private AtccReportService atccReportService;
+
+    @Autowired
+    private VidsReportService vidsReportService;
+
+    @Autowired
     private ParkingEventRepository parkingEventRepository;
 
     private static Logger logger = LoggerFactory.getLogger(ReportController.class);
 
     @PostMapping("/parkingevents")
     public void parkingEventReport(@RequestBody ParkingReportRequest request, HttpServletResponse response) throws IOException {
-        File file=null;
-        String fileName=null;
+        String fileName = null;
 
         if (request.getXAxis().equals("All Entry-Exit")) {
             fileName = apmsService.downloadParkingEvents(request);
 
         } else {
             fileName = apmsService.downloadParkingEventsOnDailyBasis(request);
-
         }
 
+        File file = new File(fileName);
 
-        file = new File(fileName);
-
-        if (file != null && file.exists()) {
-            String extension = FilenameUtils.getExtension(file.getName());
-            fileName = fileName + UUID.randomUUID().toString();
-            try {
-                FileInputStream is = new FileInputStream(file);
-                OutputStream outputStream = response.getOutputStream();
-                response.setContentType("application/vnd.ms-excel");
-                response.setHeader("Content-Disposition", "attachment; filename=" + fileName + "." + extension);
-                IOUtils.copy(is, outputStream);
-                outputStream.flush();
-                outputStream.close();
-                is.close();
-
-                if (!file.delete()) {
-                    logger.warn("Coudn't delete the file : " + file.getAbsolutePath());
-                }
-            } catch (FileNotFoundException e) {
-                logger.error("UNABLE TO FIND FILE : " + file.getAbsolutePath(), e);
-            } catch (IOException e) {
-                logger.error("ERROR IN FILE : " + file.getAbsolutePath(), e);
-            }
-        } else {
-            logger.warn("Generated file is empty.");
-        }
+        handlHttpFileResponse(response, fileName, file);
 
     }
 
     @PostMapping("/anprevents")
     public void anprEventReport(@RequestBody AnprReportRequest request, HttpServletResponse response) throws IOException {
-        File file=null;
-        String fileName=null;
+        File file = null;
+        String fileName = null;
 
         if (request.getXAxis().equals("All Entry-Exit")) {
             fileName = anprService.downloadAnprEvents(request);
-
         } else {
             fileName = anprService.downloadAnprEventsOnDailyBasis(request);
-
         }
 
-
         file = new File(fileName);
+        handlHttpFileResponse(response, fileName, file);
+    }
 
+    @PostMapping("/atcc/events")
+    public void atccEventReport(@RequestBody AtccReportRequest request, HttpServletResponse response) throws IOException {
+        String fileName = null;
+
+        if (request.getReportType().equals("All Incidents")) {
+            fileName = vidsReportService.generateHighwayIncidentsReport(request);
+        }
+
+        File file = new File(fileName);
+        handlHttpFileResponse(response, fileName, file);
+    }
+
+    private void handlHttpFileResponse(HttpServletResponse response, String fileName, File file) {
         if (file != null && file.exists()) {
             String extension = FilenameUtils.getExtension(file.getName());
             fileName = fileName + UUID.randomUUID().toString();
+
             try {
                 FileInputStream is = new FileInputStream(file);
                 OutputStream outputStream = response.getOutputStream();
@@ -124,7 +116,6 @@ public class ReportController {
         } else {
             logger.warn("Generated file is empty.");
         }
-
     }
 
 }

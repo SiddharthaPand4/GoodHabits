@@ -1,4 +1,6 @@
 import axios from "./axios";
+import { authHeader } from '../helpers/auth-header';
+import { config } from '../helpers/config'
 
 class AtccService {
 
@@ -17,6 +19,19 @@ class AtccService {
     getEvents(filter) {
         return axios.post('/api/atcc/events', filter);
     }
+
+    getAtccReport(req) {
+
+        const request = {
+            method: 'POST',
+            headers: authHeader(),
+            responseType: 'blob',
+            data: JSON.stringify(req),
+            url: config.apiUrl + 'api/report/atcc/events'
+        };
+        return axios(request);
+    }
+
 
 }
 
