@@ -9,6 +9,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
+
+import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.PARK_WRITE;
+
 @Controller
 @RequestMapping("/public/apms")
+@Secured(PARK_WRITE)
 public class ParkingFileController {
 
     private static final Logger logger = LoggerFactory.getLogger(ParkingFileController.class);

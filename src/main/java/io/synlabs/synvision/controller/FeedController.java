@@ -16,6 +16,7 @@ import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.FEED_WRITE;
 
 @RestController
 @RequestMapping("/api/feed/")
+@Secured(FEED_WRITE)
 public class FeedController {
 
     @Autowired
@@ -46,7 +47,7 @@ public class FeedController {
     }
 
     @GetMapping("list")
-    @Secured(FEED_WRITE)
+
     public List<FeedResponse> getFeeds() {
         return feedService.getFeeds().stream().map(FeedResponse::new).collect(Collectors.toList());
     }

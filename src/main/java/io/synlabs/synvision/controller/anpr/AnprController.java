@@ -13,6 +13,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,11 +26,15 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
+import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.ANPR_READ;
+import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.ROLE_WRITE;
+
 /**
  * Created by itrs on 10/21/2019.
  */
 @RestController
 @RequestMapping("/api/anpr")
+@Secured(ANPR_READ)
 public class AnprController extends MediaUploadController {
 
     private static final Logger logger = LoggerFactory.getLogger(AnprController.class);

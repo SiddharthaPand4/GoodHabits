@@ -13,15 +13,19 @@ import io.synlabs.synvision.views.common.PageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+
+import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.INCIDENT_READ;
 
 /**
  * Created by itrs on 10/16/2019.
  */
 @RestController
 @RequestMapping("/api/incident")
+@Secured(INCIDENT_READ)
 public class IncidentController {
 
     private static final Logger logger = LoggerFactory.getLogger(IncidentController.class);

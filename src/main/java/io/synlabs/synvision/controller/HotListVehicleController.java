@@ -6,10 +6,14 @@ import io.synlabs.synvision.views.hotlist.HotListVehicleRequest;
 import io.synlabs.synvision.views.hotlist.HotListVehicleResponse;
 import io.synlabs.synvision.views.common.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+
+import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.INCIDENT_READ;
 
 @RestController
 @RequestMapping("/api/hotlist/vehicle")
+@Secured(INCIDENT_READ)
 public class HotListVehicleController {
 
     @Autowired

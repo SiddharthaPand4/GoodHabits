@@ -28,7 +28,7 @@
       "key": "4",
       "title": "Triggers",
       "link": "/trigger",
-      "privilege": "TRIGGER_WRITE",
+      "privilege": "TRIGGER_READ",
       "icon": "clock-circle"
     }
   ]

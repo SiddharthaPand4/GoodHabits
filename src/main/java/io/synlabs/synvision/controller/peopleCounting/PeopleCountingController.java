@@ -9,10 +9,15 @@ import io.synlabs.synvision.views.common.PageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+
+
+import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.PEP_READ;
 
 @RestController
 @RequestMapping("api/apc")
+@Secured(PEP_READ)
 public class PeopleCountingController {
 
     private static final Logger logger = LoggerFactory.getLogger(PeopleCountingController.class);

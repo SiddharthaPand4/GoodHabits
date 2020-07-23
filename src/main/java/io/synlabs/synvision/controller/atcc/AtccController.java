@@ -18,11 +18,16 @@ import io.synlabs.synvision.views.common.SearchRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.ATCC_READ;
+import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.FEED_WRITE;
+
 @RestController
 @RequestMapping("/api/atcc/")
+@Secured(ATCC_READ)
 public class AtccController extends MediaUploadController {
 
     private static final Logger logger = LoggerFactory.getLogger(AtccController.class);

@@ -35,21 +35,4 @@ public class Menu {
             items.add(parent);
         }
     }
-    // public void merge(MenuItem parent,MenuItem submenu) {
-
-  //     if (items.contains(parent)) {
-
-  //         //toplevel is already there, find the right top level and merge children
-  //         for (MenuItem toplevel : items.value) {
-
-  //             if (toplevel.equals(parent)) {
-  //                 toplevel.merge(submenu);
-  //             }
-  //         }
-  //     }
-  //     else {
-  //         //add the whole tree once
-  //         items.add(parent,submenu);
-  //     }
-  // }
 }

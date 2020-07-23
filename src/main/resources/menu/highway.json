@@ -2,6 +2,7 @@
   "key": "highways",
   "title": "Highways",
   "icon": "box-plot",
+  "privilege": "ATCC_READ",
   "submenu": [
     {
       "key": "atcc-summary",
