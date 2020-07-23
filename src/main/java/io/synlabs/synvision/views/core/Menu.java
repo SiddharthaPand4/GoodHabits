@@ -11,43 +11,31 @@ import java.util.Set;
 public class Menu {
 
     private Set<MenuItem> items = new LinkedHashSet<>();
+          public void merge(MenuItem menu,MenuItem child) {
 
-    public void add(MenuItem parent,MenuItem menuItem) {
-        MenuItem addedParent = null;
-        if (!items.contains(parent)) {
-            addedParent = new MenuItem(parent);
-            items.add(addedParent);
-        } else {
-            for (MenuItem mainItem : items) {
-                if (parent.equals(mainItem)) {
-                    addedParent = mainItem;
-                }
-            }
+             if (items.contains(menu)){
+                     for (MenuItem parent : items) {
+                        if (parent.equals(menu)) {
+                         parent.getSubmenu().add(child);
+                     }
+                 }
+             }
+             else {
+                MenuItem parent=new MenuItem(menu);
+                parent.getSubmenu().add(child);
+                items.add(parent);
+             }
+          }
+
+    public void add(MenuItem parent) {
+        if (items.contains(parent)) {
         }
-        if (addedParent != null)
-            addedParent.getSubmenu().add(menuItem);
-
+        else {
+            //add the whole tree once
+            items.add(parent);
+        }
     }
-
-
-//  public void merge(MenuItem item) {
-
-//      if (items.contains(item)) {
-
-//          //toplevel is already there, find the right top level and merge children
-//          for (MenuItem toplevel : items) {
-
-//              if (toplevel.equals(item)) {
-//                  toplevel.merge(item.getSubmenu());
-//              }
-//          }
-//      }
-//      else {
-//          //add the whole tree once
-//          items.add(item);
-//      }
-//  }
-  // public void merge(MenuItem parent,MenuItem submenu) {
+    // public void merge(MenuItem parent,MenuItem submenu) {
 
   //     if (items.contains(parent)) {
 

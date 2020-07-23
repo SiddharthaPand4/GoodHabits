@@ -21,7 +21,7 @@ export default class Sidebar extends Component {
     componentDidMount() {
         UserService.getMenu().then(response => {
             this.setState({menu: response.data, loaded: true});
-            console.log(response.data)
+
         });
     }
 

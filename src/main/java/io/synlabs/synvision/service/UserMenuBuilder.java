@@ -82,10 +82,7 @@ public class UserMenuBuilder {
                 MenuItem item = jsonMapper.readValue(file, MenuItem.class);
                 menuMap.put(item.getKey(),item);
 
-                for(MenuItem submenu : item.getSubmenu()) {
-                    submenu.setParent(item.getKey());
-                    submenuMap.put(submenu.getKey(), submenu);
-                }
+
             }
 
 
@@ -95,15 +92,25 @@ public class UserMenuBuilder {
     }
 
     public Menu getMenu(SynVisionUser currentUser) {
-
-        for(MenuItem submenu : menuMap.values())
-        {
-            if (currentUser.getPrivileges().contains(submenu.getPrivilege()))
-            {
-                MenuItem parent = menuMap.get(submenu.getParent());
-                navigation.add(parent,submenu);
+        Menu navigation= new Menu();
+            for (MenuItem menu : menuMap.values()) {
+                if(menu.getSubmenu()==null)
+                {
+                    if(currentUser.getPrivileges().contains(menu.getPrivilege())){
+                        navigation.add(menu);
+                    }
+                }
+                else{
+                    for (MenuItem submenu : menu.getSubmenu()) {
+                        submenu.setParent(menu.getKey());
+                        if (currentUser.getPrivileges().contains(submenu.getPrivilege())) {
+                            if(submenu.getParent().equals(menu.getKey()))
+                            {navigation.merge(menu,submenu);}
+                        }
+                    }
+                }
             }
-        }
+
             return navigation;
     }
 }
