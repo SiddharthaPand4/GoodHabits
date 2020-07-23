@@ -25,9 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class UserMenuBuilder {
@@ -40,8 +38,7 @@ public class UserMenuBuilder {
     private ModuleRepository moduleRepository;
 
     private ObjectMapper jsonMapper = new ObjectMapper();
-    private Map<String, MenuItem> menuMap = new HashMap<>();
-    private Map<String, MenuItem> submenuMap = new HashMap<>();
+    private Map<String, MenuItem> menuMap = new TreeMap<>();
 
     private Menu navigation;
 
@@ -82,7 +79,6 @@ public class UserMenuBuilder {
                 MenuItem item = jsonMapper.readValue(file, MenuItem.class);
                 menuMap.put(item.getKey(),item);
 
-
             }
 
 
@@ -92,6 +88,7 @@ public class UserMenuBuilder {
     }
 
     public Menu getMenu(SynVisionUser currentUser) {
+
         Menu navigation= new Menu();
             for (MenuItem menu : menuMap.values()) {
                 if(menu.getSubmenu()==null)
