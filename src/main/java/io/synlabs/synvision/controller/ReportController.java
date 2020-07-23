@@ -14,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.*;
+
+import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.ANPR_READ;
+import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.PARKING_READ;
 
 /**
  * Created by itrs on 02/03/2020.
@@ -42,6 +46,7 @@ public class ReportController {
     private static Logger logger = LoggerFactory.getLogger(ReportController.class);
 
     @PostMapping("/parkingevents")
+    @Secured(PARKING_READ)
     public void parkingEventReport(@RequestBody ParkingReportRequest request, HttpServletResponse response) throws IOException {
         File file=null;
         String fileName=null;
@@ -85,6 +90,7 @@ public class ReportController {
     }
 
     @PostMapping("/anprevents")
+    @Secured(ANPR_READ)
     public void anprEventReport(@RequestBody AnprReportRequest request, HttpServletResponse response) throws IOException {
         File file=null;
         String fileName=null;

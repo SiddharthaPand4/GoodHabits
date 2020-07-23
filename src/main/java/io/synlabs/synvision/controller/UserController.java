@@ -31,18 +31,18 @@ public class UserController {
     }
 
     @GetMapping
-    @Secured(USER_WRITE)
+    @Secured(USER_READ)
     public List<UserResponse> listUsers() {
         return userService.listUsers();
     }
 
     @GetMapping("{userId}")
+    @Secured(USER_READ)
     public UserResponse list(@PathVariable(name = "userId") Long userId) {
         return new UserResponse(userService.getUserDetail(new UserRequest(userId)));
     }
 
     @PostMapping
-
     @Secured(USER_WRITE)
     public UserResponse createUser(@RequestBody UserRequest request) {
 
@@ -67,13 +67,13 @@ public class UserController {
 
 
     @GetMapping("/get/roles")
-    @Secured(ROLE_WRITE)
+    @Secured(ROLE_READ)
     public List<RoleResponse> roles() {
         return userService.getRoles().stream().map(RoleResponse::new).collect(Collectors.toList());
     }
 
     @GetMapping("/role/{roleId}")
-    @Secured(ROLE_WRITE)
+    @Secured(ROLE_READ)
     public RoleResponse getRole(@PathVariable Long roleId) {
         return new RoleResponse(userService.getRole(new RoleRequest(roleId)));
     }

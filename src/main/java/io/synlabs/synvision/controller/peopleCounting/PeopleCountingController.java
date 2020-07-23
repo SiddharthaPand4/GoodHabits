@@ -12,12 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
-
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.PEP_READ;
+import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.*;
 
 @RestController
 @RequestMapping("api/apc")
-@Secured(PEP_READ)
+
 public class PeopleCountingController {
 
     private static final Logger logger = LoggerFactory.getLogger(PeopleCountingController.class);
@@ -28,12 +27,14 @@ public class PeopleCountingController {
     private ApcFileService apcFileService;
 
   @PostMapping("/pplData")
+  @Secured(PEPCOUNT_READ)
     public PageResponse<ApcResponse> listPeople(@RequestBody ApcFilterRequest request) {
         return apcFileService.listPeople(request);
     }
 
 
     @DeleteMapping("/{id}")
+    @Secured(PEPCOUNT_WRITE)
     public void archiveEvent(@PathVariable Long id) {
         apcFileService.archiveEvent(new ApcRequest(id));
     }

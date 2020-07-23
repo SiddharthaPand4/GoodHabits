@@ -18,12 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.PARK_WRITE;
+import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.*;
 
 @Controller
 @RequestMapping("/public/apms")
-@Secured(PARK_WRITE)
+
 public class ParkingFileController {
 
     private static final Logger logger = LoggerFactory.getLogger(ParkingFileController.class);
@@ -35,6 +34,7 @@ public class ParkingFileController {
 
 
     @GetMapping("/lot/{name}/image.jpg")
+    @Secured(PARKING_READ)
     public ResponseEntity<Resource> downloadVehicleImage(@PathVariable String name, HttpServletRequest request) throws IOException {
 
         Resource resource = guidanceService.downloadLotImage(name);
@@ -42,6 +42,7 @@ public class ParkingFileController {
     }
 
     @GetMapping("/parking/event/{id}/image.jpg")
+    @Secured(PARKING_READ)
     public ResponseEntity<Resource> downloadVehicleImage(@PathVariable Long id, HttpServletRequest request) throws IOException {
 
         Resource resource = guidanceService.downloadParkingEventImage(id);
