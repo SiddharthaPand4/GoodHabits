@@ -13,33 +13,29 @@ import java.util.stream.Collectors;
  */
 @Getter
 public class RoleResponse implements Response {
-    private Long                   id;
-    private String                 name;
+    private Long id;
+    private String name;
     private Set<String> privileges = new HashSet<>();
 
-    public RoleResponse(Role role)
-    {
+    public RoleResponse(Role role) {
 
         this.id = mask(role.getId());
         this.name = role.getName();
-         if (role.getPrivileges() != null)
-        {
+        if (role.getPrivileges() != null) {
             role.getPrivileges().forEach(privilege -> this.privileges.add(privilege.getName()));
         }
     }
 
-    public Long getId()
-    {
+    public Long getId() {
         return id;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-   // public Set<PrivilegeResponse> getPrivileges()
-   // {
-   //     return privileges;
-   // }
+    // public Set<PrivilegeResponse> getPrivileges()
+    // {
+    //     return privileges;
+    // }
 }//

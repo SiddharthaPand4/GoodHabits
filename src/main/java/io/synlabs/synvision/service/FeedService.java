@@ -25,7 +25,7 @@ public class FeedService {
     private Process process;
 
     private final FeedRepository feedRepository;
-    HashMap<Long,Integer> processMap=new HashMap<Long,Integer>();
+    HashMap<Long, Integer> processMap = new HashMap<Long, Integer>();
 
 
     public FeedService(FeedRepository feedRepository) {
@@ -91,27 +91,24 @@ public class FeedService {
     public int startFeed(FeedRequest request) {
         File dir = new File("E://LiveFeed");
         Feed feed = feedRepository.getOne(request.getId());
-        int port =0;
+        int port = 0;
 
-        if(processMap.containsKey(request.getId()))
-        {
-           port= processMap.get(request.getId());
-        }
-        else
-        {
-            Random rand =  new Random();
-            port=rand.nextInt((9005-9000)+1)+9000;//small range for trial.can be scaled as per use
-            if(!processMap.containsValue(port)){
-                processMap.put(request.getId(),port);
-            } 
+        if (processMap.containsKey(request.getId())) {
+            port = processMap.get(request.getId());
+        } else {
+            Random rand = new Random();
+            port = rand.nextInt((9005 - 9000) + 1) + 9000;//small range for trial.can be scaled as per use
+            if (!processMap.containsValue(port)) {
+                processMap.put(request.getId(), port);
+            }
 
         }
 
-        String StreamCmd="streamer " + feed.getUrl() + " localhost:" +port;
+        String StreamCmd = "streamer " + feed.getUrl() + " localhost:" + port;
         try {
             process = Runtime.getRuntime().exec(StreamCmd, null, dir);
             System.out.println(Arrays.asList(processMap));
-          return port;
+            return port;
 
         } catch (IOException e) {
             throw new FeedStreamException("Couldn't start streaming from feed by command =>" + StreamCmd);

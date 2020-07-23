@@ -77,7 +77,7 @@ public class AtccController extends MediaUploadController {
     @PostMapping("/events")
     @Secured(ATCC_READ)
     public PageResponse<AtccRawDataResponse> list(@RequestBody AtccEventFilterRequest request) {
-      return atccDataService.list(request);
+        return atccDataService.list(request);
     }
 
 
