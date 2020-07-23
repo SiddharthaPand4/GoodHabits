@@ -30,6 +30,7 @@ import PeopleCounting from "./views/PeopleCount/PeopleCounting";
 import ApcDashboard from "./views/PeopleCount/ApcDashboard";
 import AtccView from "./views/atcc/AtccView";
 import AtccSummaryView from "./views/atcc/AtccSummaryView";
+import AtccReportView from "./views/atcc/AtccReportView";
 import HighwayIncidentView from "./views/vids/HighwayIncidentView";
 import HighwayIncidentDashboardView from "./views/vids/HighwayIncidentDashboardView";
 import AnprReportView from "./views/anpr/AnprReportView";
@@ -114,6 +115,7 @@ class App extends Component {
                                 }
                                 <PrivateRoute path='/atcc/summary' exact={true} component={AtccSummaryView}/>
                                 <PrivateRoute path='/atcc' exact={true} component={AtccGridView}/>
+                                <PrivateRoute path='/atcc/reports' exact={true} component={AtccReportView}/>
 
                                 {/* vids */}
                                 <PrivateRoute path='/vids' exact={true} component={HighwayIncidentView}/>
