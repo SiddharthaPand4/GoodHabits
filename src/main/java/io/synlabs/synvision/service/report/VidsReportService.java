@@ -63,8 +63,8 @@ public class VidsReportService extends BaseService {
         String filename = null;
         FileWriter fileWriter = null;
 
-        switch (request.getReportType()) {
-            case "CSV":
+        switch (request.getReportFileType()) {
+            case "csv":
                 filename = path.resolve(UUID.randomUUID().toString() + ".csv").toString();
                 fileWriter = new FileWriter(filename);
                 writeIncidentCSVHeader(fileWriter);
@@ -79,7 +79,7 @@ public class VidsReportService extends BaseService {
                     page++;
                 }
                 break;
-            case "JSON":
+            case "json":
                 filename = path.resolve(UUID.randomUUID().toString() + ".json").toString();
                 fileWriter = new FileWriter(filename);
                 while (totalRecordsCount > offset) {
@@ -146,10 +146,12 @@ public class VidsReportService extends BaseService {
         fileWriter.append("Incident Video");
         fileWriter.append(',');
         fileWriter.append("Location");
+        fileWriter.append(',');
+        fileWriter.append("Site");
         fileWriter.append('\n');
     }
 
-    public String downloadAnprEventsOnDailyBasis(AnprReportRequest request) throws IOException {
+    public String downloadHighwayIncidentsOnDailyBasis(AtccReportRequest request) throws IOException {
         List<HighwayIncidentType> incidentTypes = getHighwayIncidentTypes();
 
         String pattern = "yyyy-MM-dd HH:mm:ss";
@@ -225,7 +227,7 @@ public class VidsReportService extends BaseService {
             for (HighwayIncidentType incType : incidentTypes) {
                 int count = 0;
                 for (VidsDaywiseReportResponse vidsDaywiseReportResponse : totalEventsByDate.get(key)) {
-                    if (incidentType.equals(vidsDaywiseReportResponse.getIncidentType())) {
+                    if (incType.equals(vidsDaywiseReportResponse.getIncidentType())) {
                         count = vidsDaywiseReportResponse.getIncidentCount().intValue();
                         break;
                     }

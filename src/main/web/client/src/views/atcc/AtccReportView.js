@@ -18,7 +18,7 @@ export default class AtccReportView extends Component {
                 filter: {
                     selectedCustomDateRange: "Today",
                     reportType: "All Incidents",
-                    reportFormat: "CSV",
+                    reportFileType: "csv",
                     fromDate: moment().startOf('day').toDate(),
                     toDate: moment().endOf('day').toDate(),
                 }
@@ -39,7 +39,7 @@ export default class AtccReportView extends Component {
     handleChangeReportType(value) {
         let report = {...this.state.report};
         let filter = report.filter;
-        filter.reportFormat = value;
+        filter.reportFileType = value;
         this.setState({report: report})
     }
 
@@ -78,21 +78,16 @@ export default class AtccReportView extends Component {
             fromDateString: moment(filter.fromDate).format('YYYY-MM-DD HH:mm:ss'),
             toDateString: moment(filter.toDate).format('YYYY-MM-DD HH:mm:ss"'),
             reportType: filter.reportType,
-            reportFormat: filter.reportFormat,
+            reportFileType: filter.reportFileType,
         };
 
         AtccService.getAtccReport(req).then(response => {
             this.setState({downloading: false});
-
-            if (filter.reportFormat === "CSV") {
-                saveAs(response.data, "anpr-events.csv");
-            }
-            else if (filter.reportFormat === "JSON") {
-                saveAs(response.data, "anpr-events.json");
-            }
-
+            let fileName = filter.reportType + '.' + filter.reportFileType;
+            saveAs(response.data, fileName);
         }).catch(error => {
             this.setState({downloading: false});
+            alert(error);
             console.log(error);
         });
     }
@@ -113,6 +108,14 @@ export default class AtccReportView extends Component {
             <Menu.Item key="2"
                        onClick={() => this.selectReportType("DayWise Incidents Summary")}>
                 DayWise Incidents Summary
+            </Menu.Item>
+            <Menu.Item key="3"
+                       onClick={() => this.selectReportType("All Vehicles Traffic Events")}>
+                All Vehicles Traffic Events
+            </Menu.Item>
+            <Menu.Item key="4"
+                       onClick={() => this.selectReportType("Vehicles Traffic Events Summary")}>
+                Vehicles Traffic Events Summary
             </Menu.Item>
         </Menu>)
     }
@@ -152,6 +155,8 @@ export default class AtccReportView extends Component {
         let {report} = this.state;
         return (
             <div>
+                <br/>
+                <br/>
                 <div>
                     <Modal
                         onCancel={this.handleCancel}
@@ -166,7 +171,7 @@ export default class AtccReportView extends Component {
                 <Row>
                     <Col xl={{span: 8}} lg={{span: 6}} md={{span: 4}} sm={{span: 2}} xs={{span: 2}}/>
                     <Col xl={{span: 8}} lg={{span: 12}} md={{span: 12}} sm={{span: 24}} xs={{span: 24}}>
-                        <Card title={<div>Anpr Report</div>}>
+                        <Card title={<div>Reports</div>}>
                             <Form>
                                 <Form.Item>
                                     Select Date Range
@@ -192,9 +197,9 @@ export default class AtccReportView extends Component {
                                 </Form.Item>
                                 <Form.Item>
                                     Report Format
-                                    <Select defaultValue="CSV" onChange={this.handleChangeReportType}>
-                                        <Option value="CSV">CSV</Option>
-                                        <Option value="JSON">JSON</Option>
+                                    <Select defaultValue="csv" onChange={this.handleChangeReportType}>
+                                        <Option value="csv">csv</Option>
+                                        {/*<Option value="json">json</Option>*/}
                                     </Select>
                                 </Form.Item>
                                 <Form.Item>

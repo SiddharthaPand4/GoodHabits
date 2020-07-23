@@ -49,23 +49,17 @@ public class ReportController {
     @PostMapping("/parkingevents")
     public void parkingEventReport(@RequestBody ParkingReportRequest request, HttpServletResponse response) throws IOException {
         String fileName = null;
-
         if (request.getXAxis().equals("All Entry-Exit")) {
             fileName = apmsService.downloadParkingEvents(request);
 
         } else {
             fileName = apmsService.downloadParkingEventsOnDailyBasis(request);
         }
-
-        File file = new File(fileName);
-
-        handlHttpFileResponse(response, fileName, file);
-
+        handleHttpFileResponse(response, fileName);
     }
 
     @PostMapping("/anprevents")
     public void anprEventReport(@RequestBody AnprReportRequest request, HttpServletResponse response) throws IOException {
-        File file = null;
         String fileName = null;
 
         if (request.getXAxis().equals("All Entry-Exit")) {
@@ -73,25 +67,37 @@ public class ReportController {
         } else {
             fileName = anprService.downloadAnprEventsOnDailyBasis(request);
         }
-
-        file = new File(fileName);
-        handlHttpFileResponse(response, fileName, file);
+        handleHttpFileResponse(response, fileName);
     }
 
-    @PostMapping("/atcc/events")
-    public void atccEventReport(@RequestBody AtccReportRequest request, HttpServletResponse response) throws IOException {
-        String fileName = null;
+    @PostMapping("/atcc/events/all")
+    public void atccEventAllReport(@RequestBody AtccReportRequest request, HttpServletResponse response) throws IOException {
+        String fileName = atccReportService.downloadAtccEvents(request);
+        handleHttpFileResponse(response, fileName);
+    }
 
-        if (request.getReportType().equals("All Incidents")) {
-            fileName = vidsReportService.generateHighwayIncidentsReport(request);
-        }
+    @PostMapping("/atcc/events/summary/day-wise")
+    public void atccEventSummaryReport(@RequestBody AtccReportRequest request, HttpServletResponse response) throws IOException {
+        String fileName = atccReportService.downloadEventsDaywiseSummary(request);
+        handleHttpFileResponse(response, fileName);
+    }
 
+    @PostMapping("/vids/incidents/all")
+    public void vidsInciendentAllReport(@RequestBody AtccReportRequest request, HttpServletResponse response) throws IOException {
+        String fileName = vidsReportService.generateHighwayIncidentsReport(request);
+        handleHttpFileResponse(response, fileName);
+    }
+
+    @PostMapping("/vids/incidents/summary/day-wise")
+    public void vidsInciendentSummaryReport(@RequestBody AtccReportRequest request, HttpServletResponse response) throws IOException {
+        String fileName = vidsReportService.downloadHighwayIncidentsOnDailyBasis(request);
+        handleHttpFileResponse(response, fileName);
+    }
+
+
+    private void handleHttpFileResponse(HttpServletResponse response, String fileName) {
         File file = new File(fileName);
-        handlHttpFileResponse(response, fileName, file);
-    }
-
-    private void handlHttpFileResponse(HttpServletResponse response, String fileName, File file) {
-        if (file != null && file.exists()) {
+        if (file.exists()) {
             String extension = FilenameUtils.getExtension(file.getName());
             fileName = fileName + UUID.randomUUID().toString();
 

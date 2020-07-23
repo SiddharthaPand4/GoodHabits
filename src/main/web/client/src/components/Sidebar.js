@@ -1,26 +1,33 @@
 import React, {Component} from 'react';
 import {Icon, Layout, Menu} from "antd";
 import {Link} from "react-router-dom";
+import commonService from "../services/CommonService";
 import UserService from "../services/UserService";
-import UserSwitchOutlined from "@ant-design/icons/lib/icons/UserSwitchOutlined";
 
 const {Sider} = Layout;
 const {SubMenu} = Menu;
 
 export default class Sidebar extends Component {
-    state = {
-        collapsed: false,
-        loaded: false,
-        menu: {}
-    };
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            collapsed: false,
+            loaded: false,
+            menu: {}
+        };
     }
 
     componentDidMount() {
         UserService.getMenu().then(response => {
-            this.setState({menu: response.data, loaded: true});
+            let menu = response.data;
+            menu.items = commonService.getSorted(menu.items, 'seq', true);
+            menu.items.forEach(menuItem => {
+                menuItem.submenu = commonService.getSorted(menuItem.submenu, 'seq', true);
+            });
+
+            this.setState({menu, loaded: true});
         });
     }
 
@@ -57,7 +64,7 @@ export default class Sidebar extends Component {
                         >
                             {(item.submenu || []).map((subitem, index) =>
                                 <Menu.Item key={subitem.key} className="sidebar-nav-link">
-                                <Link to={subitem.link}><span className='nav-text'>{subitem.title}</span></Link>
+                                    <Link to={subitem.link}><span className='nav-text'>{subitem.title}</span></Link>
                                 </Menu.Item>
                             )}
                         </SubMenu>

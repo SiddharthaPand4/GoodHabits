@@ -5,11 +5,17 @@ import com.querydsl.jpa.impl.JPAQuery;
 
 import io.synlabs.synvision.entity.atcc.AtccEvent;
 import io.synlabs.synvision.entity.atcc.QAtccEvent;
+import io.synlabs.synvision.entity.vids.HighwayIncident;
+import io.synlabs.synvision.entity.vids.QHighwayIncident;
+import io.synlabs.synvision.enums.HighwayIncidentType;
 import io.synlabs.synvision.service.BaseService;
+import io.synlabs.synvision.util.DateUtil;
 import io.synlabs.synvision.views.anpr.AnprReportJsonResponse;
 import io.synlabs.synvision.views.anpr.AnprReportRequest;
 import io.synlabs.synvision.views.anpr.AnprReportResponse;
 import io.synlabs.synvision.views.atcc.AtccReportRequest;
+import io.synlabs.synvision.views.atcc.AtccSummaryDatawiseResponse;
+import io.synlabs.synvision.views.vids.VidsDaywiseReportResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,22 +48,17 @@ public class AtccReportService extends BaseService {
     }
 
     public String downloadAtccEvents(AtccReportRequest request) throws IOException {
-        int page = 1;
-        int offset = 0;
-        int limit = 1000;
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        try {
-            request.setFrom(sdf.parse(request.getFromDateString()));
-            request.setTo(sdf.parse(request.getToDateString()));
-        } catch (ParseException e) {
-            logger.info("Couldn't parse date", request.getFrom());
-        }
+        String pattern = "yyyy-MM-dd HH:mm:ss";
+        request.setFrom(DateUtil.parseDateString(request.getFromDateString(), pattern));
+        request.setTo(DateUtil.parseDateString(request.getToDateString(), pattern));
 
         QAtccEvent atccEvent = new QAtccEvent("atccEvent");
         JPAQuery<AtccEvent> query = new JPAQuery<>(entityManager);
         List<AtccEvent> result = null;
-
+        int page = 1;
+        int offset = 0;
+        int limit = 1000;
         query.select(atccEvent)
                 .from(atccEvent)
                 .where(atccEvent.eventDate.between(request.getFrom(), request.getTo()))
@@ -80,15 +81,17 @@ public class AtccReportService extends BaseService {
         fileWriter.append(',');
         fileWriter.append("Event ID");
         fileWriter.append(',');
-        fileWriter.append("Lane");
+        fileWriter.append("Vehicle Class");
         fileWriter.append(',');
         fileWriter.append("Speed");
         fileWriter.append(',');
-        fileWriter.append("Vehicle Class");
+        fileWriter.append("Lane");
         fileWriter.append(',');
         fileWriter.append("Direction");
         fileWriter.append(',');
         fileWriter.append("Location");
+        fileWriter.append(',');
+        fileWriter.append("Site");
         fileWriter.append('\n');
         while (totalRecordsCount > offset) {
             offset = (page - 1) * limit;
@@ -107,7 +110,18 @@ public class AtccReportService extends BaseService {
                 fileWriter.append(String.valueOf('"')).append(toFormattedDate(event.getEventDate(), "HH:mm:ss")).append(String.valueOf('"'));
                 fileWriter.append(',');
                 fileWriter.append(String.valueOf('"')).append(event.getEventId()).append(String.valueOf('"'));
-
+                fileWriter.append(',');
+                fileWriter.append(String.valueOf('"')).append(event.getType()).append(String.valueOf('"'));
+                fileWriter.append(',');
+                fileWriter.append(String.valueOf('"')).append(event.getSpeed().toPlainString()).append(String.valueOf('"'));
+                fileWriter.append(',');
+                fileWriter.append(String.valueOf('"')).append(String.valueOf(event.getLane())).append(String.valueOf('"'));
+                fileWriter.append(',');
+                fileWriter.append(String.valueOf('"')).append(String.valueOf(event.getDirection())).append(String.valueOf('"'));
+                fileWriter.append(',');
+                fileWriter.append(String.valueOf('"')).append(event.getFeed() != null ? event.getFeed().getLocation() : "").append(String.valueOf('"'));
+                fileWriter.append(',');
+                fileWriter.append(String.valueOf('"')).append(event.getFeed() != null ? event.getFeed().getLocation() : "").append(String.valueOf('"'));
                 fileWriter.append('\n');
                 i++;
             }
@@ -119,174 +133,110 @@ public class AtccReportService extends BaseService {
         return filename;
     }
 
-    public String downloadatccEventsOnDailyBasis(AnprReportRequest request) throws IOException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        SimpleDateFormat sdf1 = new SimpleDateFormat("dd/MM/yyyy");
-        try {
-            request.setFrom(sdf.parse(request.getFromDateString()));
-            request.setTo(sdf.parse(request.getToDateString()));
-        } catch (ParseException e) {
-            logger.info("Couldn't parse date", request.getFrom());
-        }
+    public String downloadEventsDaywiseSummary(AtccReportRequest request) throws IOException {
+        List<String> vehicleTypes = getDistinctVehicleTypes();
+
+        String pattern = "yyyy-MM-dd HH:mm:ss";
+        request.setFrom(DateUtil.parseDateString(request.getFromDateString(), pattern));
+        request.setTo(DateUtil.parseDateString(request.getToDateString(), pattern));
 
         QAtccEvent atccEvent = new QAtccEvent("atccEvent");
         JPAQuery<AtccEvent> query = new JPAQuery<>(entityManager);
-        JPAQuery<AtccEvent> query1 = new JPAQuery<>(entityManager);
-        JPAQuery<AtccEvent> query2 = new JPAQuery<>(entityManager);
 
         Date eventDate = null;
+        String eventDateString;
         Long eventCount = null;
-        String vehicleClass = null;
+        String vehicleType = null;
 
         List<com.querydsl.core.Tuple> result = null;
-        List<com.querydsl.core.Tuple> result1 = null;
-        String xAxis = StringUtils.isEmpty(request.getXAxis()) ? "" : request.getXAxis();
-        Map<Date, List<AnprReportResponse>> totalEventsByDate = new TreeMap<Date, List<AnprReportResponse>>();
-        Map<Date, AnprReportJsonResponse> totalEventsByDateForJsonFormat = new TreeMap<Date, AnprReportJsonResponse>();
+        Map<Date, List<AtccSummaryDatawiseResponse>> totalEventsByDate = new TreeMap<>();
+        AtccSummaryDatawiseResponse response;
+        List<AtccSummaryDatawiseResponse> responses;
 
-        List<String> vehicleClassList = query1.select(atccEvent.type).distinct()
+        result = query
+                .select(atccEvent.eventDate, //0
+                        atccEvent.type, //1
+                        atccEvent.count() //2
+                )
                 .from(atccEvent)
+                .where(atccEvent.eventDate.between(request.getFrom(), request.getTo()))
+                .groupBy(atccEvent.eventDate.dayOfMonth(), atccEvent.eventDate.month(), atccEvent.eventDate.year(), atccEvent.type)
+                .orderBy(atccEvent.eventDate.asc())
                 .fetch();
-        switch (xAxis) {
 
-            case "DayWise Summary":
+        com.querydsl.core.Tuple tuple;
+        for (int i = 0; i < result.size(); i++) {
+            tuple = result.get(i);
 
-                //---FOR JSON format
-                result1 = query2
-                        .select(atccEvent.eventDate,
-                                atccEvent.count())
-                        .from(atccEvent)
-                        .where(atccEvent.eventDate.between(request.getFrom(), request.getTo()))
-                        .groupBy(atccEvent.eventDate.dayOfMonth(), atccEvent.eventDate.month(), atccEvent.eventDate.year())
-                        .orderBy(atccEvent.eventDate.asc())
-                        .fetch();
+            eventDate = tuple.get(0, Date.class);
+            vehicleType = tuple.get(1, String.class);
+            eventCount = tuple.get(2, Long.class);
 
+            eventDateString = toFormattedDate(eventDate, "dd/MM/yyyy");
+            eventDate = DateUtil.parseDateString(eventDateString, "dd/MM/yyyy");
 
-                for (int i = 0; i < result1.size(); i++) {
-                    com.querydsl.core.Tuple tuple = result1.get(i);
-
-                    eventDate = tuple.get(0, Date.class);
-                    String eventDateString = toFormattedDate(eventDate, "dd/MM/yyyy");
-
-                    try {
-                        eventDate = sdf1.parse(eventDateString);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    eventCount = tuple.get(1, Long.class);
-
-                    totalEventsByDateForJsonFormat.put(eventDate, new AnprReportJsonResponse(eventCount, eventDateString));
-                    result1.set(i, null);
-                }
-
-                //---- For CSV format, groupby with vehicleclass also
-                result = query
-                        .select(atccEvent.eventDate, atccEvent.type,
-                                atccEvent.count())
-                        .from(atccEvent)
-                        .where(atccEvent.eventDate.between(request.getFrom(), request.getTo()))
-                        .groupBy(atccEvent.eventDate.dayOfMonth(), atccEvent.eventDate.month(), atccEvent.eventDate.year(), atccEvent.type)
-                        .orderBy(atccEvent.eventDate.asc())
-                        .fetch();
-
-
-                for (int i = 0; i < result.size(); i++) {
-                    com.querydsl.core.Tuple tuple = result.get(i);
-
-                    eventDate = tuple.get(0, Date.class);
-                    String eventDateString = toFormattedDate(eventDate, "dd/MM/yyyy");
-
-                    try {
-                        eventDate = sdf1.parse(eventDateString);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
-                    vehicleClass = tuple.get(1, String.class);
-                    eventCount = tuple.get(2, Long.class);
-
-                    AnprReportResponse response = new AnprReportResponse(vehicleClass, eventCount, eventDateString);
-                    List<AnprReportResponse> responses = totalEventsByDate.get(eventDate);
-                    if (responses == null) {
-                        responses = new ArrayList<AnprReportResponse>();
-                    }
-
-                    responses.add(response);
-
-                    totalEventsByDate.put(eventDate, responses);
-                    result.set(i, null);
-                }
-
-
-                break;
-        }
-        List<AnprReportJsonResponse> responses = new ArrayList<>();
-        for (Date date : totalEventsByDateForJsonFormat.keySet()) {
-            responses.add(new AnprReportJsonResponse(totalEventsByDateForJsonFormat.get(date).getTotalEvents(), toFormattedDate(date, "dd/MM/yyyy")));
+            response = new AtccSummaryDatawiseResponse(eventDateString, vehicleType, eventCount);
+            responses = totalEventsByDate.get(eventDate);
+            if (responses == null) {
+                responses = new ArrayList<>();
+            }
+            responses.add(response);
+            totalEventsByDate.put(eventDate, responses);
+            result.set(i, null);
         }
 
         Path path = Paths.get(uploadDirPath);
-        String filename = null;
-        FileWriter fileWriter = null;
-        switch (request.getReportType()) {
-            case "CSV":
-                filename = path.resolve(UUID.randomUUID().toString() + ".csv").toString();
-                fileWriter = new FileWriter(filename);
-                fileWriter.append("Sr. No");
-                fileWriter.append(',');
-                fileWriter.append("Date");
-                fileWriter.append(',');
-                for (String vehicleclass : vehicleClassList) {
-                    fileWriter.append(vehicleclass);
-                    fileWriter.append(',');
-                }
-                fileWriter.append("Total Events");
-                fileWriter.append('\n');
-
-                int i = 0;
-
-                for (Date key : totalEventsByDate.keySet()) {
-                    fileWriter.append(String.valueOf('"')).append(String.valueOf(i + 1)).append(String.valueOf('"'));
-                    fileWriter.append(',');
-                    fileWriter.append(String.valueOf('"')).append(toFormattedDate(key, "dd/MM/yyyy")).append(String.valueOf('"'));
-                    fileWriter.append(',');
-                    for (String vehicleclass : vehicleClassList) {
-                        int count = 0;
-                        for (AnprReportResponse anprReportResponse : totalEventsByDate.get(key)) {
-                            if (vehicleclass.equals(anprReportResponse.getVehicleClass())) {
-                                count = anprReportResponse.getTotalEvents().intValue();
-                                break;
-                            }
-                        }
-                        fileWriter.append(String.valueOf('"')).append(String.valueOf(count)).append(String.valueOf('"'));
-                        fileWriter.append(',');
-                    }
-                    int totalEvents = 0;
-                    for (AnprReportResponse anprReportResponse : totalEventsByDate.get(key)) {
-                        totalEvents = totalEvents + anprReportResponse.getTotalEvents().intValue();
-                    }
-                    fileWriter.append(String.valueOf('"')).append(String.valueOf(totalEvents)).append(String.valueOf('"'));
-                    fileWriter.append('\n');
-                    i++;
-                }
-
-                break;
-
-            case "JSON":
-                filename = path.resolve(UUID.randomUUID().toString() + ".json").toString();
-                fileWriter = new FileWriter(filename);
-
-                Gson gson = new Gson();
-                gson.toJson(responses, fileWriter);
-
-                break;
-
+        String filename = path.resolve(UUID.randomUUID().toString() + ".csv").toString();
+        FileWriter fileWriter = new FileWriter(filename);
+        fileWriter.append("Sr. No");
+        fileWriter.append(',');
+        fileWriter.append("Date");
+        fileWriter.append(',');
+        for (String vehicleType1 : vehicleTypes) {
+            fileWriter.append(vehicleType1);
+            fileWriter.append(',');
         }
+        fileWriter.append("Total Incidents");
+        fileWriter.append('\n');
 
+        int i = 0;
+
+        for (Date key : totalEventsByDate.keySet()) {
+            fileWriter.append(String.valueOf('"')).append(String.valueOf(i + 1)).append(String.valueOf('"'));
+            fileWriter.append(',');
+            fileWriter.append(String.valueOf('"')).append(toFormattedDate(key, "dd/MM/yyyy")).append(String.valueOf('"'));
+            fileWriter.append(',');
+            for (String vehicleType1 : vehicleTypes) {
+                int count = 0;
+                for (AtccSummaryDatawiseResponse res : totalEventsByDate.get(key)) {
+                    if (vehicleType1.equals(res.getVehicleClass())) {
+                        count = res.getEventCount().intValue();
+                        break;
+                    }
+                }
+                fileWriter.append(String.valueOf('"')).append(String.valueOf(count)).append(String.valueOf('"'));
+                fileWriter.append(',');
+            }
+            long totalEvents = 0;
+            for (AtccSummaryDatawiseResponse res : totalEventsByDate.get(key)) {
+                totalEvents = totalEvents + res.getEventCount();
+            }
+            fileWriter.append(String.valueOf('"')).append(String.valueOf(totalEvents)).append(String.valueOf('"'));
+            fileWriter.append('\n');
+            i++;
+        }
 
         fileWriter.flush();
         fileWriter.close();
         return filename;
     }
 
+    private List<String> getDistinctVehicleTypes() {
+        QAtccEvent atccEvent = new QAtccEvent("atccEvent");
+        return new JPAQuery<>(entityManager)
+                .select(atccEvent.type)
+                .distinct()
+                .from(atccEvent)
+                .fetch();
+    }
 }
