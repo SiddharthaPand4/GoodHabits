@@ -111,8 +111,6 @@ class LoginForm extends Component {
                         {loginError && <Text type="danger">{loginError}</Text>
                         }
                     </Card>
-
-
                 </Col>
             </Row>
 

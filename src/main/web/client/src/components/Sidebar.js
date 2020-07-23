@@ -49,7 +49,7 @@ export default class Sidebar extends Component {
                 collapsedWidth="0"
             >
                 <div className="logo">
-                    <img src={"park-n-secure-logo.jpg"}/>
+                    <img src={"park-n-secure-logo.jpg"} alt={"SynergyLabs Technology"}/>
                 </div>
                 <Menu theme="dark" mode="inline" defaultSelectedKeys={['0']}>
                     <Menu.Item key="0">
@@ -73,7 +73,6 @@ export default class Sidebar extends Component {
                         <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span
                             className='nav-text'>Logout</span></Link>
                     </Menu.Item>
-
                 </Menu>
             </Sider>
         );
