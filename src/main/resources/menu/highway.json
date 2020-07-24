@@ -1,36 +1,38 @@
 {
   "key": "menu2",
   "title": "Highways",
-  "icon": "box-plot",
-  "privilege": "ATCC_READ",
+  "icon": "rocket",
   "submenu": [
     {
-      "key": "atcc-summary",
-      "title": "ATCC Summary",
-      "icon": "area-chart",
-      "privilege": "ATCC_READ",
-      "link": "/atcc/summary"
-    },
-    {
-      "key": "atcc",
-      "title": "ATCC",
-      "icon": "fund",
-      "privilege": "ATCC_READ",
-      "link": "/atcc"
+      "key": "vids-dashboard",
+      "title": "Dashboard",
+      "icon": "alert",
+      "link": "/vids/dashboard",
+      "privilege": "VIDS_READ",
+      "seq": 100
     },
     {
       "key": "vids",
       "title": "VIDS",
       "icon": "alert",
+      "link": "/vids",
       "privilege": "VIDS_READ",
-      "link": "/vids"
+      "seq": 200
     },
     {
-      "key": "vids-dashboard",
-      "title": "Dashboard",
-      "icon": "alert",
-      "privilege": "VIDS_READ",
-      "link": "/vids/dashboard"
+      "key": "atcc",
+      "title": "ATCC",
+      "icon": "fund",
+      "link": "/atcc",
+      "privilege": "ATCC_READ",
+      "seq": 300
+    },{
+      "key": "atcc-reports",
+      "title": "Reports",
+      "icon": "fund",
+      "link": "/atcc/reports",
+      "privilege": "ATCC_READ",
+      "seq": 400
     }
   ]
 }

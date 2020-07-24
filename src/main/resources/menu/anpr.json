@@ -7,18 +7,21 @@
       "key": "1",
       "title": "Events",
       "privilege": "ANPR_READ",
+      "seq": 200,
       "link": "/anpr"
     },
     {
       "key": "2",
       "title": "Repeated Events",
       "privilege": "ANPR_READ",
+      "seq": 300,
       "link": "/anpr/masterdata"
     },
     {
       "key": "3",
       "title": "ANPR Report",
       "privilege": "ANPR_READ",
+      "seq": 100,
       "link": "/anpr/report"
     }
   ]

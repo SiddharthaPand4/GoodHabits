@@ -8,6 +8,7 @@
       "title": "Users",
       "link": "/user",
       "privilege": "USER_WRITE",
+      "seq": 100,
       "icon": "user"
     },
     {
@@ -15,6 +16,7 @@
       "title": "Roles",
       "link": "/roles",
       "privilege": "ROLE_WRITE",
+      "seq": 200,
       "icon": "user"
     },
     {
@@ -22,6 +24,7 @@
       "title": "Device",
       "link": "/device",
       "privilege": "DEVICE_WRITE",
+      "seq": 300,
       "icon": "laptop"
     },
     {
@@ -29,6 +32,7 @@
       "title": "Triggers",
       "link": "/trigger",
       "privilege": "TRIGGER_READ",
+      "seq": 400,
       "icon": "clock-circle"
     }
   ]
