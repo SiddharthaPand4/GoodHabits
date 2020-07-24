@@ -1,27 +1,33 @@
 import React, {Component} from 'react';
 import {Icon, Layout, Menu} from "antd";
 import {Link} from "react-router-dom";
+import commonService from "../services/CommonService";
 import UserService from "../services/UserService";
-import UserSwitchOutlined from "@ant-design/icons/lib/icons/UserSwitchOutlined";
 
 const {Sider} = Layout;
 const {SubMenu} = Menu;
 
 export default class Sidebar extends Component {
-    state = {
-        collapsed: false,
-        loaded: false,
-        menu: {}
-    };
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            collapsed: false,
+            loaded: false,
+            menu: {}
+        };
     }
 
     componentDidMount() {
         UserService.getMenu().then(response => {
-            this.setState({menu: response.data, loaded: true});
+            let menu = response.data;
+            menu.items = commonService.getSorted(menu.items, 'seq', true);
+            menu.items.forEach(menuItem => {
+                menuItem.submenu = commonService.getSorted(menuItem.submenu, 'seq', true);
+            });
 
+            this.setState({menu, loaded: true});
         });
     }
 
@@ -43,7 +49,7 @@ export default class Sidebar extends Component {
                 collapsedWidth="0"
             >
                 <div className="logo">
-                    <img src={"synlabs-logo.png"}/>
+                    <img src={"park-n-secure-logo.jpg"} alt={"SynergyLabs Technology"}/>
                 </div>
                 <Menu theme="dark" mode="inline" defaultSelectedKeys={['0']}>
                     <Menu.Item key="0">
@@ -51,22 +57,17 @@ export default class Sidebar extends Component {
                     </Menu.Item>
 
                     {(menu.items || []).map((item, index) =>
-                        item.submenu != null ?
-                            (<SubMenu key={item.key} title={
-                                <span><Icon type={item.icon}/><span>{item.title}</span></span>
-                            }
-                            >
-                                {(item.submenu || []).map((subitem, index) =>
-                                    <Menu.Item key={subitem.key} className="sidebar-nav-link">
-                                        <Link to={subitem.link}><span className='nav-text'>{subitem.title}</span></Link>
-                                    </Menu.Item>
-                                )}
-                            </SubMenu>)
-                            :
-                            <Menu.Item key={item.key}>
-                                <Link to={item.link}><Icon type={item.icon}/><span
-                                    className='nav-text'>{item.title}</span></Link>
-                            </Menu.Item>
+
+                        <SubMenu key={item.key} title={
+                            <span><Icon type='box-plot'/><span>{item.title}</span></span>
+                        }
+                        >
+                            {(item.submenu || []).map((subitem, index) =>
+                                <Menu.Item key={subitem.key} className="sidebar-nav-link">
+                                    <Link to={subitem.link}><span className='nav-text'>{subitem.title}</span></Link>
+                                </Menu.Item>
+                            )}
+                        </SubMenu>
                     )}
                     <Menu.Item key="7">
                         <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span

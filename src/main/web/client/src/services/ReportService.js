@@ -1,5 +1,4 @@
 import axios from "./axios";
-import moment from 'moment';
 import { authHeader } from '../helpers/auth-header';
 import { config } from '../helpers/config'
 

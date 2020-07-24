@@ -2,21 +2,20 @@
 
 .logo {
     height: 40px;
-    background: rgba(255, 255, 255, 0.2);
     margin: 16px;
 }
 
-main.ant-layout-content
-{
-    overflow:hidden;
-    margin:0 !important;
+main.ant-layout-content {
+    overflow: hidden;
+    margin: 0 !important;
 }
+
 .sc-fjdhpX.dIWoiE {
     /*position: unset !important;*/
 }
 
 .linesContainer:nth-child(2) {
-   /* display: none !important;*/
+    /* display: none !important;*/
 }
 
 @media print {
@@ -41,7 +40,6 @@ main.ant-layout-content
         margin: 0.0cm 0.0cm 0.0cm 0.3cm;
         padding: 10px;
     }
-
 
 }
 

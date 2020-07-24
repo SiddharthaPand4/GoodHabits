@@ -152,10 +152,10 @@ export default class AtccView extends Component {
                             autoPlay
                             startTime={this.state.seek}
                             playsInline
-                            poster="/synlabs-logo.png"
+                            poster="/park-n-secure-logo.jpg"
                             src={this.state.video}
                         />
-                        <img src={this.state.ss || '/synlabs-logo.png'} alt="event screenshot"/>
+                        <img src={this.state.ss || '/park-n-secure-logo.jpg'} alt="event screenshot"/>
                     </div>
                 </Col>
             </Row>)

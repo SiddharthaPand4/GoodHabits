@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import {Button, Col, Icon, message, Tag} from "antd";
 import AnnotationService from "../../services/ConfigService";
 import Row from "antd/es/grid/row";
-import Card from "@material-ui/core/Card";
 import FeedService from "../../services/FeedService";
 
 
@@ -272,7 +271,7 @@ export default class ConfigView extends Component {
         return (
             <div>
 
-                <Card>
+                <div>
                     <Row>
 
                         <Col span={12}>
@@ -342,7 +341,7 @@ export default class ConfigView extends Component {
                             </div>
                         </Col>
                     </Row>
-                </Card>
+                </div>
 
             </div>
         );

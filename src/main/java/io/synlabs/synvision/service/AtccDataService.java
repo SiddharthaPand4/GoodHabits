@@ -420,11 +420,9 @@ public class AtccDataService extends BaseService {
         atccEventRepository.save(atccEvent);
     }
 
-
     private Feed getFeed(String tag) {
         return feedRepository.findOneByName(tag);
     }
-
 
     public PageResponse<AtccRawDataResponse> list(AtccEventFilterRequest request) {
         JPAQuery<AtccEvent> query = getQuery(request);
@@ -476,5 +474,7 @@ public class AtccDataService extends BaseService {
         }
         return query;
     }
+
+
 }
 

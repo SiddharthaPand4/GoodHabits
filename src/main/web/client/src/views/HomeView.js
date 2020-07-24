@@ -454,6 +454,10 @@ export default class HomeView extends Component {
                     </Modal>
                 </div>
                 <div>
+
+                    {/*
+                    Uncomment it for Synergy Labs Installations
+
                     <Card title={<div>ANPR
                         &nbsp;
                         <Dropdown overlay={() => this.getDateRangeOptions("anpr")}>
@@ -472,8 +476,8 @@ export default class HomeView extends Component {
                         </Dropdown>
                     </div>}>
                         <Line data={anpr.chartData} options={anprChartOptions}/>
-                    </Card>
-                    <br/>
+                    </Card><br/>*/}
+
                     <Card title={<div>ATCC
                         &nbsp;
                         <Dropdown overlay={() => this.getDateRangeOptions("atcc")}>
