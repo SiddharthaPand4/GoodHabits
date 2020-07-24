@@ -51,22 +51,22 @@ export default class Sidebar extends Component {
                     </Menu.Item>
 
                     {(menu.items || []).map((item, index) =>
-                    item.submenu !=null ?
-                        (<SubMenu key={item.key} title={
-                            <span><Icon type={item.icon}/><span>{item.title}</span></span>
-                        }
-                        >
-                            {(item.submenu || []).map((subitem, index) =>
+                        item.submenu != null ?
+                            (<SubMenu key={item.key} title={
+                                <span><Icon type={item.icon}/><span>{item.title}</span></span>
+                            }
+                            >
+                                {(item.submenu || []).map((subitem, index) =>
                                     <Menu.Item key={subitem.key} className="sidebar-nav-link">
                                         <Link to={subitem.link}><span className='nav-text'>{subitem.title}</span></Link>
                                     </Menu.Item>
                                 )}
-                        </SubMenu>)
-                        :
-                        <Menu.Item key={item.key}>
-                            <Link to={item.link}><Icon type={item.icon}/><span
-                                className='nav-text'>{item.title}</span></Link>
-                        </Menu.Item>
+                            </SubMenu>)
+                            :
+                            <Menu.Item key={item.key}>
+                                <Link to={item.link}><Icon type={item.icon}/><span
+                                    className='nav-text'>{item.title}</span></Link>
+                            </Menu.Item>
                     )}
                     <Menu.Item key="7">
                         <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span
