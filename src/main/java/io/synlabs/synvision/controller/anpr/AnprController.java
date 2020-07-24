@@ -33,7 +33,6 @@ import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.*;
  */
 @RestController
 @RequestMapping("/api/anpr")
-
 public class AnprController extends MediaUploadController {
 
     private static final Logger logger = LoggerFactory.getLogger(AnprController.class);
@@ -52,7 +51,7 @@ public class AnprController extends MediaUploadController {
     public PageResponse<AnprResponse> list(@RequestBody AnprFilterRequest request) {
         return anprService.list(request);
     }
-    //shashank
+
     @PostMapping("/anprevent")
     @Secured(ANPR_READ)
     public void anprEventReport(@RequestBody AnprReportRequest request, HttpServletResponse response) throws IOException {

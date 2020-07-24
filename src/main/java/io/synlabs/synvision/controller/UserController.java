@@ -24,7 +24,7 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/menu")
-    //@Secured(SELF_READ)
+    @Secured(SELF_READ)
     public Menu getMenu() {
 
         return userService.getCurrentUserMenu();

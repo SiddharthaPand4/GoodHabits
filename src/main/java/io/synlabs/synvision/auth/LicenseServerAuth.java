@@ -37,8 +37,8 @@ public final class LicenseServerAuth
     public static final String ANPR_READ = "ROLE_ANPR_READ";
     public static final String ANPR_WRITE = "ROLE_ANPR_WRITE";
 
-    public static final String HOTLIST_READ = "ROLE_HOTLIST_READ";
-    public static final String HOTLIST_WRITE= "ROLE_HOTLIST_WRITE";
+    public static final String HOTLIST_VEHICLE_READ = "ROLE_HOTLIST_VEHICLE_READ";
+    public static final String HOTLIST_VEHICLE_WRITE = "ROLE_HOTLIST_VEHICLE_WRITE";
 
     public static final String PEPCOUNT_READ = "ROLE_PEPCOUNT_READ";
     public static final String PEPCOUNT_WRITE = "ROLE_PEPCOUNT_READ";
