@@ -4,14 +4,14 @@
   "icon": "box-plot",
   "submenu": [
     {
-      "key": "1",
+      "key": "offence-events",
       "title": "Events",
       "privilege": "INCIDENT_READ",
       "seq": 100,
       "link": "/incidents"
     },
     {
-      "key": "2",
+      "key": "offence-rep-events",
       "title": "Repeated Events",
       "privilege": "INCIDENT_READ",
       "seq": 200,

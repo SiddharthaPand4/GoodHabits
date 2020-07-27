@@ -4,14 +4,14 @@
   "icon": "box-plot",
   "submenu": [
     {
-      "key": "1",
+      "key": "pepcount-events",
       "title": "Events",
       "privilege": "PEP_READ",
       "seq": 100,
       "link": "/people-counting/events"
     },
     {
-      "key": "2",
+      "key": "pepcount-dashboard",
       "title": "Dashboard",
       "privilege": "PEP_READ",
       "seq": 200,

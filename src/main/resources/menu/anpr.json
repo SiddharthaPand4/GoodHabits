@@ -4,21 +4,21 @@
   "icon": "box-plot",
   "submenu": [
     {
-      "key": "1",
+      "key": "anpr-events",
       "title": "Events",
       "privilege": "ANPR_READ",
       "seq": 200,
       "link": "/anpr"
     },
     {
-      "key": "2",
+      "key": "anpr-rep-events",
       "title": "Repeated Events",
       "privilege": "ANPR_READ",
       "seq": 300,
       "link": "/anpr/masterdata"
     },
     {
-      "key": "3",
+      "key": "anpr-report",
       "title": "ANPR Report",
       "privilege": "ANPR_READ",
       "seq": 100,
