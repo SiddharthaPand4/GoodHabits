@@ -61,7 +61,7 @@ export default class Sidebar extends Component {
 
                     {(menu.items || []).map((item, index) =>
 
-                        item.submenu != null ?
+                        item.submenu !== null ?
                             (<SubMenu key={item.key} title={
                                 <span><Icon type={item.icon}/><span>{item.title}</span></span>
                             }
