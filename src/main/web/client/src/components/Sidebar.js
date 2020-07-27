@@ -52,7 +52,7 @@ export default class Sidebar extends Component {
                 collapsedWidth="0"
             >
                 <div className="logo">
-                    <img src={"park-n-secure-logo.jpg"} alt={"SynergyLabs Technology"}/>
+                    <img src={"synlabs-logo.png"} alt={"SynergyLabs Technology"}/>
                 </div>
                 <Menu theme="dark" mode="inline" defaultSelectedKeys={['0']}>
                     <Menu.Item key="0">
