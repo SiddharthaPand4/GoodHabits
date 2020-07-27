@@ -469,8 +469,7 @@ public class AtccDataService extends BaseService {
 
             }
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Error in parsing date", e);
         }
         return query;

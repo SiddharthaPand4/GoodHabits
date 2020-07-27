@@ -1,0 +1,21 @@
+{
+  "key": "menu7",
+  "title": "People Counting",
+  "icon": "box-plot",
+  "submenu": [
+    {
+      "key": "1",
+      "title": "Events",
+      "privilege": "PEP_READ",
+      "seq": 100,
+      "link": "/people-counting/events"
+    },
+    {
+      "key": "2",
+      "title": "Dashboard",
+      "privilege": "PEP_READ",
+      "seq": 200,
+      "link": "/people-counting/dashboard"
+    }
+  ]
+}

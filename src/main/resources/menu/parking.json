@@ -1,0 +1,35 @@
+{
+  "key": "menu6",
+  "title": "Parking",
+  "icon": "car",
+  "submenu": [
+    {
+      "key": "1",
+      "title": "Dashboard",
+      "privilege": "PARK_WRITE",
+      "seq": 100,
+      "link": "/pgs/dashboard"
+    },
+    {
+      "key": "2",
+      "title": "Operator Console",
+      "privilege": "PARK_WRITE",
+      "seq": 200,
+      "link": "/pgs/console"
+    },
+    {
+      "key": "3",
+      "title": "Check-In/Out",
+      "privilege": "PARK_WRITE",
+      "seq": 300,
+      "link": "/pgs/inout"
+    },
+    {
+      "key": "4",
+      "title": "Reports",
+      "privilege": "PARK_WRITE",
+      "seq": 400,
+      "link": "/pgs/reports"
+    }
+  ]
+}

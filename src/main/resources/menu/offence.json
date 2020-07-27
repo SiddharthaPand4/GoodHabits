@@ -1,0 +1,21 @@
+{
+  "key": "menu4",
+  "title": "Offences",
+  "icon": "box-plot",
+  "submenu": [
+    {
+      "key": "1",
+      "title": "Events",
+      "privilege": "INCIDENT_READ",
+      "seq": 100,
+      "link": "/incidents"
+    },
+    {
+      "key": "2",
+      "title": "Repeated Events",
+      "privilege": "INCIDENT_READ",
+      "seq": 200,
+      "link": "/incidents/repeated"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "key": "highways",
+  "key": "menu2",
   "title": "Highways",
   "icon": "rocket",
   "submenu": [
@@ -8,6 +8,7 @@
       "title": "Dashboard",
       "icon": "alert",
       "link": "/vids/dashboard",
+      "privilege": "VIDS_READ",
       "seq": 100
     },
     {
@@ -15,6 +16,7 @@
       "title": "VIDS",
       "icon": "alert",
       "link": "/vids",
+      "privilege": "VIDS_READ",
       "seq": 200
     },
     {
@@ -22,12 +24,14 @@
       "title": "ATCC",
       "icon": "fund",
       "link": "/atcc",
+      "privilege": "ATCC_READ",
       "seq": 300
     },{
       "key": "atcc-reports",
       "title": "Reports",
       "icon": "fund",
       "link": "/atcc/reports",
+      "privilege": "ATCC_READ",
       "seq": 400
     }
   ]

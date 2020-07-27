@@ -37,7 +37,8 @@ public class UserService extends BaseService implements UserDetailsService {
     @Autowired
     private SynVisionUserRepository userRepository;
 
-    @Autowired UserMenuBuilder menuBuilder;
+    @Autowired
+    UserMenuBuilder menuBuilder;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -47,20 +48,17 @@ public class UserService extends BaseService implements UserDetailsService {
 
     private PasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    public SynVisionUser validate(LoginRequest request)
-    {
+    public SynVisionUser validate(LoginRequest request) {
 
         SynVisionUser user;
         if (StringUtils.isEmpty(request.getEmail())) {
             user = userRepository.findByUsernameAndActiveTrue(request.getUsername());
-        }
-        else {
+        } else {
             user = userRepository.findByEmailAndActiveTrue(request.getEmail());
         }
 
 
-        if (user != null && encoder.matches(request.getPassword(), user.getPasswordHash()))
-        {
+        if (user != null && encoder.matches(request.getPassword(), user.getPasswordHash())) {
             user.setLastLogin(DateTime.now().toDate());
             userRepository.saveAndFlush(user);
             return user;
@@ -87,7 +85,7 @@ public class UserService extends BaseService implements UserDetailsService {
         if (encoder.matches(password, user.getPasswordHash())) {
 
             List<String> lroles = new LinkedList<>();
-            for(Role role: user.getRoles()) {
+            for (Role role : user.getRoles()) {
                 lroles.add("ROLE_" + role.getName());
             }
 
@@ -99,20 +97,19 @@ public class UserService extends BaseService implements UserDetailsService {
 
         return null;
     }
+
     public SynVisionUser createUser(UserRequest request) {
 
         validateUser(request);
         SynVisionUser user = userRepository.findByEmail(request.getEmail());
-        if (user != null)
-        {
+        if (user != null) {
             throw new ValidationException(String.format("Already exist [email=%s]", request.getEmail()));
         }
 
         user = request.toEntity();
         user.setOrg(getAtccUser().getOrg());
 
-        for (String role : request.getRoles())
-        {
+        for (String role : request.getRoles()) {
             user.addRole(roleRepository.getOneByName(role));
         }
 
@@ -132,40 +129,33 @@ public class UserService extends BaseService implements UserDetailsService {
         user.setOrg(getAtccUser().getOrg());
 
         user.getRoles().clear();
-        for (String role : request.getRoles())
-        {
+        for (String role : request.getRoles()) {
             user.addRole(roleRepository.getOneByName(role));
         }
 
         return userRepository.save(user);
     }
 
-    private void validateUser(UserRequest request)
-    {
-        if (StringUtils.isEmpty(request.getFirstName()))
-        {
+    private void validateUser(UserRequest request) {
+        if (StringUtils.isEmpty(request.getFirstName())) {
             throw new ValidationException("First Name is required.");
         }
 
 
-        if (StringUtils.isEmpty(request.getEmail()))
-        {
+        if (StringUtils.isEmpty(request.getEmail())) {
             throw new ValidationException("User email is required.");
         }
 
-        if (StringUtils.isEmpty(request.getUserName()))
-        {
+        if (StringUtils.isEmpty(request.getUserName())) {
             throw new ValidationException("Username is required.");
         }
 
-        if (StringUtils.isEmpty(request.getLastName()))
-        {
+        if (StringUtils.isEmpty(request.getLastName())) {
             throw new ValidationException("Lastname is required.");
         }
     }
 
-    public Set<String> getUserPrivileges(SynVisionUser user)
-    {
+    public Set<String> getUserPrivileges(SynVisionUser user) {
         return user.getPrivileges();
     }
 
@@ -173,13 +163,11 @@ public class UserService extends BaseService implements UserDetailsService {
 
         SynVisionUser user = userRepository.getOne(request.getId());
 
-        if (user == null)
-        {
+        if (user == null) {
             throw new NotFoundException("Cannot locate user");
         }
 
-        if (Objects.equals(user.getId(), getAtccUser().getId()))
-        {
+        if (Objects.equals(user.getId(), getAtccUser().getId())) {
             throw new ValidationException("You cannot deactivate yourself!");
         }
         user.getRoles().clear();
@@ -188,34 +176,32 @@ public class UserService extends BaseService implements UserDetailsService {
     }
 
     public List<UserResponse> listUsers() {
-        List<SynVisionUser> users=userRepository.findAllByOrgAndActiveTrue(getAtccUser().getOrg());
-        return  users.stream().map(UserResponse::new).collect(Collectors.toList());
+        List<SynVisionUser> users = userRepository.findAllByOrgAndActiveTrue(getAtccUser().getOrg());
+        return users.stream().map(UserResponse::new).collect(Collectors.toList());
     }
 
-    public SynVisionUser getUserDetail(UserRequest request)
-    {
+    public SynVisionUser getUserDetail(UserRequest request) {
         return userRepository.getOne(request.getId());
     }
 
-    public List<Role> getRoles(){
+    public List<Role> getRoles() {
         return roleRepository.findAll();
     }
 
     public Menu getCurrentUserMenu() {
-        return menuBuilder.getMenu();
+        return menuBuilder.getMenu(getCurrentUser());
     }
 
     public void deleteRole(RoleRequest roleRequest) {
-        Role role=roleRepository.getOne(roleRequest.getId());
-        if(getCurrentUser().getRoles().contains(role))
-        {
+        Role role = roleRepository.getOne(roleRequest.getId());
+        if (getCurrentUser().getRoles().contains(role)) {
             throw new ValidationException("You can't delete role assigned to you ");
         }
-        try{roleRepository.delete(role);}
-      catch (Exception e)
-      {
-          throw new ValidationException("This Role is assigned to some User. Disable the User first ");
-      }
+        try {
+            roleRepository.delete(role);
+        } catch (Exception e) {
+            throw new ValidationException("This Role is assigned to some User. Disable the User first ");
+        }
     }
 
     public Role getRole(RoleRequest roleRequest) {
@@ -224,15 +210,13 @@ public class UserService extends BaseService implements UserDetailsService {
     }
 
     public Role addRole(RoleRequest request) {
-        Role role=roleRepository.findByName(request.getName());
-        if(role!=null)
-        {
+        Role role = roleRepository.findByName(request.getName());
+        if (role != null) {
             throw new ValidationException(String.format("Already exist Role with name ", request.getName()));
         }
         role = request.toEntity();
-        for(String privilege : request.getPrivileges())
-        {
-           role.addPrivilege(privilegeRepository.getOneByName(privilege));
+        for (String privilege : request.getPrivileges()) {
+            role.addPrivilege(privilegeRepository.getOneByName(privilege));
         }
 
         return roleRepository.save(role);
@@ -240,11 +224,10 @@ public class UserService extends BaseService implements UserDetailsService {
     }
 
     public Role updateRole(RoleRequest request) {
-        Role role=roleRepository.findByName(request.getName());
-       request.toEntity(role);
+        Role role = roleRepository.findByName(request.getName());
+        request.toEntity(role);
         role.getPrivileges().clear();
-        for(String privilege : request.getPrivileges())
-        {
+        for (String privilege : request.getPrivileges()) {
             role.addPrivilege(privilegeRepository.getOneByName(privilege));
         }
 

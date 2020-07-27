@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.*;
+
 /**
  * Created by itrs on 10/14/2019.
  */
@@ -22,39 +24,41 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/menu")
-    //@Secured(SELF_READ)
-    public Menu getMenu()
-    {
+    @Secured(SELF_READ)
+    public Menu getMenu() {
+
         return userService.getCurrentUserMenu();
     }
 
     @GetMapping
-    public List<UserResponse> listUsers(){
-       return userService.listUsers();
+    @Secured(USER_READ)
+    public List<UserResponse> listUsers() {
+        return userService.listUsers();
     }
 
     @GetMapping("{userId}")
-    public UserResponse list(@PathVariable(name = "userId") Long userId)
-    {
+    @Secured(USER_READ)
+    public UserResponse list(@PathVariable(name = "userId") Long userId) {
         return new UserResponse(userService.getUserDetail(new UserRequest(userId)));
     }
 
-     @PostMapping
-     public UserResponse createUser(@RequestBody UserRequest request)
-     {
+    @PostMapping
+    @Secured(USER_WRITE)
+    public UserResponse createUser(@RequestBody UserRequest request) {
 
-         return new UserResponse(userService.createUser(request));
-     }
+        return new UserResponse(userService.createUser(request));
+    }
 
     @PutMapping
-    public UserResponse updateUser(@RequestBody UserRequest request)
-    {
+    @Secured(USER_WRITE)
+    public UserResponse updateUser(@RequestBody UserRequest request) {
 
         return new UserResponse(userService.updateUser(request));
     }
+
     @DeleteMapping("{userId}")
-    public void deleteUser(@PathVariable Long userId)
-    {
+    @Secured(USER_WRITE)
+    public void deleteUser(@PathVariable Long userId) {
         userService.deleteUser(new UserRequest(userId));
     }
 
@@ -63,36 +67,40 @@ public class UserController {
 
 
     @GetMapping("/get/roles")
-    public List<RoleResponse> roles()
-    {return userService.getRoles().stream().map(RoleResponse::new).collect(Collectors.toList());
+    @Secured(ROLE_READ)
+    public List<RoleResponse> roles() {
+        return userService.getRoles().stream().map(RoleResponse::new).collect(Collectors.toList());
     }
 
     @GetMapping("/role/{roleId}")
-    public RoleResponse getRole(@PathVariable Long roleId){
+    @Secured(ROLE_READ)
+    public RoleResponse getRole(@PathVariable Long roleId) {
         return new RoleResponse(userService.getRole(new RoleRequest(roleId)));
     }
 
-   @PostMapping("/role")
-   public RoleResponse addRole(@RequestBody RoleRequest request)
-   {
-       return new RoleResponse(userService.addRole(request));
+    @PostMapping("/role")
+    @Secured(ROLE_WRITE)
+    public RoleResponse addRole(@RequestBody RoleRequest request) {
+        return new RoleResponse(userService.addRole(request));
 
-   }
+    }
+
     @PutMapping("/role")
-    public RoleResponse updateRole(@RequestBody RoleRequest request)
-    {
+    @Secured(ROLE_WRITE)
+    public RoleResponse updateRole(@RequestBody RoleRequest request) {
 
         return new RoleResponse(userService.updateRole(request));
     }
 
 
     @DeleteMapping("/role/{roleId}")
-    public void deleteRole(@PathVariable Long roleId)
-    {
+    @Secured(ROLE_WRITE)
+    public void deleteRole(@PathVariable Long roleId) {
         userService.deleteRole(new RoleRequest(roleId));
     }
 
     // API for Token Validation
     @GetMapping("/tokenCheck")
-    public void tokenValid(){}
+    public void tokenValid() {
+    }
 }

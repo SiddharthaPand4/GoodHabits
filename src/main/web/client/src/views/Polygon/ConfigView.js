@@ -6,7 +6,6 @@ import Row from "antd/es/grid/row";
 import FeedService from "../../services/FeedService";
 
 
-
 export default class ConfigView extends Component {
     constructor(props) {
         super(props);
@@ -25,7 +24,7 @@ export default class ConfigView extends Component {
             isPlaying: true,
             image: null,
             dataURL: "",
-            port:null
+            port: null
         }
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -34,7 +33,7 @@ export default class ConfigView extends Component {
         this.drawArrow = this.drawArrow.bind(this);
         this.drawLine = this.drawLine.bind(this);
         this.capture = this.capture.bind(this);
-        this.refresh=this.refresh.bind(this);
+        this.refresh = this.refresh.bind(this);
 
     }
 
@@ -65,20 +64,21 @@ export default class ConfigView extends Component {
 
 
     }
-    refresh(){
+
+    refresh() {
 
     }
 
-    startFeed(feedId){
+    startFeed(feedId) {
 
-       FeedService.startFeed(feedId)
+        FeedService.startFeed(feedId)
             .then(res => {
-            message.success("Feed started")
-                this.state.port=res.data
+                message.success("Feed started")
+                this.state.port = res.data
                 console.log(res.data)
                 //window.location.reload();
 
-        }).catch(err => {
+            }).catch(err => {
             message.error("Something Went Wrong!")
         })
     }
@@ -210,6 +210,7 @@ export default class ConfigView extends Component {
         });
 
     }
+
     drawArrow() {
         this.setState({
             arrow: true
@@ -235,6 +236,7 @@ export default class ConfigView extends Component {
         ctx.beginPath();
 
     }
+
     capture() {
 
         // let dataURL = this.state.dataURL;
@@ -274,30 +276,36 @@ export default class ConfigView extends Component {
 
                         <Col span={12}>
 
-                            <br/><br/>&nbsp;&nbsp;<Button  onClick={()=>this.startFeed(this.props.location.feed.id)}><Icon type="play-circle" />Start Feed</Button>
-                            &nbsp;&nbsp;<Button onClick={()=>this.stopFeed(this.props.location.feed.id)}><Icon type="pause-circle" />Stop Feed</Button>
+                            <br/><br/>&nbsp;&nbsp;<Button
+                            onClick={() => this.startFeed(this.props.location.feed.id)}><Icon type="play-circle"/>Start
+                            Feed</Button>
+                            &nbsp;&nbsp;<Button onClick={() => this.stopFeed(this.props.location.feed.id)}><Icon
+                            type="pause-circle"/>Stop Feed</Button>
                             &nbsp;&nbsp;<Button
-                                    onClick={this.capture}><Icon type="camera" />Capture</Button><br/><br/>
-                            <Tag color="#f50">{this.props.location.feed.site} / {this.props.location.feed.location} / {this.props.location.feed.name}/ {this.props.location.feed.url}</Tag>
+                            onClick={this.capture}><Icon type="camera"/>Capture</Button><br/><br/>
+                            <Tag
+                                color="#f50">{this.props.location.feed.site} / {this.props.location.feed.location} / {this.props.location.feed.name}/ {this.props.location.feed.url}</Tag>
                             <br/><br/>
                             {isPlaying
-                                ? <img style={{border:"1px solid black"}} id="video" controls width="500" height="260" src={"http://localhost:"+this.state.port+"/stream"}></img>
+                                ? <img style={{border: "1px solid black"}} id="video" controls width="500" height="260"
+                                       src={"http://localhost:" + this.state.port + "/stream"}></img>
 
 
                                 :
-                                <img style={{border:"1px solid black"}} id="video" controls width="500" height="260" src={"http://localhost:"+this.state.port+"/ss"}></img>
+                                <img style={{border: "1px solid black"}} id="video" controls width="500" height="260"
+                                     src={"http://localhost:" + this.state.port + "/ss"}></img>
                             }
                             <br/><br/><Button style={{width: "500px"}} type="primary"
                                               onClick={() => this.setState({isPlaying: !isPlaying})}>PLAY/PAUSE</Button>
 
                         </Col>
 
-                        <Col  span={12}>
+                        <Col span={12}>
                             <br/><br/>
 
                             <h3>Draw by clicking & moving the mouse !</h3>
                             <canvas id="canvas" ref="canvas"
-                                    style={{border:"1px solid black"}}
+                                    style={{border: "1px solid black"}}
                                     width={500}
                                     height={278}
                                     border="2x solid blue"
@@ -324,12 +332,13 @@ export default class ConfigView extends Component {
 
                             />
                             <div align={"center"}>
-                                <h4>Draw using:</h4><Button onClick={this.drawLine}><Icon type="line" />line</Button>
-                                &nbsp;&nbsp;<Button onClick={this.drawArrow}><Icon type="arrow-up" /><Icon type="arrow-down" />arrow</Button><br/><br/>
+                                <h4>Draw using:</h4><Button onClick={this.drawLine}><Icon type="line"/>line</Button>
+                                &nbsp;&nbsp;<Button onClick={this.drawArrow}><Icon type="arrow-up"/><Icon
+                                type="arrow-down"/>arrow</Button><br/><br/>
                             </div>
-                                <div align={"right"}> <Button block type={"primary"}  onClick={this.save}>Save</Button>
+                            <div align={"right"}><Button block type={"primary"} onClick={this.save}>Save</Button>
                                 &nbsp;&nbsp;<Button block onClick={this.clearAll}>Clear All</Button><br/><br/>
-                                </div>
+                            </div>
                         </Col>
                     </Row>
                 </div>

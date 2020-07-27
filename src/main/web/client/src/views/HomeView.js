@@ -429,13 +429,12 @@ export default class HomeView extends Component {
             }
 
 
-
         };
         return options;
     }
 
     render() {
-        let {atcc, incident,anpr} = this.state;
+        let {atcc, incident, anpr} = this.state;
         const atccChartOptions = this.getBarChartOptions("atcc");
         const incidentChartOptions = this.getBarChartOptions("incident");
         const anprChartOptions = this.getBarChartOptions("anpr");

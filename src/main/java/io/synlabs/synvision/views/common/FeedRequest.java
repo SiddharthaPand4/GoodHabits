@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FeedRequest implements Request {
-    public Long    id;
+    public Long id;
     private String url;
     private String name;
     private String location;
@@ -16,6 +16,7 @@ public class FeedRequest implements Request {
     public FeedRequest(Long id) {
         this.id = id;
     }
+
     public FeedRequest() {
     }
 
@@ -26,13 +27,12 @@ public class FeedRequest implements Request {
         feed.setSite(this.site);
         return feed;
     }
-    public Feed toEntity()
-    {
-        return toEntity( new Feed());
+
+    public Feed toEntity() {
+        return toEntity(new Feed());
     }
 
-    public Long getId()
-    {
+    public Long getId() {
         return unmask(id);
     }
 }

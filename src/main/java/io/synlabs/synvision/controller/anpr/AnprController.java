@@ -13,6 +13,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +25,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
+
+import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.*;
 
 /**
  * Created by itrs on 10/21/2019.
@@ -44,11 +47,13 @@ public class AnprController extends MediaUploadController {
     private AnprService anprService;
 
     @PostMapping("/events")
+    @Secured(ANPR_READ)
     public PageResponse<AnprResponse> list(@RequestBody AnprFilterRequest request) {
         return anprService.list(request);
     }
-    //shashank
+
     @PostMapping("/anprevent")
+    @Secured(ANPR_READ)
     public void anprEventReport(@RequestBody AnprReportRequest request, HttpServletResponse response) throws IOException {
         File file=null;
         String fileName=null;
@@ -83,45 +88,54 @@ public class AnprController extends MediaUploadController {
     //shashank
 
     @PostMapping("/events/list/lpr/count")
+    @Secured(ANPR_READ)
     public PageResponse<AnprResponse> getEventsCountListByLpr(@RequestBody AnprFilterRequest request) {
         return anprService.getEventsCountListByLpr(request);
     }
     @PostMapping("/events/list/bylpr")
+    @Secured(ANPR_READ)
     public PageResponse<AnprResponse> getEventsListByLpr(@RequestBody AnprFilterRequest request) {
         return anprService.getEventsListByLpr(request);
     }
 
     @PostMapping("/incidents")
+    @Secured(ANPR_READ)
     public PageResponse<AnprResponse> listIncidents(@RequestBody AnprFilterRequest request) {
         return anprService.listIncidents(request);
     }
 
     @PostMapping("/incidents/hotListed")
+    @Secured(ANPR_READ)
     public PageResponse<AnprResponse> listHotListedIncidents(@RequestBody AnprFilterRequest request) {
         return anprService.listHotListedIncidents(request);
     }
 
     @DeleteMapping("/{id}")
+    @Secured(ANPR_WRITE)
     public void archiveAnpr(@PathVariable Long id) {
         anprService.archiveAnprEvent(new AnprRequest(id));
     }
 
     @PostMapping("/vehicle")
+    @Secured(ANPR_WRITE)
     public void addVehicle(@RequestBody CreateAnprRequest request) {
         anprService.addAnprEvent(request);
     }
 
     @PostMapping("/image")
+    @Secured(ANPR_WRITE)
     public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("tag") String tag) {
         return UploadFile(file, tag, fileStorageProperties);
     }
 
     @PutMapping("/event")
+    @Secured(ANPR_WRITE)
     public AnprResponse updateEvent(@RequestBody AnprRequest request) {
         return anprService.updateAnprEvent(request);
     }
 
     @PutMapping("/events/archive/{lpr}")
+    @Secured(ANPR_WRITE)
     public void archiveAnpr(@PathVariable String lpr) {
         anprService.archiveAnprEvents(new AnprRequest(lpr));
     }

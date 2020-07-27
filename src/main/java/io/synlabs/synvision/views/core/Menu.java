@@ -1,8 +1,10 @@
 package io.synlabs.synvision.views.core;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -10,21 +12,25 @@ public class Menu {
 
     private Set<MenuItem> items = new LinkedHashSet<>();
 
-    public void merge(MenuItem item) {
-
-        if (items.contains(item)) {
-
-            //toplevel is already there, find the right top level and merge children
-            for (MenuItem toplevel : items) {
-
-                if (toplevel.equals(item)) {
-                    toplevel.merge(item.getSubmenu());
+    public void merge(MenuItem menu, MenuItem child) {
+        if (items.contains(menu)) {
+            for (MenuItem parent : items) {
+                if (parent.equals(menu)) {
+                    parent.getSubmenu().add(child);
                 }
             }
+        } else {
+            MenuItem parent = new MenuItem(menu);
+            parent.getSubmenu().add(child);
+            items.add(parent);
         }
-        else {
+    }
+
+    public void add(MenuItem parent) {
+        if (items.contains(parent)) {
+        } else {
             //add the whole tree once
-            items.add(item);
+            items.add(parent);
         }
     }
 }

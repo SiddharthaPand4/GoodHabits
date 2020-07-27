@@ -1,0 +1,39 @@
+{
+  "key": "menu8",
+  "title": "Admin",
+  "icon": "deployment-unit",
+  "submenu": [
+    {
+      "key": "1",
+      "title": "Users",
+      "link": "/user",
+      "privilege": "USER_WRITE",
+      "seq": 100,
+      "icon": "user"
+    },
+    {
+      "key": "2",
+      "title": "Roles",
+      "link": "/roles",
+      "privilege": "ROLE_WRITE",
+      "seq": 200,
+      "icon": "user"
+    },
+    {
+      "key": "3",
+      "title": "Device",
+      "link": "/device",
+      "privilege": "DEVICE_WRITE",
+      "seq": 300,
+      "icon": "laptop"
+    },
+    {
+      "key": "4",
+      "title": "Triggers",
+      "link": "/trigger",
+      "privilege": "TRIGGER_READ",
+      "seq": 400,
+      "icon": "clock-circle"
+    }
+  ]
+}
