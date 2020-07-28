@@ -4,28 +4,28 @@
   "icon": "car",
   "submenu": [
     {
-      "key": "1",
+      "key": "park-dashboard",
       "title": "Dashboard",
       "privilege": "PARK_WRITE",
       "seq": 100,
       "link": "/pgs/dashboard"
     },
     {
-      "key": "2",
+      "key": "park-operator-console",
       "title": "Operator Console",
       "privilege": "PARK_WRITE",
       "seq": 200,
       "link": "/pgs/console"
     },
     {
-      "key": "3",
+      "key": "check-in/out",
       "title": "Check-In/Out",
       "privilege": "PARK_WRITE",
       "seq": 300,
       "link": "/pgs/inout"
     },
     {
-      "key": "4",
+      "key": "park-reports",
       "title": "Reports",
       "privilege": "PARK_WRITE",
       "seq": 400,
