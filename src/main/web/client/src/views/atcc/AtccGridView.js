@@ -341,8 +341,8 @@ export default class AtccGridView extends Component {
 
         return (
             <Table dataSource={events} pagination={pagination} size="small">
-                <Column title="ID" dataIndex="id" key="id"></Column>
-                <Column title="Type" dataIndex="type" key="type"></Column>
+                <Column title="ID" dataIndex="id" key="id"/>
+                <Column title="Type" dataIndex="type" key="type"/>
                 <Column title="Date & Time" dataIndex="eventDate" format={"ll"} key="eventDate"
                         render={eventDate => (
                             <div>
@@ -350,10 +350,11 @@ export default class AtccGridView extends Component {
                                 {' '}|{' '}
                                 <Moment format="LTS">{eventDate}</Moment>
                             </div>)}/>
+                <Column title="Speed" dataIndex="speed" key="speed"/>
                 <Column title="Lane" dataIndex="lane" key="lane"/>
                 <Column title="Direction" dataIndex="direction" key="direction"
                         render={direction => (<div>{direction === 1 ? "Fwd" : "Rev"}</div>)}/>
-                <Column title="Vid" dataIndex="vid" key="vid"/>
+                <Column title="Location" dataIndex="location" key="location"/>
                 <Column title="Image" dataIndex="id" key="id"
                         render={(id) => (
                             <Button type="primary" title={"click here to download"}

@@ -441,7 +441,6 @@ export default class HomeView extends Component {
         return (
             <div>
                 <div>
-
                     <Modal
                         onCancel={this.handleCancel}
                         title="Custom Date Range"
@@ -454,9 +453,6 @@ export default class HomeView extends Component {
                     </Modal>
                 </div>
                 <div>
-
-                    {/*
-                    Uncomment it for Synergy Labs Installations
 
                     <Card title={<div>ANPR
                         &nbsp;
@@ -476,7 +472,8 @@ export default class HomeView extends Component {
                         </Dropdown>
                     </div>}>
                         <Line data={anpr.chartData} options={anprChartOptions}/>
-                    </Card><br/>*/}
+                    </Card>
+                    <br/>
 
                     <Card title={<div>ATCC
                         &nbsp;
