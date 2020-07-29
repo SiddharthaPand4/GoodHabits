@@ -48,9 +48,9 @@ export default class HomeView extends Component {
                     datasets: []
                 }
             },
-            isAnprAllowed:false,
-            isAtccAllowed:false,
-            isIncidentAllowed:false
+            isAnprAllowed: false,
+            isAtccAllowed: false,
+            isIncidentAllowed: false
         };
 
         this.getIncidentVehicleCount = this.getIncidentVehicleCount.bind(this);
@@ -169,7 +169,7 @@ export default class HomeView extends Component {
                 }
             }
             this.setState({atcc});
-            this.setState({isAtccAllowed:true})
+            this.setState({isAtccAllowed: true})
         }).catch(error => {
             console.log(error);
         });
@@ -226,10 +226,9 @@ export default class HomeView extends Component {
                 }
             }
             this.setState({anpr});
-            this.setState({isAnprAllowed:true})
+            this.setState({isAnprAllowed: true})
         }).catch(error => {
             console.log(error);
-
         });
     }
 
@@ -311,7 +310,7 @@ export default class HomeView extends Component {
             incident.chartData.datasets.push(helmetMissingDataset);
             incident.chartData.datasets.push(reverseDirectionDataset);
             this.setState({incident});
-            this.setState({isIncidentAllowed:true})
+            this.setState({isIncidentAllowed: true})
         }).catch(error => {
             this.setState({incident});
             console.log(error);
@@ -534,7 +533,7 @@ export default class HomeView extends Component {
                             </div>}>
                                 <Line data={incident.chartData} options={incidentChartOptions}/>
                             </Card>
-                            : null }
+                            : null}
                 </div>
             </div>
         )
