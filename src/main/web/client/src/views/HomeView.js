@@ -168,8 +168,7 @@ export default class HomeView extends Component {
                     vehicleTypeIndex++;
                 }
             }
-            this.setState({atcc});
-            this.setState({isAtccAllowed: true})
+            this.setState({atcc,isAtccAllowed: true});
         }).catch(error => {
             console.log(error);
         });
@@ -225,8 +224,7 @@ export default class HomeView extends Component {
                     vehicleTypeIndex++;
                 }
             }
-            this.setState({anpr});
-            this.setState({isAnprAllowed: true})
+            this.setState({anpr,isAnprAllowed: true});
         }).catch(error => {
             console.log(error);
         });
@@ -309,8 +307,7 @@ export default class HomeView extends Component {
             incident.chartData.labels = labels;
             incident.chartData.datasets.push(helmetMissingDataset);
             incident.chartData.datasets.push(reverseDirectionDataset);
-            this.setState({incident});
-            this.setState({isIncidentAllowed: true})
+            this.setState({incident,isIncidentAllowed: true});
         }).catch(error => {
             this.setState({incident});
             console.log(error);
