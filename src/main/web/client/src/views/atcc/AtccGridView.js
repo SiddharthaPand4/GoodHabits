@@ -235,8 +235,8 @@ export default class AtccGridView extends Component {
                                     <Menu.Item key="1">
                                         <a
                                             title={"click here to download"}
-                                            href={"/public/atcc/screenshot/" + event.id}
-                                            download={true}><Icon type="download"/>{' '} Image</a>
+                                            onClick={()=> this.downloadImage(event)}
+                                            ><Icon type="download"/>{' '} Image</a>
                                     </Menu.Item>
                                     <Menu.Item key="2">
                                         <a
@@ -381,6 +381,15 @@ export default class AtccGridView extends Component {
         AtccService.downloadVideo(e.id)
             .then((response) => {
                 saveAs(response.data, e.vid + ".mp4");
+            }).catch(error => {
+            alert("Something went wrong!");
+        })
+    }
+
+    downloadImage(e) {
+        AtccService.downloadScreenshot(e.id)
+            .then((response) => {
+                saveAs(response.data,  + "image.jpeg");
             }).catch(error => {
             alert("Something went wrong!");
         })

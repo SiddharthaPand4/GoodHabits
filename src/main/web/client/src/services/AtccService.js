@@ -60,6 +60,17 @@ class AtccService {
         return axios(request);
     }
 
+    downloadScreenshot(id){
+        const request = {
+            method: 'GET',
+            headers: authHeader(),
+            responseType: 'blob',
+            timeout: 30000,
+            url: config.apiUrl + 'public/atcc/screenshot/' + id
+        };
+        return axios(request);
+    }
+
 
 }
 
