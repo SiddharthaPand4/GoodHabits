@@ -389,7 +389,7 @@ export default class AtccGridView extends Component {
     downloadImage(e) {
         AtccService.downloadScreenshot(e.id)
             .then((response) => {
-                saveAs(response.data,  + "image.jpeg");
+                saveAs(response.data, "image.jpg");
             }).catch(error => {
             alert("Something went wrong!");
         })
