@@ -49,6 +49,17 @@ class AtccService {
         return axios(request);
     }
 
+    downloadVideo(id){
+        const request = {
+            method: 'GET',
+            headers: authHeader(),
+            responseType: 'blob',
+            timeout: 30000,
+            url: config.apiUrl + 'public/atcc/video/' + id
+        };
+        return axios(request);
+    }
+
 
 }
 

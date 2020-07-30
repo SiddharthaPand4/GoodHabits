@@ -20,6 +20,7 @@ import Magnifier from "react-magnifier";
 import AtccService from "../../services/AtccService";
 import Switch from "antd/es/switch";
 import {Player} from "video-react";
+import {saveAs} from 'file-saver';
 
 const {Paragraph, Text} = Typography;
 
@@ -377,17 +378,12 @@ export default class AtccGridView extends Component {
     }
 
     downloadVideo(e) {
-        fetch('/api/atcc/video/' + e.vid)
-            .then((response) => response.blob())
-            .then((blob) => {
-                const url = window.URL.createObjectURL(new Blob([blob]));
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', "Video-" + e.vid + `.mp4`);
-                document.body.appendChild(link);
-                link.click();
-                link.parentNode.removeChild(link);
-            })
+        AtccService.downloadVideo(e.id)
+            .then((response) => {
+                saveAs(response.data, e.vid + ".mp4");
+            }).catch(error => {
+            alert("Something went wrong!");
+        })
     }
 
 
