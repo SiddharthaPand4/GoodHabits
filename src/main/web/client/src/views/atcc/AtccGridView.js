@@ -224,6 +224,7 @@ export default class AtccGridView extends Component {
                                     <div>
                                         {(event.type) ? <Tag color="#f50">{event.type}</Tag> : null}
                                         <Tag color="#f50">{(event.direction === 1 ? "Fwd" : "Rev")}</Tag>
+                                        <br/>
                                         {(event.lane) ? <Tag color="#f50">Lane : {event.lane}</Tag>:null}
                                             <Tag color="#f50">Speed : {event.speed}</Tag>
 
