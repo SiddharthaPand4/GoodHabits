@@ -20,6 +20,7 @@ import Magnifier from "react-magnifier";
 import AtccService from "../../services/AtccService";
 import Switch from "antd/es/switch";
 import {Player} from "video-react";
+import {saveAs} from 'file-saver';
 
 const {Paragraph, Text} = Typography;
 
@@ -223,6 +224,7 @@ export default class AtccGridView extends Component {
                                     <div>
                                         {(event.type) ? <Tag color="#f50">{event.type}</Tag> : null}
                                         <Tag color="#f50">{(event.direction === 1 ? "Fwd" : "Rev")}</Tag>
+                                        <br/>
                                         {(event.lane) ? <Tag color="#f50">Lane : {event.lane}</Tag>:null}
                                             <Tag color="#f50">Speed : {event.speed}</Tag>
 
@@ -235,8 +237,8 @@ export default class AtccGridView extends Component {
                                     <Menu.Item key="1">
                                         <a
                                             title={"click here to download"}
-                                            href={"/public/atcc/screenshot/" + event.id}
-                                            download={true}><Icon type="download"/>{' '} Image</a>
+                                            onClick={()=> this.downloadImage(event)}
+                                            ><Icon type="download"/>{' '} Image</a>
                                     </Menu.Item>
                                     <Menu.Item key="2">
                                         <a
@@ -377,17 +379,21 @@ export default class AtccGridView extends Component {
     }
 
     downloadVideo(e) {
-        fetch('/api/atcc/video/' + e.vid)
-            .then((response) => response.blob())
-            .then((blob) => {
-                const url = window.URL.createObjectURL(new Blob([blob]));
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', "Video-" + e.vid + `.mp4`);
-                document.body.appendChild(link);
-                link.click();
-                link.parentNode.removeChild(link);
-            })
+        AtccService.downloadVideo(e.id)
+            .then((response) => {
+                saveAs(response.data, e.vid + ".mp4");
+            }).catch(error => {
+            alert("Something went wrong!");
+        })
+    }
+
+    downloadImage(e) {
+        AtccService.downloadScreenshot(e.id)
+            .then((response) => {
+                saveAs(response.data, "image.jpg");
+            }).catch(error => {
+            alert("Something went wrong!");
+        })
     }
 
 
