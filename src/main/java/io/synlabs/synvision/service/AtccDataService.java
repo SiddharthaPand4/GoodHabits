@@ -451,7 +451,7 @@ public class AtccDataService extends BaseService {
         String toDate = request.getToDate();
         QAtccEvent atccEvent = new QAtccEvent("atccEvent");
         JPAQuery<AtccEvent> query = new JPAQuery<>(entityManager);
-        query = query.select(atccEvent).from(atccEvent);
+        query = query.select(atccEvent).from(atccEvent).orderBy(atccEvent.eventDate.desc());
         try {
             if (request.getFromDate() != null) {
                 String fromTime = request.getFromTime() == null ? "00:00:00" : request.getFromTime();

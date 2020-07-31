@@ -223,7 +223,8 @@ export default class AtccGridView extends Component {
                                     <div>
                                         {(event.type) ? <Tag color="#f50">{event.type}</Tag> : null}
                                         <Tag color="#f50">{(event.direction === 1 ? "Fwd" : "Rev")}</Tag>
-                                        {(event.lane) ? <Tag color="#f50">Lane : {event.lane}</Tag> : null}
+                                        {(event.lane) ? <Tag color="#f50">Lane : {event.lane}</Tag>:null}
+                                            <Tag color="#f50">Speed : {event.speed}</Tag>
 
                                     </div>
                                 }
@@ -258,7 +259,6 @@ export default class AtccGridView extends Component {
                                                        zoomFactor={zoomFactor}/>
                                             :
                                             <img alt="event"
-                                                 style={{maxWidth: 120}}
                                                  src={"/public/atcc/screenshot/" + event.id}/>
                                     )
                                     :

@@ -48,6 +48,9 @@ export default class HomeView extends Component {
                     datasets: []
                 }
             },
+            isAnprAllowed: false,
+            isAtccAllowed: false,
+            isIncidentAllowed: false
         };
 
         this.getIncidentVehicleCount = this.getIncidentVehicleCount.bind(this);
@@ -165,7 +168,7 @@ export default class HomeView extends Component {
                     vehicleTypeIndex++;
                 }
             }
-            this.setState({atcc});
+            this.setState({atcc,isAtccAllowed: true});
         }).catch(error => {
             console.log(error);
         });
@@ -221,7 +224,7 @@ export default class HomeView extends Component {
                     vehicleTypeIndex++;
                 }
             }
-            this.setState({anpr});
+            this.setState({anpr,isAnprAllowed: true});
         }).catch(error => {
             console.log(error);
         });
@@ -304,7 +307,7 @@ export default class HomeView extends Component {
             incident.chartData.labels = labels;
             incident.chartData.datasets.push(helmetMissingDataset);
             incident.chartData.datasets.push(reverseDirectionDataset);
-            this.setState({incident});
+            this.setState({incident,isIncidentAllowed: true});
         }).catch(error => {
             this.setState({incident});
             console.log(error);
@@ -453,67 +456,81 @@ export default class HomeView extends Component {
                     </Modal>
                 </div>
                 <div>
-
-                    <Card title={<div>ANPR
-                        &nbsp;
-                        <Dropdown overlay={() => this.getDateRangeOptions("anpr")}>
-                            <Button>
-                                {anpr.filter.selectedCustomDateRange ? anpr.filter.selectedCustomDateRange : "Select"}
-                                <Icon
-                                    type="down"/>
-                            </Button>
-                        </Dropdown>
-                        &nbsp;<Dropdown overlay={() => this.getXAxisOptions("anpr")}>
-                            <Button>
-                                {anpr.filter.selectedXAxisOption ? anpr.filter.selectedXAxisOption : "Select"}
-                                <Icon
-                                    type="down"/>
-                            </Button>
-                        </Dropdown>
-                    </div>}>
-                        <Line data={anpr.chartData} options={anprChartOptions}/>
-                    </Card>
+                    {
+                        this.state.isAnprAllowed
+                            ?
+                            <Card title={<div>ANPR
+                                &nbsp;
+                                <Dropdown overlay={() => this.getDateRangeOptions("anpr")}>
+                                    <Button>
+                                        {anpr.filter.selectedCustomDateRange ? anpr.filter.selectedCustomDateRange : "Select"}
+                                        <Icon
+                                            type="down"/>
+                                    </Button>
+                                </Dropdown>
+                                &nbsp;<Dropdown overlay={() => this.getXAxisOptions("anpr")}>
+                                    <Button>
+                                        {anpr.filter.selectedXAxisOption ? anpr.filter.selectedXAxisOption : "Select"}
+                                        <Icon
+                                            type="down"/>
+                                    </Button>
+                                </Dropdown>
+                            </div>}>
+                                <Line data={anpr.chartData} options={anprChartOptions}/>
+                            </Card>
+                            :
+                            null
+                    }
                     <br/>
+                    {
+                        this.state.isAtccAllowed
+                            ?
+                            <Card title={<div>ATCC
+                                &nbsp;
+                                <Dropdown overlay={() => this.getDateRangeOptions("atcc")}>
+                                    <Button>
+                                        {atcc.filter.selectedCustomDateRange ? atcc.filter.selectedCustomDateRange : "Select"}
+                                        <Icon
+                                            type="down"/>
+                                    </Button>
+                                </Dropdown>
+                                &nbsp;<Dropdown overlay={() => this.getXAxisOptions("atcc")}>
+                                    <Button>
+                                        {atcc.filter.selectedXAxisOption ? atcc.filter.selectedXAxisOption : "Select"}
+                                        <Icon
+                                            type="down"/>
+                                    </Button>
+                                </Dropdown>
+                            </div>}>
+                                <Line data={atcc.chartData} options={atccChartOptions}/>
 
-                    <Card title={<div>ATCC
-                        &nbsp;
-                        <Dropdown overlay={() => this.getDateRangeOptions("atcc")}>
-                            <Button>
-                                {atcc.filter.selectedCustomDateRange ? atcc.filter.selectedCustomDateRange : "Select"}
-                                <Icon
-                                    type="down"/>
-                            </Button>
-                        </Dropdown>
-                        &nbsp;<Dropdown overlay={() => this.getXAxisOptions("atcc")}>
-                            <Button>
-                                {atcc.filter.selectedXAxisOption ? atcc.filter.selectedXAxisOption : "Select"} <Icon
-                                type="down"/>
-                            </Button>
-                        </Dropdown>
-                    </div>}>
-                        <Line data={atcc.chartData} options={atccChartOptions}/>
-
-                    </Card>
+                            </Card>
+                            : null
+                    }
                     <br/>
-                    <Card title={<div>Incidents
-                        &nbsp;
-                        <Dropdown overlay={() => this.getDateRangeOptions("incident")}>
-                            <Button>
-                                {incident.filter.selectedCustomDateRange ? incident.filter.selectedCustomDateRange : "Select"}
-                                <Icon
-                                    type="down"/>
-                            </Button>
-                        </Dropdown>
-                        &nbsp;<Dropdown overlay={() => this.getXAxisOptions("incident")}>
-                            <Button>
-                                {incident.filter.selectedXAxisOption ? incident.filter.selectedXAxisOption : "Select"}
-                                <Icon
-                                    type="down"/>
-                            </Button>
-                        </Dropdown>
-                    </div>}>
-                        <Line data={incident.chartData} options={incidentChartOptions}/>
-                    </Card>
+                    {
+                        this.state.isIncidentAllowed
+                            ?
+                            <Card title={<div>Incidents
+                                &nbsp;
+                                <Dropdown overlay={() => this.getDateRangeOptions("incident")}>
+                                    <Button>
+                                        {incident.filter.selectedCustomDateRange ? incident.filter.selectedCustomDateRange : "Select"}
+                                        <Icon
+                                            type="down"/>
+                                    </Button>
+                                </Dropdown>
+                                &nbsp;<Dropdown overlay={() => this.getXAxisOptions("incident")}>
+                                    <Button>
+                                        {incident.filter.selectedXAxisOption ? incident.filter.selectedXAxisOption : "Select"}
+                                        <Icon
+                                            type="down"/>
+                                    </Button>
+                                </Dropdown>
+                            </div>}>
+                                <Line data={incident.chartData} options={incidentChartOptions}/>
+                            </Card>
+                            : null}
                 </div>
             </div>
         )
