@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 
 public abstract class MediaUploadController {
 
@@ -25,7 +26,7 @@ public abstract class MediaUploadController {
         logger.info("File uploaded, now importing..{} with tag {}", file.getOriginalFilename(), tag);
         try {
             Path fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir(), tag).toAbsolutePath().normalize();
-
+            fileStorageLocation=fileStorageLocation.resolve(LocalDate.now().toString());
             if (!Files.exists(fileStorageLocation)) {
                 File dir = new File(fileStorageLocation.toString());
                 dir.mkdirs();
