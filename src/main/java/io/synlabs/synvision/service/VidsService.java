@@ -38,6 +38,7 @@ public class VidsService {
 
     private static final Logger logger = LoggerFactory.getLogger(VidsService.class);
 
+    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
     @Autowired
     private HighwayIncidentRepository incidentRepository;
 
@@ -161,7 +162,7 @@ public class VidsService {
             Optional<HighwayIncident> incident = incidentRepository.findById(id);
             if (incident.isPresent()) {
                 filename = incident.get().getIncidentImage();
-                String incidentDate=incident.get().getIncidentDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
+                String incidentDate=formatter.format(incident.get().getIncidentDate());
                 Path filePath = Paths.get(fileStorageLocation.toString(), tag,incidentDate,filename).toAbsolutePath().normalize();
                 Resource resource = new UrlResource(filePath.toUri());
                 if (resource.exists()) {
@@ -190,7 +191,7 @@ public class VidsService {
             Optional<HighwayIncident> incident = incidentRepository.findById(id);
             if (incident.isPresent()) {
                 filename = incident.get().getIncidentVideo();
-                String incidentDate=incident.get().getIncidentDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
+                String incidentDate=formatter.format(incident.get().getIncidentDate());
                 if (filename == null) {
                     throw new NotFoundException("Missing video file name");
                 }

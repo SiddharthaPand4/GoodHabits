@@ -63,6 +63,8 @@ public class AtccDataService extends BaseService {
 
     private final ImportStatusRepository statusRepository;
 
+    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+
     @Autowired
     private FeedRepository feedRepository;
 
@@ -343,7 +345,7 @@ public class AtccDataService extends BaseService {
             Optional<AtccEvent> data = atccEventRepository.findById(Long.parseLong(id));
             if (data.isPresent()) {
                 String fileName = data.get().getEventVideo();
-                String eventDate =data.get().getEventDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
+                String eventDate =formatter.format(data.get().getEventDate());
                 Path filePath = this.fileStorageLocation.resolve("atcc-video").resolve(eventDate).resolve(fileName).normalize();
                 Resource resource = new UrlResource(filePath.toUri());
                 if (resource.exists()) {
@@ -369,7 +371,7 @@ public class AtccDataService extends BaseService {
 
         if (data.isPresent()) {
             String fileName = data.get().getEventImage();
-            String eventDate =data.get().getEventDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
+            String eventDate =formatter.format(data.get().getEventDate());
             Path filePath = this.fileStorageLocation.resolve("atcc-image").resolve(eventDate).resolve(fileName).normalize();
 
             Resource resource = new UrlResource(filePath.toUri());
