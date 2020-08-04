@@ -15,6 +15,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileTime;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 
 public abstract class MediaUploadController {
 
@@ -23,14 +28,16 @@ public abstract class MediaUploadController {
     protected static UploadFileResponse UploadFile(MultipartFile file, String tag, FileStorageProperties fileStorageProperties) {
         if (file == null) throw new FileStorageException("Missing file in multipart");
         logger.info("File uploaded, now importing..{} with tag {}", file.getOriginalFilename(), tag);
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        String strDate=formatter.format(new Date());
         try {
             Path fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir(), tag).toAbsolutePath().normalize();
-
+            //fileStorageLocation=fileStorageLocation.resolve(LocalDate.now().toString());
+            fileStorageLocation=fileStorageLocation.resolve(strDate);
             if (!Files.exists(fileStorageLocation)) {
                 File dir = new File(fileStorageLocation.toString());
                 dir.mkdirs();
             }
-
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
             Path targetLocation = fileStorageLocation.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
