@@ -16,7 +16,7 @@ import GenericFilter from "../../components/GenericFilter";
 import Moment from "react-moment";
 import VidsService from "../../services/VidsService";
 import feedService from "../../services/FeedService";
-
+import {saveAs} from 'file-saver';
 import {Player} from 'video-react';
 import "video-react/dist/video-react.css";
 import TrafficIncidentService from "../../services/TrafficIncidentService";
@@ -151,6 +151,24 @@ export default class HighwayIncidentView extends Component {
         }
     }
 
+    downloadVideo(e) {
+        VidsService.downloadVideo(e.id)
+            .then((response) => {
+                saveAs(response.data,  + "video.mp4");
+            }).catch(error => {
+            alert("Something went wrong!");
+        })
+    }
+
+    downloadImage(e) {
+        VidsService.downloadScreenshot(e.id)
+            .then((response) => {
+                saveAs(response.data, "image.jpg");
+            }).catch(error => {
+            alert("Something went wrong!");
+        })
+    }
+
 
     render() {
 
@@ -267,14 +285,14 @@ export default class HighwayIncidentView extends Component {
                                     <Menu.Item key="1">
                                         <a
                                             title={"click here to download"}
-                                            href={"/public/vids/image/" + event.id + "/image.jpg"}
-                                            download={true}><Icon type="download"/>{' '} Image</a>
+                                            onClick={()=>this.downloadImage(event)}
+                                            ><Icon type="download"/>{' '} Image</a>
                                     </Menu.Item>
                                     <Menu.Item key="2">
                                         <a
                                             title={"click here to download"}
-                                            href={"/public/vids/video/" + event.id + "/image.mp4"}
-                                            download={true}><Icon type="download"/>{' '} Video</a>
+                                            onClick={()=>this.downloadVideo(event)}
+                                           ><Icon type="download"/>{' '} Video</a>
                                     </Menu.Item>
                                     <Menu.Item key="3">
                                         <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon
