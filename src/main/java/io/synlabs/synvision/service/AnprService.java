@@ -3,7 +3,9 @@ package io.synlabs.synvision.service;
 import com.google.gson.Gson;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.jpa.impl.JPAQuery;
+import io.synlabs.synvision.config.Local;
 import io.synlabs.synvision.entity.anpr.*;
 import io.synlabs.synvision.entity.core.Feed;
 import io.synlabs.synvision.entity.parking.ParkingEvent;
@@ -12,9 +14,11 @@ import io.synlabs.synvision.enums.VehicleType;
 import io.synlabs.synvision.jpa.*;
 import io.synlabs.synvision.views.anpr.*;
 import io.synlabs.synvision.views.common.PageResponse;
+import io.synlabs.synvision.views.hotlist.HotListVehicleResponse;
 import io.synlabs.synvision.views.parking.ParkingEventResponse;
 import io.synlabs.synvision.views.parking.ParkingReportRequest;
 import io.synlabs.synvision.views.parking.ParkingReportResponse;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +37,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Duration;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -807,5 +811,17 @@ public class AnprService extends BaseService {
         fileWriter.flush();
         fileWriter.close();
         return  filename;
+    }
+
+    public void deleteData (int days)
+    {
+        Date date=new DateTime().minusDays(days).toDate() ;
+        QAnprEvent anprEvent=new QAnprEvent("anprEvent");
+        JPAQuery<AnprEvent> query=new JPAQuery<>(entityManager);
+        query=query.select(anprEvent).from(anprEvent).where(anprEvent.eventDate.before(date));
+        List<AnprEvent> events =query.fetch();
+        events.forEach(item -> {
+           anprEventRepository.delete(item);
+        });
     }
 }

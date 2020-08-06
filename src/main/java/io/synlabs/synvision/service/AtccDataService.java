@@ -16,6 +16,7 @@ import io.synlabs.synvision.views.common.DummyRequest;
 import io.synlabs.synvision.views.common.PageResponse;
 import io.synlabs.synvision.views.common.ResponseWrapper;
 import io.synlabs.synvision.views.common.SearchRequest;
+import org.joda.time.DateTime;
 import org.simpleflatmapper.csv.CsvWriter;
 import org.simpleflatmapper.util.CheckedConsumer;
 import org.slf4j.Logger;
@@ -479,6 +480,17 @@ public class AtccDataService extends BaseService {
             logger.error("Error in parsing date", e);
         }
         return query;
+    }
+    public void deleteData (int days)
+    {
+        Date date=new DateTime().minusDays(days).toDate() ;
+        QAtccEvent atccEvent=new QAtccEvent("atccEvent");
+        JPAQuery<AtccEvent> query=new JPAQuery<>(entityManager);
+        query=query.select(atccEvent).from(atccEvent).where(atccEvent.eventDate.before(date));
+        List<AtccEvent> events =query.fetch();
+        events.forEach(item -> {
+            atccEventRepository.delete(item);
+        });
     }
 
 

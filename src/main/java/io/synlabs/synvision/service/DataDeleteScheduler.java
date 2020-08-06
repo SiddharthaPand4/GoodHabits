@@ -19,6 +19,15 @@ public class DataDeleteScheduler {
     @Value("${synvision.auth.data_del_after_days}")
     private int data_del_after_days;
 
+    @Value("${synvision.auth.del_records_fromDB}")
+    private boolean del_records_fromDB;
+
+    @Autowired
+    private AnprService anprService;
+    @Autowired
+    private AtccDataService atccDataService;
+    @Autowired
+    private VidsService vidsService;
     @Autowired
     private FileStorageProperties fileStorageProperties;
 
@@ -52,10 +61,16 @@ public class DataDeleteScheduler {
                         }
                         if(lastModified.plusDays(data_del_after_days).isBefore(LocalDate.now()))
                         { subFile.delete();
-                        logger.info("Data deleted on " + LocalDate.now());}
-
+                        logger.info("Data deleted on " + LocalDate.now());
+                        }
                     }
                 }
+            }
+            if(del_records_fromDB)
+            {
+                anprService.deleteData(data_del_after_days);
+                atccDataService.deleteData(data_del_after_days);
+                vidsService.deleteData(data_del_after_days);
             }
         }
     }

@@ -1,6 +1,7 @@
 package io.synlabs.synvision.service;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.entity.core.Feed;
 import io.synlabs.synvision.entity.vids.HighwayIncident;
@@ -13,6 +14,7 @@ import io.synlabs.synvision.jpa.HighwayIncidentRepository;
 import io.synlabs.synvision.jpa.HighwayTrafficStateRepository;
 import io.synlabs.synvision.views.common.PageResponse;
 import io.synlabs.synvision.views.vids.*;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,6 +53,8 @@ public class VidsService {
 
     @Autowired
     private FileStorageProperties fileStorageProperties;
+    @Autowired
+    private EntityManager entityManager;
 
     public PageResponse<VidsResponse> listIncidents(VidsFilterRequest request) {
         BooleanExpression query = getQuery(request);
@@ -239,4 +244,15 @@ public class VidsService {
         }
     }
 
+    public void deleteData (int days)
+    {
+        Date date=new DateTime().minusDays(days).toDate() ;
+        QHighwayIncident highwayIncident=new QHighwayIncident("highwayIncident");
+        JPAQuery<HighwayIncident> query=new JPAQuery<>(entityManager);
+        query=query.select(highwayIncident).from(highwayIncident).where(highwayIncident.incidentDate.before(date));
+        List<HighwayIncident> incidents =query.fetch();
+        incidents.forEach(item -> {
+            incidentRepository.delete(item);
+        });
+    }
 }
