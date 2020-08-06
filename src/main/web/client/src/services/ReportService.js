@@ -27,6 +27,7 @@ class ReportService {
             headers: authHeader(),
             responseType: 'blob',
             data: JSON.stringify(req),
+            timeout:180000,
             url: config.apiUrl + 'api/report/anprevents'
         };
         return axios(request);
