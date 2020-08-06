@@ -649,7 +649,7 @@ public class AnprService extends BaseService {
                     file.createNewFile();
                 }
                 FileOutputStream fileOutputStream = new FileOutputStream(file);
-                SXSSFWorkbook workbook = new SXSSFWorkbook(100);
+                SXSSFWorkbook workbook = new SXSSFWorkbook(100); // keep 100 rows in memory, exceeding rows will be flushed to disk
                 createStyle(workbook);
                 int rowNumber = 0;
                 Sheet anprSheet = workbook.createSheet("anpr");
