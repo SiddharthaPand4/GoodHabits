@@ -131,7 +131,7 @@ export default class FeedView extends Component {
                     <br/>
                     <span>&nbsp;&nbsp;</span>
                     <Button type="primary" onClick={this.addFeeds}>
-                        + New Feed
+                        <Icon type="plus-circle"/>New Feed
                     </Button>&nbsp;&nbsp;&nbsp;
                     <ButtonGroup>
                         <Button type={layout === "list" ? "primary" : ""} icon="unordered-list"
@@ -363,7 +363,7 @@ class FeedForm extends Component {
                     <Button htmlType="submit" type="primary" disabled={hasErrors(getFieldsError())}>Save</Button>
                     {validationError && <Text type="danger">{validationError}</Text>}
                     <span>&nbsp;&nbsp;</span>
-                    <Button type="secondary" className="user-form-button" size="small" onClick={this.close}>
+                    <Button type="secondary" className="user-form-button" onClick={this.close}>
                         Close
                     </Button>
 

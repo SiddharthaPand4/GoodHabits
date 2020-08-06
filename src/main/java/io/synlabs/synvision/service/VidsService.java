@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.*;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -37,6 +38,7 @@ public class VidsService {
 
     private static final Logger logger = LoggerFactory.getLogger(VidsService.class);
 
+    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
     @Autowired
     private HighwayIncidentRepository incidentRepository;
 
@@ -160,8 +162,8 @@ public class VidsService {
             Optional<HighwayIncident> incident = incidentRepository.findById(id);
             if (incident.isPresent()) {
                 filename = incident.get().getIncidentImage();
-
-                Path filePath = Paths.get(fileStorageLocation.toString(), tag, filename).toAbsolutePath().normalize();
+                String incidentDate=formatter.format(incident.get().getIncidentDate());
+                Path filePath = Paths.get(fileStorageLocation.toString(), tag,incidentDate,filename).toAbsolutePath().normalize();
                 Resource resource = new UrlResource(filePath.toUri());
                 if (resource.exists()) {
                     return resource;
@@ -189,12 +191,11 @@ public class VidsService {
             Optional<HighwayIncident> incident = incidentRepository.findById(id);
             if (incident.isPresent()) {
                 filename = incident.get().getIncidentVideo();
-
+                String incidentDate=formatter.format(incident.get().getIncidentDate());
                 if (filename == null) {
                     throw new NotFoundException("Missing video file name");
                 }
-
-                Path filePath = Paths.get(fileStorageLocation.toString(), tag, filename).toAbsolutePath().normalize();
+                Path filePath = Paths.get(fileStorageLocation.toString(), tag,incidentDate,filename).toAbsolutePath().normalize();
                 Resource resource = new UrlResource(filePath.toUri());
                 if (resource.exists()) {
                     return resource;

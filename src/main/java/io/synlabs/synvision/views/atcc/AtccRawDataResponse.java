@@ -33,7 +33,7 @@ public class AtccRawDataResponse implements Response {
         this.speed = atccEvent.getSpeed();
         this.direction = atccEvent.getDirection();
         this.type = atccEvent.getType();
-        this.location = atccEvent.getFeed().getLocation();
+        this.location = atccEvent.getFeed() != null ? atccEvent.getFeed().getLocation() : "";
         this.vehicleImage = atccEvent.getEventImage();
         this.seek = atccEvent.getSeek();
         this.vid = atccEvent.getVid();

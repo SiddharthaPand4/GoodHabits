@@ -20,6 +20,7 @@ import Magnifier from "react-magnifier";
 import AtccService from "../../services/AtccService";
 import Switch from "antd/es/switch";
 import {Player} from "video-react";
+import {saveAs} from 'file-saver';
 
 const {Paragraph, Text} = Typography;
 
@@ -223,7 +224,9 @@ export default class AtccGridView extends Component {
                                     <div>
                                         {(event.type) ? <Tag color="#f50">{event.type}</Tag> : null}
                                         <Tag color="#f50">{(event.direction === 1 ? "Fwd" : "Rev")}</Tag>
-                                        {(event.lane) ? <Tag color="#f50">Lane : {event.lane}</Tag> : null}
+                                        <br/>
+                                        {(event.lane) ? <Tag color="#f50">Lane : {event.lane}</Tag>:null}
+                                            <Tag color="#f50">Speed : {event.speed}</Tag>
 
                                     </div>
                                 }
@@ -234,8 +237,8 @@ export default class AtccGridView extends Component {
                                     <Menu.Item key="1">
                                         <a
                                             title={"click here to download"}
-                                            href={"/public/atcc/screenshot/" + event.id}
-                                            download={true}><Icon type="download"/>{' '} Image</a>
+                                            onClick={()=> this.downloadImage(event)}
+                                            ><Icon type="download"/>{' '} Image</a>
                                     </Menu.Item>
                                     <Menu.Item key="2">
                                         <a
@@ -258,7 +261,6 @@ export default class AtccGridView extends Component {
                                                        zoomFactor={zoomFactor}/>
                                             :
                                             <img alt="event"
-                                                 style={{maxWidth: 120}}
                                                  src={"/public/atcc/screenshot/" + event.id}/>
                                     )
                                     :
@@ -341,8 +343,8 @@ export default class AtccGridView extends Component {
 
         return (
             <Table dataSource={events} pagination={pagination} size="small">
-                <Column title="ID" dataIndex="id" key="id"></Column>
-                <Column title="Type" dataIndex="type" key="type"></Column>
+                <Column title="ID" dataIndex="id" key="id"/>
+                <Column title="Type" dataIndex="type" key="type"/>
                 <Column title="Date & Time" dataIndex="eventDate" format={"ll"} key="eventDate"
                         render={eventDate => (
                             <div>
@@ -350,10 +352,11 @@ export default class AtccGridView extends Component {
                                 {' '}|{' '}
                                 <Moment format="LTS">{eventDate}</Moment>
                             </div>)}/>
+                <Column title="Speed" dataIndex="speed" key="speed"/>
                 <Column title="Lane" dataIndex="lane" key="lane"/>
                 <Column title="Direction" dataIndex="direction" key="direction"
                         render={direction => (<div>{direction === 1 ? "Fwd" : "Rev"}</div>)}/>
-                <Column title="Vid" dataIndex="vid" key="vid"/>
+                <Column title="Location" dataIndex="location" key="location"/>
                 <Column title="Image" dataIndex="id" key="id"
                         render={(id) => (
                             <Button type="primary" title={"click here to download"}
@@ -376,17 +379,21 @@ export default class AtccGridView extends Component {
     }
 
     downloadVideo(e) {
-        fetch('/api/atcc/video/' + e.vid)
-            .then((response) => response.blob())
-            .then((blob) => {
-                const url = window.URL.createObjectURL(new Blob([blob]));
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', "Video-" + e.vid + `.mp4`);
-                document.body.appendChild(link);
-                link.click();
-                link.parentNode.removeChild(link);
-            })
+        AtccService.downloadVideo(e.id)
+            .then((response) => {
+                saveAs(response.data, e.vid + ".mp4");
+            }).catch(error => {
+            alert("Something went wrong!");
+        })
+    }
+
+    downloadImage(e) {
+        AtccService.downloadScreenshot(e.id)
+            .then((response) => {
+                saveAs(response.data, "image.jpg");
+            }).catch(error => {
+            alert("Something went wrong!");
+        })
     }
 
 

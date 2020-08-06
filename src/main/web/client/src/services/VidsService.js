@@ -1,4 +1,6 @@
 import axios from "./axios";
+import {authHeader} from '../helpers/auth-header';
+import {config} from '../helpers/config'
 
 class VidsService {
 
@@ -28,6 +30,28 @@ class VidsService {
 
     getStats() {
         return axios.get('/api/vids/stats');
+    }
+
+    downloadVideo(id){
+        const request = {
+            method: 'GET',
+            headers: authHeader(),
+            responseType: 'blob',
+            timeout: 30000,
+            url: config.apiUrl + 'public/vids/video/' + id + "/video.mp4"
+        };
+        return axios(request);
+    }
+
+    downloadScreenshot(id){
+        const request = {
+            method: 'GET',
+            headers: authHeader(),
+            responseType: 'blob',
+            timeout: 30000,
+            url: config.apiUrl + 'public/vids/image/' + id + "/image.jpg"
+        };
+        return axios(request);
     }
 
 }

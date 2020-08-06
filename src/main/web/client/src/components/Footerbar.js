@@ -10,7 +10,7 @@ export default class Headbar extends Component {
             <Footer>
                 <Row>
                     <Col span={12} style={{textAlign: 'left'}}><span style={{color: "#f0f2f5"}}>Provided by SynergyLabs Technology</span></Col>
-                    <Col span={12} style={{textAlign: 'right'}}><span>Powered by PARKnSECURE © 2020</span></Col>
+                    <Col span={12} style={{textAlign: 'right'}}><span>Powered by SynergyLabs © 2020</span></Col>
                 </Row>
             </Footer>
         )

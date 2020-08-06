@@ -44,6 +44,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -60,6 +62,8 @@ public class AtccDataService extends BaseService {
     private final Path fileStorageLocation;
 
     private final ImportStatusRepository statusRepository;
+
+    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 
     @Autowired
     private FeedRepository feedRepository;
@@ -341,7 +345,8 @@ public class AtccDataService extends BaseService {
             Optional<AtccEvent> data = atccEventRepository.findById(Long.parseLong(id));
             if (data.isPresent()) {
                 String fileName = data.get().getEventVideo();
-                Path filePath = this.fileStorageLocation.resolve("atcc-video").resolve(fileName).normalize();
+                String eventDate =formatter.format(data.get().getEventDate());
+                Path filePath = this.fileStorageLocation.resolve("atcc-video").resolve(eventDate).resolve(fileName).normalize();
                 Resource resource = new UrlResource(filePath.toUri());
                 if (resource.exists()) {
                     return resource;
@@ -366,8 +371,8 @@ public class AtccDataService extends BaseService {
 
         if (data.isPresent()) {
             String fileName = data.get().getEventImage();
-
-            Path filePath = this.fileStorageLocation.resolve("atcc-image").resolve(fileName).normalize();
+            String eventDate =formatter.format(data.get().getEventDate());
+            Path filePath = this.fileStorageLocation.resolve("atcc-image").resolve(eventDate).resolve(fileName).normalize();
 
             Resource resource = new UrlResource(filePath.toUri());
             if (resource.exists()) {
@@ -396,8 +401,9 @@ public class AtccDataService extends BaseService {
             Optional<AnprEvent> eventop = anprEventRepository.findById(id);
             if (eventop.isPresent()) {
                 String filename = eventop.get().getVehicleImage() + ".jpg";
+                String eventDate=eventop.get().getEventDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
+                Path filePath = Paths.get(this.fileStorageLocation.toString(),tag,eventDate,filename).toAbsolutePath().normalize();
 
-                Path filePath = Paths.get(this.fileStorageLocation.toString(), tag, filename).toAbsolutePath().normalize();
                 Resource resource = new UrlResource(filePath.toUri());
                 if (resource.exists()) {
                     return resource;
@@ -451,7 +457,7 @@ public class AtccDataService extends BaseService {
         String toDate = request.getToDate();
         QAtccEvent atccEvent = new QAtccEvent("atccEvent");
         JPAQuery<AtccEvent> query = new JPAQuery<>(entityManager);
-        query = query.select(atccEvent).from(atccEvent);
+        query = query.select(atccEvent).from(atccEvent).orderBy(atccEvent.eventDate.desc());
         try {
             if (request.getFromDate() != null) {
                 String fromTime = request.getFromTime() == null ? "00:00:00" : request.getFromTime();
