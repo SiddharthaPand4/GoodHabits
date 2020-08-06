@@ -119,6 +119,9 @@ downloadReport(){
     else if(filter.reportType=="JSON"){
         saveAs(response.data, "anpr-events.json");
     }
+    else if(filter.reportType=="EXCEL"){
+        saveAs(response.data, "anpr-events.xlsx");
+    }
 
 }).catch(error => {
         this.setState({downloading: false});
@@ -230,8 +233,9 @@ render() {
 <Form.Item>
     Report Format
     <Select defaultValue="CSV" onChange={this.handleChangeReportType}>
-<Option value="CSV">CSV</Option>
+        <Option value="CSV">CSV</Option>
         <Option value="JSON">JSON</Option>
+        {this.state.atcc.filter.selectedXAxisOption=="All Entry-Exit"? <Option value="EXCEL">EXCEL</Option>:null}
         </Select>
 
         </Form.Item>

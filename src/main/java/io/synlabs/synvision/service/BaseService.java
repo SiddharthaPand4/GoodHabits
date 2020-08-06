@@ -3,6 +3,8 @@ package io.synlabs.synvision.service;
 import io.synlabs.synvision.entity.core.SynVisionUser;
 import io.synlabs.synvision.entity.CurrentUser;
 import io.synlabs.synvision.views.common.SortRequest;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.CollectionUtils;
@@ -82,5 +84,14 @@ public class BaseService {
         }
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         return sdf.format(date);
+    }
+
+    protected void createStyle(SXSSFWorkbook workbook)
+    {
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setBorderTop(CellStyle.BORDER_THIN);
+        cellStyle.setBorderRight(CellStyle.BORDER_THIN);
+        cellStyle.setBorderLeft(CellStyle.BORDER_THIN);
+        cellStyle.setBorderBottom(CellStyle.BORDER_THIN);
     }
 }
