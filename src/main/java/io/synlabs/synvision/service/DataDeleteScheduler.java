@@ -18,10 +18,10 @@ import java.time.ZoneId;
 @Component
 public class DataDeleteScheduler {
 
-    @Value("${synvision.auth.data_del_after_days}")
+    @Value("${synvison.data.ttl.days}")
     private int data_del_after_days;
 
-    @Value("${synvision.auth.del_records_fromDB}")
+    @Value("${ synvison.data.ttl.include.database.records}")
     private boolean del_records_fromDB;
 
     @Autowired
@@ -39,7 +39,7 @@ public class DataDeleteScheduler {
         this.fileStorageProperties = fileStorageProperties;
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void DeleteFilesAfterNDays() {
         Path fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir()).toAbsolutePath().normalize();
         final File directory = new File(fileStorageLocation.toString());
