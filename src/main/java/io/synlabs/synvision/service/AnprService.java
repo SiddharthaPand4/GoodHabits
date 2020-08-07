@@ -27,8 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -36,6 +35,12 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.util.IOUtils;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFPicture;
+import org.apache.poi.xssf.usermodel.XSSFDrawing;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -606,6 +611,9 @@ public class AnprService extends BaseService {
                     }
                     page++;
                 }
+                fileWriter.flush();
+                fileWriter.close();
+
                 break;
 
             case "JSON":
@@ -628,13 +636,149 @@ public class AnprService extends BaseService {
                     }
                     page++;
                 }
+                fileWriter.flush();
+                fileWriter.close();
 
+                break;
+
+            case "EXCEL":
+
+                filename=path.resolve(UUID.randomUUID().toString() + ".xlsx").toString();
+                File file = new File(filename);
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
+                SXSSFWorkbook workbook = new SXSSFWorkbook(100); // keep 100 rows in memory, exceeding rows will be flushed to disk
+                createStyle(workbook);
+                int rowNumber = 0;
+                Sheet anprSheet = workbook.createSheet("anpr");
+                Row row = anprSheet.createRow(rowNumber++);
+
+                row.createCell(0, Cell.CELL_TYPE_STRING).setCellValue("Sr.No");
+                row.createCell(1, Cell.CELL_TYPE_STRING).setCellValue("Event Date");
+                row.createCell(2, Cell.CELL_TYPE_STRING).setCellValue("Event Time");
+                row.createCell(3, Cell.CELL_TYPE_STRING).setCellValue("Vehicle Id");
+                row.createCell(4, Cell.CELL_TYPE_STRING).setCellValue("Vehicle Class");
+                row.createCell(5, Cell.CELL_TYPE_STRING).setCellValue("Direction");
+                row.createCell(6, Cell.CELL_TYPE_STRING).setCellValue("Location");
+                row.createCell(7, Cell.CELL_TYPE_STRING).setCellValue("LPR");
+                row.createCell(8, Cell.CELL_TYPE_STRING).setCellValue("Number Plate Image");
+                row.createCell(10, Cell.CELL_TYPE_STRING).setCellValue("Full Vehicle Image");
+
+                while (totalRecordsCount > offset) {
+                    offset = (page - 1) * limit;
+                    if (offset > 0) {
+                        query.offset(offset);
+                    }
+                    query.limit(limit);
+                    result = query.fetch();
+
+                    int i = 0;
+                    for (AnprEvent event : result) {
+                        row = anprSheet.createRow(rowNumber++);
+                        row.setHeight((short) 2000);
+                        row.createCell(0, Cell.CELL_TYPE_NUMERIC).setCellValue(i+1);
+                        row.createCell(1, Cell.CELL_TYPE_STRING).setCellValue(toFormattedDate(event.getEventDate(), "dd-MM-yyyy"));
+                        row.createCell(2, Cell.CELL_TYPE_STRING).setCellValue(toFormattedDate(event.getEventDate(), "HH:mm:ss"));
+                        row.createCell(3, Cell.CELL_TYPE_STRING).setCellValue(event.getVehicleId());
+                        row.createCell(4, Cell.CELL_TYPE_STRING).setCellValue(event.getVehicleClass());
+                        row.createCell(5, Cell.CELL_TYPE_STRING).setCellValue(event.getDirection());
+                        row.createCell(6, Cell.CELL_TYPE_STRING).setCellValue(event.getSource());
+                        row.createCell(7, Cell.CELL_TYPE_STRING).setCellValue(event.getAnprText());
+
+
+                        String vehicleImage = event.getVehicleImage() + ".jpg";
+
+                        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+                        String eventDate=formatter.format(event.getEventDate());
+
+                        //------- for vehicle image ------//
+                        Path filePath = path.resolve("vehicle").resolve(eventDate).resolve(vehicleImage).normalize();
+
+                        File vehicleImageFile = new File(filePath.toString());
+                        if (vehicleImageFile.exists()) {
+
+
+                            //FileInputStream obtains input bytes from the image file
+                            InputStream inputStream = new FileInputStream(filePath.toString());
+                            //Get the contents of an InputStream as a byte[].
+                            byte[] bytes = IOUtils.toByteArray(inputStream);
+                            //Adds a picture to the workbook
+                            int pictureIdx = workbook.addPicture(bytes, Workbook.PICTURE_TYPE_PNG);
+                            //close the input stream
+                            inputStream.close();
+
+                            //Returns an object that handles instantiating concrete classes
+                            CreationHelper helper = workbook.getCreationHelper();
+
+                            //Creates the top-level drawing patriarch.
+                            XSSFDrawing  drawing = (XSSFDrawing)anprSheet.createDrawingPatriarch();
+
+                            //Create an anchor that is attached to the worksheet
+                            ClientAnchor anchor = helper.createClientAnchor();
+                            //set top-left corner for the image
+                            anchor.setCol1(8);
+                            anchor.setRow1(rowNumber-1);
+
+                            //Creates a picture
+                            XSSFPicture my_picture = drawing.createPicture(anchor, pictureIdx);
+                            my_picture.resize(1.01);
+
+                            anprSheet.autoSizeColumn(8);
+
+                        }
+                        else{
+                            row.createCell(8, Cell.CELL_TYPE_STRING).setCellValue("");
+                        }
+
+
+                        //------ for LPR image--------//
+                        Path lprFilePath = path.resolve("anpr").resolve(eventDate).resolve(vehicleImage).normalize();
+
+                        File lprImageFile = new File(lprFilePath.toString());
+                        if (lprImageFile.exists()) {
+
+
+                            //FileInputStream obtains input bytes from the image file
+                            InputStream inputStream = new FileInputStream(lprFilePath.toString());
+                            //Get the contents of an InputStream as a byte[].
+                            byte[] bytes = IOUtils.toByteArray(inputStream);
+                            //Adds a picture to the workbook
+                            int pictureIdx = workbook.addPicture(bytes, Workbook.PICTURE_TYPE_PNG);
+                            //close the input stream
+                            inputStream.close();
+
+                            //Returns an object that handles instantiating concrete classes
+                            CreationHelper helper = workbook.getCreationHelper();
+
+                            //Creates the top-level drawing patriarch.
+                            XSSFDrawing drawing = (XSSFDrawing) anprSheet.createDrawingPatriarch();
+
+                            //Create an anchor that is attached to the worksheet
+                            ClientAnchor anchor = helper.createClientAnchor();
+                            //set top-left corner for the image
+                            anchor.setCol1(10);
+                            anchor.setRow1(rowNumber-1);
+
+                            //Creates a picture
+                            XSSFPicture pict = drawing.createPicture(anchor, pictureIdx);
+                            pict.resize(1.01);
+
+                            anprSheet.autoSizeColumn(10);
+                        }
+
+                        i++;
+                    }
+                    page++;
+                }
+
+                workbook.write(fileOutputStream);
+                workbook.dispose();
                 break;
         }
 
 
-        fileWriter.flush();
-        fileWriter.close();
         return filename;
     }
 
