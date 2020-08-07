@@ -222,8 +222,8 @@ public class VidsService {
             Optional<HighwayTrafficState> state = stateRepository.findById(id);
             if (state.isPresent()) {
                 filename = state.get().getFlowImage();
-
-                Path filePath = Paths.get(fileStorageLocation.toString(), tag, filename).toAbsolutePath().normalize();
+                String stateDate=formatter.format(state.get().getUpdateDate());
+                Path filePath = Paths.get(fileStorageLocation.toString(), tag,stateDate, filename).toAbsolutePath().normalize();
                 Resource resource = new UrlResource(filePath.toUri());
                 if (resource.exists()) {
                     return resource;
