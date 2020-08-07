@@ -401,7 +401,7 @@ public class AtccDataService extends BaseService {
             Optional<AnprEvent> eventop = anprEventRepository.findById(id);
             if (eventop.isPresent()) {
                 String filename = eventop.get().getVehicleImage() + ".jpg";
-                String eventDate=eventop.get().getEventDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
+                String eventDate=formatter.format(eventop.get().getEventDate());
                 Path filePath = Paths.get(this.fileStorageLocation.toString(),tag,eventDate,filename).toAbsolutePath().normalize();
 
                 Resource resource = new UrlResource(filePath.toUri());

@@ -32,7 +32,6 @@ public abstract class MediaUploadController {
         String strDate=formatter.format(new Date());
         try {
             Path fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir(), tag).toAbsolutePath().normalize();
-            //fileStorageLocation=fileStorageLocation.resolve(LocalDate.now().toString());
             fileStorageLocation=fileStorageLocation.resolve(strDate);
             if (!Files.exists(fileStorageLocation)) {
                 File dir = new File(fileStorageLocation.toString());
