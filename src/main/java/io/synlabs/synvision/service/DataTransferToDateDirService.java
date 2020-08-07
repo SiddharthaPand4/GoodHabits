@@ -60,7 +60,7 @@ public class DataTransferToDateDirService {
                     dir.mkdirs();
                 }
                 try {
-                    Files.copy(fileName,fileStorageLocation.resolve(anprEvent.getVehicleImage()+".jpg"),StandardCopyOption.REPLACE_EXISTING);
+                    Files.move(fileName,fileStorageLocation.resolve(anprEvent.getVehicleImage()+".jpg"),StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -85,7 +85,7 @@ public class DataTransferToDateDirService {
                     dir.mkdirs();
                 }
                 try {
-                    Files.copy(fileNameImg,fileStorageLocationImg.resolve(atccEvent.getEventImage()),StandardCopyOption.REPLACE_EXISTING);
+                    Files.move(fileNameImg,fileStorageLocationImg.resolve(atccEvent.getEventImage()),StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -99,7 +99,7 @@ public class DataTransferToDateDirService {
                     dir.mkdirs();
                 }
                 try {
-                    Files.copy(fileNameVid,fileStorageLocationVid.resolve(atccEvent.getEventVideo()),StandardCopyOption.REPLACE_EXISTING);
+                    Files.move(fileNameVid,fileStorageLocationVid.resolve(atccEvent.getEventVideo()),StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -125,7 +125,7 @@ public class DataTransferToDateDirService {
                     dir.mkdirs();
                 }
                 try {
-                    Files.copy(fileNameImg,fileStorageLocationImg.resolve(highwayIncident.getIncidentImage()),StandardCopyOption.REPLACE_EXISTING);
+                    Files.move(fileNameImg,fileStorageLocationImg.resolve(highwayIncident.getIncidentImage()),StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
                    e.printStackTrace();
                 }
@@ -138,7 +138,7 @@ public class DataTransferToDateDirService {
                     dir.mkdirs();
                 }
                 try {
-                    Files.copy(fileNameVid,fileStorageLocationVid.resolve(highwayIncident.getIncidentVideo()),StandardCopyOption.REPLACE_EXISTING);
+                    Files.move(fileNameVid,fileStorageLocationVid.resolve(highwayIncident.getIncidentVideo()),StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
                    e.printStackTrace();
                 }
@@ -161,7 +161,7 @@ public class DataTransferToDateDirService {
                     dir.mkdirs();
                 }
                 try {
-                    Files.copy(fileName,fileStorageLocation.resolve(anprEvent.getVehicleImage()+".jpg"),StandardCopyOption.REPLACE_EXISTING);
+                    Files.move(fileName,fileStorageLocation.resolve(anprEvent.getVehicleImage()+".jpg"),StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -186,7 +186,7 @@ public class DataTransferToDateDirService {
                     dir.mkdirs();
                 }
                 try {
-                    Files.copy(fileNameImg,fileStorageLocationImg.resolve(trafficState.getFlowImage()),StandardCopyOption.REPLACE_EXISTING);
+                    Files.move(fileNameImg,fileStorageLocationImg.resolve(trafficState.getFlowImage()),StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -200,7 +200,7 @@ public class DataTransferToDateDirService {
            //         dir.mkdirs();
            //     }
            //     try {
-            //       Files.copy(fileNameVid,fileStorageLocationVid.resolve(trafficState.getFlowVideo()),StandardCopyOption.REPLACE_EXISTING);
+            //       Files.move(fileNameVid,fileStorageLocationVid.resolve(trafficState.getFlowVideo()),StandardCopyOption.REPLACE_EXISTING);
            //     } catch (IOException e) {
            //         e.printStackTrace();
            //     }
