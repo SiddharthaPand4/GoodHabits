@@ -14,7 +14,11 @@ public class DataTransferToDateDirController {
     DataTransferToDateDirService dataTransferToDateDirService;
     @GetMapping("/transfer")
     public void TransferData(){
-        dataTransferToDateDirService.transfer();
+       dataTransferToDateDirService.transferAnprData();
+       dataTransferToDateDirService.transferAtccData();
+       dataTransferToDateDirService.transferVidsData();
+       dataTransferToDateDirService.transferOffenceData();
+       dataTransferToDateDirService.transferFlowStateData();
     }
 
 }
