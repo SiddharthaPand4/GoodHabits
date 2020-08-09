@@ -46,19 +46,19 @@ public class IncidentController {
     }
 
     @PostMapping("/repeated/reverse")
-    @Secured(ANPR_READ)
+    @Secured(INCIDENT_READ)
     public PageResponse<IncidentRepeatCount> listRepeatedIncidents(@RequestBody AnprFilterRequest request) {
         return anprService.listRepeatedIncidents(request);
     }
 
     @PostMapping("/repeated/helmet-missing")
-    @Secured(ANPR_READ)
+    @Secured(INCIDENT_READ)
     public PageResponse<IncidentRepeatCount> listRepeatedHelmetMissingIncidents(@RequestBody AnprFilterRequest request) {
         return anprService.listRepeatedHelmetMissingIncidents(request);
     }
 
     @PostMapping("/timeline")
-    @Secured(ANPR_READ)
+    @Secured(INCIDENT_READ)
     public PageResponse<AnprResponse> getIncidentsTimeline(@RequestBody AnprFilterRequest request) {
         return anprService.getIncidentsTimeline(request);
     }
