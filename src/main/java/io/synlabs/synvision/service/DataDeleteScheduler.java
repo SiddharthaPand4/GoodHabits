@@ -55,7 +55,7 @@ public class DataDeleteScheduler {
                         try {
                             lastModified = Files.getLastModifiedTime(Paths.get(subFile.getPath())).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                         } catch (java.io.IOException e) {
-                            e.printStackTrace();
+                            logger.error("Unable to get last modified date of File",e);
                         }
                         if (lastModified.plusDays(data_del_after_days).isBefore(LocalDate.now())) {
                             subFile.delete();
