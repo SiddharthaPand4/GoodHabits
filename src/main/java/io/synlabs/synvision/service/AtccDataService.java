@@ -1,6 +1,7 @@
 package io.synlabs.synvision.service;
 
 import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.entity.anpr.AnprEvent;
 import io.synlabs.synvision.entity.atcc.AtccEvent;
@@ -481,16 +482,13 @@ public class AtccDataService extends BaseService {
         }
         return query;
     }
+    @Transactional
     public void deleteData (int days)
     {
         Date date=new DateTime().minusDays(days).toDate() ;
         QAtccEvent atccEvent=new QAtccEvent("atccEvent");
-        JPAQuery<AtccEvent> query=new JPAQuery<>(entityManager);
-        query=query.select(atccEvent).from(atccEvent).where(atccEvent.eventDate.before(date));
-        List<AtccEvent> events =query.fetch();
-        events.forEach(item -> {
-            atccEventRepository.delete(item);
-        });
+        JPAQueryFactory query=new JPAQueryFactory(entityManager);
+        query.delete(atccEvent).where(atccEvent.eventDate.before(date)).execute();
     }
 
 

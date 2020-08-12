@@ -65,9 +65,15 @@ public class DataDeleteScheduler {
                 }
             }
            if (del_records_fromDB) {
-               anprService.deleteData(data_del_after_days);
-               atccDataService.deleteData(data_del_after_days);
-               vidsService.deleteData(data_del_after_days);
+               if(folders.contains("anpr")) {
+                   anprService.deleteData(data_del_after_days);
+               }
+               if(folders.contains("atcc-image") && folders.contains("atcc-video")) {
+                   atccDataService.deleteData(data_del_after_days);
+               }
+               if(folders.contains("vids-image") && folders.contains("vids-video")) {
+                   vidsService.deleteData(data_del_after_days);
+               }
            }
         }
     }

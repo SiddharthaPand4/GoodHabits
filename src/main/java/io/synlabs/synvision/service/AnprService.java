@@ -5,6 +5,7 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.synlabs.synvision.config.Local;
 import io.synlabs.synvision.entity.anpr.*;
 import io.synlabs.synvision.entity.core.Feed;
@@ -28,6 +29,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
@@ -957,15 +959,12 @@ public class AnprService extends BaseService {
         return  filename;
     }
 
+    @Transactional
     public void deleteData (int days)
     {
         Date date=new DateTime().minusDays(days).toDate() ;
         QAnprEvent anprEvent=new QAnprEvent("anprEvent");
-        JPAQuery<AnprEvent> query=new JPAQuery<>(entityManager);
-        query=query.select(anprEvent).from(anprEvent).where(anprEvent.eventDate.before(date));
-        List<AnprEvent> events =query.fetch();
-        events.forEach(item -> {
-           anprEventRepository.delete(item);
-        });
+        JPAQueryFactory query=new JPAQueryFactory(entityManager);
+        query.delete(anprEvent).where(anprEvent.eventDate.before(date)).execute();
     }
 }
