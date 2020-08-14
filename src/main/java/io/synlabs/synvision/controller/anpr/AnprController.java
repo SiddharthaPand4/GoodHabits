@@ -26,8 +26,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.*;
-
 /**
  * Created by itrs on 10/21/2019.
  */

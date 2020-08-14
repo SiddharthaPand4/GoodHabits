@@ -1,12 +1,12 @@
 import React, {Component} from "react";
 import Webcam from "react-webcam";
-import {Button, ButtonGroup, Col, Form, Input, Row, Typography} from "antd";
-import FaceMatchService from "../../services/facerec/FaceMatchService";
+import {Button, message, Col, Form, Input, Row, Select, Typography} from "antd";
+import FaceMatchService from "../../services/facerec/FrsService";
 import {EventBus} from "../event";
 
 const {Text} = Typography;
 
-export default class FaceMatchView extends Component {
+export default class FaceRegisterView extends Component {
 
     constructor(props) {
         super(props);
@@ -19,6 +19,14 @@ export default class FaceMatchView extends Component {
         this.webcamRef = React.createRef();
         this.capture = this.capture.bind(this);
         this.resetcamera = this.resetcamera.bind(this);
+    }
+
+    componentDidMount() {
+        setInterval(() => {
+            this.setState({
+                curTime : new Date().toLocaleString('in-IN')
+            })
+        }, 1000)
     }
 
     capture() {
@@ -55,13 +63,16 @@ export default class FaceMatchView extends Component {
         }
         return (<div>
             <Row>
-                <Col md={6}>
+                <Col md={12} >
                     {elmnt}
+                    <br/>
+                    <div><h5>Registration Time: {this.state.curTime}</h5></div>
                     <br/>
                     <Button type="primary" onClick={this.capture}>Capture photo</Button>{' '}
                     <Button onClick={this.resetcamera}>Reset</Button>
                 </Col>
                 <Col md={6}>
+
                     <WrapperUserForm userdata={this.state.userdata}/>
                 </Col>
             </Row>
@@ -80,18 +91,20 @@ class UserForm extends Component {
         this.state = {
             id: '',
             name: '',
-            address: '',
             submitted: false,
             loading: false,
             loginError: '',
             userdata: this.props.userdata
         };
 
+        this.state.userdata.type = "Employee";
+        this.state.userdata.accessType = "WhiteList";
         this.handleSubmit = this.handleSubmit.bind(this);
         this.refresh = this.refresh.bind(this);
         this.screenshot = this.screenshot.bind(this);
         this.lookup = this.lookup.bind(this);
-
+        this.handleChange = this.handleChange.bind(this);
+        this.handleAccessTypeChange = this.handleAccessTypeChange.bind(this);
         EventBus.subscribe('frs-refresh', (data) => this.refresh(data));
         EventBus.subscribe('frs-screenshot', (data) => this.screenshot(data));
 
@@ -104,12 +117,29 @@ class UserForm extends Component {
         this.props.form.setFieldsInitialValue({
             id: this.state.userdata.id,
             name: this.state.userdata.name,
-            address: this.state.userdata.address
+            type: this.state.userdata.type,
+            accessType: this.state.userdata.accessType
         })
+
+
     }
 
     componentWillUnmount() {
         console.log('component unmounted');
+    }
+
+    handleChange(value) {
+        let userdata = this.state.userdata;
+        userdata.type = value;
+        this.setState({userdata: userdata});
+        console.log(`selected ${value}`);
+    }
+
+    handleAccessTypeChange(value) {
+        let userdata = this.state.userdata;
+        userdata.accessType = value;
+        this.setState({userdata: userdata});
+        console.log(`selected ${value}`);
     }
 
     screenshot(image) {
@@ -118,13 +148,16 @@ class UserForm extends Component {
     }
 
     lookup() {
-        let self = this;
+        let self = this
         FaceMatchService.lookup(this.state.image).then(response => {
-            this.setState({userdata: response.data, validationError:null});
+            this.setState({userdata: response.data});
             EventBus.publish('frs-refresh', response.data)
         }).catch(function (error) {
-            if (error.response.data.message) {
+            if (error.response?.data?.message) {
                 self.setState({validationError: error.response.data.message});
+            }
+            else {
+                self.setState({validationError: "Server Error"});
             }
         });
     }
@@ -134,7 +167,8 @@ class UserForm extends Component {
         this.props.form.setFieldsValue({
             id: userdata.id,
             name: userdata.name,
-            address: userdata.address
+            address: userdata.address,
+            type: userdata.type
         })
     }
 
@@ -146,8 +180,8 @@ class UserForm extends Component {
         var userdata = {};
         userdata.id = form.getFieldValue("id");
         userdata.name = form.getFieldValue("name");
-        userdata.address = form.getFieldValue("address");
-
+        userdata.type = this.state.userdata.type;
+        userdata.accessType = this.state.userdata.accessType;
         let validationError;
         if (!userdata.id) {
             validationError = "Missing ID"
@@ -157,12 +191,8 @@ class UserForm extends Component {
             validationError = "Missing name"
         }
 
-        if (!userdata.address) {
-            validationError = "Missing address"
-        }
-
         if (!this.state.image) {
-            validationError = "First Capture image"
+            validationError = "Capture image First by Click on Capture"
         }
 
         if (validationError) {
@@ -175,10 +205,14 @@ class UserForm extends Component {
         this.setState({submitted: true, loading: true});
         const self = this;
         FaceMatchService.register(userdata, this.state.image).then(function (response) {
-            console.log(response)
+            message.success("Registration sucessfull");
         }).catch(function (error) {
-            if (error.response.data.message) {
+            message.error("Error registering user!");
+            if (error.response?.data?.message) {
                 self.setState({validationError: error.response.data.message});
+            }
+            else {
+                self.setState({validationError: "Server Error"});
             }
         })
     }
@@ -199,10 +233,19 @@ class UserForm extends Component {
                         <Input addonBefore="Name&nbsp;&nbsp;&nbsp;"/>,
                     )}
                 </Form.Item>
-                <Form.Item>
-                    {getFieldDecorator('address', {rules: [{required: true, message: 'enter address!'}],})(
-                        <Input addonBefore="Address"/>,
-                    )}
+                <Form.Item label="Type">
+                    <Select defaultValue="Employee" onChange={this.handleChange}>
+                        <Select.Option value="Employee">Employee</Select.Option>
+                        <Select.Option value="Vendor">Vendor</Select.Option>
+                        <Select.Option value="Visitor">Visitor</Select.Option>
+                        <Select.Option value="Others">Others</Select.Option>
+                    </Select>
+                </Form.Item>
+                <Form.Item label="Access">
+                    <Select defaultValue="WhiteList" onChange={this.handleAccessTypeChange}>
+                        <Select.Option value="BlackList">BlackList</Select.Option>
+                        <Select.Option value="WhiteList">WhiteList</Select.Option>
+                    </Select>
                 </Form.Item>
                 <div>
                     <Button onClick={this.lookup}>Lookup</Button>{' '}
