@@ -28,8 +28,8 @@ class VidsService {
         return axios.get('/public/vids/video/' + id + '/video.mp4');
     }
 
-    getStats() {
-        return axios.get('/api/vids/stats');
+    getStats(req) {
+        return axios.post('/api/vids/stats',req);
     }
 
     downloadVideo(id){
