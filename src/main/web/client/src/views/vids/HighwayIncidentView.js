@@ -65,15 +65,16 @@ export default class HighwayIncidentView extends Component {
     }
 
     componentDidMount() {
+        this.myInstant=setInterval(()=>{this.refresh()},30000);
         this.refresh();
         this.getFeeds();
         this.getIncidentTypes();
-
-
+ }
+    componentWillUnmount() {
+        clearInterval(this.myInstant);
     }
 
     refresh() {
-
         this.UpdateIncidentFilter();
         this.UpdateLocationFilter();
         VidsService.getIncidents(this.state.filter).then(request => {

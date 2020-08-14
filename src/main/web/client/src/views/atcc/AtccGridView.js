@@ -71,7 +71,11 @@ export default class AtccGridView extends Component {
     }
 
     componentDidMount() {
+        this.myInstant=setInterval(()=>{this.refresh()},30000);
         this.refresh();
+    }
+    componentWillUnmount() {
+        clearInterval(this.myInstant);
     }
 
     videoSwitchChange() {
