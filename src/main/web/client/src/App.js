@@ -6,9 +6,9 @@ import Sidebar from "./components/Sidebar";
 import Headbar from "./components/Headbar";
 import Footerbar from "./components/Footerbar";
 import PrivateRoute from "./components/PrivateRoute";
-import HomeView from "./views/HomeView";
+
 import FeedView from "./views/FeedView";
-import {Redirect, Route} from "react-router-dom";
+import {Route} from "react-router-dom";
 import DeviceView from "./views/DeviceView";
 import UserListView from "./views/UserListView";
 import DeviceConfigView from "./views/DeviceConfigView";
@@ -27,7 +27,6 @@ import PgsReportView from "./views/parking/ParkingReportView";
 import ParkingInOutView from "./views/parking/ParkingInOutView";
 import PeopleCounting from "./views/PeopleCount/PeopleCounting";
 import ApcDashboard from "./views/PeopleCount/ApcDashboard";
-import AtccView from "./views/atcc/AtccView";
 import AtccSummaryView from "./views/atcc/AtccSummaryView";
 import AtccReportView from "./views/atcc/AtccReportView";
 import HighwayIncidentView from "./views/vids/HighwayIncidentView";
@@ -42,6 +41,9 @@ import FrsEventView from "./components/facerec/FrsEventView";
 import AtccGridView from "./views/atcc/AtccGridView";
 import {history} from "./helpers/history";
 import RoleView from "./views/RoleView";
+import Moment from "react-moment";
+import {Player} from 'video-react';
+import "video-react/dist/video-react.css";
 
 const {Text} = Typography;
 const {Content} = Layout;
@@ -115,13 +117,7 @@ class App extends Component {
         console.log("error connecting!")
     }
 
-    onMessageReceived(payload) {
-        const isLoggedIn = this.state.loggedIn;
-
-        if (!isLoggedIn) return;
-
-        let alert = JSON.parse(payload.body);
-        console.log("rcvd alert", alert);
+    getFrsAlert(alert) {
         const args = {
             message: alert.message,
             description: <Card
@@ -154,25 +150,48 @@ class App extends Component {
             </Card>,
             duration: 0,
         };
+        return args;
+    }
+
+    getVidsAlert(alert) {
+        const args = {
+            message: alert.message,
+            description: <Card
+                style={{margin: "5px"}}
+                title={
+                    <div>
+                        <Tag color="#f50">{alert.type}</Tag>
+                        <Tag color="#f50">{alert.location}</Tag>
+                        <br/>
+                        <Text code><Icon type="schedule"/> <Moment
+                            format="ll">{alert.incidentDate}</Moment>{' '}|{' '}<Moment
+                            format="LTS">{alert.incidentDate}</Moment></Text>
+
+                    </div>
+                }
+                bordered={true}
+            >
+                <div style={{textAlign: "center"}}>
+                    <Player
+                        playsInline
+                        poster={"/public/vids/image/" + alert.id + "/image.jpg"}
+                        src={"/public/vids/video/" + alert.id + "/video.mp4"}
+                    />
+                </div>
+            </Card>,
+            duration: 0,
+        };
+        return args;
+    }
+    onMessageReceived(payload) {
+        const isLoggedIn = this.state.loggedIn;
+        if (!isLoggedIn) return;
+        let alert = JSON.parse(payload.body);
+        console.log("rcvd alert", alert);
+        const args = this.getVidsAlert(payload);
         notification.open(args);
     }
 
-    refreshMenu() {
-
-            UserService.tokenValid().then(data => {
-                this.setState({loggedIn:UserService.isLoggedIn()});
-
-            }).catch(error => {
-                localStorage.clear();
-                this.setState({loggedIn: false});
-                history.push("/#/login")
-                console.log("Session Expired !! Login Again");
-
-
-
-            })
-
-    }
 
     render() {
 

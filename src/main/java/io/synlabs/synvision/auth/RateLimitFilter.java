@@ -74,21 +74,6 @@ public class RateLimitFilter extends GenericFilterBean
     chain.doFilter(request, response);
   }
 
-  void show_blank_image(boolean ret) {
-    boolean flag = false;
-    if (!ret) {
-      System.out.println("Not ret");
-      flag =  true;
-
-    }
-    else {
-      if (flag) {
-        System.out.println("Flag is true");
-      }
-    }
-
-  }
-
 }
 
 
