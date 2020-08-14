@@ -22,14 +22,7 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
     private static Logger logger = LoggerFactory.getLogger(RestErrorHandler.class);
 
 
-    @ExceptionHandler({EdcastEnrollException.class})
-    public ResponseEntity<Object> handleEdCast(Exception exception, WebRequest request) {
-        logger.warn("Auth error:", exception);
-        final ApiError apierror = message(HttpStatus.UNAUTHORIZED, exception);
-        return handleExceptionInternal(exception, apierror, new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
-    }
-
-    @ExceptionHandler({AuthException.class})
+       @ExceptionHandler({AuthException.class})
     public ResponseEntity<Object> handleAuthenticationError(Exception exception, WebRequest request) {
         logger.warn("Auth error:", exception);
         final ApiError apierror = message(HttpStatus.UNAUTHORIZED, exception);

@@ -34,6 +34,8 @@ import AtccReportView from "./views/atcc/AtccReportView";
 import HighwayIncidentView from "./views/vids/HighwayIncidentView";
 import HighwayIncidentDashboardView from "./views/vids/HighwayIncidentDashboardView";
 import AnprReportView from "./views/anpr/AnprReportView";
+import FaceMatchView from "./components/facerec/FaceMatchView";
+import AttendanceListView from "./components/facerec/AttendanceListView";
 
 import ConfigView from "./views/Polygon/ConfigView";
 import AtccGridView from "./views/atcc/AtccGridView";
@@ -94,7 +96,7 @@ class App extends Component {
                                 <PrivateRoute path='/incidents/repeated' exact={true} component={IncidentRepeatedView}/>
                                 <PrivateRoute path='/anpr/report' exact={true} component={AnprReportView}/>
                                 <PrivateRoute path='/anpr' exact={true} component={AnprView}/>
-                                <PrivateRoute path='/anpr/masterdata' exact={true} component={MasterDataView}/>
+                                {/*<PrivateRoute path='/anpr/masterdata' exact={true} component={MasterDataView}/>*/}
                                 <PrivateRoute path='/user' exact={true} component={UserListView}/>
                                 <PrivateRoute path='/feed' exact={true} component={FeedView}/>
                                 <PrivateRoute path='/trigger' exact={true} component={TriggerView}/>
@@ -122,6 +124,11 @@ class App extends Component {
                                 <PrivateRoute path='/vids/dashboard' exact={true} component={HighwayIncidentDashboardView}/>
 
                                 <PrivateRoute path='/feedStream' exact={true} component={ConfigView}/>
+
+                                {/* face rec */}
+                                <PrivateRoute path='/ngofr' exact={true} component={FaceMatchView}/>
+                                <PrivateRoute path='/frs/list' exact={true} component={AttendanceListView}/>
+
                             </div>
                         </Content>
                         <Footerbar/>

@@ -1,0 +1,25 @@
+{
+  "key": "frs",
+  "title": "Attendance",
+  "icon": "box-plot",
+  "submenu": [
+    {
+      "key": "frs-register",
+      "title": "Register",
+      "icon": "area-chart",
+      "link": "/frs/register"
+    },
+    {
+      "key": "frs-list",
+      "title": "Registered Users",
+      "icon": "fund",
+      "link": "/frs/list"
+    },
+    {
+      "key": "frs-lookup",
+      "title": "Lookup",
+      "icon": "fund",
+      "link": "/frs/lookup"
+    }
+  ]
+}
