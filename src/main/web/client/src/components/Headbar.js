@@ -7,7 +7,7 @@ export default class Headbar extends Component {
 
     render() {
         return (
-            <Header style={{ background: '#fff', padding: 10 }} >&nbsp;</Header>
+            <Header style={{ background: '#fff', padding: 10 , height:500}} >&nbsp;</Header>
         )
     }
 }

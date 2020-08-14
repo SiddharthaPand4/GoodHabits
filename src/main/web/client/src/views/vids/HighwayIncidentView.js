@@ -14,8 +14,9 @@ import {
 import GenericFilter from "../../components/GenericFilter";
 import Moment from "react-moment";
 import VidsService from "../../services/VidsService";
-import { Player } from 'video-react';
+import {Player} from 'video-react';
 import "video-react/dist/video-react.css";
+
 const {Text} = Typography;
 
 const {Column} = Table;
@@ -121,6 +122,15 @@ export default class HighwayIncidentView extends Component {
             </div>)
     }
 
+    getFeedString(event) {
+        let result = "NA";
+        if (event && event.feed) {
+            result = event.feed.site + " > " + event.feed.location + " > " + event.feed.name;
+        }
+        return result;
+
+    }
+
     renderGrid() {
 
 
@@ -150,7 +160,9 @@ export default class HighwayIncidentView extends Component {
                                         <div style={{marginTop: "5px", textAlign: "left"}}>
                                             <div>
                                                 <Text code>
-                                                    <Icon type="environment"/> {event.feed.site} > {event.feed.location} > {event.feed.name}</Text>
+                                                    <Icon type="environment"/>
+                                                    {this.getFeedString(event)}
+                                                </Text>
                                             </div>
                                         </div>
 

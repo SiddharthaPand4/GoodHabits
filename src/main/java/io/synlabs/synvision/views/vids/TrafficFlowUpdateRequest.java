@@ -1,8 +1,6 @@
 package io.synlabs.synvision.views.vids;
 
-import io.synlabs.synvision.entity.vids.HighwayIncident;
 import io.synlabs.synvision.entity.vids.HighwayTrafficState;
-import io.synlabs.synvision.enums.HighwayIncidentType;
 import io.synlabs.synvision.enums.TrafficDensity;
 import io.synlabs.synvision.views.common.Request;
 import lombok.Getter;

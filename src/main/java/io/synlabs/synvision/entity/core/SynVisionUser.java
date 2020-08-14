@@ -65,4 +65,13 @@ public class SynVisionUser extends BaseEntity {
         }
         roles.add(role);
     }
+
+    @Transient
+    public boolean isAdmin() {
+        for (Role userRole : roles)
+        {
+            if ("admin".equalsIgnoreCase(userRole.getName())) return true;
+        }
+        return false;
+    }
 }

@@ -7,11 +7,14 @@ import lombok.Setter;
 @Setter
 public class AnprReportResponse {
     public String date;
+    public String vehicleClass;
     public Long totalEvents;
 
 
-    public AnprReportResponse(Long events ,String date) {
+    public AnprReportResponse(String vehicleClass,Long events ,String date) {
         this.totalEvents = events == null ? 0 : events;
         this.date=date;
+        this.vehicleClass=vehicleClass;
     }
+
 }

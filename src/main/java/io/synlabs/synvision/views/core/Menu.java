@@ -1,13 +1,16 @@
 package io.synlabs.synvision.views.core;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Getter
+@Setter
 public class Menu {
 
+    private boolean admin;
     private Set<MenuItem> items = new LinkedHashSet<>();
 
     public void merge(MenuItem item) {

@@ -203,6 +203,8 @@ public class UserService extends BaseService implements UserDetailsService {
     }
 
     public Menu getCurrentUserMenu() {
-        return menuBuilder.getMenu();
+        Menu menu = menuBuilder.getMenu();
+        menu.setAdmin(getCurrentUser().isAdmin());
+        return menu;
     }
 }
