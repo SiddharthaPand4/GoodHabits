@@ -84,7 +84,7 @@ export default class IncidentHotlistView extends Component {
     }
 
     //cant use refresh to read from state as state may not have been set
-    refreshNow(filter) {
+    refreshNow() {
         AnprService.getIncidentsHotlisted(this.state.filter).then(request => {
             this.setState({"anprresponse": request.data, loading: false})
         })
@@ -152,18 +152,12 @@ export default class IncidentHotlistView extends Component {
 
         let {workingEvent, workingEventLoading} = this.state;
         workingEvent.anprText = anprText;
-        workingEventLoading = true;
-        this.setState({workingEvent, workingEventLoading});
+        this.setState({workingEvent:workingEvent, workingEventLoading:true});
         AnprService.updateEvent(workingEvent).then(request => {
-            let {workingEvent, workingEventLoading} = this.state;
-            workingEvent.anprText = anprText;
-            workingEventLoading = false;
-            this.setState({workingEventLoading});
+            this.setState({workingEventLoading:false});
         }).catch(error => {
             alert("error in saving");
-            let {workingEventLoading} = this.state;
-            workingEventLoading = false;
-            this.setState({workingEventLoading});
+            this.setState({workingEventLoading:false});
         })
     }
 

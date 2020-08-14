@@ -12,8 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.PARKING_READ;
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.PARKING_WRITE;
+import static io.synlabs.synvision.auth.SynvisionAuth.Privileges.PARKING_WRITE;
 
 
 @RestController

@@ -42,7 +42,6 @@ export default class AnprView extends Component {
                 page: 1,
                 pageSize: 12,
                 lpr: ""
-
             },
             workingEvent: {},
             workingEventLoading: false,

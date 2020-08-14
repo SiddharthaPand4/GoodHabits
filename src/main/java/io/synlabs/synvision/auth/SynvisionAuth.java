@@ -1,8 +1,8 @@
 package io.synlabs.synvision.auth;
 
-public final class LicenseServerAuth
+public final class SynvisionAuth
 {
-  private LicenseServerAuth()
+  private SynvisionAuth()
   {
     throw new AssertionError("Not allowed");
   }

@@ -10,9 +10,7 @@ import io.synlabs.synvision.views.parking.ParkingDashboardResponse;
 import io.synlabs.synvision.views.parking.ParkingEventCountResponse;
 import io.synlabs.synvision.views.parking.ParkingEventDashboardResponse;
 import io.synlabs.synvision.views.parking.ParkingSlotResponse;
-import io.synlabs.synvision.views.incident.IncidentGroupCountResponse;
 import io.synlabs.synvision.views.parking.*;
-import io.synlabs.synvision.views.parking.ParkingSlotResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +27,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Collectors;
 
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.PARKING_READ;
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.PARKING_WRITE;
+import static io.synlabs.synvision.auth.SynvisionAuth.Privileges.PARKING_READ;
+import static io.synlabs.synvision.auth.SynvisionAuth.Privileges.PARKING_WRITE;
 
 @RestController
 @RequestMapping("/api/apms/guidance")

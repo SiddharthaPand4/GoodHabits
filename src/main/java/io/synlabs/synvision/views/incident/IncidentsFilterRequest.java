@@ -11,13 +11,13 @@ import lombok.Setter;
 @Setter
 public class IncidentsFilterRequest implements Request {
 
-        public String fromDate;
-        public String fromTime;
-        public String toDate;
-        public String toTime;
-        public String incidentType;
+        private String fromDate;
+        private String fromTime;
+        private String toDate;
+        private String toTime;
+        private String incidentType;
 
-        public int page;
-        public int pageSize;
+        private int page;
+        private int pageSize;
 
 }

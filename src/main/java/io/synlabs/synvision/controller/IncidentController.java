@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.*;
+import static io.synlabs.synvision.auth.SynvisionAuth.Privileges.*;
 
 /**
  * Created by itrs on 10/16/2019.

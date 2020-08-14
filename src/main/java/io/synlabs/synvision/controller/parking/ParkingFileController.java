@@ -1,6 +1,5 @@
 package io.synlabs.synvision.controller.parking;
 
-import io.synlabs.synvision.service.AtccDataService;
 import io.synlabs.synvision.service.parking.ParkingGuidanceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.*;
+import static io.synlabs.synvision.auth.SynvisionAuth.Privileges.*;
 
 @Controller
 @RequestMapping("/public/apms")
