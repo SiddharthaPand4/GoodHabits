@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Col, message, Row, Switch, Card} from "antd";
+import {Col, message, Row, Switch, Card, Button} from "antd";
 import AlertService from "../../services/AlertService";
 
 export default class AlertConfig extends Component {
@@ -13,16 +13,21 @@ export default class AlertConfig extends Component {
     }
 
     fetchDataAndConnect = async ()=> {
-        const alertTypesResponse = await AlertService.fetchAlertTypes();
-        const alertTypes = alertTypesResponse.data;
-        this.connections = []
-        alertTypes.forEach(alert => {
-            const con = new WebSocket(alert.url)
-            con.onmessage = event => {
-                message.warn(`Hotlisted Vehicle ${event.data}, type: ${alert.text}`)
-            }
-            this.connections.push(con)
-        })
+        try {
+            const alertTypesResponse = await AlertService.fetchAlertTypes();
+            const alertTypes = alertTypesResponse.data;
+            this.connections = []
+            alertTypes.forEach(alert => {
+                const con = new WebSocket(alert.url)
+                con.onmessage = event => {
+                    message.warn(`Hotlisted Vehicle ${event.data}, type: ${alert.text}`)
+                }
+                this.connections.push(con)
+            })
+        } catch (err) {
+            message.error("Something Went Wrong")
+            console.log(err)
+        }
     }
 
     componentWillUnmount() {
@@ -37,6 +42,16 @@ export default class AlertConfig extends Component {
         this.setState({alertTypes})
     }
 
+    saveConfig = async () => {
+        try {
+            const res = await AlertService.saveAlertSettings({...this.state})
+            console.log(res.response)
+            message.success("Saved")
+        } catch (e) {
+            console.log(e)
+            message.error("Something Went Wrong")
+        }
+    }
 
     render() {
         return (
@@ -53,6 +68,11 @@ export default class AlertConfig extends Component {
                             </Col>
                         </Row>
                     )}
+                    <Row>
+                        <Col>
+                            <Button onClick={this.saveConfig}>Save</Button>
+                        </Col>
+                    </Row>
                 </Card>
             </div>
         )
