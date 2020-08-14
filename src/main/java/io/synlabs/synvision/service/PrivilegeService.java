@@ -1,12 +1,11 @@
 package io.synlabs.synvision.service;
 
 
-import io.synlabs.synvision.auth.LicenseServerAuth;
+import io.synlabs.synvision.auth.SynvisionAuth;
 import io.synlabs.synvision.entity.core.Privilege;
 import io.synlabs.synvision.entity.core.Role;
 import io.synlabs.synvision.jpa.PrivilegeRepository;
 import io.synlabs.synvision.jpa.RoleRepository;
-import io.synlabs.synvision.service.BaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ public class PrivilegeService extends BaseService
   @PostConstruct
   public void init()
   {
-    Field[] fields = LicenseServerAuth.Privileges.class.getDeclaredFields();
+    Field[] fields = SynvisionAuth.Privileges.class.getDeclaredFields();
     for (Field f : fields)
     {
       if (Modifier.isStatic(f.getModifiers()) && Modifier.isFinal(f.getModifiers()))

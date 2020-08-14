@@ -8,7 +8,7 @@ import io.synlabs.synvision.views.common.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.*;
+import static io.synlabs.synvision.auth.SynvisionAuth.Privileges.*;
 
 @RestController
 @RequestMapping("/api/hotlist/vehicle")

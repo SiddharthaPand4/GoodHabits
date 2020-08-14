@@ -8,11 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.DEVICE_WRITE;
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.ROLE_WRITE;
+import static io.synlabs.synvision.auth.SynvisionAuth.Privileges.DEVICE_WRITE;
 
 /**
  * Created by itrs on 10/16/2019.

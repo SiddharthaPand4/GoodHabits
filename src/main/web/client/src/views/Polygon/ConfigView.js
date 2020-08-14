@@ -1,9 +1,6 @@
 import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
-import {Button, Col, Icon, message, Tag} from "antd";
-import AnnotationService from "../../services/ConfigService";
+import {Card, Button, Col, Icon, message, Tag} from "antd";
 import Row from "antd/es/grid/row";
-import Card from "@material-ui/core/Card";
 import FeedService from "../../services/FeedService";
 
 
@@ -66,12 +63,12 @@ export default class ConfigView extends Component {
                             <br/><br/>
                             {isPlaying
                                 ? <img style={{border: "1px solid black"}} id="video" controls width="500" height="260"
-                                       src={"http://localhost:" + this.state.port + "/stream"}></img>
+                                       src={"http://localhost:" + this.state.port + "/stream"}/>
 
 
                                 :
                                 <img style={{border: "1px solid black"}} id="video" controls width="500" height="260"
-                                     src={"http://localhost:" + this.state.port + "/ss"}></img>
+                                     src={"http://localhost:" + this.state.port + "/ss"}/>
                             }
                             <br/><br/><Button style={{width: "500px"}} type="primary"
                                               onClick={() => this.setState({isPlaying: !isPlaying})}>PLAY/PAUSE</Button>

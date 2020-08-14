@@ -2,12 +2,8 @@ package io.synlabs.synvision.controller.atcc;
 
 import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.controller.MediaUploadController;
-import io.synlabs.synvision.ex.AuthException;
 import io.synlabs.synvision.service.AtccDataService;
 import io.synlabs.synvision.views.*;
-import io.synlabs.synvision.views.anpr.AnprFilterRequest;
-import io.synlabs.synvision.views.anpr.AnprRequest;
-import io.synlabs.synvision.views.anpr.AnprResponse;
 import io.synlabs.synvision.views.atcc.AtccEventFilterRequest;
 import io.synlabs.synvision.views.atcc.AtccRawDataResponse;
 import io.synlabs.synvision.views.atcc.AtccSummaryDataResponse;
@@ -22,7 +18,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.*;
+import static io.synlabs.synvision.auth.SynvisionAuth.Privileges.*;
 
 @RestController
 @RequestMapping("/api/atcc/")
