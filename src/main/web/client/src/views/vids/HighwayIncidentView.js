@@ -37,7 +37,7 @@ export default class HighwayIncidentView extends Component {
             loading: true,
             layout: "list",
             incidentType: "",
-            location: "",
+            location: "All",
             feedID: 0,
             feedOptions: [],
             incidentOptions: [],
@@ -142,7 +142,7 @@ export default class HighwayIncidentView extends Component {
         if (choice.item.props.children == "All") {
             feedID = 0;
             this.setState({feedID: feedID})
-            this.setState({location: ""})
+            this.setState({location: "All"})
         } else {
             feedID = choice.item.props.id;
             this.setState({feedID: feedID});

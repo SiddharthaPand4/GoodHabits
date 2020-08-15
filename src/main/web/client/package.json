@@ -27,8 +27,9 @@
     "react-scripts": "3.1.1",
     "react-stomp": "^5.0.0",
     "react-table-6": "^6.11.0",
-    "react-webcam": "^5.0.0",
+    "react-webcam": "^5.2.0",
     "sockjs-client": "^1.4.0",
+    "stompjs": "^2.3.3",
     "styled-components": "latest",
     "use-image": "^1.0.5",
     "video-react": "^0.14.1"

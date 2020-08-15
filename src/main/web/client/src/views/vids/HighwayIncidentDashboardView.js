@@ -1,11 +1,13 @@
 import React, {Component} from "react";
 import {Doughnut, Pie} from 'react-chartjs-2';
-import {Card, Col, Empty, Row, Tag} from "antd";
+import {Card, Col, Empty, Row, Tag,Collapse,Dropdown,Button, Menu,notification,Icon} from "antd";
 
 import DashboardService from "../../services/DashboardService";
-
 import 'chartjs-plugin-datalabels';
 import VidsService from "../../services/VidsService";
+import feedService from "../../services/FeedService";
+
+const {Panel} = Collapse;
 
 let flow_hourly_data = {
     labels: [],
@@ -41,22 +43,40 @@ export default class HighwayIncidentDashboardView extends Component {
             flow_today_data: flow_today_data,
             incident_data: incident_data,
             loaded: false,
+            feedID: 0,
+            feedOptions: [],
+            location:'All'
         };
 
         this.refresh = this.refresh.bind(this);
+        this.getFeeds = this.getFeeds.bind(this);
+        this.handleLocationMenuClick = this.handleLocationMenuClick.bind(this);
     }
 
     componentDidMount() {
         this.intervalID = setInterval(this.refresh.bind(this), 5 * 1000);
         this.refresh();
+        this.getFeeds();
     }
 
     componentWillUnmount() {
         clearInterval(this.intervalID);
     }
 
+    getFeeds() {
+        feedService.getFeeds().then(response => {
+            this.setState({feedOptions: response.data});
+        }).catch(error => {
+            notification.open({
+                message: 'Something went wrong ',
+                discription: error
+            });
+        })
+    }
+
     refresh() {
-        VidsService.getStats().then(response => {
+        var req={feedId:this.state.feedID};
+        VidsService.getStats(req).then(response => {
             let onehrlabels = [];
             let onehrvalues = [];
             for (let i = 0; i < response.data.onehourstats.length; i++) {
@@ -102,9 +122,37 @@ export default class HighwayIncidentDashboardView extends Component {
         })
     }
 
+    handleLocationMenuClick(choice) {
+        let feedID;
+        if (choice.item.props.children == "All") {
+            feedID = null;
+            this.setState({feedID: feedID},()=>{this.refresh()})
+            this.setState({location: "All"})
+        } else {
+            feedID = choice.item.props.id;
+            this.setState({feedID: feedID},()=>{this.refresh()});
+            this.setState({location: choice.item.props.children});
+
+
+        }
+    }
+
     render() {
         let {flow_hourly_data, flow_today_data, incident_data, loaded} = this.state;
         let stats = this.state.stats;
+
+        const locationMenu = (
+
+            <Menu onClick={this.handleLocationMenuClick}>
+                <Menu.Item key={'0'}>All</Menu.Item>
+                {(this.state.feedOptions || []).map((feed) =>
+                    <Menu.Item key={feed.id} id={feed.id}>
+                        {feed.site + ">" + feed.location}
+                    </Menu.Item>
+                )}
+            </Menu>
+
+        );
 
         if (!loaded) {
             return <Empty/>
@@ -112,6 +160,17 @@ export default class HighwayIncidentDashboardView extends Component {
 
         return (
             <div>
+                <Collapse bordered={false} defaultActiveKey={['1']}>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <Panel header="Filter" key="1">
+                        Location <Dropdown overlay={locationMenu}>
+                        <Button color="#f50">
+                            {this.state.location}<Icon type="down"/>
+                        </Button>
+                    </Dropdown>
+
+                    </Panel>
+                </Collapse>
                 <Row>
                     <Col xl={12} lg={12} md={12} sm={24} xs={24}>
                         <Row>
