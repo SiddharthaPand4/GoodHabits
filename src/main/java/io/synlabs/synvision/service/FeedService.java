@@ -37,12 +37,7 @@ public class FeedService {
 
     public Feed addFeed(FeedRequest request) {
         validateFeed(request);
-        Feed feed = feedRepository.findByUrl(request.getUrl());
-        if (feed != null) {
-            throw new ValidationException(String.format("Feed ID already exists", request.getUrl()));
-
-        }
-        feed = request.toEntity();
+        Feed feed = request.toEntity();
         return feedRepository.save(feed);
 
     }
@@ -65,7 +60,7 @@ public class FeedService {
 
     public Feed updateFeed(FeedRequest request) {
         validateFeed(request);
-        Feed feed = feedRepository.findByUrl(request.getUrl());
+        Feed feed=feedRepository.getOne(request.getId());
         request.toEntity(feed);
         return feedRepository.save(feed);
 
