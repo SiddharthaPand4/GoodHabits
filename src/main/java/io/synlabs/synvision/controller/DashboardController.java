@@ -13,10 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 import java.util.List;
 
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.*;
+import static io.synlabs.synvision.auth.SynvisionAuth.Privileges.*;
 
 /**
  * Created by itrs on 10/23/2019.

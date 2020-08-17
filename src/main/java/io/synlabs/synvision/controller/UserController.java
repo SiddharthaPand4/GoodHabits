@@ -1,8 +1,6 @@
 package io.synlabs.synvision.controller;
 
 import io.synlabs.synvision.service.UserService;
-import io.synlabs.synvision.views.common.FeedRequest;
-import io.synlabs.synvision.views.common.FeedResponse;
 import io.synlabs.synvision.views.core.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -11,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.*;
+import static io.synlabs.synvision.auth.SynvisionAuth.Privileges.*;
 
 /**
  * Created by itrs on 10/14/2019.

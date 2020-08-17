@@ -45,6 +45,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(authFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(rateLimitFilter(), JwtFilter.class);
 
+
     }
 
     @Bean(name = "multipartResolver")

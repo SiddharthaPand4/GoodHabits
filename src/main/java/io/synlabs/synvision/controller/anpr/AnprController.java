@@ -2,7 +2,6 @@ package io.synlabs.synvision.controller.anpr;
 
 import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.controller.MediaUploadController;
-import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.service.AnprService;
 import io.synlabs.synvision.service.parking.AnprReportService;
 import io.synlabs.synvision.views.UploadFileResponse;
@@ -14,19 +13,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.*;
+import static io.synlabs.synvision.auth.SynvisionAuth.Privileges.*;
 
 /**
  * Created by itrs on 10/21/2019.

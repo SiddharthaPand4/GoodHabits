@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.PEPCOUNT_WRITE;
+import static io.synlabs.synvision.auth.SynvisionAuth.Privileges.PEPCOUNT_WRITE;
 
 @RestController
 @RequestMapping("/api/apc/dashboard/")

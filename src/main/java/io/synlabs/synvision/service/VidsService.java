@@ -14,6 +14,7 @@ import io.synlabs.synvision.jpa.FeedRepository;
 import io.synlabs.synvision.jpa.HighwayIncidentRepository;
 import io.synlabs.synvision.jpa.HighwayTrafficStateRepository;
 import io.synlabs.synvision.views.common.PageResponse;
+import io.synlabs.synvision.views.frs.AlertMessage;
 import io.synlabs.synvision.views.vids.*;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,6 +59,9 @@ public class VidsService {
     private FileStorageProperties fileStorageProperties;
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private SimpMessagingTemplate websocket;
 
     public PageResponse<VidsResponse> listIncidents(VidsFilterRequest request) {
         BooleanExpression query = getQuery(request);
@@ -127,6 +132,7 @@ public class VidsService {
         Feed feed = feedRepository.findOneByName(request.getSource());
         incident.setFeed(feed);
         incidentRepository.save(incident);
+        generateAlert(incident);
     }
 
 
@@ -155,6 +161,12 @@ public class VidsService {
         Feed feed = feedRepository.findOneByName(request.getSource());
         incident.setFeed(feed);
         incidentRepository.save(incident);
+        generateAlert(incident);
+    }
+
+    private void generateAlert(HighwayIncident incident) {
+        VidsAlertMessage message = new VidsAlertMessage(incident);
+        websocket.convertAndSend("/alert", message);
     }
 
     public Resource downloadIncidentImage(Long id) {

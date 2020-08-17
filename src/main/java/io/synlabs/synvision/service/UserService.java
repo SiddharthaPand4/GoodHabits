@@ -38,7 +38,7 @@ public class UserService extends BaseService implements UserDetailsService {
     private SynVisionUserRepository userRepository;
 
     @Autowired
-    UserMenuBuilder menuBuilder;
+    private UserMenuBuilder menuBuilder;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -189,7 +189,9 @@ public class UserService extends BaseService implements UserDetailsService {
     }
 
     public Menu getCurrentUserMenu() {
-        return menuBuilder.getMenu(getCurrentUser());
+        Menu menu = menuBuilder.getMenu(getCurrentUser());
+        menu.setAdmin(getCurrentUser().isAdmin());
+        return menu;
     }
 
     public void deleteRole(RoleRequest roleRequest) {

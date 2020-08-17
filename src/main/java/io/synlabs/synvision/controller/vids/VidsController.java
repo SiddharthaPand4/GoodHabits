@@ -5,7 +5,6 @@ import io.synlabs.synvision.controller.MediaUploadController;
 import io.synlabs.synvision.service.VidsDashboardService;
 import io.synlabs.synvision.service.VidsService;
 import io.synlabs.synvision.views.UploadFileResponse;
-import io.synlabs.synvision.views.common.FeedResponse;
 import io.synlabs.synvision.views.common.PageResponse;
 import io.synlabs.synvision.views.vids.*;
 import org.slf4j.Logger;
@@ -15,10 +14,8 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.VIDS_READ;
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.VIDS_WRITE;
+import static io.synlabs.synvision.auth.SynvisionAuth.Privileges.VIDS_READ;
+import static io.synlabs.synvision.auth.SynvisionAuth.Privileges.VIDS_WRITE;
 
 @RestController
 @RequestMapping("/api/vids/")
@@ -77,10 +74,10 @@ public class VidsController extends MediaUploadController {
         return UploadFile(file, tag, fileStorageProperties);
     }
 
-    @GetMapping("/stats")
+    @PostMapping("/stats")
     @Secured(VIDS_READ)
-    public VidsDashboardResponse getStats() {
-        return dashboardService.dashboardstats();
+    public VidsDashboardResponse getStats(@RequestBody VidsFilterRequest request) {
+        return dashboardService.dashboardstats(request);
     }
 
 

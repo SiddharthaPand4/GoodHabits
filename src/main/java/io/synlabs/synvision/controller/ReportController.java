@@ -23,8 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.*;
 
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.ANPR_READ;
-import static io.synlabs.synvision.auth.LicenseServerAuth.Privileges.PARKING_READ;
+import static io.synlabs.synvision.auth.SynvisionAuth.Privileges.ANPR_READ;
+import static io.synlabs.synvision.auth.SynvisionAuth.Privileges.PARKING_READ;
 
 /**
  * Created by itrs on 02/03/2020.
