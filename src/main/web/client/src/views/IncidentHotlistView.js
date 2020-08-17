@@ -74,9 +74,13 @@ export default class IncidentHotlistView extends Component {
     }
 
     componentDidMount() {
+        this.myInstant=setInterval(()=>{this.refresh()},30000);
         this.refresh();
     }
+    componentWillUnmount() {
+        clearInterval(this.myInstant);
 
+    }
     refresh() {
         AnprService.getIncidentsHotlisted(this.state.filter).then(request => {
             this.setState({"anprresponse": request.data, loading: false})
