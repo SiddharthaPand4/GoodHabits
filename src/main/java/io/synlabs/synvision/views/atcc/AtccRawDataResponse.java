@@ -24,6 +24,7 @@ public class AtccRawDataResponse implements Response {
     private String location;
     private String vehicleImage;
     private String vid;
+    private String eventVideo;
 
     public AtccRawDataResponse(AtccEvent atccEvent) {
         this.id = atccEvent.getId();
@@ -37,5 +38,6 @@ public class AtccRawDataResponse implements Response {
         this.vehicleImage = atccEvent.getEventImage();
         this.seek = atccEvent.getSeek();
         this.vid = atccEvent.getVid();
+        this.eventVideo=atccEvent.getEventVideo();
     }
 }

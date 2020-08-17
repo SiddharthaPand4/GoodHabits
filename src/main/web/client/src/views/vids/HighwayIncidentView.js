@@ -155,7 +155,7 @@ export default class HighwayIncidentView extends Component {
     downloadVideo(e) {
         VidsService.downloadVideo(e.id)
             .then((response) => {
-                saveAs(response.data,  + "video.mp4");
+                saveAs(response.data, e.timeStamp + ".mp4");
             }).catch(error => {
             alert("Something went wrong!");
         })
@@ -164,7 +164,7 @@ export default class HighwayIncidentView extends Component {
     downloadImage(e) {
         VidsService.downloadScreenshot(e.id)
             .then((response) => {
-                saveAs(response.data, "image.jpg");
+                saveAs(response.data, e.timeStamp + ".jpg");
             }).catch(error => {
             alert("Something went wrong!");
         })
@@ -283,18 +283,25 @@ export default class HighwayIncidentView extends Component {
                                 }
 
                                 extra={<Dropdown overlay={<Menu>
-                                    <Menu.Item key="1">
+                                    {
+                                        (event.incidentImage!="")?
+                                        <Menu.Item key="1">
                                         <a
                                             title={"click here to download"}
-                                            onClick={()=>this.downloadImage(event)}
-                                            ><Icon type="download"/>{' '} Image</a>
+                                            onClick={() => this.downloadImage(event)}
+                                        ><Icon type="download"/>{' '} Image</a>
                                     </Menu.Item>
-                                    <Menu.Item key="2">
-                                        <a
-                                            title={"click here to download"}
-                                            onClick={()=>this.downloadVideo(event)}
-                                           ><Icon type="download"/>{' '} Video</a>
-                                    </Menu.Item>
+                                            : null
+                                    }
+                                    {(event.incidentVideo!="")?
+                                        <Menu.Item key="2">
+                                            <a
+                                                title={"click here to download"}
+                                                onClick={() => this.downloadVideo(event)}
+                                            ><Icon type="download"/>{' '} Video</a>
+                                        </Menu.Item>
+                                        :null
+                                    }
                                     <Menu.Item key="3">
                                         <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon
                                             type="warning"/>{' '}

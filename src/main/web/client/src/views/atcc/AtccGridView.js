@@ -238,19 +238,26 @@ export default class AtccGridView extends Component {
                                     <Menu.Item key="0" onClick={() => this.magnifyEvent(event)}><Icon type="zoom-in"/>Zoom
                                         image
                                     </Menu.Item>
-                                    <Menu.Item key="1">
+                                    {
+                                        (event.vehicleImage != "") ?
+                                            <Menu.Item key="1">
+                                                <a
+                                                    title={"click here to download"}
+                                                    onClick={() => this.downloadImage(event)}
+                                                ><Icon type="download"/>{' '} Image</a>
+                                            </Menu.Item>
+                                            :
+                                            null
+                                    }
+                                    {(event.eventVideo !="") ?
+                                        <Menu.Item key="2">
                                         <a
-                                            title={"click here to download"}
-                                            onClick={()=> this.downloadImage(event)}
-                                            ><Icon type="download"/>{' '} Image</a>
-                                    </Menu.Item>
-                                    <Menu.Item key="2">
-                                        <a
-                                            title={"click here to download"}
-                                            onClick={() => this.downloadVideo(event)}
+                                        title={"click here to download"}
+                                        onClick={() => this.downloadVideo(event)}
                                         ><Icon type="download"/>{' '} Video</a>
-                                    </Menu.Item>
-
+                                        </Menu.Item>
+                                        : null
+                                    }
                                 </Menu>}>
                                     <Button>
                                         More <Icon type="down"/>
@@ -264,14 +271,13 @@ export default class AtccGridView extends Component {
                                             <Magnifier src={"/public/atcc/screenshot/" + event.id}
                                                        zoomFactor={zoomFactor}/>
                                             :
-                                            <img alt="event"
+                                            <img alt={"event"}
                                                  src={"/public/atcc/screenshot/" + event.id}/>
                                     )
                                     :
                                     (<Player
                                         playsInline
-                                        poster={"/public/atcc/screenshot/" + event.id}
-                                        src={"/public/atcc/video/" + event.id}
+                                        src={"/public/atcc/video/" + event.id} alt={"No video"}
                                     />)
                                 }
 
@@ -385,7 +391,7 @@ export default class AtccGridView extends Component {
     downloadVideo(e) {
         AtccService.downloadVideo(e.id)
             .then((response) => {
-                saveAs(response.data, e.vid + ".mp4");
+                saveAs(response.data, e.timeStamp + ".mp4");
             }).catch(error => {
             alert("Something went wrong!");
         })
@@ -394,7 +400,7 @@ export default class AtccGridView extends Component {
     downloadImage(e) {
         AtccService.downloadScreenshot(e.id)
             .then((response) => {
-                saveAs(response.data, "image.jpg");
+                saveAs(response.data, e.timeStamp +".jpg");
             }).catch(error => {
             alert("Something went wrong!");
         })
