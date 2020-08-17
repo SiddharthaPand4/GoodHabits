@@ -277,6 +277,7 @@ export default class AtccGridView extends Component {
                                     :
                                     (<Player
                                         playsInline
+                                        poster={"/public/atcc/screenshot/" + event.id}
                                         src={"/public/atcc/video/" + event.id} alt={"No video"}
                                     />)
                                 }
