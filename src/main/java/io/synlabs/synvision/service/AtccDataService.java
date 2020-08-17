@@ -1,6 +1,7 @@
 package io.synlabs.synvision.service;
 
 import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.entity.anpr.AnprEvent;
 import io.synlabs.synvision.entity.atcc.AtccEvent;
@@ -16,6 +17,7 @@ import io.synlabs.synvision.views.common.DummyRequest;
 import io.synlabs.synvision.views.common.PageResponse;
 import io.synlabs.synvision.views.common.ResponseWrapper;
 import io.synlabs.synvision.views.common.SearchRequest;
+import org.joda.time.DateTime;
 import org.simpleflatmapper.csv.CsvWriter;
 import org.simpleflatmapper.util.CheckedConsumer;
 import org.slf4j.Logger;
@@ -479,6 +481,14 @@ public class AtccDataService extends BaseService {
             logger.error("Error in parsing date", e);
         }
         return query;
+    }
+    @Transactional
+    public void deleteData (int days)
+    {
+        Date date=new DateTime().minusDays(days).toDate() ;
+        QAtccEvent atccEvent=new QAtccEvent("atccEvent");
+        JPAQueryFactory query=new JPAQueryFactory(entityManager);
+        query.delete(atccEvent).where(atccEvent.eventDate.before(date)).execute();
     }
 
 
