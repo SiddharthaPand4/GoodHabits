@@ -61,14 +61,19 @@ public class DashboardService extends BaseService {
 
         switch (xAxis) {
             case "Hourly":
-                result = query
+                query
                         .select(
                                 rawData.eventDate.hour(),
                                 rawData.type,
                                 rawData.count())
                         .from(rawData)
-                        .where(rawData.eventDate.between(request.getFrom(), request.getTo()))
-                        .groupBy(rawData.eventDate.hour(), rawData.type)
+                        .where(rawData.eventDate.between(request.getFrom(), request.getTo()));
+
+                if (request.getFeedId()!=null && request.getFeedId() != 0) {
+                    query.where(rawData.feed.id.eq(request.getFeedId()));
+                }
+
+                result = query.groupBy(rawData.eventDate.hour(), rawData.type)
                         .fetch();
 
                 for (int i = 0; i < result.size(); i++) {
@@ -84,15 +89,23 @@ public class DashboardService extends BaseService {
             case "Daily":
             default:
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                result = query
+                        query
                         .select(
                                 rawData.eventDate,
                                 rawData.type,
                                 rawData.count())
                         .from(rawData)
-                        .where(rawData.eventDate.between(request.getFrom(), request.getTo()))
+                        .where(rawData.eventDate.between(request.getFrom(), request.getTo()));
+
+                if (request.getFeedId()!=null && request.getFeedId() != 0) {
+                    query.where(rawData.feed.id.eq(request.getFeedId()));
+                }
+
+
+                result = query
                         .groupBy(rawData.eventDate.dayOfMonth(), rawData.eventDate.month(), rawData.eventDate.year(),rawData.type)
                         .fetch();
+
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
                     vehicleType = tuple.get(rawData.type);
@@ -140,14 +153,20 @@ public class DashboardService extends BaseService {
 
         switch (xAxis) {
             case "Hourly":
-                result = query
-                        .select(
-                                anprEvent.eventDate,
-                                anprEvent.count())
-                        .from(anprEvent)
-                        .where(anprEvent.eventDate.between(request.getFrom(), request.getTo()))
-                        .where(anprEvent.helmetMissing.isTrue())
-                        .groupBy(anprEvent.eventDate.hour())
+                query
+                   .select(
+                           anprEvent.eventDate,
+                           anprEvent.count())
+                   .from(anprEvent)
+                   .where(anprEvent.eventDate.between(request.getFrom(), request.getTo()))
+                   .where(anprEvent.helmetMissing.isTrue());
+
+                if (request.getFeedId()!=null && request.getFeedId() != 0) {
+                    query.where(anprEvent.feed.id.eq(request.getFeedId()));
+                }
+
+
+                result = query.groupBy(anprEvent.eventDate.hour())
                         .fetch();
 
                 Calendar calendar = Calendar.getInstance();
@@ -166,15 +185,23 @@ public class DashboardService extends BaseService {
             case "Daily":
             default:
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                result = query
+                query
                         .select(
                                 anprEvent.eventDate,
                                 anprEvent.count())
                         .from(anprEvent)
                         .where(anprEvent.eventDate.between(request.getFrom(), request.getTo()))
-                        .where(anprEvent.helmetMissing.isTrue())
+                        .where(anprEvent.helmetMissing.isTrue());
+
+                if (request.getFeedId()!=null && request.getFeedId() != 0) {
+                    query.where(anprEvent.feed.id.eq(request.getFeedId()));
+                }
+
+
+                result = query
                         .groupBy(anprEvent.eventDate.dayOfMonth(), anprEvent.eventDate.month(), anprEvent.eventDate.year())
                         .fetch();
+
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
                     IncidentCountResponse incidentCount = new IncidentCountResponse(formatter.format(tuple.get(0, Date.class)), "helmetMissing", tuple.get(1, Long.class));
@@ -199,14 +226,20 @@ public class DashboardService extends BaseService {
 
         switch (xAxis) {
             case "Hourly":
-                result = query
-                        .select(
-                                anprEvent.eventDate,
-                                anprEvent.count())
-                        .from(anprEvent)
-                        .where(anprEvent.eventDate.between(request.getFrom(), request.getTo()))
-                        .where(anprEvent.direction.eq("rev"))
-                        .groupBy(anprEvent.eventDate.hour())
+                query
+                  .select(
+                          anprEvent.eventDate,
+                          anprEvent.count())
+                  .from(anprEvent)
+                  .where(anprEvent.eventDate.between(request.getFrom(), request.getTo()))
+                  .where(anprEvent.direction.eq("rev"));
+
+                if (request.getFeedId()!=null && request.getFeedId() != 0) {
+                    query.where(anprEvent.feed.id.eq(request.getFeedId()));
+                }
+
+
+                result = query.groupBy(anprEvent.eventDate.hour())
                         .fetch();
 
                 Calendar calendar = Calendar.getInstance();
@@ -224,15 +257,23 @@ public class DashboardService extends BaseService {
             case "Daily":
             default:
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                query
+                   .select(
+                           anprEvent.eventDate,
+                           anprEvent.count())
+                   .from(anprEvent)
+                   .where(anprEvent.eventDate.between(request.getFrom(), request.getTo()))
+                   .where(anprEvent.direction.eq("rev"));
+
+                if (request.getFeedId()!=null && request.getFeedId() != 0) {
+                    query.where(anprEvent.feed.id.eq(request.getFeedId()));
+                }
+
+
                 result = query
-                        .select(
-                                anprEvent.eventDate,
-                                anprEvent.count())
-                        .from(anprEvent)
-                        .where(anprEvent.eventDate.between(request.getFrom(), request.getTo()))
-                        .where(anprEvent.direction.eq("rev"))
                         .groupBy(anprEvent.eventDate.dayOfMonth(), anprEvent.eventDate.month(), anprEvent.eventDate.year())
                         .fetch();
+
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
                     IncidentCountResponse incidentCount = new IncidentCountResponse(formatter.format(tuple.get(0, Date.class)), "rev", tuple.get(1, Long.class));
@@ -428,14 +469,20 @@ public class DashboardService extends BaseService {
 
         switch (xAxis) {
             case "Hourly":
-                result = query
-                        .select(
-                                rawData.eventDate.hour(),
-                                rawData.vehicleClass,
-                                rawData.count())
-                        .from(rawData)
-                        .where(rawData.eventDate.between(request.getFrom(), request.getTo()))
-                        .groupBy(rawData.eventDate.hour(), rawData.vehicleClass)
+                 query
+                    .select(
+                            rawData.eventDate.hour(),
+                            rawData.vehicleClass,
+                            rawData.count())
+                    .from(rawData)
+                    .where(rawData.eventDate.between(request.getFrom(), request.getTo()));
+
+                if (request.getFeedId()!=null && request.getFeedId() != 0) {
+                    query.where(rawData.feed.id.eq(request.getFeedId()));
+                }
+
+
+                result = query.groupBy(rawData.eventDate.hour(), rawData.vehicleClass)
                         .fetch();
 
                 for (int i = 0; i < result.size(); i++) {
@@ -451,15 +498,21 @@ public class DashboardService extends BaseService {
             case "Daily":
             default:
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                result = query
-                        .select(
-                                rawData.eventDate,
-                                rawData.vehicleClass,
-                                rawData.count())
-                        .from(rawData)
-                        .where(rawData.eventDate.between(request.getFrom(), request.getTo()))
-                        .groupBy(rawData.eventDate.dayOfMonth(), rawData.eventDate.month(), rawData.eventDate.year(),rawData.vehicleClass)
+                query
+                  .select(
+                          rawData.eventDate,
+                          rawData.vehicleClass,
+                          rawData.count())
+                  .from(rawData)
+                  .where(rawData.eventDate.between(request.getFrom(), request.getTo()));
+
+                if (request.getFeedId()!=null && request.getFeedId() != 0) {
+                    query.where(rawData.feed.id.eq(request.getFeedId()));
+                }
+
+                result = query.groupBy(rawData.eventDate.dayOfMonth(), rawData.eventDate.month(), rawData.eventDate.year(),rawData.vehicleClass)
                         .fetch();
+
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
                     date = tuple.get(0, Date.class);
