@@ -3,7 +3,10 @@ package io.synlabs.synvision.service;
 import com.google.gson.Gson;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import io.synlabs.synvision.config.Local;
 import io.synlabs.synvision.entity.anpr.*;
 import io.synlabs.synvision.entity.core.Feed;
 import io.synlabs.synvision.entity.parking.ParkingEvent;
@@ -12,9 +15,11 @@ import io.synlabs.synvision.enums.VehicleType;
 import io.synlabs.synvision.jpa.*;
 import io.synlabs.synvision.views.anpr.*;
 import io.synlabs.synvision.views.common.PageResponse;
+import io.synlabs.synvision.views.hotlist.HotListVehicleResponse;
 import io.synlabs.synvision.views.parking.ParkingEventResponse;
 import io.synlabs.synvision.views.parking.ParkingReportRequest;
 import io.synlabs.synvision.views.parking.ParkingReportResponse;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +29,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
@@ -32,7 +38,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Duration;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -951,5 +957,14 @@ public class AnprService extends BaseService {
         fileWriter.flush();
         fileWriter.close();
         return  filename;
+    }
+
+    @Transactional
+    public void deleteData (int days)
+    {
+        Date date=new DateTime().minusDays(days).toDate() ;
+        QAnprEvent anprEvent=new QAnprEvent("anprEvent");
+        JPAQueryFactory query=new JPAQueryFactory(entityManager);
+        query.delete(anprEvent).where(anprEvent.eventDate.before(date)).execute();
     }
 }
