@@ -26,7 +26,7 @@ public class FeedService {
     private Process process;
 
     private final FeedRepository feedRepository;
-    private HashMap<Long,Integer> processMap=new HashMap<Long,Integer>();
+    private HashMap<Long, Integer> processMap = new HashMap<Long, Integer>();
 
     @Value("${streamer.dir}")
     private String streamderDir;
@@ -37,11 +37,19 @@ public class FeedService {
 
     public Feed addFeed(FeedRequest request) {
         validateFeed(request);
-        Feed feed = feedRepository.findByUrl(request.getUrl());
-        if (feed != null) {
-            throw new ValidationException(String.format("Feed ID already exists", request.getUrl()));
-
+        Feed feed=feedRepository.findOneByName(request.getName());
+        if(feed!=null)
+        {
+            throw new ValidationException(String.format("Feed Name already exists", request.getName()));
         }
+        Feed check=feedRepository.findByUrl(request.getUrl());
+            if(check!=null)
+            {
+                if(request.getUrl()!="")
+                {
+                    throw new ValidationException(String.format("Feed Url already exists", request.getUrl()));
+                }
+            }
         feed = request.toEntity();
         return feedRepository.save(feed);
 
@@ -65,17 +73,13 @@ public class FeedService {
 
     public Feed updateFeed(FeedRequest request) {
         validateFeed(request);
-        Feed feed = feedRepository.findByUrl(request.getUrl());
+        Feed feed = feedRepository.getOne(request.getId());
         request.toEntity(feed);
         return feedRepository.save(feed);
 
     }
 
     private void validateFeed(FeedRequest request) {
-        if (StringUtils.isEmpty(request.getUrl())) {
-            throw new ValidationException("Url is required");
-        }
-
 
         if (StringUtils.isEmpty(request.getLocation())) {
             throw new ValidationException("Location is required.");
@@ -94,27 +98,24 @@ public class FeedService {
     public int startFeed(FeedRequest request) {
         File dir = new File(streamderDir);
         Feed feed = feedRepository.getOne(request.getId());
-        int port =0;
+        int port = 0;
 
-        if(processMap.containsKey(request.getId()))
-        {
-           port= processMap.get(request.getId());
-        }
-        else
-        {
-            Random rand =  new Random();
-            port=rand.nextInt((9005-9000)+1)+9000;//small range for trial.can be scaled as per use
-            if(!processMap.containsValue(port)){
-                processMap.put(request.getId(),port);
-            } 
+        if (processMap.containsKey(request.getId())) {
+            port = processMap.get(request.getId());
+        } else {
+            Random rand = new Random();
+            port = rand.nextInt((9005 - 9000) + 1) + 9000;//small range for trial.can be scaled as per use
+            if (!processMap.containsValue(port)) {
+                processMap.put(request.getId(), port);
+            }
 
         }
 
-        String StreamCmd="streamer " + feed.getUrl() + " localhost:" +port;
+        String StreamCmd = "streamer " + feed.getUrl() + " localhost:" + port;
         try {
             process = Runtime.getRuntime().exec(StreamCmd, null, dir);
             System.out.println(Arrays.asList(processMap));
-          return port;
+            return port;
 
         } catch (IOException e) {
             throw new FeedStreamException("Couldn't start streaming from feed by command =>" + StreamCmd);
