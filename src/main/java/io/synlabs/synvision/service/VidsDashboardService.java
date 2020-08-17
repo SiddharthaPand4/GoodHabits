@@ -9,6 +9,7 @@ import io.synlabs.synvision.enums.HighwayIncidentType;
 import io.synlabs.synvision.jpa.HighwayTrafficStateRepository;
 import io.synlabs.synvision.views.DashboardResponse;
 import io.synlabs.synvision.views.vids.VidsDashboardResponse;
+import io.synlabs.synvision.views.vids.VidsFilterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,60 +29,75 @@ public class VidsDashboardService {
     @Autowired
     HighwayTrafficStateRepository trafficStateRepository;
 
-    public VidsDashboardResponse dashboardstats() {
+    public VidsDashboardResponse dashboardstats(VidsFilterRequest request) {
         LocalDateTime localDateTime = LocalDateTime.now();
-        Date now = Date.from( localDateTime.atZone( ZoneId.systemDefault()).toInstant());
+        Date now = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
         //hour atcc
-        Date hr1 = Date.from( localDateTime.minusHours(1).atZone( ZoneId.systemDefault()).toInstant());
+        Date hr1 = Date.from(localDateTime.minusHours(1).atZone(ZoneId.systemDefault()).toInstant());
 
         //daily atcc from 6 am today
-        Date startofday = Date.from( localDateTime.withHour(6).withMinute(0).withSecond(0).atZone( ZoneId.systemDefault()).toInstant());
+        Date startofday = Date.from(localDateTime.withHour(6).withMinute(0).withSecond(0).atZone(ZoneId.systemDefault()).toInstant());
 
         QAtccEvent rawData = new QAtccEvent("atccEvent");
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
 
-        List<Tuple> result = query
-                .select(
-                        rawData.type,
-                        rawData.count())
-                .from(rawData)
-                .where(rawData.eventDate.between(startofday, now))
-                .groupBy(rawData.type)
-                .fetch();
+        query
+             .select(
+                     rawData.type,
+                     rawData.count())
+             .from(rawData)
+             .where(rawData.eventDate.between(startofday, now));
+
+
+        if (request.getFeedId()!=null && request.getFeedId() != 0) {
+            query.where(rawData.feed.id.eq(request.getFeedId()));
+        }
+
+        query.groupBy(rawData.type);
+
+        List<Tuple> result = query.fetch();
 
         List<DashboardResponse> todaystats = toList(result);
 
-        result = query
+        query
                 .select(
                         rawData.type,
                         rawData.count())
                 .from(rawData)
-                .where(rawData.eventDate.between(hr1, now))
-                .groupBy(rawData.type)
-                .fetch();
+                .where(rawData.eventDate.between(hr1, now));
+
+        if (request.getFeedId()!=null && request.getFeedId() != 0) {
+            query.where(rawData.feed.id.eq(request.getFeedId()));
+        }
+
+        result= query.groupBy(rawData.type).fetch();
 
         List<DashboardResponse> onehourstats = toList(result);
 
         //current traffic status
-        List<DashboardResponse> incidents = getIncidentStats(startofday, now);
+        List<DashboardResponse> incidents = getIncidentStats(startofday, now,request);
 
         HighwayTrafficState state = trafficStateRepository.findFirstByOrderByUpdateDateDesc();
         return new VidsDashboardResponse(onehourstats, todaystats, incidents, state);
     }
 
-    private List<DashboardResponse> getIncidentStats(Date startofday, Date now) {
+    private List<DashboardResponse> getIncidentStats(Date startofday, Date now,VidsFilterRequest request) {
         QHighwayIncident inci = new QHighwayIncident("highwayIncident");
         JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
 
-        List<Tuple> result = query
-                .select(
-                        inci.incidentType,
-                        inci.count())
-                .from(inci)
-                .where(inci.incidentDate.between(startofday, now))
-                .groupBy(inci.incidentType)
-                .fetch();
+         query
+             .select(
+                     inci.incidentType,
+                     inci.count())
+             .from(inci)
+             .where(inci.incidentDate.between(startofday, now));
+
+        if (request.getFeedId()!=null && request.getFeedId() != 0) {
+            query.where(inci.feed.id.eq(request.getFeedId()));
+        }
+
+        List<Tuple> result = query.groupBy(inci.incidentType).fetch();
 
         List<DashboardResponse> stats = new ArrayList<>();
         for (int i = 0; i < result.size(); i++) {

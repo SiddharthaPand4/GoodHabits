@@ -74,10 +74,10 @@ public class VidsController extends MediaUploadController {
         return UploadFile(file, tag, fileStorageProperties);
     }
 
-    @GetMapping("/stats")
+    @PostMapping("/stats")
     @Secured(VIDS_READ)
-    public VidsDashboardResponse getStats() {
-        return dashboardService.dashboardstats();
+    public VidsDashboardResponse getStats(@RequestBody VidsFilterRequest request) {
+        return dashboardService.dashboardstats(request);
     }
 
 
