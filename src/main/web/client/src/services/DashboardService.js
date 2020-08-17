@@ -33,29 +33,32 @@ class DashboardService {
         return axios.post('/api/dashboard/vehiclescount/month', filter);
     }
 
-    getAtccVehicleCount(fromDate, toDate, xAxis) {
+    getAtccVehicleCount(fromDate, toDate, xAxis,feedID) {
         let filter = {
             fromDateString: moment(fromDate).format('YYYY-MM-DD HH:mm:ss'),
             toDateString: moment(toDate).format('YYYY-MM-DD HH:mm:ss"'),
-            xAxis: xAxis
+            xAxis: xAxis,
+            feedId:feedID
         };
         return axios.post('/api/dashboard/atcc/vehicle/count', filter);
     }
 
-    getAnprVehicleCount(fromDate, toDate, xAxis) {
+    getAnprVehicleCount(fromDate, toDate, xAxis,feedID) {
         let filter = {
             fromDateString: moment(fromDate).format('YYYY-MM-DD HH:mm:ss'),
             toDateString: moment(toDate).format('YYYY-MM-DD HH:mm:ss"'),
-            xAxis: xAxis
+            xAxis: xAxis,
+            feedId:feedID
         };
         return axios.post('/api/dashboard/anpr/vehicle/count', filter);
     }
 
-    getIncidentVehicleCount(fromDate, toDate, xAxis) {
+    getIncidentVehicleCount(fromDate, toDate, xAxis,feedID) {
         let filter = {
             fromDateString: moment(fromDate).format('YYYY-MM-DD HH:mm:ss'),
             toDateString: moment(toDate).format('YYYY-MM-DD HH:mm:ss'),
-            xAxis: xAxis
+            xAxis: xAxis,
+            feedId:feedID
         };
         return axios.post('/api/dashboard/incident/vehicle/count', filter);
     }
