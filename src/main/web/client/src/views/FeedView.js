@@ -271,9 +271,6 @@ close()
         feed.name = form.getFieldValue("name");
         feed.id=this.props.feed.id
         let validationError;
-        if (!feed.url) {
-            validationError = "Missing url"
-        }
 
         if (!feed.site) {
             validationError = "Missing site"
@@ -326,7 +323,7 @@ close()
                             <Form.Item>
                                 {getFieldDecorator('url', {
                                         initialValue:this.props.feed.url,
-                                        rules: [{required: true, message: 'enter feed url!'}],})(
+                                        })(
                                     <Input addonBefore="Feed&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
                                            placeholder="rtsp://"/>,
                                 )}
