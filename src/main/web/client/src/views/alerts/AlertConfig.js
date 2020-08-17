@@ -42,25 +42,29 @@ export default class AlertConfig extends Component {
 
     render() {
         return (
-            <div>
+            <div style={{padding:"40px"}}>
                 <h1 align={"center"}>Hotlisted Vehicles Alert Settings</h1>
                 <Card>
                     {this.state.alertTypes.map((type, i) =>
-                        <Row dataIndex={i}>
-                            <Col offset={8} span={8}>
-                                {type.alertType}
-                            </Col>
-                            <Col>
-                                <Switch checked={type.status} onChange={status => this.toggleAlert(status, i)} />
-                            </Col>
-                        </Row>
+                        <Card type={"small"} bordered={false}>
+                            <Row>
+                                <Col offset={7} span={8}>
+                                    {type.alertType}
+                                </Col>
+                                <Col>
+                                    <Switch checked={type.status} onChange={status => this.toggleAlert(status, i)} />
+                                </Col>
+                            </Row>
+                        </Card>
                     )}
                 </Card>
-                <Row>
-                    <Col offset={20}>
-                        <Button onClick={this.saveConfig}>Save</Button>
-                    </Col>
-                </Row>
+                <Card bordered={false}>
+                    <Row>
+                        <Col offset={11}>
+                            <Button type={"primary"} onClick={this.saveConfig}>Save</Button>
+                        </Col>
+                    </Row>
+                </Card>
             </div>
         )
 
