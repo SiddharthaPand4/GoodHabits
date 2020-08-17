@@ -7,11 +7,11 @@ class AlertService {
     }
 
     fetchAlertTypes() {
-        return axios.get("pending end point")
+        return axios.get("/api/setting/alerts/list")
     }
 
     saveAlertSettings(config) {
-        return axios.post("save alert config endpoint", config)
+        return axios.post("/api/setting/alerts/update", config)
     }
 
 }
