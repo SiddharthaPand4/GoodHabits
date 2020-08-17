@@ -43,7 +43,7 @@ export default class AlertConfig extends Component {
     render() {
         return (
             <div>
-                <h1>Hotlisted Vehicles Alert Settings</h1>
+                <h1 align={"center"}>Hotlisted Vehicles Alert Settings</h1>
                 <Card>
                     {this.state.alertTypes.map((type, i) =>
                         <Row dataIndex={i}>
