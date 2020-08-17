@@ -19,13 +19,9 @@ import javax.persistence.Enumerated;
 public class VidsAlertSetting extends AbstractPersistable<Long> {
 
     @Enumerated(EnumType.STRING)
+    @Column(unique = true)
     private HighwayIncidentType incidentType;
 
     private boolean enabled;
-
-    public VidsAlertSetting(AlertSettingsRequest alertSettingsRequest) {
-        this.incidentType = HighwayIncidentType.valueOf(alertSettingsRequest.getAlertType());
-        this.enabled = alertSettingsRequest.getStatus();
-    }
 
 }

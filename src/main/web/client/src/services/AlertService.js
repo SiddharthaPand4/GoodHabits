@@ -11,7 +11,7 @@ class AlertService {
     }
 
     saveAlertSettings(config) {
-        return axios.post("/api/setting/alerts/update", config)
+        return axios.put("/api/setting/alerts/update", config)
     }
 
 }

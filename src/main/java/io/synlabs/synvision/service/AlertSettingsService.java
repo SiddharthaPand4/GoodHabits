@@ -1,6 +1,7 @@
 package io.synlabs.synvision.service;
 
 import io.synlabs.synvision.entity.vids.VidsAlertSetting;
+import io.synlabs.synvision.enums.HighwayIncidentType;
 import io.synlabs.synvision.jpa.VidsAlertSettingRepository;
 import io.synlabs.synvision.views.AlertSettingsRequest;
 import io.synlabs.synvision.views.AlertSettingsResponse;
@@ -26,7 +27,13 @@ public class AlertSettingsService extends BaseService {
     }
 
     public void saveAlertSettings(List<AlertSettingsRequest> alertSettingsRequestList) {
-        vidsAlertSettingRepository.saveAll(alertSettingsRequestList.stream().map(VidsAlertSetting::new).collect(Collectors.toList()));
+        HashMap<HighwayIncidentType, VidsAlertSetting> vidAlertMap = new HashMap<>();
+        List<VidsAlertSetting> vidsAlertSettings = vidsAlertSettingRepository.findAll();
+        vidsAlertSettings.forEach(vidsAlertSetting -> vidAlertMap.put(vidsAlertSetting.getIncidentType(), vidsAlertSetting));
+
+        alertSettingsRequestList.forEach(alertSettingsRequest -> vidAlertMap.get(HighwayIncidentType.valueOf(alertSettingsRequest.getAlertType())).setEnabled(alertSettingsRequest.getStatus()));
+
+        vidsAlertSettingRepository.saveAll(vidsAlertSettings);
     }
 
 }
