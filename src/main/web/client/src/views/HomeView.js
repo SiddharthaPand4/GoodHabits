@@ -4,6 +4,7 @@ import DashboardService from "../services/DashboardService";
 import CommonService from "../services/CommonService";
 import Moment from 'moment';
 import {Line} from 'react-chartjs-2';
+import FeedService from "../services/FeedService";
 
 const {RangePicker} = DatePicker;
 
@@ -18,7 +19,9 @@ export default class HomeView extends Component {
                     selectedCustomDateRange: "Today",
                     selectedXAxisOption: "Hourly",
                     fromDate: {},
-                    toDate: {}
+                    toDate: {},
+                    feedID:0,
+                    location:'All'
                 },
                 chartData: {
                     labels: [],
@@ -29,7 +32,9 @@ export default class HomeView extends Component {
                     selectedCustomDateRange: "Today",
                     selectedXAxisOption: "Hourly",
                     fromDate: {},
-                    toDate: {}
+                    toDate: {},
+                    feedID:0,
+                    location:'All'
                 },
                 chartData: {
                     labels: [],
@@ -41,7 +46,9 @@ export default class HomeView extends Component {
                     selectedCustomDateRange: "Today",
                     selectedXAxisOption: "Hourly",
                     fromDate: {},
-                    toDate: {}
+                    toDate: {},
+                    feedID:0,
+                    location:'All'
                 },
                 chartData: {
                     labels: [],
@@ -50,7 +57,8 @@ export default class HomeView extends Component {
             },
             isAnprAllowed: false,
             isAtccAllowed: false,
-            isIncidentAllowed: false
+            isIncidentAllowed: false,
+            feedOptions:[],
         };
 
         this.getIncidentVehicleCount = this.getIncidentVehicleCount.bind(this);
@@ -63,12 +71,14 @@ export default class HomeView extends Component {
         this.getDateRangeOptions = this.getDateRangeOptions.bind(this);
         this.getXAxisOptions = this.getXAxisOptions.bind(this);
         this.handleDateRangeChange = this.handleDateRangeChange.bind(this);
+        this.getFeeds = this.getFeeds.bind(this);
 
 
     }
 
     componentDidMount() {
         this.refresh();
+        this.getFeeds();
     }
 
     showCustomDateRangeModal(graphName) {
@@ -111,20 +121,27 @@ export default class HomeView extends Component {
 
     refresh() {
 
-        this.getAtccVehicleCount(this.state.atcc.filter.fromDate, this.state.atcc.filter.toDate, this.state.atcc.filter.selectedXAxisOption);
-        this.getAnprVehicleCount(this.state.anpr.filter.fromDate, this.state.anpr.filter.toDate, this.state.anpr.filter.selectedXAxisOption);
+        this.getAtccVehicleCount(this.state.atcc.filter.fromDate, this.state.atcc.filter.toDate, this.state.atcc.filter.selectedXAxisOption,this.state.atcc.filter.feedID);
+        this.getAnprVehicleCount(this.state.anpr.filter.fromDate, this.state.anpr.filter.toDate, this.state.anpr.filter.selectedXAxisOption,this.state.anpr.filter.feedID);
 
-        this.getIncidentVehicleCount(this.state.incident.filter.fromDate, this.state.incident.filter.toDate, this.state.incident.filter.selectedXAxisOption);
+        this.getIncidentVehicleCount(this.state.incident.filter.fromDate, this.state.incident.filter.toDate, this.state.incident.filter.selectedXAxisOption,this.state.incident.filter.feedID);
     }
 
+    getFeeds() {
+        FeedService.getFeeds().then(response => {
+            this.setState({feedOptions: response.data});
+        }).catch(error => {
+            console.log(error);
+        })
+    }
 
-    getAtccVehicleCount(from_date, to_date, xAxis) {
+    getAtccVehicleCount(from_date, to_date, xAxis,feedID) {
         let {atcc} = this.state;
         atcc.chartData = {
             labels: [],
             datasets: []
         };
-        DashboardService.getAtccVehicleCount(from_date, to_date, xAxis).then(resposne => {
+        DashboardService.getAtccVehicleCount(from_date, to_date, xAxis,feedID).then(resposne => {
 
             let rawData = resposne.data;
             if (rawData && rawData.length > 0) {
@@ -174,13 +191,13 @@ export default class HomeView extends Component {
         });
     }
 
-    getAnprVehicleCount(from_date, to_date, xAxis) {
+    getAnprVehicleCount(from_date, to_date, xAxis,feedID) {
         let {anpr} = this.state;
         anpr.chartData = {
             labels: [],
             datasets: []
         };
-        DashboardService.getAnprVehicleCount(from_date, to_date, xAxis).then(resposne => {
+        DashboardService.getAnprVehicleCount(from_date, to_date, xAxis,feedID).then(resposne => {
 
             let rawData = resposne.data;
             if (rawData && rawData.length > 0) {
@@ -231,13 +248,13 @@ export default class HomeView extends Component {
     }
 
 
-    getIncidentVehicleCount(from_date, to_date, xAxis) {
+    getIncidentVehicleCount(from_date, to_date, xAxis,feedID) {
         let {incident} = this.state;
         incident.chartData = {
             labels: [],
             datasets: []
         };
-        DashboardService.getIncidentVehicleCount(from_date, to_date, xAxis).then(resposne => {
+        DashboardService.getIncidentVehicleCount(from_date, to_date, xAxis,feedID).then(resposne => {
 
             let helmetMissingIncidents = resposne.data.helmetMissingIncidents;
             let reverseDirectionIncidents = resposne.data.reverseDirectionIncidents;
@@ -366,6 +383,35 @@ export default class HomeView extends Component {
         );
     }
 
+    handleLocationMenuClick(graphName,choice) {
+        let graph = this.state[graphName];
+
+        if (choice.item.props.children == "All") {
+            graph.filter.feedID = 0;
+            graph.filter.location = 'All';
+            this.setState({[graphName]: graph}, () => {
+                this.refresh();
+            });
+        } else {
+            graph.filter.feedID = choice.item.props.id;
+            graph.filter.location = choice.item.props.children;
+            this.setState({[graphName]: graph}, () => {
+                this.refresh();
+            });
+        }
+    }
+
+    getLocation(graphName){
+        return <Menu onClick={this.handleLocationMenuClick.bind(this,graphName)}>
+            <Menu.Item key={'0'}>All</Menu.Item>
+            {(this.state.feedOptions || []).map((feed) =>
+                <Menu.Item key={feed.id} id={feed.id}>
+                    {feed.site + ">" + feed.location}
+                </Menu.Item>
+            )}
+        </Menu>
+    }
+
     getBarChartOptions(chartName) {
         let yAxisScaleLabel = "Day";
         if (this.state[chartName].filter.selectedXAxisOption === "Hourly") {
@@ -475,6 +521,12 @@ export default class HomeView extends Component {
                                             type="down"/>
                                     </Button>
                                 </Dropdown>
+                                &nbsp;<Dropdown overlay={() =>this.getLocation('anpr')}>
+                                <Button color="#f50">
+                                    {anpr.filter.location ? anpr.filter.location : "All"}
+                                    <Icon type="down"/>
+                                </Button>
+                            </Dropdown>
                             </div>}>
                                 <Line data={anpr.chartData} options={anprChartOptions}/>
                             </Card>
@@ -501,6 +553,12 @@ export default class HomeView extends Component {
                                             type="down"/>
                                     </Button>
                                 </Dropdown>
+                                &nbsp;<Dropdown overlay={() =>this.getLocation('atcc')}>
+                                    <Button color="#f50">
+                                        {atcc.filter.location ? atcc.filter.location : "All"}
+                                        <Icon type="down"/>
+                                    </Button>
+                                </Dropdown>
                             </div>}>
                                 <Line data={atcc.chartData} options={atccChartOptions}/>
 
@@ -525,6 +583,12 @@ export default class HomeView extends Component {
                                         {incident.filter.selectedXAxisOption ? incident.filter.selectedXAxisOption : "Select"}
                                         <Icon
                                             type="down"/>
+                                    </Button>
+                                </Dropdown>
+                                &nbsp;<Dropdown overlay={() =>this.getLocation('incident')}>
+                                    <Button color="#f50">
+                                        {incident.filter.location ? incident.filter.location : "All"}
+                                        <Icon type="down"/>
                                     </Button>
                                 </Dropdown>
                             </div>}>
