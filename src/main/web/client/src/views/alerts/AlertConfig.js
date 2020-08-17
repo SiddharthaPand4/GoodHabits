@@ -9,31 +9,18 @@ export default class AlertConfig extends Component {
     }
 
     componentDidMount() {
-        this.fetchDataAndConnect()
+        this.fetchAlertTypes()
     }
 
-    fetchDataAndConnect = async ()=> {
+    fetchAlertTypes = async ()=> {
         try {
             const alertTypesResponse = await AlertService.fetchAlertTypes();
             const alertTypes = alertTypesResponse.data;
-            this.connections = []
-            alertTypes.forEach(alert => {
-                const con = new WebSocket(alert.url)
-                con.onmessage = event => {
-                    message.warn(`Hotlisted Vehicle ${event.data}, type: ${alert.text}`)
-                }
-                this.connections.push(con)
-            })
+            this.setState({alertTypes})
         } catch (err) {
             message.error("Something Went Wrong")
             console.log(err)
         }
-    }
-
-    componentWillUnmount() {
-        this.connections.map(con => {
-            con.close()
-        })
     }
 
     toggleAlert = (status, i) => {
@@ -60,10 +47,10 @@ export default class AlertConfig extends Component {
                     <h2>Hotlisted Vehicles Alert Settings</h2>
                     {this.state.alertTypes.map((type, i) =>
                         <Row dataIndex={i}>
-                            <Col>
+                            <Col span={12}>
                                 type.text
                             </Col>
-                            <Col>
+                            <Col span={12}>
                                 <Switch checked={type.status} onChange={status => this.toggleAlert(status, i)} />
                             </Col>
                         </Row>
