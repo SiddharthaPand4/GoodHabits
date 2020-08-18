@@ -9,16 +9,18 @@ import {
     Row,
     Table,
     Tag,
-    Input, Button, Menu, Dropdown, Typography, Slider
+    Input, Button, Menu, Dropdown, Typography, Slider, message, Select
 } from 'antd';
 import GenericFilter from "../components/GenericFilter";
 import Moment from "react-moment";
 import AnprService from "../services/AnprService";
 import Magnifier from "react-magnifier";
+import FeedService from "../services/FeedService";
 
 const {Column} = Table;
 const {Panel} = Collapse;
 const {Paragraph, Text} = Typography;
+const {Option} = Select;
 
 
 export default class TrafficIncidentView extends Component {
@@ -26,10 +28,12 @@ export default class TrafficIncidentView extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            feedsList: [],
             loading: true,
             layout: "list",
             events: {},
             filter: {
+                feedId: 0,
                 page: 1,
                 pageSize: 12
             },
@@ -58,6 +62,7 @@ export default class TrafficIncidentView extends Component {
     }
 
     componentDidMount() {
+        this.fetchFeedsList();
         this.myInstant=setInterval(()=>{this.refresh()},30000);
         this.refresh();
     }
@@ -69,6 +74,17 @@ export default class TrafficIncidentView extends Component {
         AnprService.getIncidents(this.state.filter).then(request => {
             this.setState({"anprresponse": request.data, loading: false})
         })
+    }
+
+    fetchFeedsList = async () => {
+        try {
+            const res = await FeedService.getFeeds()
+            const feedsList = res.data
+            this.setState({ feedsList })
+        } catch(e) {
+            console.log(e)
+            message.error("Something Went Wrong ")
+        }
     }
 
     //cant use refresh to read from state as state may not have been set
@@ -155,6 +171,10 @@ export default class TrafficIncidentView extends Component {
         })
     }
 
+    feedSelected = feedId => {
+        const filter = {...this.state.filter, feedId}
+        this.setState({filter})
+    }
 
     render() {
 
@@ -166,6 +186,14 @@ export default class TrafficIncidentView extends Component {
             <Collapse bordered={false} defaultActiveKey={['1']}>
                 <Panel header="Filter" key="1">
                     LPR: <Input value={lpr} style={{"width": "200px"}} onChange={this.onLprInputChange}/> <br/><br/>
+                    <Select
+                        style={{ width: 200 }}
+                        placeholder="Select Location"
+                        onChange={this.feedSelected}
+                    >
+                        {(this.state.feedsList || []).map(feed => <Option value={feed.id}>{feed.site + " > " + feed.location}</Option>)}
+                    </Select>
+                    <br/><br/>
                     <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
                                    handleFilterChange={this.handleFilterChange}
                                    handleLayoutChange={this.handleLayoutChange}/>

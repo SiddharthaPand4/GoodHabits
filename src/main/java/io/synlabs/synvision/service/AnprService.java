@@ -328,6 +328,9 @@ public class AnprService extends BaseService {
         BooleanExpression query = getQuery(request);
         QAnprEvent root = QAnprEvent.anprEvent;
         query = query.and(root.direction.eq("rev").or(root.helmetMissing.isTrue()));
+
+        if (request.getFeedId() != 0) query.and(root.feed.id.eq(request.getFeedId()));
+
         return query;
     }
 
