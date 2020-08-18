@@ -20,4 +20,6 @@ public class IncidentsFilterRequest implements Request {
         private int page;
         private int pageSize;
 
+        private Long feedId;
+
 }

@@ -12,7 +12,7 @@ import {
     Tag,
     Input, Button, Menu, Dropdown, Typography, Slider,
     Modal,
-    message, Form, Spin
+    message, Form, Spin, Select
 } from 'antd';
 import GenericFilter from "../../components/GenericFilter";
 import Moment from "react-moment";
@@ -21,11 +21,13 @@ import AtccService from "../../services/AtccService";
 import Switch from "antd/es/switch";
 import {Player} from "video-react";
 import {saveAs} from 'file-saver';
+import FeedService from "../../services/FeedService";
 
 const {Paragraph, Text} = Typography;
 
 const {Column} = Table;
 const {Panel} = Collapse;
+const {Option} = Select;
 
 
 export default class AtccGridView extends Component {
@@ -35,6 +37,7 @@ export default class AtccGridView extends Component {
         super(props);
         this.state = {
             renderVid: false,
+            feedsList: [],
             activePanelKey: ["1"],
             visible: true,
             loading: true,
@@ -43,6 +46,7 @@ export default class AtccGridView extends Component {
             filter: {
                 page: 1,
                 pageSize: 12,
+                feedId: 0,
             },
             workingEvent: [],
             workingEventLoading: false,
@@ -72,10 +76,17 @@ export default class AtccGridView extends Component {
 
     componentDidMount() {
         this.myInstant=setInterval(()=>{this.refresh()},30000);
+        this.fetchFeedsList();
         this.refresh();
     }
     componentWillUnmount() {
         clearInterval(this.myInstant);
+    }
+
+    fetchFeedsList = async ()=> {
+        const res = await FeedService.getFeeds()
+        const feedsList = res.data
+        this.setState({feedsList})
     }
 
     videoSwitchChange() {
@@ -156,6 +167,11 @@ export default class AtccGridView extends Component {
         this.setState({activePanelKey: change})
     }
 
+    feedSelected = feedId => {
+        const filter = {...this.state.filter, feedId}
+        this.setState({filter})
+    }
+
     render() {
 
         let layout = this.state.layout;
@@ -175,6 +191,14 @@ export default class AtccGridView extends Component {
                         <Panel header="Filter" key="1">
                             <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             </span>Video <Switch onChange={this.videoSwitchChange}/>
+                            <br/><br/>
+                            <Select
+                                style={{ width: 200 }}
+                                placeholder="Select a feed"
+                                onChange={this.feedSelected}
+                            >
+                                {(this.state.feedsList || []).map(feed => <Option value={feed.id}>{feed.name}</Option>)}
+                            </Select>
                             <br/><br/>
                             <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
                                            handleFilterChange={this.handleFilterChange}

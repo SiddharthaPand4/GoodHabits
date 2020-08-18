@@ -477,6 +477,8 @@ public class AtccDataService extends BaseService {
 
             }
 
+            if (request.getFeedId() != 0) query.where(atccEvent.feed.id.eq(request.getFeedId()));
+
         } catch (Exception e) {
             logger.error("Error in parsing date", e);
         }
