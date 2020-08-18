@@ -194,10 +194,10 @@ export default class AtccGridView extends Component {
                             <br/><br/>
                             <Select
                                 style={{ width: 200 }}
-                                placeholder="Select a feed"
+                                placeholder="Select Location"
                                 onChange={this.feedSelected}
                             >
-                                {(this.state.feedsList || []).map(feed => <Option value={feed.id}>{feed.name}</Option>)}
+                                {(this.state.feedsList || []).map(feed => <Option value={feed.id}>{feed.site + " > " + feed.location}</Option>)}
                             </Select>
                             <br/><br/>
                             <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}

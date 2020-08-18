@@ -209,10 +209,10 @@ export default class AtccReportView extends Component {
                                 </Form.Item>
                                 <Form.Item>
                                     <Select
-                                        placeholder="Select a feed"
+                                        placeholder="Select Location"
                                         onChange={this.feedSelected}
                                     >
-                                        {(this.state.feeds || []).map(feed => <Option value={feed.id}>{feed.name}</Option>)}
+                                        {(this.state.feeds || []).map(feed => <Option value={feed.id}>{feed.site + " > " + feed.location}</Option>)}
                                     </Select>
                                 </Form.Item>
                                 <Form.Item>
