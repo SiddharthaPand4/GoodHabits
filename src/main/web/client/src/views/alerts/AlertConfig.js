@@ -32,7 +32,7 @@ export default class AlertConfig extends Component {
     saveConfig = async () => {
         try {
             const res = await AlertService.saveAlertSettings(this.state.alertTypes)
-            console.log(res.response)
+            console.log(res)
             message.success("Saved")
         } catch (e) {
             console.log(e)

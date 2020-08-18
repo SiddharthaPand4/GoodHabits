@@ -34,6 +34,14 @@
       "privilege": "TRIGGER_READ",
       "seq": 400,
       "icon": "clock-circle"
+    },
+    {
+      "key": "alert-setting",
+      "title": "Alert Setting",
+      "link": "/alertConfig",
+      "privilege": "ROLE_ALERT_SETTING_WRITE",
+      "seq": 500,
+      "icon": "setting"
     }
   ]
 }
