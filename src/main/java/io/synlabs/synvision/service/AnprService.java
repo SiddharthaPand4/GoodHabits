@@ -806,6 +806,12 @@ public class AnprService extends BaseService {
         JPAQuery<AnprEvent> query1 = new JPAQuery<>(entityManager);
         JPAQuery<AnprEvent> query2 = new JPAQuery<>(entityManager);
 
+        if (request.feedId != 0) {
+            query.where(anprEvent.feed.id.eq(request.feedId));
+            query1.where(anprEvent.feed.id.eq(request.feedId));
+            query2.where(anprEvent.feed.id.eq(request.feedId));
+        }
+
         Date eventDate = null;
         Long eventCount= null ;
         String vehicleClass= null ;
