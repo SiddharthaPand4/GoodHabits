@@ -1,10 +1,11 @@
 import React, {Component} from "react";
-import {Button, Card, DatePicker, Dropdown, Icon, Menu, Modal, Select,Row,Col,Form,Spin} from "antd";
+import {Button, Card, DatePicker, Dropdown, Icon, Menu, Modal, Select, Row, Col, Form, Spin, message} from "antd";
 import DashboardService from "../../services/DashboardService";
 import ReportService from "../../services/ReportService";
 import CommonService from "../../services/CommonService";
 import moment from 'moment';
 import { saveAs } from 'file-saver';
+import FeedService from "../../services/FeedService";
 
 const {Option} = Select;
 const {RangePicker} = DatePicker;
@@ -14,9 +15,11 @@ export default class AnprReportView extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            feedsList: [],
             isOpencustomDateRangeModal: "",
             atcc: {
                 filter: {
+                    feedId: 0,
                     selectedCustomDateRange: "Today",
                     selectedXAxisOption: "All Entry-Exit",
                     fromDate: moment().startOf('day').toDate(),
@@ -52,6 +55,28 @@ export default class AnprReportView extends Component {
         this.downloadReport = this.downloadReport.bind(this);
         this.handleChangeReportType = this.handleChangeReportType.bind(this);
     }
+
+    componentDidMount() {
+        this.fetchFeedsList()
+    }
+
+    fetchFeedsList = async () => {
+        try {
+            const res = await FeedService.getFeeds()
+            const feedsList = res.data
+            this.setState({ feedsList })
+        } catch(e) {
+            console.log(e)
+            message.error("Something Went Wrong ")
+        }
+    }
+
+    feedSelected = value => {
+        const atcc = {...this.state.report}
+        atcc.filter.feedId = value
+        this.setState({atcc})
+    }
+
 
     handleChange(value) {
 
@@ -107,7 +132,8 @@ downloadReport(){
         toDateString: moment(filter.toDate).format('YYYY-MM-DD HH:mm:ss"'),
         xAxis: filter.selectedXAxisOption,
         reportType:filter.reportType,
-        filterType:filter.filterType
+        filterType:filter.filterType,
+        feedId: filter.feedId
     }
 
     ReportService.getAnprReport(req).then(response => {
@@ -238,6 +264,14 @@ render() {
         {this.state.atcc.filter.selectedXAxisOption=="All Entry-Exit"? <Option value="EXCEL">EXCEL</Option>:null}
         </Select>
 
+        </Form.Item>
+        <Form.Item>
+            <Select
+                placeholder="Select Location"
+                onChange={this.feedSelected}
+            >
+                {(this.state.feedsList || []).map(feed => <Option value={feed.id}>{feed.site + " > " + feed.location}</Option>)}
+            </Select>
         </Form.Item>
         <Form.Item>
         <Button type="primary" htmlType="submit" onClick={this.downloadReport} block loading={this.state.downloading}>

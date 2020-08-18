@@ -556,6 +556,9 @@ public class AnprService extends BaseService {
                 break;
 
         }
+
+        if (request.feedId != 0) query.where(anprEvent.feed.id.eq(request.feedId));
+
         long totalRecordsCount = query.fetchCount();
         Path path = Paths.get(uploadDirPath);
         String filename = null;
