@@ -84,9 +84,14 @@ export default class AtccGridView extends Component {
     }
 
     fetchFeedsList = async ()=> {
-        const res = await FeedService.getFeeds()
-        const feedsList = res.data
-        this.setState({feedsList})
+        try {
+            const res = await FeedService.getFeeds()
+            const feedsList = res.data
+            this.setState({feedsList})
+        } catch(e) {
+            console.log(e)
+            message.error("Something Went Wrong")
+        }
     }
 
     videoSwitchChange() {
