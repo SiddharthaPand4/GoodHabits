@@ -39,7 +39,7 @@
       "key": "alert-setting",
       "title": "Alert Setting",
       "link": "/alertConfig",
-      "privilege": "ROLE_ALERT_SETTING_WRITE",
+      "privilege": "ALERT_SETTING_WRITE",
       "seq": 500,
       "icon": "setting"
     }
