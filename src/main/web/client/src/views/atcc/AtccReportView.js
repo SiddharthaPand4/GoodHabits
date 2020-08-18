@@ -1,9 +1,10 @@
 import React, {Component} from "react";
-import {Button, Card, DatePicker, Dropdown, Icon, Menu, Modal, Select, Row, Col, Form, Spin} from "antd";
+import {Button, Card, DatePicker, Dropdown, Icon, Menu, Modal, Select, Row, Col, Form, Spin, message} from "antd";
 import DashboardService from "../../services/DashboardService";
 import AtccService from "../../services/AtccService";
 import moment from 'moment';
 import {saveAs} from 'file-saver';
+import FeedService from "../../services/FeedService";
 
 const {Option} = Select;
 const {RangePicker} = DatePicker;
@@ -13,10 +14,12 @@ export default class AtccReportView extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            feeds: [],
             isOpenCustomDateRangeModal: "",
             report: {
                 filter: {
                     selectedCustomDateRange: "Today",
+                    feedId: 0,
                     reportType: "All Incidents",
                     reportFileType: "csv",
                     fromDate: moment().startOf('day').toDate(),
@@ -35,6 +38,20 @@ export default class AtccReportView extends Component {
         this.handleChangeReportType = this.handleChangeReportType.bind(this);
     }
 
+    componentDidMount() {
+        this.fetchFeedsList();
+    }
+
+    fetchFeedsList = async () => {
+        try {
+            const res = await FeedService.getFeeds()
+            const feeds = res.data
+            this.setState({ feeds })
+        } catch(e) {
+            console.log(e)
+            message.error("Something Went Wrong ")
+        }
+    }
 
     handleChangeReportType(value) {
         let report = {...this.state.report};
@@ -43,7 +60,7 @@ export default class AtccReportView extends Component {
         this.setState({report: report})
     }
 
-    showCustomDateRangeModal() {
+    showCustomDateRangeModal = ()=> {
         this.setState({
             isOpenCustomDateRangeModal: true,
         });
@@ -79,6 +96,7 @@ export default class AtccReportView extends Component {
             toDateString: moment(filter.toDate).format('YYYY-MM-DD HH:mm:ss"'),
             reportType: filter.reportType,
             reportFileType: filter.reportFileType,
+            feedId: filter.feedId,
         };
 
         AtccService.getAtccReport(req).then(response => {
@@ -90,6 +108,12 @@ export default class AtccReportView extends Component {
             alert(error);
             console.log(error);
         });
+    }
+
+    feedSelected = value => {
+        const report = {...this.state.report}
+        report.filter.feedId = value
+        this.setState({report})
     }
 
     selectReportType(reportType) {
@@ -183,7 +207,14 @@ export default class AtccReportView extends Component {
                                         </Button>
                                     </Dropdown>
                                 </Form.Item>
-
+                                <Form.Item>
+                                    <Select
+                                        placeholder="Select a feed"
+                                        onChange={this.feedSelected}
+                                    >
+                                        {this.state.feeds.map(feed => <Option value={feed.id}>{feed.name}</Option>)}
+                                    </Select>
+                                </Form.Item>
                                 <Form.Item>
                                     Report Type
                                     <Dropdown overlay={() => this.getReportTypeOptions("report")}>
