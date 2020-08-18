@@ -107,6 +107,8 @@ public class AnprService extends BaseService {
             QAnprEvent root = new QAnprEvent("anprEvent");
             BooleanExpression query = root.archived.isFalse();
 
+            if (request.getFeedId() != 0) query.and(root.feed.id.eq(request.getFeedId()));
+
             if (request.getLpr() != null) {
                 query = query.and(root.anprText.likeIgnoreCase("%" + request.getLpr() + "%"));
             }

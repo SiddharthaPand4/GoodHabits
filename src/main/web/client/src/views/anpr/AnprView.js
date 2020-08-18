@@ -12,7 +12,7 @@ import {
     Tag,
     Input, Button, Menu, Dropdown, Typography, Slider,
     Modal,
-    message, Form, Spin
+    message, Form, Spin, Select
 } from 'antd';
 import GenericFilter from "../../components/GenericFilter";
 import Moment from "react-moment";
@@ -21,11 +21,13 @@ import Magnifier from "react-magnifier";
 import moment from "moment";
 import {saveAs} from "file-saver";
 import AnprReportService from "../../services/AnprReportService";
+import FeedService from "../../services/FeedService";
 
 const {Paragraph, Text} = Typography;
 
 const {Column} = Table;
 const {Panel} = Collapse;
+const {Option} = Select;
 
 
 export default class AnprView extends Component {
@@ -33,12 +35,14 @@ export default class AnprView extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            feedsList: [],
             activePanelKey: ["1"],
             visible: true,
             loading: true,
             layout: "list",
             events: {},
             filter: {
+                feedId: 0,
                 page: 1,
                 pageSize: 12,
                 lpr: ""
@@ -76,6 +80,7 @@ export default class AnprView extends Component {
 
     componentDidMount() {
         this.myInstant=setInterval(()=>{this.refresh()},30000);
+        this.fetchFeedsList()
         this.refresh();
     }
     componentWillUnmount() {
@@ -90,6 +95,17 @@ export default class AnprView extends Component {
             alert("Something went wrong!");
             this.setState({loading: false});
         })
+    }
+
+    fetchFeedsList = async () => {
+        try {
+            const res = await FeedService.getFeeds()
+            const feedsList = res.data
+            this.setState({ feedsList })
+        } catch(e) {
+            console.log(e)
+            message.error("Something Went Wrong ")
+        }
     }
 
     archiveEvent(event) {
@@ -184,6 +200,7 @@ export default class AnprView extends Component {
             fromDateString: filter.from_date != null ? moment(filter.fromDate).format('YYYY-MM-DD HH:mm:ss') : "",
             toDateString: filter.to_date != null ? moment(filter.toDate).format('YYYY-MM-DD HH:mm:ss"') : "",
             lpr: filter.lpr,
+            feedId: filter.feedId,
         };
 
         AnprReportService.getAnprEventsReport(req).then(response => {
@@ -201,6 +218,11 @@ export default class AnprView extends Component {
 
     onCollapse(change) {
         this.setState({activePanelKey: change})
+    }
+
+    feedSelected = feedId => {
+        const filter = {...this.state.filter, feedId}
+        this.setState({filter})
     }
 
     render() {
@@ -228,6 +250,14 @@ export default class AnprView extends Component {
                             <Button type="dashed" style={{float: "right"}} onClick={this.preparePrint}>Print <Icon
                                 type="printer"/></Button>
 
+                            <br/><br/>
+                            <Select
+                                style={{ width: 200 }}
+                                placeholder="Select Location"
+                                onChange={this.feedSelected}
+                            >
+                                {(this.state.feedsList || []).map(feed => <Option value={feed.id}>{feed.site + " > " + feed.location}</Option>)}
+                            </Select>
                             <br/><br/>
                             <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
                                            handleFilterChange={this.handleFilterChange}
