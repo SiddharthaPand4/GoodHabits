@@ -129,6 +129,10 @@ public class VidsService {
 
     public void addIncident(CreateIncidentRequest request) {
         HighwayIncident incident = request.toEntity();
+        if (incident.getIncidentType().equals(HighwayIncidentType.NoVideo)) {
+            incident.setIncidentImage("novideo.jpg");
+            incident.setIncidentVideo("novideo.mp4");
+        }
         Feed feed = feedRepository.findOneByName(request.getSource());
         incident.setFeed(feed);
         incident = incidentRepository.saveAndFlush(incident);
