@@ -58,7 +58,7 @@ public class AnprReportService extends BaseService {
         query.select(anprEvent)
                 .from(anprEvent);
 
-        if (request.feedId != 0) query.where(anprEvent.feed.id.eq(request.feedId));
+        if (request.feedId != 0 && request.getFeedId() != null) query.where(anprEvent.feed.id.eq(request.feedId));
 
         if (!StringUtils.isEmpty(request.getLpr())) {
             query.where(anprEvent.anprText.like("%" + request.getLpr() + "%"));
