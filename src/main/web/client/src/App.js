@@ -12,6 +12,7 @@ import {Route} from "react-router-dom";
 import DeviceView from "./views/DeviceView";
 import UserListView from "./views/UserListView";
 import DeviceConfigView from "./views/DeviceConfigView";
+import AlertConfig from "./views/alerts/AlertConfig";
 
 import UserService from "./services/UserService";
 import {EventBus} from "./components/event"
@@ -241,6 +242,9 @@ class App extends Component {
                                 <PrivateRoute path='/atcc/summary' exact={true} component={AtccSummaryView}/>
                                 <PrivateRoute path='/atcc' exact={true} component={AtccGridView}/>
                                 <PrivateRoute path='/atcc/reports' exact={true} component={AtccReportView}/>
+
+                                {/*Alert Config Page} */}
+                                <PrivateRoute path='/alertConfig' exact={true} component={AlertConfig} />
 
                                 {/* vids */}
                                 <PrivateRoute path='/vids' exact={true} component={HighwayIncidentView}/>
