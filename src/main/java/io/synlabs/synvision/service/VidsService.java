@@ -8,11 +8,13 @@ import io.synlabs.synvision.entity.core.Feed;
 import io.synlabs.synvision.entity.vids.HighwayIncident;
 import io.synlabs.synvision.entity.vids.HighwayTrafficState;
 import io.synlabs.synvision.entity.vids.QHighwayIncident;
+import io.synlabs.synvision.entity.vids.VidsAlertSetting;
 import io.synlabs.synvision.enums.HighwayIncidentType;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.jpa.FeedRepository;
 import io.synlabs.synvision.jpa.HighwayIncidentRepository;
 import io.synlabs.synvision.jpa.HighwayTrafficStateRepository;
+import io.synlabs.synvision.jpa.VidsAlertSettingRepository;
 import io.synlabs.synvision.views.common.PageResponse;
 import io.synlabs.synvision.views.frs.AlertMessage;
 import io.synlabs.synvision.views.vids.*;
@@ -37,6 +39,7 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -51,6 +54,9 @@ public class VidsService {
 
     @Autowired
     private FeedRepository feedRepository;
+
+    @Autowired
+    private VidsAlertSettingRepository vidsAlertSettingRepository;
 
     @Autowired
     private HighwayTrafficStateRepository stateRepository;
@@ -169,8 +175,13 @@ public class VidsService {
     }
 
     private void generateAlert(HighwayIncident incident) {
-        VidsAlertMessage message = new VidsAlertMessage(incident);
-        websocket.convertAndSend("/alert", message);
+        HashSet<HighwayIncidentType> incidentTypes = new HashSet<>(
+                vidsAlertSettingRepository.findAllByEnabledTrue().stream().map(VidsAlertSetting::getIncidentType)
+                        .collect(Collectors.toList()));
+        if (incidentTypes.contains(incident.getIncidentType())) {
+            VidsAlertMessage message = new VidsAlertMessage(incident);
+            websocket.convertAndSend("/alert", message);
+        }
     }
 
     public Resource downloadIncidentImage(Long id) {
