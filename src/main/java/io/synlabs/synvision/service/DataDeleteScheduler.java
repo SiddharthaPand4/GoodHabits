@@ -14,16 +14,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class DataDeleteScheduler {
 
-    @Value("${synvison.data.ttl.days}")
+    @Value("${synvision.data.ttl.days}")
     private int data_del_after_days;
-
-    @Value("${ synvison.data.ttl.include.database.records}")
+    @Value("${synvision.data.ttl.include.database.records}")
     private boolean del_records_fromDB;
-
+    @Value("${synvision.data.ttl.include.folders}")
+    private ArrayList<String> folders;
     @Autowired
     private AnprService anprService;
     @Autowired
@@ -46,7 +48,7 @@ public class DataDeleteScheduler {
         if (directory.exists()) {
             File[] listFiles = directory.listFiles();
             for (File listFile : listFiles) {
-                if (listFile.isDirectory()) {
+                if (listFile.isDirectory() && folders.contains(listFile.getName())) {
                     File[] subFiles = listFile.listFiles();
                     for (File subFile : subFiles) {
                         LocalDate lastModified = null;
@@ -57,16 +59,16 @@ public class DataDeleteScheduler {
                         }
                         if (lastModified.plusDays(data_del_after_days).isBefore(LocalDate.now())) {
                             subFile.delete();
-                            logger.info("Data deleted on " + LocalDate.now());
+                            logger.info(subFile + " deleted on " + LocalDate.now());
                         }
                     }
                 }
             }
-            if (del_records_fromDB) {
-                anprService.deleteData(data_del_after_days);
-                atccDataService.deleteData(data_del_after_days);
-                vidsService.deleteData(data_del_after_days);
-            }
+           if (del_records_fromDB) {
+               anprService.deleteData(data_del_after_days);
+               atccDataService.deleteData(data_del_after_days);
+               vidsService.deleteData(data_del_after_days);
+           }
         }
     }
 }
