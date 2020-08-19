@@ -72,7 +72,7 @@ export default class AnprReportView extends Component {
     }
 
     feedSelected = value => {
-        const atcc = {...this.state.report}
+        const atcc = {...this.state.atcc}
         atcc.filter.feedId = value
         this.setState({atcc})
     }
