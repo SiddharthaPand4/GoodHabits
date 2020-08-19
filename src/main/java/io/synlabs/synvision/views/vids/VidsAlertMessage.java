@@ -16,6 +16,8 @@ import java.util.Date;
 @NoArgsConstructor
 public class VidsAlertMessage {
 
+    private Long id;
+
     private String eventId;
 
     private Date incidentDate;
@@ -33,7 +35,7 @@ public class VidsAlertMessage {
     private String message;
 
     public VidsAlertMessage(HighwayIncident event) {
-
+        this.id = event.getId();
         this.eventId = event.getEventId();
         this.message = "Alert!";
         this.incidentImage = event.getIncidentImage();

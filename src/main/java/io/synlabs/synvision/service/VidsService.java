@@ -135,7 +135,7 @@ public class VidsService {
         }
         Feed feed = feedRepository.findOneByName(request.getSource());
         incident.setFeed(feed);
-        incidentRepository.save(incident);
+        incident = incidentRepository.saveAndFlush(incident);
         generateAlert(incident);
     }
 
@@ -164,7 +164,7 @@ public class VidsService {
         incident.setIncidentVideo(request.getFlowVideo());
         Feed feed = feedRepository.findOneByName(request.getSource());
         incident.setFeed(feed);
-        incidentRepository.save(incident);
+        incident = incidentRepository.saveAndFlush(incident);
         generateAlert(incident);
     }
 

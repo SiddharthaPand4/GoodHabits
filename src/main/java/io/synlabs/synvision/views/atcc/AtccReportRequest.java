@@ -23,4 +23,6 @@ public class AtccReportRequest implements Request {
 
     public String reportType;
     public String reportFileType;
+
+    public Long feedId;
 }

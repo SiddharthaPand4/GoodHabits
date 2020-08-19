@@ -45,5 +45,8 @@ public final class SynvisionAuth
 
     public static final String PARKING_READ= "ROLE_PARKING_READ";
     public static final String PARKING_WRITE= "ROLE_PARKING_WRITE";
+
+    public static final String ALERT_SETTING_READ = "ROLE_ALERT_SETTING_READ";
+    public static final String ALERT_SETTING_WRITE = "ROLE_ALERT_SETTING_WRITE";
   }
 }

@@ -58,6 +58,8 @@ public class VidsReportService extends BaseService {
                 .where(HighwayIncident.incidentDate.between(request.getFrom(), request.getTo()))
                 .orderBy(HighwayIncident.incidentDate.asc());
 
+        if (request.getFeedId() != null && request.feedId != 0) query.where(HighwayIncident.feed.id.eq(request.feedId));
+
         long totalRecordsCount = query.fetchCount();
         Path path = Paths.get(uploadDirPath);
         String filename = null;

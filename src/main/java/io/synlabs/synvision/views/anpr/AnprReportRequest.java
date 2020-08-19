@@ -25,4 +25,6 @@ public class AnprReportRequest implements Request {
     public String filterType;
     public String xAxis;
     public String reportType;
+
+    public Long feedId;
 }
