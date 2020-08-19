@@ -107,7 +107,7 @@ public class AnprService extends BaseService {
             QAnprEvent root = new QAnprEvent("anprEvent");
             BooleanExpression query = root.archived.isFalse();
 
-            if (request.getFeedId() != 0 && request.getFeedId() != null) query.and(root.feed.id.eq(request.getFeedId()));
+            if (request.getFeedId() != null && request.getFeedId() != 0) query.and(root.feed.id.eq(request.getFeedId()));
 
             if (request.getLpr() != null) {
                 query = query.and(root.anprText.likeIgnoreCase("%" + request.getLpr() + "%"));
@@ -329,7 +329,7 @@ public class AnprService extends BaseService {
         QAnprEvent root = QAnprEvent.anprEvent;
         query = query.and(root.direction.eq("rev").or(root.helmetMissing.isTrue()));
 
-        if (request.getFeedId() != 0 && request.getFeedId() != null) query.and(root.feed.id.eq(request.getFeedId()));
+        if (request.getFeedId() != null && request.getFeedId() != 0) query.and(root.feed.id.eq(request.getFeedId()));
 
         return query;
     }
@@ -562,7 +562,7 @@ public class AnprService extends BaseService {
 
         }
 
-        if (request.feedId != 0 && request.getFeedId() != null) query.where(anprEvent.feed.id.eq(request.feedId));
+        if (request.getFeedId() != null && request.feedId != 0) query.where(anprEvent.feed.id.eq(request.feedId));
 
         long totalRecordsCount = query.fetchCount();
         Path path = Paths.get(uploadDirPath);
@@ -811,7 +811,7 @@ public class AnprService extends BaseService {
         JPAQuery<AnprEvent> query1 = new JPAQuery<>(entityManager);
         JPAQuery<AnprEvent> query2 = new JPAQuery<>(entityManager);
 
-        if (request.feedId != 0 && request.getFeedId() != null) {
+        if (request.getFeedId() != null && request.feedId != 0) {
             query.where(anprEvent.feed.id.eq(request.feedId));
             query1.where(anprEvent.feed.id.eq(request.feedId));
             query2.where(anprEvent.feed.id.eq(request.feedId));
