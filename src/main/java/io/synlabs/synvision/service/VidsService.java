@@ -187,7 +187,6 @@ public class VidsService {
                 filename = incident.get().getIncidentImage();
                 String incidentDate=formatter.format(incident.get().getIncidentDate());
                 Path filePath = Paths.get(fileStorageLocation.toString(), tag,incidentDate,filename).toAbsolutePath().normalize();
-                logger.info(filePath.toString());
                 Resource resource = new UrlResource(filePath.toUri());
                 if (resource.exists()) {
                     return resource;
