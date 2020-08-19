@@ -154,7 +154,8 @@ class App extends Component {
         return args;
     }
 
-    getVidsAlert(alert) {
+    getVidsAlert(response) {
+        const alert = JSON.parse(response.body);
         const args = {
             message: alert.message,
             description: <Card

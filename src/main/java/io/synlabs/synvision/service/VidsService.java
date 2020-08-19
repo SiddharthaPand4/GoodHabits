@@ -131,7 +131,7 @@ public class VidsService {
         HighwayIncident incident = request.toEntity();
         Feed feed = feedRepository.findOneByName(request.getSource());
         incident.setFeed(feed);
-        incidentRepository.save(incident);
+        incident = incidentRepository.saveAndFlush(incident);
         generateAlert(incident);
     }
 
@@ -160,7 +160,7 @@ public class VidsService {
         incident.setIncidentVideo(request.getFlowVideo());
         Feed feed = feedRepository.findOneByName(request.getSource());
         incident.setFeed(feed);
-        incidentRepository.save(incident);
+        incident = incidentRepository.saveAndFlush(incident);
         generateAlert(incident);
     }
 
@@ -183,6 +183,7 @@ public class VidsService {
                 filename = incident.get().getIncidentImage();
                 String incidentDate=formatter.format(incident.get().getIncidentDate());
                 Path filePath = Paths.get(fileStorageLocation.toString(), tag,incidentDate,filename).toAbsolutePath().normalize();
+                logger.info(filePath.toString());
                 Resource resource = new UrlResource(filePath.toUri());
                 if (resource.exists()) {
                     return resource;
