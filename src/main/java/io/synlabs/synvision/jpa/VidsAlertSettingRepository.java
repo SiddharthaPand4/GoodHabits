@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface VidsAlertSettingRepository extends JpaRepository<VidsAlertSetting, Long> {
-
+    List<VidsAlertSetting> findAllByEnabledTrue();
 }
