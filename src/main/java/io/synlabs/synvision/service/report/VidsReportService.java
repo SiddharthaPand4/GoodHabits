@@ -187,9 +187,9 @@ public class VidsReportService extends BaseService {
         com.querydsl.core.Tuple tuple;
         for (int i = 0; i < result.size(); i++) {
             tuple = result.get(i);
-            String dayOfMonth = tuple.get(0, String.class);
-            String month = tuple.get(1, String.class);
-            String year = tuple.get(2, String.class);
+            Integer dayOfMonth = tuple.get(0, Integer.class);
+            Integer month = tuple.get(1, Integer.class);
+            Integer year = tuple.get(2, Integer.class);
             //eventDate = tuple.get(0, Date.class);
             incidentType = tuple.get(3, HighwayIncidentType.class);
             eventCount = tuple.get(4, Long.class);
