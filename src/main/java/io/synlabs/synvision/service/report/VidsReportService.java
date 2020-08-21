@@ -174,9 +174,9 @@ public class VidsReportService extends BaseService {
         List<VidsDaywiseReportResponse> responses;
 
         result = query
-                .select(highwayIncident.incidentDate //0
-                        , highwayIncident.incidentType, //1
-                        highwayIncident.count() //2
+                .select(highwayIncident.incidentDate.dayOfMonth(), highwayIncident.incidentDate.month(), highwayIncident.incidentDate.year() //0, 1, 2
+                        , highwayIncident.incidentType, //3
+                        highwayIncident.count() //4
                 )
                 .from(highwayIncident)
                 .where(highwayIncident.incidentDate.between(request.getFrom(), request.getTo()))
@@ -187,12 +187,15 @@ public class VidsReportService extends BaseService {
         com.querydsl.core.Tuple tuple;
         for (int i = 0; i < result.size(); i++) {
             tuple = result.get(i);
+            String dayOfMonth = tuple.get(0, String.class);
+            String month = tuple.get(1, String.class);
+            String year = tuple.get(2, String.class);
+            //eventDate = tuple.get(0, Date.class);
+            incidentType = tuple.get(3, HighwayIncidentType.class);
+            eventCount = tuple.get(4, Long.class);
 
-            eventDate = tuple.get(0, Date.class);
-            incidentType = tuple.get(1, HighwayIncidentType.class);
-            eventCount = tuple.get(2, Long.class);
-
-            eventDateString = toFormattedDate(eventDate, "dd/MM/yyyy");
+            //eventDateString = toFormattedDate(eventDate, "dd/MM/yyyy");
+            eventDateString = dayOfMonth + "/" + month + "/" + year;
             eventDate = DateUtil.parseDateString(eventDateString, "dd/MM/yyyy");
 
             response = new VidsDaywiseReportResponse(eventDateString, incidentType, eventCount);
