@@ -61,9 +61,13 @@ public class AtccReportService extends BaseService {
         int limit = 1000;
         query.select(atccEvent)
                 .from(atccEvent)
-                .where(atccEvent.eventDate.between(request.getFrom(), request.getTo()))
-                .orderBy(atccEvent.eventDate.asc());
+                .where(atccEvent.eventDate.between(request.getFrom(), request.getTo()));
 
+
+        if (request.getFeedId() != null && request.getFeedId() != 0) {
+            query.where(atccEvent.feed.id.eq(request.getFeedId()));
+        }
+        query.orderBy(atccEvent.eventDate.asc());
 
         long totalRecordsCount = query.fetchCount();
         Path path = Paths.get(uploadDirPath);
@@ -141,7 +145,7 @@ public class AtccReportService extends BaseService {
         request.setTo(DateUtil.parseDateString(request.getToDateString(), pattern));
 
         QAtccEvent atccEvent = new QAtccEvent("atccEvent");
-        JPAQuery<AtccEvent> query = new JPAQuery<>(entityManager);
+        JPAQuery<com.querydsl.core.Tuple> query = new JPAQuery<>(entityManager);
 
         Date eventDate = null;
         String eventDateString;
@@ -153,14 +157,19 @@ public class AtccReportService extends BaseService {
         AtccSummaryDatawiseResponse response;
         List<AtccSummaryDatawiseResponse> responses;
 
-        result = query
+                query
                 .select(atccEvent.eventDate, //0
                         atccEvent.type, //1
                         atccEvent.count() //2
                 )
                 .from(atccEvent)
-                .where(atccEvent.eventDate.between(request.getFrom(), request.getTo()))
-                .groupBy(atccEvent.eventDate.dayOfMonth(), atccEvent.eventDate.month(), atccEvent.eventDate.year(), atccEvent.type)
+                .where(atccEvent.eventDate.between(request.getFrom(), request.getTo()));
+
+
+        if (request.getFeedId() != null && request.getFeedId() != 0) {
+            query.where(atccEvent.feed.id.eq(request.getFeedId()));
+        }
+        result = query.groupBy(atccEvent.eventDate.dayOfMonth(), atccEvent.eventDate.month(), atccEvent.eventDate.year(), atccEvent.type)
                 .orderBy(atccEvent.eventDate.asc())
                 .fetch();
 

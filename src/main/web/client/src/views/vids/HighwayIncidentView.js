@@ -38,7 +38,7 @@ export default class HighwayIncidentView extends Component {
             layout: "list",
             incidentType: "",
             location: "All",
-            feedID: 0,
+            feedId: 0,
             feedOptions: [],
             incidentOptions: [],
             incidents: {},
@@ -47,7 +47,7 @@ export default class HighwayIncidentView extends Component {
                 page: 1,
                 pageSize: 12,
                 incidentType: "",
-                feedID: 0,
+                feedId: 0,
 
             },
         };
@@ -65,11 +65,14 @@ export default class HighwayIncidentView extends Component {
     }
 
     componentDidMount() {
-        this.myInstant=setInterval(()=>{this.refresh()},30000);
+        this.myInstant = setInterval(() => {
+            this.refresh()
+        }, 30000);
         this.refresh();
         this.getFeeds();
         this.getIncidentTypes();
- }
+    }
+
     componentWillUnmount() {
         clearInterval(this.myInstant);
     }
@@ -138,14 +141,14 @@ export default class HighwayIncidentView extends Component {
     }
 
     handleLocationMenuClick(choice) {
-        let feedID;
+        let feedId;
         if (choice.item.props.children == "All") {
-            feedID = 0;
-            this.setState({feedID: feedID})
+            feedId = 0;
+            this.setState({feedId: feedId})
             this.setState({location: "All"})
         } else {
-            feedID = choice.item.props.id;
-            this.setState({feedID: feedID});
+            feedId = choice.item.props.id;
+            this.setState({feedId: feedId});
             this.setState({location: choice.item.props.children});
 
 
@@ -238,7 +241,7 @@ export default class HighwayIncidentView extends Component {
     getFeedString(event) {
         let result = "NA";
         if (event && event.feed) {
-            result = event.feed.site + " > " + event.feed.location + " > " + event.feed.name;
+            result = event.feed.site + " | " + event.feed.location + " | " + event.feed.name;
         }
         return result;
     }
@@ -264,43 +267,29 @@ export default class HighwayIncidentView extends Component {
                                 title={
                                     <div>
                                         <Tag color="#f50">{event.incidentType}</Tag>
-                                        <div>
-                                            <Text code><Icon type="schedule"/> <Moment
-                                                format="ll">{event.incidentDate}</Moment>{' '}|{' '}<Moment
-                                                format="LTS">{event.incidentDate}</Moment></Text>
-                                        </div>
-                                        <div style={{marginTop: "5px", textAlign: "left"}}>
-                                            <div>
-                                                <Text code>
-                                                    <Icon type="environment"/>
-                                                    {this.getFeedString(event)}
-                                                </Text>
-                                            </div>
-                                        </div>
-
                                     </div>
 
                                 }
 
                                 extra={<Dropdown overlay={<Menu>
                                     {
-                                        (event.incidentImage!="")?
-                                        <Menu.Item key="1">
-                                        <a
-                                            title={"click here to download"}
-                                            onClick={() => this.downloadImage(event)}
-                                        ><Icon type="download"/>{' '} Image</a>
-                                    </Menu.Item>
+                                        (event.incidentImage != "") ?
+                                            <Menu.Item key="1">
+                                                <a
+                                                    title={"click here to download"}
+                                                    onClick={() => this.downloadImage(event)}
+                                                ><Icon type="download"/>{' '} Image</a>
+                                            </Menu.Item>
                                             : null
                                     }
-                                    {(event.incidentVideo!="")?
+                                    {(event.incidentVideo != "") ?
                                         <Menu.Item key="2">
                                             <a
                                                 title={"click here to download"}
                                                 onClick={() => this.downloadVideo(event)}
                                             ><Icon type="download"/>{' '} Video</a>
                                         </Menu.Item>
-                                        :null
+                                        : null
                                     }
                                     <Menu.Item key="3">
                                         <Button type="danger" onClick={() => this.archiveEvent(event)}><Icon
@@ -324,6 +313,19 @@ export default class HighwayIncidentView extends Component {
                                     poster={"/public/vids/image/" + event.id + "/image.jpg"}
                                     src={"/public/vids/video/" + event.id + "/video.mp4"}
                                 />
+                                <div style={{textAlign: "center", marginTop: "5px"}}>
+                                    <Text code><Icon type="schedule"/> <Moment
+                                        format="ll">{event.incidentDate}</Moment>{' '}|{' '}<Moment
+                                        format="LTS">{event.incidentDate}</Moment></Text>
+                                </div>
+                                <div style={{textAlign: "center", marginTop: "2px"}}>
+                                    <div>
+                                        <Text code>
+                                            <Icon type="environment"/>
+                                            {this.getFeedString(event)}
+                                        </Text>
+                                    </div>
+                                </div>
                             </Card>
                         </Col>
                     )
@@ -405,7 +407,7 @@ export default class HighwayIncidentView extends Component {
 
     UpdateLocationFilter() {
         let filter = this.state.filter;
-        filter.feedID = this.state.feedID;
+        filter.feedId = this.state.feedId;
         this.setState({filter: filter});
 
     }

@@ -1,6 +1,7 @@
 package io.synlabs.synvision.views.atcc;
 
 import io.synlabs.synvision.entity.atcc.AtccEvent;
+import io.synlabs.synvision.views.common.FeedResponse;
 import io.synlabs.synvision.views.common.Response;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,7 @@ public class AtccRawDataResponse implements Response {
     private String vehicleImage;
     private String vid;
     private String eventVideo;
+    private FeedResponse feed;
 
     public AtccRawDataResponse(AtccEvent atccEvent) {
         this.id = atccEvent.getId();
@@ -35,6 +37,7 @@ public class AtccRawDataResponse implements Response {
         this.direction = atccEvent.getDirection();
         this.type = atccEvent.getType();
         this.location = atccEvent.getFeed() != null ? atccEvent.getFeed().getLocation() : "";
+        this.feed = atccEvent.getFeed() != null ? new FeedResponse(atccEvent.getFeed()) : null;
         this.vehicleImage = atccEvent.getEventImage();
         this.seek = atccEvent.getSeek();
         this.vid = atccEvent.getVid();

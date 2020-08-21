@@ -7,6 +7,7 @@ import Headbar from "./components/Headbar";
 import Footerbar from "./components/Footerbar";
 import PrivateRoute from "./components/PrivateRoute";
 
+import HomeView from "./views/HomeView";
 import FeedView from "./views/FeedView";
 import {Route} from "react-router-dom";
 import DeviceView from "./views/DeviceView";
@@ -216,7 +217,7 @@ class App extends Component {
                         <Content style={{margin: '16px'}}>
                             <div style={{padding: 4}}>
                                 <Route path='/login' exact={true} component={LoginView}/>
-                                <PrivateRoute path='/' exact={true} component={FrsEventView}/>
+                                <PrivateRoute path='/' exact={true} component={HomeView}/>
                                 <PrivateRoute path='/incidents' exact={true} component={TrafficIncidentView}/>
                                 <PrivateRoute path='/incidents/hotlisted' exact={true} component={IncidentHotlistView}/>
                                 <PrivateRoute path='/incidents/repeated' exact={true} component={IncidentRepeatedView}/>
@@ -244,7 +245,6 @@ class App extends Component {
                                 <PrivateRoute path='/atcc' exact={true} component={AtccGridView}/>
                                 <PrivateRoute path='/atcc/reports' exact={true} component={AtccReportView}/>
 
-                                {/*Alert Config Page} */}
                                 <PrivateRoute path='/alertConfig' exact={true} component={AlertConfig} />
 
                                 {/* vids */}
