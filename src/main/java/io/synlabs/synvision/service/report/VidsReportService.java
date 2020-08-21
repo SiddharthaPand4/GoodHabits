@@ -58,7 +58,9 @@ public class VidsReportService extends BaseService {
                 .where(HighwayIncident.incidentDate.between(request.getFrom(), request.getTo()))
                 .orderBy(HighwayIncident.incidentDate.asc());
 
-        if (request.getFeedId() != null && request.feedId != 0) query.where(HighwayIncident.feed.id.eq(request.feedId));
+        if (request.getFeedId() != null && request.getFeedId() != 0) {
+            query.where(HighwayIncident.feed.id.eq(request.getFeedId()));
+        }
 
         long totalRecordsCount = query.fetchCount();
         Path path = Paths.get(uploadDirPath);
@@ -161,7 +163,7 @@ public class VidsReportService extends BaseService {
         request.setTo(DateUtil.parseDateString(request.getToDateString(), pattern));
 
         QHighwayIncident highwayIncident = new QHighwayIncident("highwayIncident");
-        JPAQuery<HighwayIncident> query = new JPAQuery<>(entityManager);
+        JPAQuery<com.querydsl.core.Tuple> query = new JPAQuery<>(entityManager);
 
         Date eventDate = null;
         String eventDateString;
@@ -173,14 +175,18 @@ public class VidsReportService extends BaseService {
         VidsDaywiseReportResponse response;
         List<VidsDaywiseReportResponse> responses;
 
-        result = query
-                .select(highwayIncident.incidentDate.dayOfMonth(), highwayIncident.incidentDate.month(), highwayIncident.incidentDate.year() //0, 1, 2
-                        , highwayIncident.incidentType, //3
-                        highwayIncident.count() //4
-                )
+        query.select(highwayIncident.incidentDate.dayOfMonth(), highwayIncident.incidentDate.month(), highwayIncident.incidentDate.year() //0, 1, 2
+                , highwayIncident.incidentType, //3
+                highwayIncident.count() //4
+        )
                 .from(highwayIncident)
-                .where(highwayIncident.incidentDate.between(request.getFrom(), request.getTo()))
-                .groupBy(highwayIncident.incidentDate.dayOfMonth(), highwayIncident.incidentDate.month(), highwayIncident.incidentDate.year(), highwayIncident.incidentType)
+                .where(highwayIncident.incidentDate.between(request.getFrom(), request.getTo()));
+
+
+        if (request.getFeedId() != null && request.getFeedId() != 0) {
+            query.where(highwayIncident.feed.id.eq(request.getFeedId()));
+        }
+        result = query.groupBy(highwayIncident.incidentDate.dayOfMonth(), highwayIncident.incidentDate.month(), highwayIncident.incidentDate.year(), highwayIncident.incidentType)
                 .orderBy(highwayIncident.incidentDate.asc())
                 .fetch();
 

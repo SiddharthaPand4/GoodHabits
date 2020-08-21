@@ -78,9 +78,9 @@ export default class Sidebar extends Component {
                                     className='nav-text'>{item.title}</span></Link>
                             </Menu.Item>
                     )}
-                    <Menu.Item key="7">
+                    {/*<Menu.Item key="7">
                         <Link to='/ngofr'><Icon type='video-camera'/><span className='nav-text'>FRS</span></Link>
-                    </Menu.Item>
+                    </Menu.Item>*/}
                     <Menu.Item key="8">
                         <Link to='/' onClick={() => UserService.logout()}><Icon type='logout'/><span
                             className='nav-text'>Logout</span></Link>

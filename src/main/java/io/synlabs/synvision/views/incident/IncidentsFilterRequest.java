@@ -22,4 +22,8 @@ public class IncidentsFilterRequest implements Request {
 
         private Long feedId;
 
+        public Long getFeedId() {
+                return unmask(feedId);
+        }
+
 }

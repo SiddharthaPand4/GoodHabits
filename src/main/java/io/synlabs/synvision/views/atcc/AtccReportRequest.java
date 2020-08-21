@@ -11,18 +11,22 @@ import java.util.Date;
 @Setter
 public class AtccReportRequest implements Request {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm",timezone = "IST")
-    public Date from;
+    private Date from;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm",timezone = "IST")
-    public Date to;
-    public String fromDateString;
-    public String fromTime;
-    public String toDateString;
-    public String toTime;
-    public int page;
-    public int pageSize;
+    private Date to;
+    private String fromDateString;
+    private String fromTime;
+    private String toDateString;
+    private String toTime;
+    private int page;
+    private int pageSize;
 
-    public String reportType;
-    public String reportFileType;
+    private String reportType;
+    private String reportFileType;
 
-    public Long feedId;
+    private Long feedId;
+
+    public Long getFeedId() {
+        return unmask(feedId);
+    }
 }

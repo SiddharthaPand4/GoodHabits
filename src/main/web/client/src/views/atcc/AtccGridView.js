@@ -75,20 +75,23 @@ export default class AtccGridView extends Component {
     }
 
     componentDidMount() {
-        this.myInstant=setInterval(()=>{this.refresh()},30000);
+        this.myInstant = setInterval(() => {
+            this.refresh()
+        }, 30000);
         this.fetchFeedsList();
         this.refresh();
     }
+
     componentWillUnmount() {
         clearInterval(this.myInstant);
     }
 
-    fetchFeedsList = async ()=> {
+    fetchFeedsList = async () => {
         try {
             const res = await FeedService.getFeeds()
             const feedsList = res.data
             this.setState({feedsList})
-        } catch(e) {
+        } catch (e) {
             console.log(e)
             message.error("Something Went Wrong")
         }
@@ -198,11 +201,12 @@ export default class AtccGridView extends Component {
                             </span>Video <Switch onChange={this.videoSwitchChange}/>
                             <br/><br/>
                             <Select
-                                style={{ width: 200 }}
+                                style={{width: 200}}
                                 placeholder="Select Location"
                                 onChange={this.feedSelected}
                             >
-                                {(this.state.feedsList || []).map(feed => <Option value={feed.id}>{feed.site + " > " + feed.location}</Option>)}
+                                {(this.state.feedsList || []).map(feed => <Option
+                                    value={feed.id}>{feed.site + " > " + feed.location}</Option>)}
                             </Select>
                             <br/><br/>
                             <GenericFilter handleRefresh={this.refresh} filter={this.state.filter} layout={layout}
@@ -258,8 +262,8 @@ export default class AtccGridView extends Component {
                                         {(event.type) ? <Tag color="#f50">{event.type}</Tag> : null}
                                         <Tag color="#f50">{(event.direction === 1 ? "Fwd" : "Rev")}</Tag>
                                         <br/>
-                                        {(event.lane) ? <Tag color="#f50">Lane : {event.lane}</Tag>:null}
-                                            <Tag color="#f50">Speed : {event.speed}</Tag>
+                                        {(event.lane) ? <Tag color="#f50">Lane : {event.lane}</Tag> : null}
+                                        <Tag color="#f50">Speed : {event.speed}</Tag>
 
                                     </div>
                                 }
@@ -278,12 +282,12 @@ export default class AtccGridView extends Component {
                                             :
                                             null
                                     }
-                                    {(event.eventVideo !="") ?
+                                    {(event.eventVideo != "") ?
                                         <Menu.Item key="2">
-                                        <a
-                                        title={"click here to download"}
-                                        onClick={() => this.downloadVideo(event)}
-                                        ><Icon type="download"/>{' '} Video</a>
+                                            <a
+                                                title={"click here to download"}
+                                                onClick={() => this.downloadVideo(event)}
+                                            ><Icon type="download"/>{' '} Video</a>
                                         </Menu.Item>
                                         : null
                                     }
@@ -340,6 +344,19 @@ export default class AtccGridView extends Component {
                                         format="ll">{event.eventDate}</Moment>{' '}|{' '}<Moment
                                         format="LTS">{event.eventDate}</Moment></Text>
                                 </div>
+                                {
+                                    event.feed
+                                    ? <div style={{textAlign: "center", marginTop:"2px"}}>
+                                        <Text code>
+                                            <Icon type="environment"/>
+                                            {' '}
+                                            {event.feed.location}{' '}|{' '}
+                                            {event.feed.site}{' '}|{' '}
+                                            {event.feed.name}
+                                        </Text>
+                                    </div>
+                                    : null
+                                }
 
                             </Card>
                         </Col>
@@ -430,7 +447,7 @@ export default class AtccGridView extends Component {
     downloadImage(e) {
         AtccService.downloadScreenshot(e.id)
             .then((response) => {
-                saveAs(response.data, e.timeStamp +".jpg");
+                saveAs(response.data, e.timeStamp + ".jpg");
             }).catch(error => {
             alert("Something went wrong!");
         })
