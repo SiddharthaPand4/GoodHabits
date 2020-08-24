@@ -26,5 +26,9 @@ public class AnprReportRequest implements Request {
     public String xAxis;
     public String reportType;
 
-    public Long feedId;
+    private Long feedId;
+
+    public Long getFeedId() {
+        return unmask(this.feedId);
+    }
 }

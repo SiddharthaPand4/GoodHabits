@@ -270,6 +270,7 @@ render() {
                 placeholder="Select Location"
                 onChange={this.feedSelected}
             >
+                <Option value={0}>All</Option>
                 {(this.state.feedsList || []).map(feed => <Option value={feed.id}>{feed.site + " > " + feed.location}</Option>)}
             </Select>
         </Form.Item>

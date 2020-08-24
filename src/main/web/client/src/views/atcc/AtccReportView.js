@@ -72,7 +72,7 @@ export default class AtccReportView extends Component {
         });
     };
 
-    selectDateRange(selectedCustomDateRangeEnum, selectedCustomDateRangeMoment) {
+    selectDateRange(reportName, selectedCustomDateRangeEnum, selectedCustomDateRangeMoment) {
         let {isOpenCustomDateRangeModal} = this.state;
         let report = this.state.report;
         report.filter.selectedCustomDateRange = selectedCustomDateRangeEnum;
@@ -212,6 +212,7 @@ export default class AtccReportView extends Component {
                                         placeholder="Select Location"
                                         onChange={this.feedSelected}
                                     >
+                                        <Option value={0}>All</Option>
                                         {(this.state.feeds || []).map(feed => <Option value={feed.id}>{feed.site + " > " + feed.location}</Option>)}
                                     </Select>
                                 </Form.Item>

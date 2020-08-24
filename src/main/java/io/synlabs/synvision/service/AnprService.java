@@ -562,7 +562,7 @@ public class AnprService extends BaseService {
 
         }
 
-        if (request.getFeedId() != null && request.feedId != 0) query.where(anprEvent.feed.id.eq(request.feedId));
+        if (request.getFeedId() != null && request.getFeedId() != 0) query.where(anprEvent.feed.id.eq(request.getFeedId()));
 
         long totalRecordsCount = query.fetchCount();
         Path path = Paths.get(uploadDirPath);
@@ -811,10 +811,10 @@ public class AnprService extends BaseService {
         JPAQuery<AnprEvent> query1 = new JPAQuery<>(entityManager);
         JPAQuery<AnprEvent> query2 = new JPAQuery<>(entityManager);
 
-        if (request.getFeedId() != null && request.feedId != 0) {
-            query.where(anprEvent.feed.id.eq(request.feedId));
-            query1.where(anprEvent.feed.id.eq(request.feedId));
-            query2.where(anprEvent.feed.id.eq(request.feedId));
+        if (request.getFeedId() != null && request.getFeedId() != 0) {
+            query.where(anprEvent.feed.id.eq(request.getFeedId()));
+            query1.where(anprEvent.feed.id.eq(request.getFeedId()));
+            query2.where(anprEvent.feed.id.eq(request.getFeedId()));
         }
 
         Date eventDate = null;
