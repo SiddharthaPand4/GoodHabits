@@ -157,14 +157,13 @@ public class AtccReportService extends BaseService {
         AtccSummaryDatawiseResponse response;
         List<AtccSummaryDatawiseResponse> responses;
 
-                query
+        query
                 .select(atccEvent.eventDate, //0
                         atccEvent.type, //1
                         atccEvent.count() //2
                 )
                 .from(atccEvent)
                 .where(atccEvent.eventDate.between(request.getFrom(), request.getTo()));
-
 
         if (request.getFeedId() != null && request.getFeedId() != 0) {
             query.where(atccEvent.feed.id.eq(request.getFeedId()));

@@ -72,7 +72,7 @@ export default class AtccReportView extends Component {
         });
     };
 
-    selectDateRange(selectedCustomDateRangeEnum, selectedCustomDateRangeMoment) {
+    selectDateRange(reportName, selectedCustomDateRangeEnum, selectedCustomDateRangeMoment) {
         let {isOpenCustomDateRangeModal} = this.state;
         let report = this.state.report;
         report.filter.selectedCustomDateRange = selectedCustomDateRangeEnum;
