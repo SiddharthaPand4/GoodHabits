@@ -187,7 +187,9 @@ public class VidsReportService extends BaseService {
             query.where(highwayIncident.feed.id.eq(request.getFeedId()));
         }
         result = query.groupBy(highwayIncident.incidentDate.dayOfMonth(), highwayIncident.incidentDate.month(), highwayIncident.incidentDate.year(), highwayIncident.incidentType)
-                .orderBy(highwayIncident.incidentDate.asc())
+                .orderBy(highwayIncident.incidentDate.year().asc())
+                .orderBy(highwayIncident.incidentDate.month().asc())
+                .orderBy(highwayIncident.incidentDate.dayOfMonth().asc())
                 .fetch();
 
         com.querydsl.core.Tuple tuple;
