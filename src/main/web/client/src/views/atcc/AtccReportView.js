@@ -144,28 +144,28 @@ export default class AtccReportView extends Component {
         </Menu>)
     }
 
-    getDateRangeOptions() {
+    getDateRangeOptions(reportName) {
         return (
             <Menu>
-                <Menu.Item key="1" onClick={() => this.selectDateRange("Today")}>
+                <Menu.Item key="1" onClick={() => this.selectDateRange(reportName, "Today")}>
                     Today
                 </Menu.Item>
-                <Menu.Item key="2" onClick={() => this.selectDateRange("Yesterday")}>
+                <Menu.Item key="2" onClick={() => this.selectDateRange(reportName, "Yesterday")}>
                     Yesterday
                 </Menu.Item>
-                <Menu.Item key="3" onClick={() => this.selectDateRange("This week")}>
+                <Menu.Item key="3" onClick={() => this.selectDateRange(reportName, "This week")}>
                     This week
                 </Menu.Item>
-                <Menu.Item key="4" onClick={() => this.selectDateRange("Last week")}>
+                <Menu.Item key="4" onClick={() => this.selectDateRange(reportName, "Last week")}>
                     Last week
                 </Menu.Item>
-                <Menu.Item key="5" onClick={() => this.selectDateRange("This month")}>
+                <Menu.Item key="5" onClick={() => this.selectDateRange(reportName, "This month")}>
                     This month
                 </Menu.Item>
-                <Menu.Item key="6" onClick={() => this.selectDateRange("This year")}>
+                <Menu.Item key="6" onClick={() => this.selectDateRange(reportName, "This year")}>
                     This year
                 </Menu.Item>
-                <Menu.Item key="7" onClick={() => this.selectDateRange("Last year")}>
+                <Menu.Item key="7" onClick={() => this.selectDateRange(reportName, "Last year")}>
                     Last year
                 </Menu.Item>
                 <Menu.Item onClick={this.showCustomDateRangeModal}>
