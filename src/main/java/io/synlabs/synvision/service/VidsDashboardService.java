@@ -3,9 +3,11 @@ package io.synlabs.synvision.service;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import io.synlabs.synvision.entity.atcc.QAtccEvent;
+import io.synlabs.synvision.entity.core.Feed;
 import io.synlabs.synvision.entity.vids.HighwayTrafficState;
 import io.synlabs.synvision.entity.vids.QHighwayIncident;
 import io.synlabs.synvision.enums.HighwayIncidentType;
+import io.synlabs.synvision.jpa.FeedRepository;
 import io.synlabs.synvision.jpa.HighwayTrafficStateRepository;
 import io.synlabs.synvision.views.DashboardResponse;
 import io.synlabs.synvision.views.vids.VidsDashboardResponse;
@@ -19,12 +21,16 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VidsDashboardService {
 
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private FeedRepository feedRepository;
 
     @Autowired
     HighwayTrafficStateRepository trafficStateRepository;
@@ -78,7 +84,16 @@ public class VidsDashboardService {
         //current traffic status
         List<DashboardResponse> incidents = getIncidentStats(startofday, now,request);
 
-        HighwayTrafficState state = trafficStateRepository.findFirstByOrderByUpdateDateDesc();
+        HighwayTrafficState state = null;
+        if (request.getFeedId()!=null && request.getFeedId() != 0) {
+            Optional<Feed> optionalFeed = feedRepository.findById(request.getFeedId());
+            if (optionalFeed.isPresent()) {
+                Feed feed = optionalFeed.get();
+                state = trafficStateRepository.findFirstByFeedOrderByUpdateDateDesc(feed);
+            }
+        } else {
+            state = trafficStateRepository.findFirstByOrderByUpdateDateDesc();
+        }
         return new VidsDashboardResponse(onehourstats, todaystats, incidents, state);
     }
 
