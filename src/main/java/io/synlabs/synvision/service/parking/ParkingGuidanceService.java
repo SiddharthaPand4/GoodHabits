@@ -186,7 +186,8 @@ public class ParkingGuidanceService {
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                 result = query
                         .select(
-                                parkingEvent.checkIn,
+                                parkingEvent.checkIn.dayOfMonth(), parkingEvent.checkIn.month(),
+                                parkingEvent.checkIn.year(),
                                 parkingEvent.count())
                         .from(parkingEvent)
                         .where(parkingEvent.checkIn.between(request.getFrom(), request.getTo()))
@@ -194,7 +195,13 @@ public class ParkingGuidanceService {
                         .fetch();
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
-                    VehicleCountResponse eventCount = new VehicleCountResponse(formatter.format(tuple.get(0, Date.class)), "CheckIn", tuple.get(1, Long.class));
+                    Integer dayOfMonth = tuple.get(0, Integer.class);
+                    Integer month = tuple.get(1, Integer.class);
+                    Integer year = tuple.get(2, Integer.class);
+                    String dateString = dayOfMonth + "/" + month + "/" + year;
+                    VehicleCountResponse eventCount =
+                            new VehicleCountResponse(dateString,
+                                    "CheckIn", tuple.get(3, Long.class));
 
                     checkInEvents.add(eventCount);
                     result.set(i, null);
@@ -217,7 +224,7 @@ public class ParkingGuidanceService {
             case "Hourly":
                 result = query
                         .select(
-                                parkingEvent.checkOut,
+                                parkingEvent.checkOut.hour(),
                                 parkingEvent.count())
                         .from(parkingEvent)
                         .where(parkingEvent.checkOut.isNotNull())
@@ -225,13 +232,14 @@ public class ParkingGuidanceService {
                         .groupBy(parkingEvent.checkOut.hour())
                         .fetch();
 
-                Calendar calendar = Calendar.getInstance();
+                //Calendar calendar = Calendar.getInstance();
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
-                    Date date = tuple.get(0, Date.class);
+                    Integer hour = tuple.get(0, Integer.class);
 
-                    calendar.setTime(date);
-                    VehicleCountResponse eventCount = new VehicleCountResponse(String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)), "CheckOut", tuple.get(1, Long.class));
+                    //calendar.setTime(date);
+                    VehicleCountResponse eventCount =
+                            new VehicleCountResponse(hour.toString(), "CheckOut", tuple.get(1, Long.class));
 
                     checkInEvents.add(eventCount);
                     result.set(i, null);
@@ -243,7 +251,9 @@ public class ParkingGuidanceService {
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                 result = query
                         .select(
-                                parkingEvent.checkOut,
+                                parkingEvent.checkOut.dayOfMonth(),
+                                parkingEvent.checkOut.month(),
+                                parkingEvent.checkOut.year(),
                                 parkingEvent.count())
                         .from(parkingEvent)
                         .where(parkingEvent.checkOut.between(request.getFrom(), request.getTo()))
@@ -251,7 +261,13 @@ public class ParkingGuidanceService {
                         .fetch();
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
-                    VehicleCountResponse eventCount = new VehicleCountResponse(formatter.format(tuple.get(0, Date.class)), "CheckOut", tuple.get(1, Long.class));
+                    Integer dayOfMonth = tuple.get(0, Integer.class);
+                    Integer month = tuple.get(1, Integer.class);
+                    Integer year = tuple.get(2, Integer.class);
+                    String dateString = dayOfMonth + "/" + month + "/" + year;
+
+                    VehicleCountResponse eventCount =
+                            new VehicleCountResponse(dateString, "CheckOut", tuple.get(3, Long.class));
 
                     checkInEvents.add(eventCount);
                     result.set(i, null);
