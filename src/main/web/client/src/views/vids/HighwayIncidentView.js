@@ -103,7 +103,9 @@ export default class HighwayIncidentView extends Component {
     }
 
     handleFilterChange(data) {
-        this.setState({filter: data})
+        const feedId = this.state.filter.feedId;
+        const filter = {...data, feedId}
+        this.setState({filter})
     }
 
     handleLayoutChange(data) {
