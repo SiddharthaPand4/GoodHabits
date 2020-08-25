@@ -91,7 +91,7 @@ public class DashboardService extends BaseService {
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                         query
                         .select(
-                                rawData.eventDate,
+                                rawData.eventDate.dayOfMonth(), rawData.eventDate.month(), rawData.eventDate.year(),
                                 rawData.type,
                                 rawData.count())
                         .from(rawData)
@@ -110,7 +110,11 @@ public class DashboardService extends BaseService {
                     Tuple tuple = result.get(i);
                     vehicleType = tuple.get(rawData.type);
                     vehicleCount = tuple.get(2, Long.class);
-                    String eventDateString = formatter.format(tuple.get(0, Date.class));
+                    //String eventDateString = formatter.format(tuple.get(0, Date.class));
+                    Integer dayOfMonth = tuple.get(0, Integer.class);
+                    Integer month = tuple.get(1, Integer.class);
+                    Integer year = tuple.get(2, Integer.class);
+                    String eventDateString = dayOfMonth + "/" + month + "/" + year;
                     response.add(new AtccVehicleCountResponse(eventDateString, vehicleType, vehicleCount));
                     result.set(i, null);
                 }
