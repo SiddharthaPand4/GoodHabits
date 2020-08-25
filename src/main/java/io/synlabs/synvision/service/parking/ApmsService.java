@@ -271,35 +271,47 @@ public class ApmsService extends BaseService {
 
             case "DayWise Summary":
                 result = checkinquery
-                        .select(parkingEvent.checkIn,
+                        .select(parkingEvent.checkIn.dayOfMonth(),
+                                parkingEvent.checkIn.month(),
+                                parkingEvent.checkIn.year(),
                                 parkingEvent.count())
                         .from(parkingEvent)
                         .where(parkingEvent.checkIn.between(request.getFrom(),request.getTo()))
                         .groupBy(parkingEvent.checkIn.dayOfMonth(), parkingEvent.checkIn.month(), parkingEvent.checkIn.year())
-                        .orderBy(parkingEvent.checkIn.asc())
+                        .orderBy(parkingEvent.checkIn.year().asc())
+                        .orderBy(parkingEvent.checkIn.month().asc())
+                        .orderBy(parkingEvent.checkIn.dayOfMonth().asc())
                         .fetch();
 
                 result1 = checkoutquery
-                        .select(parkingEvent.checkOut,
+                        .select(parkingEvent.checkOut.dayOfMonth(),
+                                parkingEvent.checkOut.month(),
+                                parkingEvent.checkOut.year(),
                                 parkingEvent.count())
                         .from(parkingEvent)
                         .where(parkingEvent.checkOut.between(request.getFrom(),request.getTo()))
                         .groupBy(parkingEvent.checkOut.dayOfMonth(), parkingEvent.checkOut.month(), parkingEvent.checkOut.year())
-                        .orderBy(parkingEvent.checkIn.asc())
+                        .orderBy(parkingEvent.checkIn.dayOfMonth().asc())
+                        .orderBy(parkingEvent.checkIn.month().asc())
+                        .orderBy(parkingEvent.checkIn.year().asc())
                         .fetch();
 
                 for (int i = 0; i < result.size(); i++) {
                     com.querydsl.core.Tuple tuple = result.get(i);
 
-                    checkin = tuple.get(0, Date.class);
-                    String checkinString = toFormattedDate(checkin,"dd/MM/yyyy");
+                    //checkin = tuple.get(0, Date.class);
+                    //String checkinString = toFormattedDate(checkin,"dd/MM/yyyy");
+                    Integer dayOfMonth = tuple.get(0, Integer.class);
+                    Integer month = tuple.get(1, Integer.class);
+                    Integer year = tuple.get(2, Integer.class);
+                    String checkinString = dayOfMonth + "/" + month + "/" + year;
 
                     try {
                         checkin= sdf1.parse(checkinString);
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                    checkinCount = tuple.get(1, Long.class);
+                    checkinCount = tuple.get(3, Long.class);
 
                     totalCheckinAndCheckoutsByDate.put(checkin,new ParkingReportResponse(checkinCount,checkoutCount));
                     result.set(i, null);
@@ -307,16 +319,21 @@ public class ApmsService extends BaseService {
 
                 for (int i = 0; i < result1.size(); i++) {
                     com.querydsl.core.Tuple tuple = result1.get(i);
-                    checkout = tuple.get(0, Date.class);
+//                    checkout = tuple.get(0, Date.class);
+//
+//                    String checkOutString = toFormattedDate(checkout,"dd/MM/yyyy");
 
-                    String checkOutString = toFormattedDate(checkout,"dd/MM/yyyy");
+                    Integer dayOfMonth = tuple.get(0, Integer.class);
+                    Integer month = tuple.get(1, Integer.class);
+                    Integer year = tuple.get(2, Integer.class);
+                    String checkOutString = dayOfMonth + "/" + month + "/" + year;
 
                     try {
                         checkout= sdf1.parse(checkOutString);
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                    checkoutCount = tuple.get(1, Long.class);
+                    checkoutCount = tuple.get(3, Long.class);
 
                     if(totalCheckinAndCheckoutsByDate.containsKey(checkout)){
                         ParkingReportResponse parkingReportResponse = totalCheckinAndCheckoutsByDate.get(checkout);
