@@ -161,20 +161,20 @@ public class ParkingGuidanceService {
             case "Hourly":
                 result = query
                         .select(
-                                parkingEvent.checkIn,
+                                parkingEvent.checkIn.hour(),  //.hour() for preventing full group by exception
                                 parkingEvent.count())
                         .from(parkingEvent)
                         .where(parkingEvent.checkIn.between(request.getFrom(), request.getTo()))
                         .groupBy(parkingEvent.checkIn.hour())
                         .fetch();
 
-                Calendar calendar = Calendar.getInstance();
+                //Calendar calendar = Calendar.getInstance();//
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
-                    Date date = tuple.get(0, Date.class);
+//                    Date date = tuple.get(0, Date.class);
 
-                    calendar.setTime(date);
-                    VehicleCountResponse eventCount = new VehicleCountResponse(String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)), "CheckIn", tuple.get(1, Long.class));
+                    Integer hour = tuple.get(0, Integer.class);
+                    VehicleCountResponse eventCount = new VehicleCountResponse(hour.toString(), "CheckIn", tuple.get(1, Long.class));
 
                     checkInEvents.add(eventCount);
                     result.set(i, null);
