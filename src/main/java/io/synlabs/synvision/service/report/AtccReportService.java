@@ -158,9 +158,9 @@ public class AtccReportService extends BaseService {
         List<AtccSummaryDatawiseResponse> responses;
 
         query
-                .select(atccEvent.eventDate, //0
-                        atccEvent.type, //1
-                        atccEvent.count() //2
+                .select(atccEvent.eventDate.dayOfMonth(),atccEvent.eventDate.month(), atccEvent.eventDate.year(), //0,1,2
+                        atccEvent.type, //3
+                        atccEvent.count() //4
                 )
                 .from(atccEvent)
                 .where(atccEvent.eventDate.between(request.getFrom(), request.getTo()));
@@ -169,18 +169,25 @@ public class AtccReportService extends BaseService {
             query.where(atccEvent.feed.id.eq(request.getFeedId()));
         }
         result = query.groupBy(atccEvent.eventDate.dayOfMonth(), atccEvent.eventDate.month(), atccEvent.eventDate.year(), atccEvent.type)
-                .orderBy(atccEvent.eventDate.asc())
+                .orderBy(atccEvent.eventDate.year().asc())
+                .orderBy(atccEvent.eventDate.month().asc())
+                .orderBy(atccEvent.eventDate.dayOfMonth().asc())
                 .fetch();
 
         com.querydsl.core.Tuple tuple;
         for (int i = 0; i < result.size(); i++) {
             tuple = result.get(i);
 
-            eventDate = tuple.get(0, Date.class);
-            vehicleType = tuple.get(1, String.class);
-            eventCount = tuple.get(2, Long.class);
+            //eventDate = tuple.get(0, Date.class);
+            Integer dayOfMonth = tuple.get(0, Integer.class);
+            Integer month = tuple.get(1, Integer.class);
+            Integer year = tuple.get(2, Integer.class);
 
-            eventDateString = toFormattedDate(eventDate, "dd/MM/yyyy");
+            vehicleType = tuple.get(3, String.class);
+            eventCount = tuple.get(4, Long.class);
+
+//            eventDateString = toFormattedDate(eventDate, "dd/MM/yyyy");
+            eventDateString = dayOfMonth + "/" + month + "/" + year;
             eventDate = DateUtil.parseDateString(eventDateString, "dd/MM/yyyy");
 
             response = new AtccSummaryDatawiseResponse(eventDateString, vehicleType, eventCount);
