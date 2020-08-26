@@ -109,7 +109,7 @@ public class DashboardService extends BaseService {
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
                     vehicleType = tuple.get(rawData.type);
-                    vehicleCount = tuple.get(2, Long.class);
+                    vehicleCount = tuple.get(4, Long.class);
                     //String eventDateString = formatter.format(tuple.get(0, Date.class));
                     Integer dayOfMonth = tuple.get(0, Integer.class);
                     Integer month = tuple.get(1, Integer.class);
