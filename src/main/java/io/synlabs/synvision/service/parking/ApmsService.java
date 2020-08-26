@@ -291,9 +291,9 @@ public class ApmsService extends BaseService {
                         .from(parkingEvent)
                         .where(parkingEvent.checkOut.between(request.getFrom(),request.getTo()))
                         .groupBy(parkingEvent.checkOut.dayOfMonth(), parkingEvent.checkOut.month(), parkingEvent.checkOut.year())
-                        .orderBy(parkingEvent.checkIn.dayOfMonth().asc())
-                        .orderBy(parkingEvent.checkIn.month().asc())
                         .orderBy(parkingEvent.checkIn.year().asc())
+                        .orderBy(parkingEvent.checkIn.month().asc())
+                        .orderBy(parkingEvent.checkIn.dayOfMonth().asc())
                         .fetch();
 
                 for (int i = 0; i < result.size(); i++) {
