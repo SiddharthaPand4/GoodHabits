@@ -47,18 +47,20 @@ public class ApcDashboardService extends BaseService {
 
         switch (xAxis) {
             case "Hourly":
-                result = query.select(apcEvent.eventDate, apcEvent.count())
+                result = query.select(apcEvent.eventDate.hour(),
+                        apcEvent.count())
                         .from(apcEvent)
                         .where(apcEvent.eventDate.between(request.getFrom(), request.getTo()))
                         .groupBy(apcEvent.eventDate.hour()).orderBy(apcEvent.eventDate.hour().asc())
                         .fetch();
 
-                Calendar calendar = Calendar.getInstance();
+                //Calendar calendar = Calendar.getInstance();
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
-                    Date date = tuple.get(0, Date.class);
-                    calendar.setTime(date);
-                    ApcDashboardResponse apcDashboardResponse = new ApcDashboardResponse(String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)), tuple.get(1, Long.class));
+                    //Date date = tuple.get(0, Date.class);
+                    //calendar.setTime(date);
+                    Integer hour = tuple.get(0, Integer.class);
+                    ApcDashboardResponse apcDashboardResponse = new ApcDashboardResponse(hour.toString(), tuple.get(1, Long.class));
                     response.add(apcDashboardResponse);
                     result.set(i, null);
                 }
@@ -69,15 +71,26 @@ public class ApcDashboardService extends BaseService {
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                 result = query
                         .select(
-                                apcEvent.eventDate,
+                                apcEvent.eventDate.dayOfMonth(),
+                                apcEvent.eventDate.month(),
+                                apcEvent.eventDate.year(),
                                 apcEvent.count())
                         .from(apcEvent)
                         .where(apcEvent.eventDate.between(request.getFrom(), request.getTo()))
-                        .groupBy(apcEvent.eventDate.dayOfMonth(), apcEvent.eventDate.month(), apcEvent.eventDate.year()).orderBy(apcEvent.eventDate.asc())
+                        .groupBy(apcEvent.eventDate.dayOfMonth(), apcEvent.eventDate.month(), apcEvent.eventDate.year())
+                        .orderBy(apcEvent.eventDate.year().asc())
+                        .orderBy(apcEvent.eventDate.month().asc())
+                        .orderBy(apcEvent.eventDate.dayOfMonth().asc())
                         .fetch();
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
-                    ApcDashboardResponse apcDashboardResponse = new ApcDashboardResponse(formatter.format(tuple.get(0, Date.class)), tuple.get(1, Long.class));
+                    Integer dayOfMonth = tuple.get(0, Integer.class);
+                    Integer month = tuple.get(1, Integer.class);
+                    Integer year = tuple.get(2, Integer.class);
+                    String dateString = dayOfMonth + "/" + month + "/" + year;
+                    ApcDashboardResponse apcDashboardResponse =
+                            new ApcDashboardResponse(dateString,
+                                    tuple.get(3, Long.class));
 
                     response.add(apcDashboardResponse);
                     result.set(i, null);
@@ -102,18 +115,19 @@ public class ApcDashboardService extends BaseService {
             logger.info("Couldn't parse date", request.getFrom());
         }
 
-        result = query.select(apcEvent.eventDate, apcEvent.count())
+        result = query.select(apcEvent.eventDate.hour(),
+                apcEvent.count())
                 .from(apcEvent)
                 .where(apcEvent.eventDate.between(request.getFrom(), request.getTo()))
                 .groupBy(apcEvent.eventDate.hour()).orderBy(apcEvent.eventDate.hour().asc())
                 .fetch();
 
-        Calendar calendar = Calendar.getInstance();
+        //Calendar calendar = Calendar.getInstance();
         for (int i = 0; i < result.size(); i++) {
             Tuple tuple = result.get(i);
-            Date date = tuple.get(0, Date.class);
-            calendar.setTime(date);
-            ApcDashboardResponse apcDashboardResponse = new ApcDashboardResponse(String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)), tuple.get(1, Long.class));
+            Integer hour = tuple.get(0, Integer.class);
+            //calendar.setTime(date);
+            ApcDashboardResponse apcDashboardResponse = new ApcDashboardResponse(hour.toString(), tuple.get(1, Long.class));
             response.add(apcDashboardResponse);
             result.set(i, null);
         }

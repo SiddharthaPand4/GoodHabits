@@ -91,7 +91,7 @@ public class DashboardService extends BaseService {
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                         query
                         .select(
-                                rawData.eventDate,
+                                rawData.eventDate.dayOfMonth(), rawData.eventDate.month(), rawData.eventDate.year(),
                                 rawData.type,
                                 rawData.count())
                         .from(rawData)
@@ -109,8 +109,12 @@ public class DashboardService extends BaseService {
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
                     vehicleType = tuple.get(rawData.type);
-                    vehicleCount = tuple.get(2, Long.class);
-                    String eventDateString = formatter.format(tuple.get(0, Date.class));
+                    vehicleCount = tuple.get(4, Long.class);
+                    //String eventDateString = formatter.format(tuple.get(0, Date.class));
+                    Integer dayOfMonth = tuple.get(0, Integer.class);
+                    Integer month = tuple.get(1, Integer.class);
+                    Integer year = tuple.get(2, Integer.class);
+                    String eventDateString = dayOfMonth + "/" + month + "/" + year;
                     response.add(new AtccVehicleCountResponse(eventDateString, vehicleType, vehicleCount));
                     result.set(i, null);
                 }
@@ -155,7 +159,7 @@ public class DashboardService extends BaseService {
             case "Hourly":
                 query
                    .select(
-                           anprEvent.eventDate,
+                           anprEvent.eventDate.hour(),
                            anprEvent.count())
                    .from(anprEvent)
                    .where(anprEvent.eventDate.between(request.getFrom(), request.getTo()))
@@ -169,13 +173,13 @@ public class DashboardService extends BaseService {
                 result = query.groupBy(anprEvent.eventDate.hour())
                         .fetch();
 
-                Calendar calendar = Calendar.getInstance();
+                //Calendar calendar = Calendar.getInstance();
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
-                    Date date = tuple.get(0, Date.class);
-
-                    calendar.setTime(date);
-                    IncidentCountResponse incidentCount = new IncidentCountResponse(String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)), "helmetMissing", tuple.get(1, Long.class));
+//                    Date date = tuple.get(0, Date.class);
+                    Integer hour = tuple.get(0, Integer.class);
+//                    calendar.setTime(date);
+                    IncidentCountResponse incidentCount = new IncidentCountResponse(hour.toString(), "helmetMissing", tuple.get(1, Long.class));
 
                     helmetMissingIncidents.add(incidentCount);
                     result.set(i, null);
@@ -187,7 +191,9 @@ public class DashboardService extends BaseService {
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                 query
                         .select(
-                                anprEvent.eventDate,
+                                anprEvent.eventDate.dayOfMonth(),
+                                anprEvent.eventDate.month(),
+                                anprEvent.eventDate.year(),
                                 anprEvent.count())
                         .from(anprEvent)
                         .where(anprEvent.eventDate.between(request.getFrom(), request.getTo()))
@@ -204,7 +210,13 @@ public class DashboardService extends BaseService {
 
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
-                    IncidentCountResponse incidentCount = new IncidentCountResponse(formatter.format(tuple.get(0, Date.class)), "helmetMissing", tuple.get(1, Long.class));
+                    Integer dayOfMonth = tuple.get(0, Integer.class);
+                    Integer month = tuple.get(1, Integer.class);
+                    Integer year = tuple.get(2, Integer.class);
+                    String dateString = dayOfMonth + "/" + month + "/" + year;
+                    IncidentCountResponse incidentCount =
+                            new IncidentCountResponse(dateString,
+                                    "helmetMissing", tuple.get(3, Long.class));
 
                     helmetMissingIncidents.add(incidentCount);
                     result.set(i, null);
@@ -228,7 +240,7 @@ public class DashboardService extends BaseService {
             case "Hourly":
                 query
                   .select(
-                          anprEvent.eventDate,
+                          anprEvent.eventDate.hour(),
                           anprEvent.count())
                   .from(anprEvent)
                   .where(anprEvent.eventDate.between(request.getFrom(), request.getTo()))
@@ -242,12 +254,13 @@ public class DashboardService extends BaseService {
                 result = query.groupBy(anprEvent.eventDate.hour())
                         .fetch();
 
-                Calendar calendar = Calendar.getInstance();
+               // Calendar calendar = Calendar.getInstance();
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
-                    Date date = tuple.get(0, Date.class);
-                    calendar.setTime(date);
-                    IncidentCountResponse incidentCount = new IncidentCountResponse(String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)), "rev", tuple.get(1, Long.class));
+                    Integer hour = tuple.get(0, Integer.class);
+                    //calendar.setTime(date);
+                    IncidentCountResponse incidentCount =
+                            new IncidentCountResponse(hour.toString(), "rev", tuple.get(1, Long.class));
 
                     reverseDirectionIncidents.add(incidentCount);
                     result.set(i, null);
@@ -259,7 +272,9 @@ public class DashboardService extends BaseService {
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                 query
                    .select(
-                           anprEvent.eventDate,
+                           anprEvent.eventDate.dayOfMonth(),
+                           anprEvent.eventDate.month(),
+                           anprEvent.eventDate.year(),
                            anprEvent.count())
                    .from(anprEvent)
                    .where(anprEvent.eventDate.between(request.getFrom(), request.getTo()))
@@ -276,7 +291,13 @@ public class DashboardService extends BaseService {
 
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
-                    IncidentCountResponse incidentCount = new IncidentCountResponse(formatter.format(tuple.get(0, Date.class)), "rev", tuple.get(1, Long.class));
+                    Integer dayOfMonth = tuple.get(0, Integer.class);
+                    Integer month = tuple.get(1, Integer.class);
+                    Integer year = tuple.get(2, Integer.class);
+                    String dateString = dayOfMonth + "/" + month + "/" + year;
+
+                    IncidentCountResponse incidentCount =
+                            new IncidentCountResponse(dateString, "rev", tuple.get(3, Long.class));
 
                     reverseDirectionIncidents.add(incidentCount);
                     result.set(i, null);
@@ -500,7 +521,7 @@ public class DashboardService extends BaseService {
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                 query
                   .select(
-                          rawData.eventDate,
+                          rawData.eventDate.dayOfMonth(), rawData.eventDate.month(), rawData.eventDate.year(),
                           rawData.vehicleClass,
                           rawData.count())
                   .from(rawData)
@@ -515,10 +536,13 @@ public class DashboardService extends BaseService {
 
                 for (int i = 0; i < result.size(); i++) {
                     Tuple tuple = result.get(i);
-                    date = tuple.get(0, Date.class);
+                    Integer dayOfMonth = tuple.get(0, Integer.class);
+                    Integer month = tuple.get(1, Integer.class);
+                    Integer year = tuple.get(2, Integer.class);
                     vehicleType = tuple.get(rawData.vehicleClass);
-                    vehicleCount = tuple.get(2, Long.class);
-                    String eventDateString =formatter.format(tuple.get(0, Date.class));
+                    vehicleCount = tuple.get(4, Long.class);
+                    //String eventDateString =formatter.format(tuple.get(0, Date.class));
+                    String eventDateString = dayOfMonth + "/" + month + "/" + year;
                     response.add(new AnprVehicleCountResponse(eventDateString, vehicleType, vehicleCount));
                     result.set(i, null);
                 }
