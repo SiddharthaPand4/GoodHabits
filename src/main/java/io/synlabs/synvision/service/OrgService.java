@@ -32,10 +32,9 @@ public class OrgService extends BaseService {
     private String uploadDirPath;
 
     public OrgResponse orgDetails() {
-//        SynVisionUser user = getCurrentUser();
-//        Org org = user.getOrg();
-//        return new OrgResponse(org);
-        return new OrgResponse(orgRepository.findFirstByOrderByIdDesc());
+        SynVisionUser user = getCurrentUser();
+        Org org = user.getOrg();
+        return new OrgResponse(org);
     }
 
     public void saveOrgDetails(OrgRequest request, MultipartFile logoFileMultipart) {

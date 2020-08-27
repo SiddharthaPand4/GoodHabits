@@ -1,6 +1,7 @@
 package io.synlabs.synvision.controller;
 
 import io.synlabs.synvision.service.OrgDataService;
+import io.synlabs.synvision.util.LongObfuscator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public class OrgDataController {
 
     @GetMapping("/logo/{id}")
     public ResponseEntity<Resource> sendLogo(@PathVariable Long id, HttpServletRequest request) {
-        Resource resource = orgDataService.logoFile(id);
+        Resource resource = orgDataService.logoFile(LongObfuscator.INSTANCE.unobfuscate(id));
         return send(resource, request);
     }
 

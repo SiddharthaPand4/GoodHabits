@@ -15,13 +15,17 @@ export default class EditCurrentOrg extends Component {
     }
 
     componentDidMount() {
+        this.refresh()
+    }
+
+    refresh = () => {
         this.loadCurrentOrg()
     }
 
     loadCurrentOrg = async () => {
         try {
             const res = await OrgService.getOrgDetails()
-            const org = res.data
+            const org = {...res.data}
             this.setState({org})
         } catch (e) {
             message.error("Something Went Wrong")
@@ -67,6 +71,7 @@ export default class EditCurrentOrg extends Component {
                 formData.append("logoFile", this.state.org.logoFile)
                 const res = await OrgService.saveOrgDetails(formData)
                 message.success("Org Details Saved")
+                this.refresh()
             } catch (e) {
                 message.error("Something Went Wrong")
                 console.log(e)
