@@ -46,6 +46,7 @@ import RoleView from "./views/RoleView";
 import Moment from "react-moment";
 import {Player} from 'video-react';
 import "video-react/dist/video-react.css";
+import EditCurrentOrg from "./views/Org/EditCurrentOrg";
 
 const {Text} = Typography;
 const {Content} = Layout;
@@ -257,6 +258,9 @@ class App extends Component {
                                 <PrivateRoute path='/register' exact={true} component={FaceRegisterView}/>
                                 <PrivateRoute path='/frsuser' exact={true} component={RegisteredView}/>
                                 <PrivateRoute path='/frsevents' exact={true} component={FrsEventView}/>
+
+                                {/*org change*/}
+                                <PrivateRoute path={'/edit/org'} exact={true} component={EditCurrentOrg} />
 
                             </div>
                         </Content>
