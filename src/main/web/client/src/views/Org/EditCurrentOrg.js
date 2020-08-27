@@ -57,6 +57,7 @@ export default class EditCurrentOrg extends Component {
         } else {
             const org = {...this.state.org, logoFile}
             this.setState({org})
+            message.success("File Verified")
         }
         return false
     }
