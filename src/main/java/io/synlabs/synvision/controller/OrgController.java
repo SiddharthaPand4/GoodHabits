@@ -29,7 +29,7 @@ public class OrgController {
     public void saveOrgDetails(@RequestParam String name,
                                @RequestParam(required = false) Long id,
                                @RequestParam String legalName,
-                               @RequestParam("logoFile") MultipartFile logoFile) {
+                               @RequestParam(value = "logoFile", required = false) MultipartFile logoFile) {
         OrgRequest orgRequest = new OrgRequest(id, name, legalName, logoFile.getOriginalFilename());
         orgService.saveOrgDetails(orgRequest, logoFile);
     }
