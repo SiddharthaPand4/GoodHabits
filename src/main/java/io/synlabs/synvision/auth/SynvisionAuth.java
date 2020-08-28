@@ -48,5 +48,9 @@ public final class SynvisionAuth
 
     public static final String ALERT_SETTING_READ = "ROLE_ALERT_SETTING_READ";
     public static final String ALERT_SETTING_WRITE = "ROLE_ALERT_SETTING_WRITE";
+
+    public static final String ORG_SETTING_READ = "ROLE_ORG_SETTING_READ";
+    public static final String ORG_SETTING_WRITE = "ROLE_ORG_SETTING_WRITE";
+
   }
 }
