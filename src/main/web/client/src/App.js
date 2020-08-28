@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import './App.css';
-import {Layout, notification, Modal, Tag, Icon, Card, Typography} from 'antd';
+import {Layout, notification, Modal, Tag, Icon, Card, Typography, message} from 'antd';
 import Sidebar from "./components/Sidebar";
 import Headbar from "./components/Headbar";
 import Footerbar from "./components/Footerbar";
@@ -47,6 +47,7 @@ import Moment from "react-moment";
 import {Player} from 'video-react';
 import "video-react/dist/video-react.css";
 import EditCurrentOrg from "./views/Org/EditCurrentOrg";
+import OrgService from "./services/OrgService";
 
 const {Text} = Typography;
 const {Content} = Layout;
@@ -59,6 +60,7 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            org: null,
             loggedIn: false,
             channelConnected: false,
             showAlert :false,
@@ -75,20 +77,33 @@ class App extends Component {
         this.connect();
     }
 
+    updateOrg = async () => {
+        try {
+            const res = await OrgService.getOrgDetails()
+            const org = {...res.data}
+            this.setState({org})
+        } catch (e) {
+            message.error("Something Went Wrong")
+            console.log(e)
+        }
+    }
+
     refreshMenu() {
 
-        UserService.tokenValid().then(data => {
-            this.setState({loggedIn:UserService.isLoggedIn()});
-
-        }).catch(error => {
-            localStorage.clear();
-            this.setState({loggedIn: false});
-            history.push("/#/login")
-            console.log("Session Expired !! Login Again");
-
-
-
-        })
+        UserService.tokenValid()
+            .then(data => {
+                const loggedIn = UserService.isLoggedIn()
+                if (loggedIn) {
+                    this.updateOrg()
+                }
+                this.setState({loggedIn});
+            })
+            .catch(error => {
+                localStorage.clear();
+                this.setState({loggedIn: false});
+                history.push("/#/login")
+                console.log("Session Expired !! Login Again");
+            })
 
     }
 
@@ -200,9 +215,10 @@ class App extends Component {
     render() {
 
         const isLoggedIn = this.state.loggedIn;
+        const org = this.state.org;
         const showAlert = this.state.showAlert;
         const alert = this.state.alert;
-        const sideBar = isLoggedIn ? <Sidebar/> : null;
+        const sideBar = isLoggedIn && org ? <Sidebar org={org} /> : null;
         const header = isLoggedIn && showAlert ? <Headbar alert={alert} isLoggedIn={isLoggedIn}/> : null;
 
 
@@ -264,7 +280,7 @@ class App extends Component {
 
                             </div>
                         </Content>
-                        <Footerbar/>
+                        <Footerbar org={org}/>
                     </Layout>
                 </Layout>
 
