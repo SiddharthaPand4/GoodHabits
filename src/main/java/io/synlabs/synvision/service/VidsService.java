@@ -29,9 +29,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
@@ -69,6 +71,28 @@ public class VidsService {
     @Autowired
     private SimpMessagingTemplate websocket;
 
+    private Set<HighwayIncident> highwayIncidents;
+
+    @PostConstruct
+    private void initializeIncidentList() {
+        highwayIncidents = new HashSet<>();
+    }
+
+    @Scheduled(fixedRate = 1000 * 5)
+    private void generateAlerts() {
+        //find alert for which file exists i.e. accessing them as resource doesn't throw error
+        HashSet<HighwayIncident> validAlert = highwayIncidents.stream().
+                filter(incident -> incidentImageExists(incident) && incidentImageExists(incident)).collect(Collectors.toCollection(HashSet::new));
+
+        HashSet<HighwayIncidentType> incidentTypes =
+                vidsAlertSettingRepository.findAllByEnabledTrue().stream().
+                        map(VidsAlertSetting::getIncidentType).collect(Collectors.toCollection(HashSet::new));
+
+        validAlert.stream().filter(incident -> incidentTypes.contains(incident.getIncidentType())).forEach(this::generateAlert);  //generate alert for every valid alert
+
+        highwayIncidents.removeAll(validAlert);  //remove the alerts which were valid and are generated
+    }
+
     public PageResponse<VidsResponse> listIncidents(VidsFilterRequest request) {
         BooleanExpression query = getQuery(request);
         int count = (int) incidentRepository.count(query);
@@ -80,9 +104,7 @@ public class VidsService {
         //List<AnprResponse> list = page.get().map(AnprResponse::new).collect(Collectors.toList());
 
         List<VidsResponse> list = new ArrayList<>(page.getSize());
-        page.get().forEach(item -> {
-            list.add(new VidsResponse(item));
-        });
+        page.get().forEach(item -> list.add(new VidsResponse(item)));
 
         return new VidsPageResponse(request.getPageSize(), pageCount, request.getPage(), list);
     }
@@ -142,7 +164,7 @@ public class VidsService {
         Feed feed = feedRepository.findOneByName(request.getSource());
         incident.setFeed(feed);
         incident = incidentRepository.saveAndFlush(incident);
-        generateAlert(incident);
+        highwayIncidents.add(incident);
     }
 
 
@@ -171,16 +193,52 @@ public class VidsService {
         Feed feed = feedRepository.findOneByName(request.getSource());
         incident.setFeed(feed);
         incident = incidentRepository.saveAndFlush(incident);
-        generateAlert(incident);
+        highwayIncidents.add(incident);
     }
 
     private void generateAlert(HighwayIncident incident) {
-        HashSet<HighwayIncidentType> incidentTypes = new HashSet<>(
-                vidsAlertSettingRepository.findAllByEnabledTrue().stream().map(VidsAlertSetting::getIncidentType)
-                        .collect(Collectors.toList()));
-        if (incidentTypes.contains(incident.getIncidentType())) {
-            VidsAlertMessage message = new VidsAlertMessage(incident);
-            websocket.convertAndSend("/alert", message);
+        VidsAlertMessage message = new VidsAlertMessage(incident);
+        websocket.convertAndSend("/alert", message);
+    }
+
+    public boolean incidentVideoExists(HighwayIncident incident) {
+
+        String tag = "vids-video";
+        Path fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
+                .toAbsolutePath().normalize();
+
+        String filename;
+
+        try {
+            filename = incident.getIncidentVideo();
+            String incidentDate=formatter.format(incident.getIncidentDate());
+            if (filename == null) {
+                throw new NotFoundException("Missing video file name");
+            }
+            Path filePath = Paths.get(fileStorageLocation.toString(), tag,incidentDate,filename).toAbsolutePath().normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+            return resource.exists();
+        } catch (MalformedURLException ex) {
+            return false;
+        }
+    }
+
+    public boolean incidentImageExists(HighwayIncident incident) {
+
+        String tag = "vids-image";
+        Path fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
+                .toAbsolutePath().normalize();
+
+        String filename;
+
+        try {
+            filename = incident.getIncidentImage();
+            String incidentDate=formatter.format(incident.getIncidentDate());
+            Path filePath = Paths.get(fileStorageLocation.toString(), tag,incidentDate,filename).toAbsolutePath().normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+            return resource.exists();
+        } catch (MalformedURLException ex) {
+            return false;
         }
     }
 
