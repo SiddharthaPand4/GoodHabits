@@ -80,7 +80,7 @@ public class VidsService {
     }
 
     @Scheduled(fixedRate = 1000 * 5)
-    private void generateAlerts() {
+    protected void generateAlerts() {
         //find alert for which file exists
         HashSet<HighwayIncident> validAlert = highwayIncidents.stream().
                 filter(incident -> incidentImageExists(incident) && incidentImageExists(incident)).collect(Collectors.toCollection(HashSet::new));
