@@ -54,7 +54,7 @@ public class OrgService extends BaseService {
                 if (opOrg.isPresent()) {
                     Org org = opOrg.get();
 
-                    if (!request.getLogoFileName().toLowerCase().equalsIgnoreCase(org.getLogoFileName())) {
+                    if (!request.getLogoFileName().equals(org.getLogoFileName())) {
                         File prevLogo = Paths.get(logoFolder.toString(), org.getLogoFileName()).toFile();
                         if (prevLogo.exists()) {
                             if (prevLogo.delete()) {
