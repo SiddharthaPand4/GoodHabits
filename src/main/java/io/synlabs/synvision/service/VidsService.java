@@ -83,7 +83,7 @@ public class VidsService {
     protected void generateAlerts() {
         //find alert for which file exists
         HashSet<HighwayIncident> validAlert = highwayIncidents.stream().
-                filter(incident -> incidentImageExists(incident) && incidentImageExists(incident)).collect(Collectors.toCollection(HashSet::new));
+                filter(incident -> incidentImageExists(incident) && incidentVideoExists(incident)).collect(Collectors.toCollection(HashSet::new));
 
         HashSet<HighwayIncidentType> incidentTypes =
                 vidsAlertSettingRepository.findAllByEnabledTrue().stream().
