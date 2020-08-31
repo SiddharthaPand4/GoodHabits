@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -80,7 +81,7 @@ public class VidsService {
 
     @Scheduled(fixedRate = 1000 * 5)
     private void generateAlerts() {
-        //find alert for which file exists i.e. accessing them as resource doesn't throw error
+        //find alert for which file exists
         HashSet<HighwayIncident> validAlert = highwayIncidents.stream().
                 filter(incident -> incidentImageExists(incident) && incidentImageExists(incident)).collect(Collectors.toCollection(HashSet::new));
 

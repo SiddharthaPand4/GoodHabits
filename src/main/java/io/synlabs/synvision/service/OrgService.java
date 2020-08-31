@@ -17,6 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 @Service
@@ -38,16 +41,11 @@ public class OrgService extends BaseService {
 
     public void saveOrgDetails(OrgRequest request, MultipartFile logoFileMultipart) {
         try {
-            String logoFolderPath = uploadDirPath + "orgLogo/";
-            File logoFolder = new File(logoFolderPath);
-            if (!logoFolder.exists()) {
-                if (!logoFolder.mkdir()) {
-                    throw new FileStorageException("Couldn't create upload directory for org logos");
-                }
-            }
+            Path logoFolder = Paths.get(uploadDirPath, "orgLogo");
+            Files.createDirectory(logoFolder);
 
             if (logoFileMultipart != null) {
-                File logoFile = new File(logoFolderPath + logoFileMultipart.getOriginalFilename());
+                File logoFile = Paths.get(logoFolder.toString(), logoFileMultipart.getOriginalFilename()).toFile();
                 FileUtils.copyInputStreamToFile(logoFileMultipart.getInputStream(), logoFile);
             }
 
@@ -57,7 +55,7 @@ public class OrgService extends BaseService {
                     Org org = opOrg.get();
 
                     if (!request.getLogoFileName().toLowerCase().equalsIgnoreCase(org.getLogoFileName())) {
-                        File prevLogo = new File(logoFolderPath + org.getLogoFileName());
+                        File prevLogo = Paths.get(logoFolder.toString(), org.getLogoFileName()).toFile();
                         if (prevLogo.exists()) {
                             if (prevLogo.delete()) {
                                 logger.info("Previous logo file deleted");
