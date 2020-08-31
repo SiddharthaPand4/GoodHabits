@@ -52,7 +52,7 @@ export default class Sidebar extends Component {
                 collapsedWidth="0"
             >
                 <div className="logo">
-                    <img src={"/public/org/logo/" + this.props.org.id} alt={this.props.org.name}/>
+                    <img src={"/public/org/logo/" + this.props.org.id} alt={this.props.org.name} height={50} width={170}/>
                 </div>
                 <Menu theme="dark" mode="inline" defaultSelectedKeys={['0']}>
                     <Menu.Item key="0">

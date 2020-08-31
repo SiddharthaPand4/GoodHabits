@@ -220,7 +220,7 @@ class App extends Component {
         const alert = this.state.alert;
         const sideBar = isLoggedIn && org ? <Sidebar org={org} /> : null;
         const header = isLoggedIn && showAlert ? <Headbar alert={alert} isLoggedIn={isLoggedIn}/> : null;
-
+        const footer = org ? <Footerbar org={org}/> : null;
 
         return (
             <div className="App">
@@ -280,7 +280,7 @@ class App extends Component {
 
                             </div>
                         </Content>
-                        <Footerbar org={org}/>
+                        {footer}
                     </Layout>
                 </Layout>
 

@@ -10,7 +10,8 @@ export default class EditCurrentOrg extends Component {
             id: 0,
             name: "",
             legalName: "",
-            logoFile: ""
+            logoFile: "",
+            logoFileName: ""
         }
     }
 
@@ -43,7 +44,7 @@ export default class EditCurrentOrg extends Component {
         } else if (this.state.org.legalName.length < 3 || this.state.org.legalName > 30) {
             error = "Legal Name should be between 3 to 30 charcaters"
             valid = false
-        } else if (!this.state.org.logoFile) {
+        } else if (!this.state.org.logoFile || !this.state.org.logoFileName) {
             error = "Logo not uploaded"
             valid = false
         }

@@ -42,6 +42,14 @@
       "privilege": "ALERT_SETTING_WRITE",
       "seq": 500,
       "icon": "setting"
+    },
+    {
+      "key": "org-setting",
+      "title": "Org Settings",
+      "link": "/edit/org",
+      "privilege": "ORG_SETTING_WRITE",
+      "seq": 600,
+      "icon": "edit"
     }
   ]
 }
