@@ -37,10 +37,14 @@ public class OrgService extends BaseService {
 
     public void saveOrgDetails(OrgRequest request, MultipartFile logoFileMultipart) {
         try {
-            String logoFolder = uploadDirPath + "orgLogo/";
+            String logoFolderPath = uploadDirPath + "orgLogo/";
+            File logoFolder = new File(logoFolderPath);
+            if (!logoFolder.exists()) {
+                logoFolder.mkdir();
+            }
 
             if (logoFileMultipart != null) {
-                File logoFile = new File(logoFolder + logoFileMultipart.getOriginalFilename());
+                File logoFile = new File(logoFolderPath + logoFileMultipart.getOriginalFilename());
                 FileUtils.copyInputStreamToFile(logoFileMultipart.getInputStream(), logoFile);
             }
 
@@ -50,7 +54,7 @@ public class OrgService extends BaseService {
                     Org org = opOrg.get();
 
                     if (!request.getLogoFileName().toLowerCase().equalsIgnoreCase(org.getLogoFileName())) {
-                        File prevLogo = new File(logoFolder + org.getLogoFileName());
+                        File prevLogo = new File(logoFolderPath + org.getLogoFileName());
                         if (prevLogo.exists()) {
                             if (prevLogo.delete()) {
                                 logger.info("Previous logo file deleted");
