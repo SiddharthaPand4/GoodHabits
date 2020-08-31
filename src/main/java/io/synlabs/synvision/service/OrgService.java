@@ -2,6 +2,7 @@ package io.synlabs.synvision.service;
 
 import io.synlabs.synvision.entity.core.Org;
 import io.synlabs.synvision.entity.core.SynVisionUser;
+import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.jpa.OrgRepository;
 import io.synlabs.synvision.views.OrgRequest;
@@ -40,7 +41,9 @@ public class OrgService extends BaseService {
             String logoFolderPath = uploadDirPath + "orgLogo/";
             File logoFolder = new File(logoFolderPath);
             if (!logoFolder.exists()) {
-                logoFolder.mkdir();
+                if (!logoFolder.mkdir()) {
+                    throw new FileStorageException("Couldn't create upload directory for org logos");
+                }
             }
 
             if (logoFileMultipart != null) {
