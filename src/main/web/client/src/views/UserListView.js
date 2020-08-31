@@ -190,7 +190,8 @@ class UserForm extends Component {
         user.userName = form.getFieldValue("username");
         user.lastName = form.getFieldValue("lastname");
         user.email = form.getFieldValue("email");
-        user.password = form.getFieldValue("password");
+        user.newPassword = form.getFieldValue("newPassword");
+        user.confirmPassword = form.getFieldValue("confirmPassword");
         user.roles = form.getFieldValue("role");
         user.id = this.props.user.id;
         let validationError;
@@ -205,6 +206,10 @@ class UserForm extends Component {
         }
         if (!user.email) {
             validationError = "Missing email"
+        }
+
+        if (user.confirmPassword !== user.newPassword) {
+            validationError = "Passwords do not match!"
         }
 
         if (user.roles.length === 0) {
@@ -285,6 +290,27 @@ class UserForm extends Component {
                             <Input
                                 type="email"
                                 placeholder="email"
+
+                            />,
+                        )}
+                    </Form.Item>
+                    <Form.Item label="NewPassword" className="formitem">
+                        {getFieldDecorator('newPassword', {
+                            initialValue: this.props.user.password,
+                            rules: [{required: true, message: 'Please enter your password!'}],
+                        })(
+                            <Input.Password
+                                placeholder="New Password"
+                            />,
+                        )}
+                    </Form.Item>
+                    <Form.Item label="ConfirmPassword" className="formitem">
+                        {getFieldDecorator('confirmPassword', {
+                            initialValue: this.props.user.password,
+                            rules: [{required: true, message: 'Please confirm your password!'}],
+                        })(
+                            <Input.Password
+                                placeholder={"Confirm Password"}
 
                             />,
                         )}
