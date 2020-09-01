@@ -32,6 +32,7 @@ class UserService {
              email:user.email,
              id:user.id,
              roles:user.roles,
+             password: user.confirmPassword,
         };
 
         const request = {

@@ -4,6 +4,7 @@ import io.synlabs.synvision.entity.core.SynVisionUser;
 import io.synlabs.synvision.views.common.Request;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,13 +15,14 @@ import java.util.List;
 @Getter
 @Setter
 public class UserRequest implements Request {
-    public Long id;
-    public String userName;
-    public String firstName;
-    public String lastName;
-    public String email;
-    public boolean active = true;
-    public List<String> roles = new ArrayList<>();
+    private Long id;
+    private String userName;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String password;
+    private boolean active = true;
+    private List<String> roles = new ArrayList<>();
 
 
     public UserRequest(Long id) {
@@ -36,6 +38,11 @@ public class UserRequest implements Request {
         user.setFirstname(this.firstName);
         user.setLastname(this.lastName);
         user.setUsername(this.userName);
+
+        if (this.password != null && !this.password.isEmpty()) {
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            user.setPasswordHash(encoder.encode(this.password));
+        }
         //user.setPhone(this.phone);
         return user;
     }
