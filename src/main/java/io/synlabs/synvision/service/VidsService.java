@@ -83,15 +83,19 @@ public class VidsService {
     protected void generateAlerts() {
         //find alert for which file exists
         HashSet<HighwayIncident> validAlert = highwayIncidents.stream().
-                filter(incident -> incidentImageExists(incident) && incidentVideoExists(incident)).collect(Collectors.toCollection(HashSet::new));
+                filter(incident -> incidentImageExists(incident) && incidentVideoExists(incident))
+                .collect(Collectors.toCollection(HashSet::new));
 
-        HashSet<HighwayIncidentType> incidentTypes =
-                vidsAlertSettingRepository.findAllByEnabledTrue().stream().
-                        map(VidsAlertSetting::getIncidentType).collect(Collectors.toCollection(HashSet::new));
+        if (!validAlert.isEmpty()) {
+            HashSet<HighwayIncidentType> incidentTypes =
+                    vidsAlertSettingRepository.findAllByEnabledTrue().stream().
+                            map(VidsAlertSetting::getIncidentType).collect(Collectors.toCollection(HashSet::new));
 
-        validAlert.stream().filter(incident -> incidentTypes.contains(incident.getIncidentType())).forEach(this::generateAlert);  //generate alert for every valid alert
+            validAlert.stream().filter(incident -> incidentTypes.contains(incident.getIncidentType()))
+                    .forEach(this::generateAlert);  //generate alert for every valid alert
 
-        highwayIncidents.removeAll(validAlert);  //remove the alerts which were valid and are generated
+            highwayIncidents.removeAll(validAlert);  //remove the alerts which were valid and are generated
+        }
     }
 
     public PageResponse<VidsResponse> listIncidents(VidsFilterRequest request) {
