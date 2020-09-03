@@ -224,7 +224,9 @@ public class VidsReportService extends BaseService {
         fileWriter.append("Date");
         fileWriter.append(',');
         for (HighwayIncidentType incType : incidentTypes) {
-            fileWriter.append(incType.name());
+            fileWriter.append(String.format("%s Count", incType.name()));
+            fileWriter.append(',');
+            fileWriter.append(String.format("%s Percentage", incType.name()));
             fileWriter.append(',');
         }
         fileWriter.append("Total Incidents");
@@ -237,21 +239,28 @@ public class VidsReportService extends BaseService {
             fileWriter.append(',');
             fileWriter.append(String.valueOf('"')).append(toFormattedDate(key, "dd/MM/yyyy")).append(String.valueOf('"'));
             fileWriter.append(',');
-            for (HighwayIncidentType incType : incidentTypes) {
-                int count = 0;
-                for (VidsDaywiseReportResponse vidsDaywiseReportResponse : totalEventsByDate.get(key)) {
-                    if (incType.equals(vidsDaywiseReportResponse.getIncidentType())) {
-                        count = vidsDaywiseReportResponse.getIncidentCount().intValue();
-                        break;
-                    }
-                }
-                fileWriter.append(String.valueOf('"')).append(String.valueOf(count)).append(String.valueOf('"'));
-                fileWriter.append(',');
-            }
-            long totalEvents = 0;
+
+            long totalEvents = 0L;
             for (VidsDaywiseReportResponse vidsDaywiseReportResponse : totalEventsByDate.get(key)) {
                 totalEvents = totalEvents + vidsDaywiseReportResponse.getIncidentCount();
             }
+
+            for (HighwayIncidentType incType : incidentTypes) {
+                Long count = 0L;
+                for (VidsDaywiseReportResponse vidsDaywiseReportResponse : totalEventsByDate.get(key)) {
+                    if (incType.equals(vidsDaywiseReportResponse.getIncidentType())) {
+                        count = vidsDaywiseReportResponse.getIncidentCount();
+                        break;
+                    }
+                }
+                fileWriter.append(String.valueOf('"')).append(String.valueOf(count.intValue())).append(String.valueOf('"'));
+                fileWriter.append(',');
+                Double percentage = (int) totalEvents == 0 ? 0 : ((count.doubleValue() / (double) totalEvents) *100);
+                String percentString  = percentage + "%";
+                fileWriter.append(String.valueOf('"')).append(percentString).append(String.valueOf('"'));
+                fileWriter.append(',');
+            }
+
             fileWriter.append(String.valueOf('"')).append(String.valueOf(totalEvents)).append(String.valueOf('"'));
             fileWriter.append('\n');
             i++;
