@@ -33,6 +33,16 @@ class DashboardService {
         return axios.post('/api/dashboard/vehiclescount/month', filter);
     }
 
+    getIncidentCountForAllTypes(fromDate, toDate, xAxis, feedID) {
+        let filter = {
+            fromDateString: moment(fromDate).format('YYYY-MM-DD HH:mm:ss'),
+            toDateString: moment(toDate).format('YYYY-MM-DD HH:mm:ss"'),
+            xAxis: xAxis,
+            feedId:feedID
+        };
+        return axios.post('/api/dashboard/incidentCount', filter);
+    }
+
     getAtccVehicleCount(fromDate, toDate, xAxis,feedID) {
         let filter = {
             fromDateString: moment(fromDate).format('YYYY-MM-DD HH:mm:ss'),

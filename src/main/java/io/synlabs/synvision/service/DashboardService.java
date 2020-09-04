@@ -4,6 +4,8 @@ import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import io.synlabs.synvision.entity.anpr.QAnprEvent;
 import io.synlabs.synvision.entity.atcc.QAtccEvent;
+import io.synlabs.synvision.entity.vids.QHighwayIncident;
+import io.synlabs.synvision.enums.HighwayIncidentType;
 import io.synlabs.synvision.jpa.AnprEventRepository;
 import io.synlabs.synvision.views.DashboardRequest;
 import io.synlabs.synvision.views.DashboardResponse;
@@ -551,5 +553,93 @@ public class DashboardService extends BaseService {
 
 
         return response;
+    }
+
+    public List<IncidentCountResponse> getIncidentCountForAllTypes(DashboardRequest request) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            request.setFrom(sdf.parse(request.getFromDateString()));
+            request.setTo(sdf.parse(request.getToDateString()));
+        } catch (ParseException e) {
+            logger.info("Couldn't parse date", request.getFrom());
+        }
+
+        QHighwayIncident rawData = QHighwayIncident.highwayIncident;
+        JPAQuery<Tuple> query = new JPAQuery<>(entityManager);
+        List<Tuple> result = null;
+        Date date = null;
+        Integer timeSpan = null;
+        HighwayIncidentType incidentType = null;
+        Long incidentCount = null;
+        List<IncidentCountResponse> response = new ArrayList<>();
+        String xAxis = StringUtils.isEmpty(request.getXAxis()) ? "" : request.getXAxis();
+
+        switch (xAxis) {
+            case "Hourly":
+                query
+                        .select(
+                                rawData.incidentDate.hour(),
+                                rawData.incidentType,
+                                rawData.count())
+                        .from(rawData)
+                        .where(rawData.incidentDate.between(request.getFrom(), request.getTo()));
+
+                if (request.getFeedId()!=null && request.getFeedId() != 0) {
+                    query.where(rawData.feed.id.eq(request.getFeedId()));
+                }
+
+                result = query.groupBy(rawData.incidentDate.hour(), rawData.incidentType)
+                        .fetch();
+
+                for (int i = 0; i < result.size(); i++) {
+                    Tuple tuple = result.get(i);
+                    timeSpan = tuple.get(0, Integer.class);
+                    incidentType = tuple.get(rawData.incidentType);
+                    incidentCount = tuple.get(2, Long.class);
+                    response.add(new IncidentCountResponse(timeSpan.toString(), incidentType, incidentCount));
+                    result.set(i, null);
+                }
+                break;
+
+            case "Daily":
+            default:
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                query
+                        .select(
+                                rawData.incidentDate.dayOfMonth(), rawData.incidentDate.month(), rawData.incidentDate.year(),
+                                rawData.incidentType,
+                                rawData.count())
+                        .from(rawData)
+                        .where(rawData.incidentDate.between(request.getFrom(), request.getTo()));
+
+                if (request.getFeedId()!=null && request.getFeedId() != 0) {
+                    query.where(rawData.feed.id.eq(request.getFeedId()));
+                }
+
+
+                result = query
+                        .groupBy(rawData.incidentDate.dayOfMonth(), rawData.incidentDate.month(), rawData.incidentDate.year(),rawData.incidentType)
+                        .fetch();
+
+                for (int i = 0; i < result.size(); i++) {
+                    Tuple tuple = result.get(i);
+                    incidentType = tuple.get(rawData.incidentType);
+                    incidentCount = tuple.get(4, Long.class);
+                    //String eventDateString = formatter.format(tuple.get(0, Date.class));
+                    Integer dayOfMonth = tuple.get(0, Integer.class);
+                    Integer month = tuple.get(1, Integer.class);
+                    Integer year = tuple.get(2, Integer.class);
+                    String eventDateString = dayOfMonth + "/" + month + "/" + year;
+                    response.add(new IncidentCountResponse(eventDateString, incidentType, incidentCount));
+                    result.set(i, null);
+                }
+                break;
+        }
+
+
+        return response;
+
     }
 }

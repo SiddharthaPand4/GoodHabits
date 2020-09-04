@@ -179,8 +179,8 @@ class App extends Component {
                 style={{margin: "5px"}}
                 title={
                     <div>
-                        <Tag color="#f50">{alert.type}</Tag>
-                        <Tag color="#f50">{alert.location}</Tag>
+                        <Tag color={alert.incidentImage === "novideo.jpg" ? "#f00" : "#f50"}>{alert.type}</Tag>
+                        <Tag color={alert.incidentVideo === "novideo.jpg" ? "#f00" : "#f50"}>{alert.location}</Tag>
                         <br/>
                         <Text code><Icon type="schedule"/> <Moment
                             format="ll">{alert.incidentDate}</Moment>{' '}|{' '}<Moment

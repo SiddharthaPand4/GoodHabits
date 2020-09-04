@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Button, Card, DatePicker, Dropdown, Icon, Menu, Modal} from "antd";
+import {Button, Card, DatePicker, Dropdown, Icon, Menu, message, Modal} from "antd";
 import DashboardService from "../services/DashboardService";
 import CommonService from "../services/CommonService";
 import Moment from 'moment';
@@ -40,6 +40,19 @@ export default class HomeView extends Component {
                     labels: [],
                     datasets: []
                 }
+            }, incidentCount: {
+                filter: {
+                    selectedCustomDateRange: "Today",
+                    selectedXAxisOption: "Hourly",
+                    fromDate: {},
+                    toDate: {},
+                    feedID:0,
+                    location:'All'
+                },
+                chartData: {
+                    labels: [],
+                    datasets: []
+                }
             },
             anpr: {
                 filter: {
@@ -58,6 +71,7 @@ export default class HomeView extends Component {
             isAnprAllowed: false,
             isAtccAllowed: false,
             isIncidentAllowed: false,
+            isIncidentCountAllowed: false,
             feedOptions:[],
         };
 
@@ -105,7 +119,7 @@ export default class HomeView extends Component {
         if (selectedCustomDateRangeEnum === "Custom") {
             isOpencustomDateRangeModal = ""
         }
-        this.setState({[graphName]: graph, isOpencustomDateRangeModal}, () => {
+        this.setState({graph, isOpencustomDateRangeModal}, () => {
             this.refresh();
         });
 
@@ -123,7 +137,7 @@ export default class HomeView extends Component {
 
         this.getAtccVehicleCount(this.state.atcc.filter.fromDate, this.state.atcc.filter.toDate, this.state.atcc.filter.selectedXAxisOption,this.state.atcc.filter.feedID);
         this.getAnprVehicleCount(this.state.anpr.filter.fromDate, this.state.anpr.filter.toDate, this.state.anpr.filter.selectedXAxisOption,this.state.anpr.filter.feedID);
-
+        this.getIncidentCount(this.state.incidentCount.filter.fromDate, this.state.incidentCount.filter.toDate, this.state.incidentCount.filter.selectedXAxisOption,this.state.incidentCount.filter.feedID)
         this.getIncidentVehicleCount(this.state.incident.filter.fromDate, this.state.incident.filter.toDate, this.state.incident.filter.selectedXAxisOption,this.state.incident.filter.feedID);
     }
 
@@ -245,6 +259,64 @@ export default class HomeView extends Component {
         }).catch(error => {
             console.log(error);
         });
+    }
+
+    getIncidentCount = async (from_date, to_date, xAxis, feedID) => {
+        let {incidentCount} = this.state
+        incidentCount.chartData = {
+            labels: [],
+            datasets: []
+        }
+
+        DashboardService.getIncidentCountForAllTypes(from_date, to_date, xAxis,feedID).then(resposne => {
+
+            let rawData = resposne.data;
+            if (rawData && rawData.length > 0) {
+                //let labelDates = DashboardService.enumerateDaysBetweenDates(from_date, to_date);
+                let labelDates = [];
+
+                let rawDataByIncidentData = [];
+                for (let i in rawData) {
+
+                    if (!labelDates.includes(rawData[i].date)) {
+                        labelDates.push(rawData[i].date)
+                    }
+
+                    if (!rawDataByIncidentData[rawData[i].incidentType]) {
+                        rawDataByIncidentData[rawData[i].incidentType] = {};
+                    }
+                    if (!rawDataByIncidentData[rawData[i].incidentType][rawData[i].date]) {
+                        rawDataByIncidentData[rawData[i].incidentType][rawData[i].date] = rawData[i];
+                    }
+                }
+                incidentCount.chartData.labels = labelDates;
+                let incidentTypeIndex = 0;
+                for (let incidentType in rawDataByIncidentData) {
+
+                    let color = DashboardService.getColor(incidentTypeIndex);
+                    let dataSet = {
+                        label: incidentType,
+                        data: [],
+                        borderColor: color,
+                        backgroundColor: color
+                    };
+
+                    for (let i in labelDates) {
+                        if (rawDataByIncidentData[incidentType][labelDates[i]]) {
+                            dataSet.data.push(rawDataByIncidentData[incidentType][labelDates[i]].incidentCount);
+                        } else {
+                            dataSet.data.push(0);
+                        }
+                    }
+                    incidentCount.chartData.datasets.push(dataSet);
+                    incidentTypeIndex++;
+                }
+            }
+            this.setState({incidentCount, isIncidentCountAllowed: true});
+        }).catch(error => {
+            console.log(error);
+        });
+
     }
 
 
@@ -483,17 +555,18 @@ export default class HomeView extends Component {
     }
 
     render() {
-        let {atcc, incident, anpr} = this.state;
+        let {atcc, incident, anpr, incidentCount} = this.state;
         const atccChartOptions = this.getBarChartOptions("atcc");
         const incidentChartOptions = this.getBarChartOptions("incident");
         const anprChartOptions = this.getBarChartOptions("anpr");
+        const incidentCountChartOptions = this.getBarChartOptions("incidentCount");
         return (
             <div>
                 <div>
                     <Modal
                         onCancel={this.handleCancel}
                         title="Custom Date Range"
-                        visible={!!this.state.isOpencustomDateRangeModal}
+                        visible={this.state.isOpencustomDateRangeModal}
                         footer={[]}
 
                     >
@@ -561,6 +634,38 @@ export default class HomeView extends Component {
                                 </Dropdown>
                             </div>}>
                                 <Line data={atcc.chartData} options={atccChartOptions}/>
+
+                            </Card>
+                            : null
+                    }
+                    <br/>
+                    {
+                        this.state.isIncidentCountAllowed
+                            ?
+                            <Card title={<div>Incident Counts
+                                &nbsp;
+                                <Dropdown overlay={() => this.getDateRangeOptions("incidentCount")}>
+                                    <Button>
+                                        {incidentCount.filter.selectedCustomDateRange ? incidentCount.filter.selectedCustomDateRange : "Select"}
+                                        <Icon
+                                            type="down"/>
+                                    </Button>
+                                </Dropdown>
+                                &nbsp;<Dropdown overlay={() => this.getXAxisOptions("incidentCount")}>
+                                    <Button>
+                                        {incidentCount.filter.selectedXAxisOption ? incidentCount.filter.selectedXAxisOption : "Select"}
+                                        <Icon
+                                            type="down"/>
+                                    </Button>
+                                </Dropdown>
+                                &nbsp;<Dropdown overlay={() =>this.getLocation('incidentCount')}>
+                                    <Button color="#f50">
+                                        {incidentCount.filter.location ? incidentCount.filter.location : "All"}
+                                        <Icon type="down"/>
+                                    </Button>
+                                </Dropdown>
+                            </div>}>
+                                <Line data={incidentCount.chartData} options={incidentCountChartOptions}/>
 
                             </Card>
                             : null
