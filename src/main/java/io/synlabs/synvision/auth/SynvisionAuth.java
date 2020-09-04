@@ -52,7 +52,5 @@ public final class SynvisionAuth
     public static final String ORG_SETTING_READ = "ROLE_ORG_SETTING_READ";
     public static final String ORG_SETTING_WRITE = "ROLE_ORG_SETTING_WRITE";
 
-    public static final String INCIDENT_COUNT_READ = "ROLE_INCIDENT_COUNT_READ";
-
   }
 }

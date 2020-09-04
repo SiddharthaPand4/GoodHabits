@@ -40,7 +40,7 @@ public class DashboardController {
     }
 
     @PostMapping("incidentCount")
-    @Secured(INCIDENT_COUNT_READ)
+    @Secured(VIDS_READ)
     public List<IncidentCountResponse> getIncidentCount(@RequestBody DashboardRequest request) {
         return dashboardService.getIncidentCountForAllTypes(request);
     }
