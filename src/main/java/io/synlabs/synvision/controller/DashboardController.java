@@ -5,6 +5,7 @@ import io.synlabs.synvision.views.DashboardRequest;
 import io.synlabs.synvision.views.DashboardResponse;
 import io.synlabs.synvision.views.anpr.AnprVehicleCountResponse;
 import io.synlabs.synvision.views.atcc.AtccVehicleCountResponse;
+import io.synlabs.synvision.views.incident.IncidentCountResponse;
 import io.synlabs.synvision.views.incident.IncidentGroupCountResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -36,6 +37,12 @@ public class DashboardController {
     @Secured(ATCC_READ)
     public List<AtccVehicleCountResponse> getAtccVehicleCount(@RequestBody DashboardRequest request){
         return dashboardService.getAtccVehicleCount(request);
+    }
+
+    @PostMapping("incidentCount")
+    @Secured(INCIDENT_COUNT_READ)
+    public List<IncidentCountResponse> getIncidentCount(@RequestBody DashboardRequest request) {
+        return dashboardService.getIncidentCountForAllTypes(request);
     }
 
     @PostMapping("incident/vehicle/count")
