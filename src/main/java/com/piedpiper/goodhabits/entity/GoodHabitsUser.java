@@ -24,6 +24,9 @@ public class GoodHabitsUser extends BaseEntity {
     @Column(name = "password_hash", nullable = false, length = 100)
     private String passwordHash;
 
+    @Column(nullable = false)
+    private Integer goodSamaritanPoints;
+
     @Column(name = "active", nullable = false)
     private boolean active;
 
