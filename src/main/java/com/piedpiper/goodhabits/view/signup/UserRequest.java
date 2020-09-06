@@ -8,12 +8,17 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CreateUserRequest implements Request {
+public class UserRequest implements Request {
 
+    private Long userId;
     private String firstName;
     private String lastName;
     private String password;
     private String email;
     private String userName;
+
+    public Long getUserId() {
+        return unmask(this.userId);
+    }
 
 }

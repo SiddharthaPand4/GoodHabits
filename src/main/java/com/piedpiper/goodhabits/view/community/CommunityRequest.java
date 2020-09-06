@@ -8,9 +8,19 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CreateCommunityRequest implements Request {
+public class CommunityRequest implements Request {
 
+    private Long communityId;
     private String name;
     private String description;
+    private Long adminId;
+
+    public Long getCommunityId() {
+        return unmask(this.communityId);
+    }
+
+    public Long getAdminId() {
+        return unmask(this.adminId);
+    }
 
 }

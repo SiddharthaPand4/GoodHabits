@@ -1,7 +1,7 @@
 package com.piedpiper.goodhabits.controller;
 
 import com.piedpiper.goodhabits.service.CommunityService;
-import com.piedpiper.goodhabits.view.community.CreateCommunityRequest;
+import com.piedpiper.goodhabits.view.community.CommunityRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +16,7 @@ public class CommunityController {
     private CommunityService communityService;
 
     @PostMapping("/")
-    public void createCommunity(@RequestBody CreateCommunityRequest request) {
+    public void createCommunity(@RequestBody CommunityRequest request) {
         communityService.createCommunity(request);
     }
 
