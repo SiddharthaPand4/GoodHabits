@@ -1,4 +1,4 @@
-package com.piedpiper.goodhabits.view;
+package com.piedpiper.goodhabits.view.Login;
 
 import com.piedpiper.goodhabits.view.common.Request;
 import lombok.Getter;

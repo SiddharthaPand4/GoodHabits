@@ -5,7 +5,8 @@ import com.piedpiper.goodhabits.entity.GoodHabitsUser;
 import com.piedpiper.goodhabits.jpa.GoodHabitsUserRepository;
 import com.piedpiper.goodhabits.jpa.PrivilegeRepository;
 import com.piedpiper.goodhabits.jpa.RoleRepository;
-import com.piedpiper.goodhabits.view.LoginRequest;
+import com.piedpiper.goodhabits.view.Login.LoginRequest;
+import com.piedpiper.goodhabits.view.signup.CreateUserRequest;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +25,6 @@ public class UserService extends BaseService implements UserDetailsService {
 
     @Autowired
     private GoodHabitsUserRepository userRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private PrivilegeRepository privilegeRepository;
 
     private PasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -62,5 +57,8 @@ public class UserService extends BaseService implements UserDetailsService {
         return new CurrentUser(user, new String[]{"ROLE_USER"});
     }
 
+    public void createUser(CreateUserRequest request) {
+        userRepository.saveAndFlush(new GoodHabitsUser(request));
+    }
 
 }

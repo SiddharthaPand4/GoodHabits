@@ -17,6 +17,11 @@ public class CommunityMembership extends BaseEntity {
     private Community community;
 
     @ManyToOne
-    private GoodHabitsUser user;
+    private GoodHabitsUser member;
+
+    public CommunityMembership(Community community, GoodHabitsUser member) {
+        this.community = community;
+        this.member = member;
+    }
 
 }
