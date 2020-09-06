@@ -1,3 +1,5 @@
 /GoodHabits.iml
 /.idea/
 /target/
+/src/main/web/GoodHabitsApp/node_modules/
+/src/main/web/GoodHabitsApp/yarn.lock
