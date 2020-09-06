@@ -1,4 +1,4 @@
-package com.piedpiper.goodhabits.view;
+package com.piedpiper.goodhabits.view.community;
 
 import com.piedpiper.goodhabits.view.common.Request;
 import lombok.Getter;
@@ -8,10 +8,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class LoginRequest implements Request {
+public class CreateCommunityRequest implements Request {
 
-    private String email;
-    private String username;
-    private String password;
+    private String name;
+    private String description;
 
 }

@@ -1,8 +1,11 @@
 package com.piedpiper.goodhabits.entity;
 
+import com.piedpiper.goodhabits.view.signup.CreateUserRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -47,6 +50,16 @@ public class GoodHabitsUser extends BaseEntity {
     private Set<Role> roles;
 
     private String externalId;
+
+    public GoodHabitsUser (CreateUserRequest request) {
+        this.firstname = request.getFirstName();
+        this.lastname = request.getLastName();
+        this.username = request.getUserName();
+        this.email = request.getEmail();
+
+        PasswordEncoder encoder = new BCryptPasswordEncoder();
+        this.passwordHash = encoder.encode(request.getPassword());
+    }
 
     public Set<String> getPrivileges()
     {

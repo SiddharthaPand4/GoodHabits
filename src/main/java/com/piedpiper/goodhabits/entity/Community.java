@@ -1,5 +1,6 @@
 package com.piedpiper.goodhabits.entity;
 
+import com.piedpiper.goodhabits.view.community.CreateCommunityRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,5 +22,10 @@ public class Community extends BaseEntity {
 
     @ManyToOne
     private GoodHabitsUser admin;
+
+    public Community(CreateCommunityRequest request) {
+        this.name = request.getName();
+        this.description = request.getDescription();
+    }
 
 }
