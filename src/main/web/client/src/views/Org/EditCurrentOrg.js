@@ -44,9 +44,6 @@ export default class EditCurrentOrg extends Component {
         } else if (this.state.org.legalName.length < 3 || this.state.org.legalName > 30) {
             error = "Legal Name should be between 3 to 30 charcaters"
             valid = false
-        } else if (!this.state.org.logoFile || !this.state.org.logoFileName) {
-            error = "Logo not uploaded"
-            valid = false
         }
         if (!valid) message.error(error)
         return valid
@@ -57,8 +54,9 @@ export default class EditCurrentOrg extends Component {
             message.error("FIle size should be less than 50kb")
         } else {
             const org = {...this.state.org, logoFile}
-            this.setState({org})
-            message.success("File Verified")
+            this.setState({org}, () => {
+                message.success("File Verified")
+            })
         }
         return false
     }
