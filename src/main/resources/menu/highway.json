@@ -41,6 +41,14 @@
       "link": "/edit/survey",
       "privilege": "AVC_SURVEY_WRITE",
       "seq": 500
+    },
+    {
+      "key": "survey-list",
+      "title": "Surveys",
+      "icon": "fund",
+      "link": "/surveyReports",
+      "privilege": "AVC_SURVEY_READ",
+      "seq": 600
     }
   ]
 }

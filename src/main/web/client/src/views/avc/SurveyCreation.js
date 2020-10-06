@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {Button, Card, Input, message, Col, Row, DatePicker} from 'antd'
-import AvcService from "../../services/AvcService";
+import AvcService from "../../services/AvcService"
 
 const {RangePicker} = DatePicker
 
