@@ -7,13 +7,22 @@ const {RangePicker} = DatePicker
 export default class SurveyCreation extends Component {
 
     state = {
-        survey : {
+        survey : {}
+    }
+
+    componentDidMount() {
+        this.refresh()
+    }
+
+    refresh = () => {
+        const survey = {
             id: 0,
             name: "",
             folder: "",
             startDate: "",
             endDate: ""
         }
+        this.setState({survey})
     }
 
     handleFolderChange = e => {
@@ -57,6 +66,7 @@ export default class SurveyCreation extends Component {
             try {
                 await AvcService.saveSurvey({...this.state.survey})
                 message.success("Survey Created!")
+                this.refresh()
             } catch (e) {
                 message.error("Something Went Wrong!")
                 console.log(e)
