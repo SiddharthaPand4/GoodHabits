@@ -26,4 +26,8 @@ public class SurveyResponse implements Response {
         this.startDate = survey.getStartDate();
         this.endDate = survey.getEndDate();
     }
+
+    public void setId(Long id) {
+        this.id = mask(id);
+    }
 }

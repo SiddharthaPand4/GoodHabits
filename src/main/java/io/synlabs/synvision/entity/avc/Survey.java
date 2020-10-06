@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -19,6 +20,7 @@ public class Survey extends BaseEntity {
 
     private String name;
 
+    @Column(unique = true)
     private String folderName;
 
     @Temporal(TemporalType.TIMESTAMP)
