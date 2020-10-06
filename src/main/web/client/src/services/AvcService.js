@@ -14,6 +14,10 @@ class AvcService {
         return axios.get('/api/survey/list')
     }
 
+    generateReport(surveyId) {
+        //report api
+    }
+
 }
 
 export default AvcService.Instance()

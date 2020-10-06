@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import AvcService from "../../services/AvcService"
-import {Table} from "antd"
+import {Table, Button, message} from "antd"
 import {FileExcelOutlined} from '@ant-design/icons'
 
 const {Column} = Table
@@ -10,8 +10,9 @@ export default class SurveyReports extends Component {
         surveys: []
     }
 
-    generateReport = e => {
-        console.log(e)
+    generateReport = async index => {
+        await AvcService.generateReport(this.state.surveys[index].id)
+        message.success("Report Generated!")
     }
 
     componentDidMount() {
@@ -39,8 +40,8 @@ export default class SurveyReports extends Component {
                         title={"Report"}
                         dataIndex={"report"}
                         key={"report"}
-                        render = {()=> (
-                            <div onClick={this.generateReport}><FileExcelOutlined /></div>
+                        render = {(text, record, index)=> (
+                            <Button onClick={() => this.generateReport(index)}><FileExcelOutlined /></Button>
                         )}
                     />
                 </Table>
