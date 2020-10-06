@@ -1,4 +1,4 @@
-package io.synlabs.synvision.entity.avc_;
+package io.synlabs.synvision.entity.avc;
 
 import io.synlabs.synvision.enums.TimeSpan;
 import lombok.Getter;
