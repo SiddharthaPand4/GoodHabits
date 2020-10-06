@@ -14,7 +14,7 @@ import DeviceView from "./views/DeviceView";
 import UserListView from "./views/UserListView";
 import DeviceConfigView from "./views/DeviceConfigView";
 import AlertConfig from "./views/alerts/AlertConfig";
-import SurveyCreation from "./views/avc_/SurveyCreation";
+import SurveyCreation from "./views/avc/SurveyCreation";
 
 import UserService from "./services/UserService";
 import {EventBus} from "./components/event"
@@ -49,6 +49,7 @@ import {Player} from 'video-react';
 import "video-react/dist/video-react.css";
 import EditCurrentOrg from "./views/Org/EditCurrentOrg";
 import OrgService from "./services/OrgService";
+import SurveyReports from "./views/avc/SurveyReports";
 
 const {Text} = Typography;
 const {Content} = Layout;
@@ -280,6 +281,7 @@ class App extends Component {
                                 <PrivateRoute path={'/edit/org'} exact={true} component={EditCurrentOrg} />
 
                                 <PrivateRoute path={'/edit/survey'} exact={true} component={SurveyCreation} />
+                                <PrivateRoute path={'/surveyReports'} exact={true} component={SurveyReports} />
 
                             </div>
                         </Content>
