@@ -38,10 +38,10 @@ export default class EditCurrentOrg extends Component {
     validate = () => {
         let valid = true
         let error = ""
-        if (this.state.org.name.length < 3 || this.state.org.name > 30) {
+        if (this.state.org.name.length < 3 || this.state.org.name.length > 30) {
             error = "Org Name should be between 3 to 30 charcaters"
             valid = false
-        } else if (this.state.org.legalName.length < 3 || this.state.org.legalName > 30) {
+        } else if (this.state.org.legalName.length < 3 || this.state.org.legalName.length > 30) {
             error = "Legal Name should be between 3 to 30 charcaters"
             valid = false
         }

@@ -14,6 +14,7 @@ import DeviceView from "./views/DeviceView";
 import UserListView from "./views/UserListView";
 import DeviceConfigView from "./views/DeviceConfigView";
 import AlertConfig from "./views/alerts/AlertConfig";
+import SurveyCreation from "./views/avc_/SurveyCreation";
 
 import UserService from "./services/UserService";
 import {EventBus} from "./components/event"
@@ -277,6 +278,8 @@ class App extends Component {
 
                                 {/*org change*/}
                                 <PrivateRoute path={'/edit/org'} exact={true} component={EditCurrentOrg} />
+
+                                <PrivateRoute path={'/edit/survey'} exact={true} component={SurveyCreation} />
 
                             </div>
                         </Content>
