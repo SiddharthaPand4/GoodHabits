@@ -33,6 +33,14 @@
       "link": "/atcc/reports",
       "privilege": "ATCC_READ",
       "seq": 400
+    },
+    {
+      "key": "survey-creation",
+      "title": "Create Survey",
+      "icon": "fund",
+      "link": "/edit/survey",
+      "privilege": "AVC_SURVEY_WRITE",
+      "seq": 500
     }
   ]
 }

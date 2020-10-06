@@ -1,4 +1,4 @@
-package io.synlabs.synvision.entity.vids;
+package io.synlabs.synvision.entity.avc_;
 
 import io.synlabs.synvision.entity.BaseEntity;
 import io.synlabs.synvision.views.SurveyRequest;
@@ -26,7 +26,6 @@ public class Survey extends BaseEntity {
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date endDate;
-
 
     public Survey (SurveyRequest request) {
         this.name = request.getName();
