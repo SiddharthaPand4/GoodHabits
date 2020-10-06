@@ -1,6 +1,6 @@
 package io.synlabs.synvision.jpa;
 
-import io.synlabs.synvision.entity.avc_.Survey;
+import io.synlabs.synvision.entity.avc.Survey;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

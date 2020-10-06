@@ -1,6 +1,6 @@
 package io.synlabs.synvision.views;
 
-import io.synlabs.synvision.entity.avc_.Survey;
+import io.synlabs.synvision.entity.avc.Survey;
 import io.synlabs.synvision.views.common.Response;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,6 @@
 package io.synlabs.synvision.service;
 
-import io.synlabs.synvision.entity.avc_.Survey;
+import io.synlabs.synvision.entity.avc.Survey;
 import io.synlabs.synvision.jpa.SurveyRepository;
 import io.synlabs.synvision.views.SurveyRequest;
 import io.synlabs.synvision.views.SurveyResponse;
