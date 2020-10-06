@@ -6,6 +6,8 @@ import io.synlabs.synvision.views.SurveyResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/survey")
 public class SurveyController {
@@ -26,6 +28,11 @@ public class SurveyController {
     @GetMapping("/duplicates")
     public boolean checkDuplicates(@RequestParam String surveyFolder) {
         return surveyService.checkDuplicateSurvey(surveyFolder);
+    }
+
+    @GetMapping("/list")
+    public List<SurveyResponse> surveyList() {
+        return surveyService.surveyList();
     }
 
 }

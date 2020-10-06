@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SurveyService extends BaseService {
@@ -39,5 +41,9 @@ public class SurveyService extends BaseService {
 
     public void deleteSurvey(Long surveyId) {
         surveyRepository.deleteById(surveyId);
+    }
+
+    public List<SurveyResponse> surveyList() {
+        return surveyRepository.findAll().stream().map(SurveyResponse::new).collect(Collectors.toList());
     }
 }
