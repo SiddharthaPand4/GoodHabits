@@ -1,4 +1,4 @@
-package io.synlabs.synvision.views;
+package io.synlabs.synvision.views.avc;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.synlabs.synvision.views.common.Request;

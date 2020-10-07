@@ -34,6 +34,9 @@ public class AvcEvent extends AbstractPersistable<Long> {
     private int seek;
 
     @ManyToOne
+    private Survey survey;
+
+    @ManyToOne
     private Feed feed;
 
     @Column(length = 200)

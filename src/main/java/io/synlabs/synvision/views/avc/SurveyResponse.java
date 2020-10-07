@@ -1,4 +1,4 @@
-package io.synlabs.synvision.views;
+package io.synlabs.synvision.views.avc;
 
 import io.synlabs.synvision.entity.avc.Survey;
 import io.synlabs.synvision.views.common.Response;

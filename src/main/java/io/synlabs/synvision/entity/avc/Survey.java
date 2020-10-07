@@ -1,7 +1,7 @@
 package io.synlabs.synvision.entity.avc;
 
 import io.synlabs.synvision.entity.BaseEntity;
-import io.synlabs.synvision.views.SurveyRequest;
+import io.synlabs.synvision.views.avc.SurveyRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
