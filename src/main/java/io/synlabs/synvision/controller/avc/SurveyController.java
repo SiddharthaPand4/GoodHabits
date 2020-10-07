@@ -1,9 +1,9 @@
-package io.synlabs.synvision.controller;
+package io.synlabs.synvision.controller.avc;
 
 import io.synlabs.synvision.auth.SynvisionAuth;
-import io.synlabs.synvision.service.SurveyService;
-import io.synlabs.synvision.views.SurveyRequest;
-import io.synlabs.synvision.views.SurveyResponse;
+import io.synlabs.synvision.service.avc.SurveyService;
+import io.synlabs.synvision.views.avc.SurveyRequest;
+import io.synlabs.synvision.views.avc.SurveyResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;

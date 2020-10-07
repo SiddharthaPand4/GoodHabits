@@ -15,7 +15,7 @@ class AvcService {
     }
 
     generateReport(surveyId) {
-        //report api
+        return axios.get('/api/report/avc?surveyId=' + surveyId)
     }
 
 }
