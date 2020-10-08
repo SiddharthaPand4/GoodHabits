@@ -10,8 +10,9 @@ export default class SurveyReports extends Component {
         surveys: []
     }
 
-    generateReport = async index => {
-        await AvcService.generateReport(this.state.surveys[index].id)
+    generateReport = async id => {
+        const res = await AvcService.generateReport(id)
+        saveAs(res.data)
         message.success("Report Generated!")
     }
 
@@ -40,8 +41,8 @@ export default class SurveyReports extends Component {
                         title={"Report"}
                         dataIndex={"report"}
                         key={"report"}
-                        render = {(text, record, index)=> (
-                            <Button onClick={() => this.generateReport(index)}><FileExcelOutlined /></Button>
+                        render = {(text, record, _)=> (
+                            <Button onClick={() => this.generateReport(record.id)}><FileExcelOutlined /></Button>
                         )}
                     />
                 </Table>
