@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import AvcService from "../../services/AvcService"
 import {Table, Button, message} from "antd"
 import {FileExcelOutlined} from '@ant-design/icons'
+import {saveAs} from 'file-saver'
 
 const {Column} = Table
 
@@ -11,9 +12,14 @@ export default class SurveyReports extends Component {
     }
 
     generateReport = async id => {
-        const res = await AvcService.generateReport(id)
-        saveAs(res.data)
-        message.success("Report Generated!")
+        try {
+            const res = await AvcService.generateReport(id)
+            saveAs(res.data)
+            message.success("Report Generated!")
+        } catch (e) {
+            console.log(e)
+            message.error("Something Went Wrong")
+        }
     }
 
     componentDidMount() {
@@ -21,9 +27,14 @@ export default class SurveyReports extends Component {
     }
 
     fetchSurveys = async () => {
-        const res = await AvcService.fetchSurveys()
-        const surveys = res.data
-        this.setState({surveys})
+        try {
+            const res = await AvcService.fetchSurveys()
+            const surveys = res.data
+            this.setState({surveys})
+        } catch (e) {
+            console.log(e)
+            message.error("Something Went Wrong")
+        }
     }
 
     render() {
