@@ -2,7 +2,6 @@ package io.synlabs.synvision.controller.avc;
 
 import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.controller.MediaUploadController;
-import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.service.avc.AvcDataService;
 import io.synlabs.synvision.util.LongObfuscator;
 import io.synlabs.synvision.views.UploadFileResponse;
