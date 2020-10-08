@@ -14,7 +14,7 @@ export default class SurveyReports extends Component {
     generateReport = async id => {
         try {
             const res = await AvcService.generateReport(id)
-            saveAs(res.data)
+            saveAs(res.data, "survey-report.xlsx")
             message.success("Report Generated!")
         } catch (e) {
             console.log(e)

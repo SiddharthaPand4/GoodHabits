@@ -1,4 +1,6 @@
 import axios from "./axios"
+import {authHeader} from "../helpers/auth-header";
+import {config} from "../helpers/config";
 
 class AvcService {
 
@@ -15,7 +17,15 @@ class AvcService {
     }
 
     generateReport(surveyId) {
-        return axios.get('/api/report/avc/survey?surveyId=' + surveyId)
+
+        const request = {
+            method: 'GET',
+            headers: authHeader(),
+            responseType: 'blob',
+            timeout:180000,
+            url: config.apiUrl + 'api/report/avc/survey?surveyId=' + surveyId
+        };
+        return axios(request);
     }
 
 }

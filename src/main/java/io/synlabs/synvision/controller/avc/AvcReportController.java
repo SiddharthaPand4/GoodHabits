@@ -1,5 +1,6 @@
 package io.synlabs.synvision.controller.avc;
 
+import io.synlabs.synvision.auth.SynvisionAuth;
 import io.synlabs.synvision.service.avc.AvcReportService;
 import io.synlabs.synvision.util.LongObfuscator;
 import org.apache.commons.io.FilenameUtils;
@@ -7,6 +8,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -52,6 +54,7 @@ public class AvcReportController {
     }
 
     @GetMapping("/survey")
+    @Secured(SynvisionAuth.Privileges.AVC_SURVEY_READ)
     public void avcEventReport(@RequestParam Long surveyId, HttpServletResponse response) throws IOException {
         String fileName = avcReportService.downloadAvcReportBySurvey(LongObfuscator.INSTANCE.unobfuscate(surveyId));
         handleHttpFileResponse(response, fileName);
