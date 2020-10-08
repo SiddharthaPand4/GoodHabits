@@ -3,6 +3,7 @@ package io.synlabs.synvision.service.avc;
 import io.synlabs.synvision.entity.avc.AvcEvent;
 import io.synlabs.synvision.entity.avc.Survey;
 import io.synlabs.synvision.entity.core.Feed;
+import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.ex.NotFoundException;
 import io.synlabs.synvision.jpa.AvcEventRepository;
 import io.synlabs.synvision.jpa.FeedRepository;
@@ -47,9 +48,17 @@ public class AvcDataService extends BaseService {
         return currentDate.after(survey.getStartDate()) && currentDate.before(survey.getEndDate());
     }
 
-    public boolean checkValidFolderTag(String tag) {
-        Survey survey = surveyRepository.findFirstByFolderName(tag);
-        if (survey == null) return false;
-        return checkValidDuration(survey);
+    public String surveyFolder(Long surveyId) {
+        Optional<Survey> opSurvey = surveyRepository.findById(surveyId);
+        if (opSurvey.isPresent()) {
+            Survey survey = opSurvey.get();
+            if (checkValidDuration(survey)) {
+                return opSurvey.get().getFolderName();
+            } else {
+                throw new FileStorageException("Survey has expired so no uploads allowed");
+            }
+        } else {
+            throw new NotFoundException("Can't find survey with unmasked id : " + surveyId);
+        }
     }
 }
