@@ -4,6 +4,7 @@ import io.synlabs.synvision.config.FileStorageProperties;
 import io.synlabs.synvision.controller.MediaUploadController;
 import io.synlabs.synvision.ex.FileStorageException;
 import io.synlabs.synvision.service.avc.AvcDataService;
+import io.synlabs.synvision.util.LongObfuscator;
 import io.synlabs.synvision.views.UploadFileResponse;
 import io.synlabs.synvision.views.avc.AvcEventRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,16 +28,16 @@ public class AvcController extends MediaUploadController {
 
     @PostMapping("/image")
     @Secured(AVC_SURVEY_WRITE)
-    public UploadFileResponse uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("tag") String tag) {
-        if (avcDataService.checkValidFolderTag(tag)) return UploadFile(file, tag, fileStorageProperties);
-        else throw new FileStorageException("Either survey has expired or tag is wrong");
+    public UploadFileResponse uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("surveyId") Long surveyId) {
+        String tag = avcDataService.surveyFolder(LongObfuscator.INSTANCE.unobfuscate(surveyId));
+        return UploadFile(file, tag, fileStorageProperties);
     }
 
     @PostMapping("/video")
     @Secured(AVC_SURVEY_WRITE)
-    public UploadFileResponse uploadVideo(@RequestParam("file") MultipartFile file, @RequestParam("tag") String tag) {
-        if (avcDataService.checkValidFolderTag(tag)) return UploadFile(file, tag, fileStorageProperties);
-        else throw new FileStorageException("Either survey has expired or tag is wrong");
+    public UploadFileResponse uploadVideo(@RequestParam("file") MultipartFile file, @RequestParam("surveyId") Long surveyId) {
+        String tag = avcDataService.surveyFolder(LongObfuscator.INSTANCE.unobfuscate(surveyId));
+        return UploadFile(file, tag, fileStorageProperties);
     }
 
     @PostMapping("/event")

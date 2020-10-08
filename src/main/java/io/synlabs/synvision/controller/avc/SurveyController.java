@@ -2,6 +2,7 @@ package io.synlabs.synvision.controller.avc;
 
 import io.synlabs.synvision.auth.SynvisionAuth;
 import io.synlabs.synvision.service.avc.SurveyService;
+import io.synlabs.synvision.util.LongObfuscator;
 import io.synlabs.synvision.views.avc.SurveyRequest;
 import io.synlabs.synvision.views.avc.SurveyResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class SurveyController {
     @DeleteMapping
     @Secured(SynvisionAuth.Privileges.AVC_SURVEY_WRITE)
     public void deleteSurvey(@RequestParam Long surveyId) {
-        surveyService.deleteSurvey(surveyId);
+        surveyService.deleteSurvey(LongObfuscator.INSTANCE.unobfuscate(surveyId));
     }
 
     @GetMapping("/duplicates")
